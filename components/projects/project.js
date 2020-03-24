@@ -1,7 +1,6 @@
 import theme from "../../themes/dark.js";
 
 const Project = ({ url, name, badge, desc }) => {
-  console.log(url, name, badge, desc);
   return (
     <a href={url} className="card" aria-label={name}>
       <span className="header">

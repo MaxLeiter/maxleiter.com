@@ -12,5 +12,6 @@ tasks:
       cd ${project}
       yarn
   - test: |
+      cd ${project}
       yarn prettier
       yarn build
