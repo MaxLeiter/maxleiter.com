@@ -1,10 +1,10 @@
-import theme from '../themes/dark'
-import Icons from '../components/icons'
-import Visit from './external-link.svg'
-import Projects from '../components/projects'
+import theme from "../themes/dark";
+import Icons from "../components/icons";
+import Visit from "./external-link.svg";
+import Projects from "../components/projects";
 
-import Head from 'next/head'
-import Link from 'next/link'
+import Head from "next/head";
+import Link from "next/link";
 
 const Home = () => (
   <div className="container">
@@ -14,16 +14,19 @@ const Home = () => (
     </Head>
 
     <main>
-      <h1 className="title section">
-        Max Leiter
-      </h1>
+      <h1 className="title section">Max Leiter</h1>
 
-      <p className="description section">
-        Full-stack developer and student
-      </p>
+      <p className="description section">Full-stack developer and student</p>
 
       <p className="work section">
-        Currently building at <a target="_blank" href="https://zeit.co">ZEIT</a> and <a target="_blank" href="https://www.uscannenbergmedia.com/">Annenberg Media</a>
+        Currently building at{" "}
+        <a target="_blank" href="https://zeit.co">
+          ZEIT
+        </a>{" "}
+        and{" "}
+        <a target="_blank" href="https://www.uscannenbergmedia.com/">
+          Annenberg Media
+        </a>
       </p>
 
       <Icons />
@@ -31,7 +34,9 @@ const Home = () => (
       <Projects />
     </main>
     <footer>
-      <a href="https://github.com/MaxLeiter" alt="Source for this page">This site on GitHub</a>
+      <a href="https://github.com/MaxLeiter" alt="Source for this page">
+        This site on GitHub
+      </a>
     </footer>
     <style jsx>{`
       .container {
@@ -55,7 +60,7 @@ const Home = () => (
       a {
         color: ${theme.colors.link};
         text-decoraton: underline;
-        transition: .5s;
+        transition: 0.5s;
       }
 
       a:hover,
@@ -113,7 +118,8 @@ const Home = () => (
       body {
         padding: 0;
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue,
+          sans-serif;
         color: ${theme.colors.text};
         background-color: ${theme.colors.background};
       }
@@ -123,6 +129,6 @@ const Home = () => (
       }
     `}</style>
   </div>
-)
+);
 
-export default Home
+export default Home;
