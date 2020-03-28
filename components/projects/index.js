@@ -9,7 +9,7 @@ const Projects = () => {
       desc: "Patched, compiled, and packaged X11 for jailbroken iOS devices.",
     },
     {
-      url: "https://maxleiter.com/jsonTree",
+      url: "https://maxleiter.github.io/jsonTree/",
       name: "jsonTree",
       badge: "Creator",
       desc: "A 2kb JavaScript library for generating HTML trees from JSON.",

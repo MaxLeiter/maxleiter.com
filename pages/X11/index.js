@@ -45,17 +45,16 @@ const Home = () => (
 
       <img
         className="image section"
-        src="https://maxleiter.com/X11/front.png"
+        src="/x11.png"
         alt="running on device"
         async="on"
       />
       <i>
-        Above: adie (text editor), glxgears (GL demo), xterm (terminal
-        emulator), fluxbox (window manager), compton (compositor), PathFinder
-        (files).
+        Above: glxgears (GL demo), xterm (terminal
+        emulator), fluxbox (window manager), compton (compositor)
       </i>
 
-      <a href="./onipad.jpg" className="section">
+      <a href="/onipad.jpg" className="section">
         Image of programs running on device
       </a>
       <h2 className="section"> How it works </h2>
