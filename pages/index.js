@@ -20,8 +20,8 @@ const Home = () => (
 
       <p className="work section">
         Currently building at{" "}
-        <a target="_blank" href="https://zeit.co">
-          ZEIT
+        <a target="_blank" href="https://vercel.com">
+          Vercel
         </a>{" "}
         and{" "}
         <a target="_blank" href="https://www.uscannenbergmedia.com/">
