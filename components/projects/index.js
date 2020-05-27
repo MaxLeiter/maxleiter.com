@@ -15,7 +15,7 @@ const Projects = () => {
       desc: "A 2kb JavaScript library for generating HTML trees from JSON.",
     },
     {
-      url: "https://uscannenbergmedia.com",
+      url: "https://www.uscannenbergmedia.com",
       name: "Annie",
       badge: "Developer",
       desc:
