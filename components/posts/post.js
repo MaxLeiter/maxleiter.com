@@ -5,7 +5,7 @@ const Post = ({ title, date, children }) => {
     return (
         <Page title={title}>
             <Heading title={title} date={date} />
-           {children}
+            {children}
         </Page>)
 }
 

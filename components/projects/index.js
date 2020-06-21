@@ -45,7 +45,7 @@ const Projects = () => {
   ];
 
   return (
-    <div className="grid section" key={e.url}>
+    <div className="grid section">
       {data.map((e) => (
         <Project url={e.url} key={e.url} name={e.name} badge={e.badge} desc={e.desc} />
       ))}

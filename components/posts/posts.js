@@ -38,6 +38,12 @@ const Posts = ({ posts }) => {
 				  }
 				}
             `}</style>
+
+            <style jsx global>{`
+                p {
+                    font-size: 18px;
+                }
+            `}</style>
             </ul>
     )
 }
