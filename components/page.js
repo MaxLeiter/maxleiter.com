@@ -41,7 +41,7 @@ const Page = ({ children, title }) => (
             display: flex;
             flex-direction: row;
             align-self: center;
-            justify-content: center;
+            align-items: center;
         }
 
         @media (max-width: 700px) {

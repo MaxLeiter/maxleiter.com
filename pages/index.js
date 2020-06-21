@@ -2,7 +2,7 @@ import theme from "../themes/dark";
 import Icons from "../components/icons";
 import Visit from "./external-link.svg";
 import Projects from "../components/projects";
-import PostsList from '../components/posts';
+import PostsList from '../components/posts/posts';
 import Page from "../components/page";
 
 import { posts } from "../lib/data/posts";
