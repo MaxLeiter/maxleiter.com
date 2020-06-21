@@ -45,8 +45,9 @@ const Page = ({ children, title }) => (
         }
 
         @media (max-width: 700px) {
-            footer {
+            main {
                 width: 80%;
+                margin: 0 auto;
             }
         }
         `}</style>

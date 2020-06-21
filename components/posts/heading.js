@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const Heading = ({ title, date }) => (
-    <div>
+    <div className="container">
         <p>
             <Link href="/">
                 <a>Back to Home</a>
@@ -25,7 +25,15 @@ const Heading = ({ title, date }) => (
                 justify-content: space-between;
                 align-items: center;
                 text-align: center;
-            } 
+            }
+
+            @media (max-width: 700px) {
+				div .heading {
+                   display: flex;
+                   flex-direction: column;
+                }
+			}
+
         `}</style>
     </div>
 );
