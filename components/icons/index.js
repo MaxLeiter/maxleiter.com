@@ -9,6 +9,7 @@ const Icons = ({}) => {
     <span>
       <a
         target="_blank"
+        rel="noreferrer"
         className="icon"
         href="https://github.com/MaxLeiter"
         aria-label="Github"
@@ -17,6 +18,7 @@ const Icons = ({}) => {
       </a>
       <a
         target="_blank"
+        rel="noreferrer"
         className="icon"
         href="mailto:maxwell.leiter@gmail.com"
         aria-label="Email"
@@ -25,6 +27,7 @@ const Icons = ({}) => {
       </a>
       <a
         target="_blank"
+        rel="noreferrer"
         className="icon"
         href="https://demo.thelounge.chat/?nick=Hello_Max&join=maxleiter"
         aria-label="IRC"
@@ -33,6 +36,7 @@ const Icons = ({}) => {
       </a>
       <a
         target="_blank"
+        rel="noreferrer"
         className="icon"
         href="https://linkedin.com/in/MaxLeiter"
         aria-label="LinkedIn"

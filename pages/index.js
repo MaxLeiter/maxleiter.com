@@ -1,6 +1,5 @@
 import theme from "../themes/dark";
 import Icons from "../components/icons";
-import Visit from "./external-link.svg";
 import Projects from "../components/projects";
 import PostsList from '../components/posts/posts';
 import Page from "../components/page";
@@ -26,11 +25,11 @@ const Home = (props) => (
 
       <p className="work section">
         Currently building at{" "}
-        <a target="_blank" href="https://vercel.com">
+        <a target="_blank" rel="noreferrer" href="https://vercel.com">
           Vercel
         </a>{" "}
         and{" "}
-        <a target="_blank" href="https://www.uscannenbergmedia.com/">
+        <a target="_blank" rel="noreferrer" href="https://www.uscannenbergmedia.com/">
           Annenberg Media
         </a>
         <Icons />
