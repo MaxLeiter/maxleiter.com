@@ -24,7 +24,8 @@ const Project = ({ url, name, badge, desc }) => {
           .card {
             margin: 1rem;
             flex-basis: 45%;
-            padding: 20px;
+            align-self: stretch;
+            padding: 1.4rem;
             color: inherit;
             text-decoration: none;
             border: 1px solid #eaeaea;

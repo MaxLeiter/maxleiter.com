@@ -22,13 +22,21 @@ const Posts = ({ posts }) => {
                 }
 
                 ul li {
-                    padding: 0px 1.4rem;
+                    padding-left: 0px 1.4rem;
                     transition: .5s;
                 }
 
                 ul li a {
                     margin-left: 5%;
                 }
+
+                @media (max-width: 700px) {
+				  ul {
+				    width: 80%;
+                    flex-direction: column;
+                    margin: auto auto;
+				  }
+				}
             `}</style>
             </ul>
     )

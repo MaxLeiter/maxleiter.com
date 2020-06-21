@@ -36,9 +36,9 @@ const Home = (props) => (
         <Icons />
       </p>
 
-
-      <Projects />
-
+      <div style={{alignSelf: 'center'}}>
+        <Projects />
+      </div>
       <h2 style={{alignSelf: 'center'}}> Posts and Ramblings </h2>
       <PostsList posts={props.posts} />
     <style jsx>{`

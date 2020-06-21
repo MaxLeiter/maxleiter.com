@@ -63,7 +63,8 @@ const Projects = () => {
 				@media (max-width: 700px) {
 				  .grid {
 				    width: 80%;
-				    flex-direction: column;
+            flex-direction: column;
+            margin: 0 auto;
 				  }
 				}
 			`}
