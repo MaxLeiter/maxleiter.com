@@ -1,6 +1,6 @@
 export *  from './2020/welcome';
 import { posts } from "../../lib/data/posts";
-import PostList from "../../components/posts";
+import PostList from "../../components/posts/posts";
 
 export function getStaticProps() {
     return {
