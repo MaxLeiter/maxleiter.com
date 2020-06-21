@@ -5,7 +5,7 @@ const Project = ({ url, name, badge, desc }) => {
     <a href={url} className="card" aria-label={name}>
       <span className="header">
         {" "}
-        <h3>{name}</h3> <h2 className="badge">{badge}</h2>{" "}
+        <h2>{name}</h2> <h3 className="badge">{badge}</h3>{" "}
       </span>
       <p>{desc}</p>
 
@@ -40,7 +40,7 @@ const Project = ({ url, name, badge, desc }) => {
             border-color: ${theme.colors.linkHover};
           }
 
-          .card h3 {
+          .card h2 {
             margin: 0 0 1rem 0;
             font-size: 1.5rem;
           }
