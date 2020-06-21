@@ -29,7 +29,6 @@ const Page = ({ children, title }) => (
             display: flex;
             flex-direction: column;
             max-width: 750px;
-            width: 100%;
             align-self: center;
         }
 
@@ -46,7 +45,7 @@ const Page = ({ children, title }) => (
 
         @media (max-width: 700px) {
             main {
-                width: 80%;
+                width: 95%;
                 margin: 0 auto;
             }
         }
