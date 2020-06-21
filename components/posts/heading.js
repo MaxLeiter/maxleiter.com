@@ -4,7 +4,7 @@ const Heading = ({ title, date }) => (
     <div className="container">
         <p>
             <Link href="/">
-                <a>Back to Home</a>
+                <a>&#171; Back to Home</a>
             </Link>
         </p>
         <span className="heading">

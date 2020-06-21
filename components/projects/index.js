@@ -45,9 +45,9 @@ const Projects = () => {
   ];
 
   return (
-    <div className="grid section">
+    <div className="grid section" key={e.url}>
       {data.map((e) => (
-        <Project url={e.url} name={e.name} badge={e.badge} desc={e.desc} />
+        <Project url={e.url} key={e.url} name={e.name} badge={e.badge} desc={e.desc} />
       ))}
       <style jsx>
         {`
