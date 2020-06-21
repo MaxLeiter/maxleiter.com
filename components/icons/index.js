@@ -6,7 +6,7 @@ import theme from "../../themes/dark.js";
 
 const Icons = ({}) => {
   return (
-    <p>
+    <span>
       <a
         target="_blank"
         className="icon"
@@ -41,6 +41,11 @@ const Icons = ({}) => {
       </a>
 
       <style jsx>{`
+        span {
+          margin: ${theme.spacing.gap} ${theme.spacing.halfGap}  0px 0px;
+          display: block;
+          width: 100%;
+        }
         .icon {
           color: ${theme.colors.link};
           transition: 1s;
@@ -52,7 +57,7 @@ const Icons = ({}) => {
           color: ${theme.colors.linkHover};
         }
       `}</style>
-    </p>
+    </span>
   );
 };
 

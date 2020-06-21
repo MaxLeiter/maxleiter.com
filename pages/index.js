@@ -2,18 +2,24 @@ import theme from "../themes/dark";
 import Icons from "../components/icons";
 import Visit from "./external-link.svg";
 import Projects from "../components/projects";
+import PostsList from '../components/posts';
+import Page from "../components/page";
 
-import Head from "next/head";
-import Link from "next/link";
+import { posts } from "../lib/data/posts";
 
-const Home = () => (
-  <div className="container">
-    <Head>
-      <title>Max Leiter</title>
-      <link rel="icon" href="/favicon.ico" />
-    </Head>
+export function getStaticProps() {
+  return {
+    props: {
+      posts: posts.map(post => ({
+        ...post,
+        url: `posts/${new Date(post.date).getFullYear()}/${post.id}`,
+      })),
+    },
+  };
+}
 
-    <main>
+const Home = (props) => (
+  <Page>
       <h1 className="title section">Max Leiter</h1>
 
       <p className="description section">Full-stack developer and student</p>
@@ -27,48 +33,15 @@ const Home = () => (
         <a target="_blank" href="https://www.uscannenbergmedia.com/">
           Annenberg Media
         </a>
+        <Icons />
       </p>
 
-      <Icons />
 
       <Projects />
-    </main>
-    <footer>
-      <a href="https://github.com/MaxLeiter" alt="Source for this page">
-        This site on GitHub
-      </a>
-    </footer>
+
+      <h2 style={{alignSelf: 'center'}}> Posts and Ramblings </h2>
+      <PostsList posts={props.posts} />
     <style jsx>{`
-      .container {
-        min-height: 100vh;
-        padding: 0 0.5rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-
-      main {
-        padding: ${theme.spacing.gap} 0;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-
-      a {
-        color: ${theme.colors.link};
-        text-decoraton: underline;
-        transition: 0.5s;
-      }
-
-      a:hover,
-      a:focus,
-      a:active {
-        color: ${theme.colors.linkHover};
-      }
-
       .title {
         margin: 0;
         line-height: 1.15;
@@ -85,6 +58,7 @@ const Home = () => (
       .work,
       .title,
       .description {
+        align-self: center;
         text-align: center;
       }
 
@@ -92,43 +66,13 @@ const Home = () => (
         margin: ${theme.spacing.qtrGap} 0;
       }
 
-      footer {
-        max-width: 750px;
-        width: 100%;
-        height: 50px;
-        border-top: 1px solid ${theme.colors.text};
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
       @media (max-width: 700px) {
-        footer {
-          width: 80%;
-        }
-
         .description {
           width: 60%;
         }
       }
     `}</style>
-
-    <style jsx global>{`
-      html,
-      body {
-        padding: 0;
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue,
-          sans-serif;
-        color: ${theme.colors.text};
-        background-color: ${theme.colors.background};
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-    `}</style>
-  </div>
+  </Page>
 );
 
 export default Home;
