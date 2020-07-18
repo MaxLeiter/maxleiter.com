@@ -1,7 +1,8 @@
 import Github from "./github.svg";
-import Hash from "./hash.svg";
 import LinkedIn from "./linkedin.svg";
 import Send from "./send.svg";
+import Twitter from "./twitter.svg";
+
 import theme from "../../themes/dark.js";
 
 const Icons = ({}) => {
@@ -29,10 +30,10 @@ const Icons = ({}) => {
         target="_blank"
         rel="noreferrer"
         className="icon"
-        href="https://demo.thelounge.chat/?nick=Hello_Max&join=maxleiter"
-        aria-label="IRC"
+        href="https://twitter.com/max_leiter"
+        aria-label="Twitter"
       >
-        <Hash />
+        <Twitter />
       </a>
       <a
         target="_blank"

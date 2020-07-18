@@ -21,16 +21,12 @@ const Home = (props) => (
   <Page>
       <h1 className="title section">Max Leiter</h1>
 
-      <p className="description section">Full-stack developer and student</p>
+      <p className="description section">Full-stack developer and students</p>
 
       <p className="work section">
         Currently building at{" "}
         <a target="_blank" rel="noreferrer" href="https://vercel.com">
           Vercel
-        </a>{" "}
-        and{" "}
-        <a target="_blank" rel="noreferrer" href="https://www.uscannenbergmedia.com/">
-          Annenberg Media
         </a>
         <Icons />
       </p>

@@ -1,30 +1,31 @@
 {
-   "name":"maxleiter.com",
-   "version":"0.1.0",
-   "private":true,
-   "scripts":{
-      "dev":"next dev",
-      "build":"next build",
-      "start":"next start",
-      "prettier":"./node_modules/.bin/prettier --write components/**/*.js pages/**/*.js"
+   "name": "maxleiter.com",
+   "version": "0.1.0",
+   "private": true,
+   "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "prettier": "./node_modules/.bin/prettier --write components/**/*.js pages/**/*.js"
    },
-   "dependencies":{
-      "@svgr/webpack":"^5.2.0",
-      "next":"9.3.2",
-      "react":"16.13.0",
-      "react-dom":"16.13.0"
+   "dependencies": {
+      "@svgr/webpack": "^5.2.0",
+      "next": "9.3.2",
+      "react": "16.13.0",
+      "react-dom": "16.13.0",
+      "vercel": "^19.1.1"
    },
-   "devDependencies":{
-      "husky":"^4.2.3",
-      "lint-staged":"^10.0.9",
-      "prettier":"2.0.2"
+   "devDependencies": {
+      "husky": "^4.2.3",
+      "lint-staged": "^10.0.9",
+      "prettier": "2.0.2"
    },
-   "husky":{
-      "hooks":{
-         "pre-commit":"lint-staged"
+   "husky": {
+      "hooks": {
+         "pre-commit": "lint-staged"
       }
    },
-   "lint-staged":{
-       "components/**/*.js pages/**/*.js pages/**/*.js themes/**/*.css": "prettier --write"
-    }
+   "lint-staged": {
+      "components/**/*.js pages/**/*.js pages/**/*.js themes/**/*.css": "prettier --write"
+   }
 }
