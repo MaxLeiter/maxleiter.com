@@ -21,7 +21,7 @@ const Home = (props) => (
   <Page>
       <h1 className="title section">Max Leiter</h1>
 
-      <p className="description section">Full-stack developer and students</p>
+      <p className="description section">Full-stack developer and student</p>
 
       <p className="work section">
         Currently building at{" "}
