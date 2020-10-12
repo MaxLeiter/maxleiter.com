@@ -9,7 +9,7 @@
       "prettier": "./node_modules/.bin/prettier --write components/**/*.js pages/**/*.js"
    },
    "dependencies": {
-      "@svgr/webpack": "^5.2.0",
+      "@svgr/webpack": "^5.4.0",
       "next": "9.3.2",
       "react": "16.13.0",
       "react-dom": "16.13.0",
