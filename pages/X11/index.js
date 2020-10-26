@@ -67,7 +67,7 @@ const Home = () => (
 
       <h2 className="section"> Why </h2>
       <p className="section">
-        Because I can. Also, I want to turn my iPad into a proper development
+        Largely just because I can. Also, I want to turn my iPad into a proper development
         environment, and a windowing system helps with that. It's a powerful
         machine with a Unix-like OS, so X11 seemed like a reasonable project.
         X11 allows running arbirtary applications like browsers and IDEs,
