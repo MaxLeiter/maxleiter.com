@@ -6,7 +6,7 @@ const Projects = () => {
       url: "/X11",
       name: "X11 on iOS",
       badge: "Creator",
-      desc: "Patched, compiled, and packaged X11 for jailbroken iOS devices.",
+      desc: "Patched, compiled, and packaged X11 for iOS devices.",
     },
     {
       url: "https://maxleiter.github.io/jsonTree/",

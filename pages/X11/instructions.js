@@ -9,7 +9,7 @@ const Instructions = () => (
       <link rel="icon" href="/favicon.ico" />
       <meta
         name="description"
-        content="Instructions for building X11 and Xorg on jailbroken iOS. "
+        content="Instructions for building X11 and Xorg on iOS. "
       />
       <meta
         name="keywords"
