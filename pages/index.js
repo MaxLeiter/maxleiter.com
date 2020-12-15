@@ -25,7 +25,7 @@ const Home = (props) => (
 
       <p className="work section">
         Currently building at{" "}
-        <a target="_blank" rel="noreferrer" href="https://uscannenbergmedia.com">
+        <a target="_blank" rel="noreferrer" href="https://www.uscannenbergmedia.com">
           Annenberg Media
         </a>
         {' '} and {' '}
