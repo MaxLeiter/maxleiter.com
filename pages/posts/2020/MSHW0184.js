@@ -13,7 +13,7 @@ export const meta = {
 const MSHW0184 = () => {
     return (
         <Post title={meta.title} date={meta.date}>
-            <p>A couple of a week ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale.
+            <p>A couple of a weeks ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale.
              I love making devices run software they shouldn't, so I got to work dual-booting Linux on it. 
              To my surprise, almost everything worked with the default Fedora 33 kernel, not including the touchscreen, 
              the ambient light sensor, and the camera. After compiling and loading the great <a href="https://github.com/linux-surface/linux-surface">linux-surface</a> kernel 
