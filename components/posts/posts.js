@@ -1,42 +1,21 @@
 import Link from "next/link";
-import theme from "../../themes/dark";
-import Page from '../page';
 
 const Posts = ({ posts }) => {
     return (
-            <ul>
+            <table>
                 {posts.map(post => (
-                    <li key={post.id}>
-                        <span>{post.date}</span>
-                        <Link href={post.url}>
+                    <tr key={post.id}>
+                        <td className="title">{post.date}</td>
+                        <td className="url"><Link href={post.url}>
                             <a>{post.title}</a>
                         </Link>
-                    </li>
+                        </td>
+                    </tr>
                 ))}
             <style jsx>{`
-                ul {
-                    width: 100%;
-                    list-style-type: none;
-                    font-size: 18px;
-                    padding: 0;
-                }
-
-                ul li {
-                    padding-left: 0px 1.4rem;
-                    transition: .5s;
-                }
-
-                ul li a {
-                    margin-left: 5%;
-                }
-
-                @media (max-width: 700px) {
-				  ul {
-				    width: 80%;
-                    flex-direction: column;
-                    margin: auto auto;
-				  }
-				}
+                    .title {
+                        width: 25%;
+                    }
             `}</style>
 
             <style jsx global>{`
@@ -44,7 +23,7 @@ const Posts = ({ posts }) => {
                     font-size: 18px;
                 }
             `}</style>
-            </ul>
+            </table>
     )
 }
 

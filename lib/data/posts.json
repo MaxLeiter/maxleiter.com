@@ -1,6 +1,11 @@
 {
   "posts": [
     {
+      "id": "mshw0184",
+      "date": "December 15, 2020",
+      "title": "Adding ambient light support to Linux and GNOME on the Surface Pro 7"
+    },
+    {
       "id": "welcome",
       "date": "June 20, 2020",
       "title": "A first post"

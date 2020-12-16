@@ -28,12 +28,12 @@ const Page = ({ children, title }) => (
             flex: 1;
             display: flex;
             flex-direction: column;
-            max-width: 700px;
+            max-width: 800px;
             align-self: center;
         }
 
         footer {
-            max-width: 700px;
+            max-width: 800px;
             width: 100%;
             height: 50px;
             border-top: 1px solid ${theme.colors.text};
