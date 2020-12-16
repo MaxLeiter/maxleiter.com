@@ -120,6 +120,7 @@ SUBSYSTEM=="iio", TEST=="in_intensity_clear_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="i
                     margin-left: 40px;
                     margin-bottom: 0;
                     margin-top: 0;
+                    overflow: scroll;
                 }
             `}</style>
         </Post>)
