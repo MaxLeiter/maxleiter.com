@@ -40,7 +40,7 @@ const MSHW0184 = () => {
                 </pre>
            </p>
             <p>
-                A few minutes later (well, probably closer to an hour after all the recompiling and testing) I had the following:
+                A few minutes later (well, probably closer to 30 minutes after compiling and testing the kernel on-device) I had the following, largely copied from other ACPI drivers:
                 <pre>
                     {`
 + static const struct acpi_device_id apds9960_acpi_match[] = {
