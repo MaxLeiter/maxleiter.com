@@ -7,7 +7,7 @@ export const meta = {
     publishedAt: "December 15, 2020",
     summary: "Adding ambient light support to Linux on the Surface Pro 7``",
     title: "Adding ambient light support to Linux and GNOME on the Surface Pro 7",
-    id: "mshw0184"
+    id: "MSHW0184"
 };
 
 const MSHW0184 = () => {
