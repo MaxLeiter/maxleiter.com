@@ -1,0 +1,108 @@
+---
+title: 	Adding ambient light support to Linux and GNOME
+description: A quick dive into Linux kernel drivers
+slug: MSHW018
+date: Dec 15, 2020
+og: true
+---
+
+A couple of a weeks ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale. I love making devices run software they shouldn't, so I got to work dual-booting Linux on it. To my surprise, almost everything worked with the default Fedora 33 kernel, not including the touchscreen, the ambient light sensor, and the camera. After compiling and loading the great [linux-surface](https://github.com/linux-surface/linux-surface) kernel the touchscreen started to work but I found a [GitHub issue](https://github.com/linux-surface/linux-surface/issues/121) someone had made detailing that the ambient light sensor (a MSHW0184) isn't detected. This normally wouldn't matter a lot, but I'd discovered that GNOME supported adjusting the screen brightness based on the ambient light through [iio-sensor-proxy](https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/).
+
+I knew nothing (and still know very little) about the Linux kernel or drivers, but this seemed like a great place to start. Luckily, GitHub user archseer discovered that the MSHW0184 registers align with the APDS9960 device, which already has an upstream kernel driver, and he mentioned all that should be needed is a small change to allow the driver to detect the new device.
+
+Here I realized I had to do some research into how the kernel loads drivers. I knew that drivers could either be statically built into the kernel, or built as kernel modules so they can be dynamically loaded when they're needed. But how does the kernel know when to load specific drivers for certain hardware? You register the ID with a matching table.
+
+Initially, I tried adding the MSHW0184 device ID to the existing match table in the APDS9960 driver for the i2c protocol. This consisted of the following one-line change:
+
+```c
+static const struct i2c_device_id apds9960_id[] = {
+                    { "apds9960", 0 },
++                   { "MSHW0184, 0 }
+                    {}
+}
+```
+
+However, this didn't work and I realized the conventions seemed a little odd: no other i2c device ids in other drivers contained capitals or were ambient light sensing devices. Thankfully, someone on IRC helped me out:
+
+```
+00:53 &#60;djrscally&#62; That's an acpi ID 
+00:53 &#60;djrscally&#62; You probably need to add an ACPI match table
+```
+
+A few minutes later (well, probably closer to 30 minutes after compiling and testing the kernel on-device) I had the following, largely copied from other ACPI drivers:
+
+```c
+
++ static const struct acpi_device_id apds9960_acpi_match[] = {
+    +	{ "MSHW0184" },
+    +	{ }
+    +};
++ MODULE_DEVICE_TABLE(acpi, apds9960_acpi_match);
+
+  static struct i2c_driver apds9960_driver = {
+    .driver = {
+        .name	= APDS9960_DRV_NAME,
+        .of_match_table = apds9960_of_match,
+        .pm	= &apds9960_pm_ops,
++       .acpi_match_table = apds9960_acpi_match,
+    },
+    .probe		= apds9960_probe,
+    .remove		= apds9960_remove
+
+```
+
+I recompiled the kernel module, rebooted, and verified the driver was matched with lsmod and ensured the driver paired with the device by navigating to the IIO device (finding the path to the device took a lot more work than I'd like to admit) and reading in the `in_intensity_clear_raw` file:
+
+```sh
+ max@surface ~> cat sys/bus/iio/devices/iio:device0/in_intensity_clear_raw
+    33
+```
+
+The joy I felt seeing that file exist and the output was monumental. I had something to work with!
+
+I wasn't done yet though — GNOME still didn't show me an option to automatically adjust the screen brightness. After someone else verified they also had the device loaded with the modified driver but not in GNOME I determined the problem was somewhere in iio-sensor-proxy. I cloned the iio-sensor-proxy repository and started digging.
+
+The first thing I always do when I clone a new repo is expand and quickly look over every folder (assuming the repo is a reasonable size) and that served me well here. I found the following file `80-iio-sensor-proxy.rules`:
+
+```yml
+# iio-sensor-proxy
+# IIO sensor to D-Bus proxy
+
+ACTION=="remove", GOTO="iio_sensor_proxy_end"
+
+# Set the sensor type for all the types we recognise
+SUBSYSTEM=="hwmon", TEST=="light", ENV{IIO_SENSOR_PROXY_TYPE}+="hwmon-als"
+SUBSYSTEM=="iio", TEST=="in_accel_x_raw", TEST=="in_accel_y_raw", TEST=="in_accel_z_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-accel"
+SUBSYSTEM=="iio", TEST=="scan_elements/in_accel_x_en", TEST=="scan_elements/in_accel_y_en", TEST=="scan_elements/in_accel_z_en", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-buffer-accel"
+SUBSYSTEM=="iio", TEST=="scan_elements/in_rot_from_north_magnetic_tilt_comp_en", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-buffer-compass"
+SUBSYSTEM=="iio", TEST=="in_illuminance_input", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-als"
+SUBSYSTEM=="iio", TEST=="in_illuminance0_input", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-als"
+SUBSYSTEM=="iio", TEST=="in_illuminance_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-als"
+SUBSYSTEM=="iio", TEST=="scan_elements/in_intensity_both_en", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-buffer-als"
+SUBSYSTEM=="iio", TEST=="in_proximity_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-proximity"
+SUBSYSTEM=="input", ENV{ID_INPUT_ACCELEROMETER}=="1", ENV{IIO_SENSOR_PROXY_TYPE}+="input-accel"
+
+ENV{IIO_SENSOR_PROXY_TYPE}=="", GOTO="iio_sensor_proxy_end"
+
+# We got here because we have a sensor type, which means we need the service
+TAG+="systemd", ENV{SYSTEMD_WANTS}+="iio-sensor-proxy.service"
+```
+
+As you might be able to figure out, each TEST file is checked for existence and is used to determine whether or not the device should be used by iio-sensor-proxy.
+
+I hadn't seen any of the seemingly relevant files, in_illuminance_*, so I added my own line:
+
+```yml
+SUBSYSTEM=="iio", TEST=="in_intensity_clear_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-als"
+```
+
+After another small iio-sensor-proxy change and running again the device was now discovered by iio-sensor-proxy! The full merge request can be seen [here](https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/-/merge_requests/319). The option appeared in GNOME and I now have automatic adjusting brightness!
+
+It kind of sucks though and isn't very consistent. As it turns out, intensity_clear != illuminance, which is what most programs expect from ambient light sensors, so I need to figure out and perform some math in iio-sensor-proxy to translate the RGBC values to lux.
+
+If you've made it this far (or are here to get the code yourself), the modified driver (with basic proximity sensing support too) can be found here: https://github.com/maxleiter/MSHW0184.
+
+Major thanks to everyone that helped me in the ##linux-surface IRC channel. It was great to finally get a little low-level with Linux. 
+
+---
+*This post was originally written on the old maxleiter.com, and formatting has slightly adjusted

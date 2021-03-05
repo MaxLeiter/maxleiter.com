@@ -1,77 +1,63 @@
-import theme from "../themes/dark";
-import Icons from "../components/icons";
-import Projects from "../components/projects";
-import PostsList from '../components/posts/posts';
-import Page from "../components/page";
+import Page from '@components/page'
+import Link from '@components/link'
+import PostsList from '@components/posts-list'
+import Socials from '@components/socials'
+import ProjectList from '@components/projects'
+import getPosts from '@lib/get-posts'
+import getProjects from '@lib/projects'
 
-import { posts } from "../lib/data/posts";
+const PROJECT_COUNT = 4
 
-export function getStaticProps() {
-  return {
-    props: {
-      posts: posts.map(post => ({
-        ...post,
-        url: `posts/${new Date(post.date).getFullYear()}/${post.id}`,
-      })),
-    },
-  };
+const About = ({ posts, projects }) => {
+  return (
+    <Page header={false} title="" description="Max Leiter's personal website and projects.">
+      <article>
+        <h1 style={{margin: 0, color: 'var(--link)', display: 'inline-block'}}>Max Leiter</h1>
+        <h2 style={{margin: 0, lineHeight: '2.7rem'}}>
+          Full-stack developer and student
+        </h2>
+        <Socials />
+        <p>
+          I've previously worked at{' '}
+          <Link underline href="https://vercel.com" external>
+            Vercel
+          </Link>{' '}
+          and{' '}
+          <Link underline href="https://www.uscannenbergmedia.com" external>
+            Annenberg Media
+          </Link>. This summer, I'll be working at{' '}
+          <Link underline href="https://blend.com" external>
+            Blend
+          </Link>{' '}
+          to streamline banking. I'm interested in politics, tech, and building a fast, accessible web.
+        </p>
+
+        <h3>My projects</h3>
+        <ProjectList count={PROJECT_COUNT} projects={projects}/>
+        <h3>My posts</h3>
+        <PostsList posts={posts} />
+        <p>
+          <Link href="/about">About this site</Link>
+        </p>
+      </article>
+    </Page>
+  )
 }
 
-const Home = (props) => (
-  <Page>
-      <h1 className="title section">Max Leiter</h1>
+export const getStaticProps = async () => {
+  const posts = getPosts()
+  const projects = await getProjects()
 
-      <p className="description section">Full-stack developer and student</p>
+  return {
+    props: {
+      posts,
+      projects
+    }
+  }
+}
 
-      <p className="work section">
-        Currently building at{" "}
-        <a target="_blank" rel="noreferrer" href="https://www.uscannenbergmedia.com">
-          Annenberg Media
-        </a>
-        {' '} and {' '}
-        <a target="_blank" rel="noreferrer" href="https://hacksc.com">
-          HackSC
-        </a>
-        <Icons />
-      </p>
+export const config = {
+  unstable_runtimeJS: false
+}
 
-      <div style={{alignSelf: 'center'}}>
-        <Projects />
-      </div>
-      <h2 style={{alignSelf: 'center'}}> Posts and Ramblings </h2>
-      <PostsList posts={props.posts} />
-    <style jsx>{`
-      .title {
-        margin: 0;
-        line-height: 1.15;
-        font-size: 2.5rem;
-        color: ${theme.colors.header};
-      }
-
-      .description,
-      .work {
-        width: 80%;
-        font-size: 18px;
-      }
-
-      .work,
-      .title,
-      .description {
-        align-self: center;
-        text-align: center;
-      }
-
-      .section {
-        margin: ${theme.spacing.qtrGap} 0;
-      }
-
-      @media (max-width: 700px) {
-        .description {
-          width: 60%;
-        }
-      }
-    `}</style>
-  </Page>
-);
-
-export default Home;
+export default About

@@ -1,0 +1,23 @@
+.icon {
+    display: inline-flex;
+    padding: 15px;
+    margin: -10px;
+    border-radius: var(--radius);
+    color: var(--fg);
+    transition: color var(--transition);
+}
+
+.icon:hover,
+.icon:focus-within {
+    outline: none;
+    color: var(--link);
+}
+
+.icon {
+    margin-right: var(--gap-half);
+}
+
+.socials {
+    display: inline-flex;
+    align-items: center;
+}

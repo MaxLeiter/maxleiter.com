@@ -1,0 +1,13 @@
+.wrapper {
+  margin: var(--gap-double) 0;
+}
+
+.stars {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+}
+
+.stars svg {
+  margin-left: 4px;
+}

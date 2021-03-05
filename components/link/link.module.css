@@ -1,0 +1,25 @@
+.reset {
+  outline: none;
+  color: var(--link);
+  text-decoration: none;
+}
+
+.gray {
+  color: var(--gray);
+}
+
+.gray:hover,
+.gray:focus {
+  color: var(--link);
+}
+
+.underline {
+  outline: none;
+  color: var(--link);
+  text-decoration: underline;
+}
+
+.underline:hover,
+.underline:focus {
+  color: var(--gray);
+}
