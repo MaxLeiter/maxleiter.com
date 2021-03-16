@@ -2,8 +2,9 @@ import Link from '@components/link'
 import { Star } from '@components/icons'
 import styles from './entry.module.css'
 
-const Entry = ({ href, title, description, role, stars = -1 }) => (
+const Entry = ({ href, title, description, role, stars = -1, years }) => (
   <li className={styles.wrapper}>
+      <div> <i>{years[0]} {years[1] ? '-' : ''} {years[1]}</i> </div>
       <Link underline href={href} external={true}>
           {title}
       </Link> &mdash; {role} {stars > 0 && <span className={styles.stars}>({stars} GitHub <Star size={12} />)</span>}

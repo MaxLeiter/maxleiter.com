@@ -11,3 +11,7 @@
 .stars svg {
   margin-left: 4px;
 }
+
+.wrapper i {
+  color: var(--gray-alpha);
+}
