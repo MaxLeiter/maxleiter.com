@@ -33,7 +33,7 @@ const About = ({ posts, projects }) => {
         </p>
 
         <h3>My projects</h3>
-        <ProjectList count={PROJECT_COUNT} projects={projects}/>
+        <ProjectList showYears={false} count={PROJECT_COUNT} projects={projects}/>
         <h3>My posts</h3>
         <PostsList posts={posts} />
         <p>
