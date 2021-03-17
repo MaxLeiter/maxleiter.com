@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import Parser, { Item } from 'rss-parser'
+import Parser from 'rss-parser'
 
 
 type Feed = {
