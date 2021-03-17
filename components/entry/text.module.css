@@ -12,6 +12,7 @@
   padding-bottom: var(--gap-double);
 }
 
+.date,
 .type {
   font-size: 1rem;
   line-height: 30px;
@@ -21,6 +22,7 @@
   color: var(--gray);
 }
 
+.date + div,
 .type + div {
   flex: 1;
 }
@@ -63,4 +65,8 @@
   .description {
     -webkit-line-clamp: 2;
   }
+}
+
+.date {
+  float: right;
 }
