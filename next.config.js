@@ -7,5 +7,14 @@ module.exports = {
   },
   future: {
     webpack5: true,
-  }
+  },
+  async redirects() {
+    return [
+      {
+        source: '/X11',
+        destination: '/blog/X11',
+        permanent: true,
+      },
+    ]
+  },
 }
