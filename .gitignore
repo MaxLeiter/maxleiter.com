@@ -8,6 +8,7 @@ dist/
 packages/
 yalc.lock
 .yalc
+.env.local
 .env
 
 .vercel

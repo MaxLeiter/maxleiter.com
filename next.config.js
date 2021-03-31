@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 module.exports = {
   typescript: {
     ignoreDevErrors: true
@@ -17,4 +19,7 @@ module.exports = {
       },
     ]
   },
+  env: {
+    NEXT_PUBLIC_rawAnalyticsFromFile: fs.readFileSync('./lib/analytics.js').toString()
+  }
 }
