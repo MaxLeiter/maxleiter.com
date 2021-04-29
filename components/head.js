@@ -56,7 +56,6 @@ const Head = ({
         href="/favicons/favicon-32x32.png"
         key="dynamic-favicon"
       />
-      <script type="text/javascript" dangerouslySetInnerHTML={{__html: process.env.NEXT_PUBLIC_rawAnalyticsFromFile}} />
 
       {children}
     </NextHead>

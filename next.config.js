@@ -18,8 +18,5 @@ module.exports = {
         permanent: true,
       },
     ]
-  },
-  env: {
-    NEXT_PUBLIC_rawAnalyticsFromFile: fs.readFileSync('./lib/analytics.js').toString()
   }
 }
