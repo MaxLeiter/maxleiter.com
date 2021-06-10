@@ -30,7 +30,7 @@
   --lighter-gray: #222;
   --lightest-gray: #1a1a1a;
   --article-color: #eaeaea;
-  --header-bg: rgba(18,18,18,0.5);
+  --header-bg: var(--bg);
   --gray-alpha: rgba(255, 255, 255, 0.5);
   --selection: rgba(255, 255, 255, 0.99);
   --link: #82A3C4;
@@ -213,7 +213,7 @@ th {
     --lighter-gray: #f5f5f5;
     --lightest-gray: #fafafa;
     --article-color: #212121;
-    --header-bg: rgba(255, 255, 255, 0.8);
+    --header-bg: var(--bg);
     --gray-alpha: rgba(19, 20, 21, 0.5);
     --selection: rgba(0, 0, 0, 0.99);
 

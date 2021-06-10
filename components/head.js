@@ -1,13 +1,12 @@
 import NextHead from 'next/head'
 
-const defaultOgImage =
-  ''
+const defaultOgImage = ''
 
 const Head = ({
   title = 'Max Leiter',
-  description = "Full-stack developer and student",
+  description = 'Full-stack developer and student',
   image = defaultOgImage,
-  children
+  children,
 }) => {
   return (
     <NextHead>

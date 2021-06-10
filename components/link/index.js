@@ -12,7 +12,9 @@ const Link = ({
   underline = true,
   ...props
 }) => {
-  const style = underline ? className + ` ${styles.underline}` : className + ` ${styles.reset}`
+  const style = underline
+    ? className + ` ${styles.underline}`
+    : className + ` ${styles.reset}`
 
   if (external) {
     return (
@@ -30,10 +32,7 @@ const Link = ({
 
   return (
     <>
-      <NextLink
-        href={href}
-        as={as}
-      >
+      <NextLink href={href} as={as}>
         <a className={style} {...props}>
           {children}
         </a>

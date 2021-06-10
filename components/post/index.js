@@ -22,7 +22,7 @@ const Post = ({
   description,
   date,
   previous,
-  next
+  next,
 }) => {
   return (
     <Page
@@ -45,7 +45,7 @@ const Post = ({
         dangerouslySetInnerHTML={{
           __html: `<span class="${styles.date}">${date}</span><h1 class="${
             styles.title
-          }">${escapeHtml(title)}</h1>${html}`
+          }">${escapeHtml(title)}</h1>${html}`,
         }}
       />
 

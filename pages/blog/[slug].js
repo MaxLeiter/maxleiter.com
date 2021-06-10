@@ -2,13 +2,13 @@ import Post from '@components/post'
 import getPosts from '@lib/get-posts'
 import renderMarkdown from '@lib/render-markdown'
 
-const PostPage = props => {
+const PostPage = (props) => {
   return <Post {...props} />
 }
 
 export const getStaticProps = ({ params: { slug } }) => {
   const posts = getPosts()
-  const postIndex = posts.findIndex(p => p.slug === slug)
+  const postIndex = posts.findIndex((p) => p.slug === slug)
   const post = posts[postIndex]
   const { body, ...rest } = post
 
@@ -17,15 +17,15 @@ export const getStaticProps = ({ params: { slug } }) => {
       previous: posts[postIndex + 1] || null,
       next: posts[postIndex - 1] || null,
       ...rest,
-      html: renderMarkdown(body)
-    }
+      html: renderMarkdown(body),
+    },
   }
 }
 
 export const getStaticPaths = () => {
   return {
-    paths: getPosts().map(p => `/blog/${p.slug}`),
-    fallback: false
+    paths: getPosts().map((p) => `/blog/${p.slug}`),
+    fallback: false,
   }
 }
 

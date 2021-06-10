@@ -1,8 +1,6 @@
-const fs = require('fs');
-
 module.exports = {
   typescript: {
-    ignoreDevErrors: true
+    ignoreDevErrors: true,
   },
   experimental: {
     stats: true,
@@ -18,5 +16,5 @@ module.exports = {
         permanent: true,
       },
     ]
-  }
+  },
 }

@@ -1,4 +1,4 @@
-const withIcon = icon => {
+const withIcon = (icon) => {
   const Icon = ({ size = 24, color = 'currentColor' }) => {
     return (
       <svg

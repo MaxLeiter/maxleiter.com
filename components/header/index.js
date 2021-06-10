@@ -27,7 +27,6 @@ const Header = ({ render, title, content }) => {
       </nav>
     )
   }
-
 }
 
 Header.displayName = 'Header'

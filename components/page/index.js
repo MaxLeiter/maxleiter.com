@@ -9,7 +9,7 @@ const Page = ({
   description,
   image,
   showHeaderTitle = true,
-  children
+  children,
 }) => {
   return (
     <div className={styles.wrapper}>

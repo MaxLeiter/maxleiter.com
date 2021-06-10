@@ -8,12 +8,14 @@ const Error = ({ status, posts }) => {
   return (
     <Page title={status || 'Error'}>
       <Head>
-        <title>404 —  Max Leiter</title>
+        <title>404 — Max Leiter</title>
       </Head>
 
       {status === 404 ? (
         <>
-          <h1 className={styles.first}>This is not the page you are looking for.</h1>
+          <h1 className={styles.first}>
+            This is not the page you are looking for.
+          </h1>
           <h2 className={styles.second}>Maybe it was one of these?</h2>
           <span className={styles.third}>
             <PostsList posts={posts} />

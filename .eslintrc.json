@@ -60,10 +60,7 @@
     }
   ],
   "globals": {
-    "VERSION": true,
-    "IMAGE_ASSETS_URL": true,
-    "VIDEO_ASSETS_URL": true,
-    "RAW_ASSETS_URL": true
+    "VERSION": true
   },
   "rules": {
     "array-callback-return": "warn",
