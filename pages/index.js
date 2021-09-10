@@ -34,7 +34,7 @@ const About = ({ posts, projects }) => {
           <Link underline href="https://www.uscannenbergmedia.com" external>
             Annenberg Media
           </Link>
-          . Next August, I'l be joining{' '}
+          . Next August, I'll be joining{' '}
           <Link underline href="https://blend.com" external>
             Blend
           </Link>{' '}
