@@ -34,11 +34,11 @@ const About = ({ posts, projects }) => {
           <Link underline href="https://www.uscannenbergmedia.com" external>
             Annenberg Media
           </Link>
-          . This summer, I'm working as a software intern at{' '}
+          . Next August, I'l be joining{' '}
           <Link underline href="https://blend.com" external>
             Blend
           </Link>{' '}
-          on automation. I'm interested in politics, tech, and building a fast,
+          as a software engineer on the quality team. I'm interested in politics, tech, and building a fast,
           accessible web.
         </p>
 
