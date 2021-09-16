@@ -23,7 +23,7 @@ const Projects = ({ count = -1, projects, showYears = true }) => {
       {count > 0 && count < projects.length && (
         <li>
           See the rest on{' '}
-          <Link style={{ margin: '0 auto' }} underline href="/projects">
+          <Link style={{ margin: '0 auto' }} href="/projects">
             {' '}
             this page
           </Link>

@@ -1,25 +1,11 @@
-.reset {
+.transition {
   outline: none;
   color: var(--link);
   text-decoration: none;
 }
 
-.gray {
-  color: var(--gray);
+.transition:hover {
+  transition: box-shadow 100ms ease 0s;
+  box-shadow: 0px 2px 0px var(--link);
 }
 
-.gray:hover,
-.gray:focus {
-  color: var(--link);
-}
-
-.underline {
-  outline: none;
-  color: var(--link);
-  text-decoration: underline;
-}
-
-.underline:hover,
-.underline:focus {
-  color: var(--gray);
-}

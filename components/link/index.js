@@ -9,12 +9,10 @@ const Link = ({
   as,
   children,
   className,
-  underline = true,
+  transition = true,
   ...props
 }) => {
-  const style = underline
-    ? className + ` ${styles.underline}`
-    : className + ` ${styles.reset}`
+  const style = transition ? styles.transition + ` ${className}` : className
 
   if (external) {
     return (

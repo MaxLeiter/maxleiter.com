@@ -11,18 +11,17 @@ const Entry = ({
   showYears = true,
 }) => (
   <li className={styles.wrapper}>
-    {showYears && (
-      <div>
-        {' '}
-        <i>
+    <div className={styles.split}>
+      <Link href={href} external={true}>
+        {title}
+      </Link>{' '}
+      &mdash; {role}
+      {showYears && (
+        <i style={{ float: 'right' }}>
           {years[0]} {years[1] ? '-' : ''} {years[1]}
-        </i>{' '}
-      </div>
-    )}
-    <Link underline href={href} external={true}>
-      {title}
-    </Link>{' '}
-    &mdash; {role}
+        </i>
+      )}
+    </div>
     {/* {stars > 0 && <span className={styles.stars}>({stars} GitHub <Star size={12} />)</span>} */}
     <div>{description}</div>
   </li>

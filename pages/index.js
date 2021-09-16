@@ -27,19 +27,19 @@ const About = ({ posts, projects }) => {
         <Socials />
         <p>
           I've previously worked at{' '}
-          <Link underline href="https://vercel.com" external>
+          <Link href="https://vercel.com" external>
             Vercel
           </Link>{' '}
           and{' '}
-          <Link underline href="https://www.uscannenbergmedia.com" external>
+          <Link href="https://www.uscannenbergmedia.com" external>
             Annenberg Media
           </Link>
           . Next August, I'll be joining{' '}
-          <Link underline href="https://blend.com" external>
+          <Link href="https://blend.com" external>
             Blend
           </Link>{' '}
-          as a software engineer on the quality team. I'm interested in politics, tech, and building a fast,
-          accessible web.
+          as a software engineer on the quality team. I'm interested in
+          politics, tech, and building a fast, accessible web.
         </p>
 
         <h3>My projects</h3>

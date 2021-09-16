@@ -16,10 +16,6 @@
   color: var(--link);
 }
 
-.icon {
-  margin-right: var(--gap-half);
-}
-
 .nav {
   z-index: 10;
   margin: var(--small-gap) auto var(--gap) auto;

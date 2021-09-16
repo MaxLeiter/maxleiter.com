@@ -12,7 +12,7 @@ const TextEntry = ({ title, description, type, comment, href, as, date }) => {
         external={!as}
         title={`${title}`}
         className={styles.link}
-        underline={false}
+        transition={false}
       >
         {date && (
           <div className={styles.date}>{date.toLocaleDateString('en-US')}</div>

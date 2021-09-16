@@ -33,7 +33,7 @@
   --header-bg: var(--bg);
   --gray-alpha: rgba(255, 255, 255, 0.5);
   --selection: rgba(255, 255, 255, 0.99);
-  --link: #82A3C4;
+  --link: #579dff;
 
   /* Syntax Highlighting */
   --token: #999;
@@ -61,7 +61,7 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-size: 14px;
+  font-size: calc(1rem);
   background: var(--bg);
   color: var(--fg);
   text-rendering: optimizeLegibility;
@@ -141,14 +141,6 @@ a.reset {
   color: var(--fg);
   text-decoration: none;
   transition: background-color var(--transition), color var(--transition);
-}
-
-p a:hover,
-p a:focus,
-p a:active,
-a.reset:hover,
-a.reset:focus {
-  color: var(--gray);
 }
 
 pre,
