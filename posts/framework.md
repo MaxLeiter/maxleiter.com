@@ -1,6 +1,6 @@
 ---
 title: Impressions of the Framework Laptop
-description: A quick dive into Linux kernel drivers
+description: My thoughts on the Framework Laptop's hardware
 slug: framework
 date: Nov 3, 2021
 og: true
