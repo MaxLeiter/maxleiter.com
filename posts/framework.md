@@ -17,7 +17,7 @@ Here's what I got:
 * USB-C Expansion Card x2
 * HDMI Expansion Card
 
-I bought everything from the Framework store (at a slight markup of ~$80 for the RAM, SSD, and wifi card), but I'm happy to support them and the convienence of knowing it would work properly was well worth it. 
+I bought everything from the Framework store (at a slight markup of ~$80 for the RAM, SSD, and wifi card), but I'm happy to support them and for the convenience of knowing it would work properly was well worth it. 
 
 ## The Good
 * Well crafted body. I was not expecting a premium build quality from a startup trying to create an upgradeable laptop, but wow they excelled.
