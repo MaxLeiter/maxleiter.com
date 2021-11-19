@@ -1,8 +1,8 @@
-import React from 'react'
 
+import { Component } from 'react'
 import Error from '@components/error'
 
-class E extends React.Component {
+class E extends Component {
   static getInitialProps({ res, err }) {
     const status = res ? res.statusCode : err ? err.statusCode : null
     return { status }
