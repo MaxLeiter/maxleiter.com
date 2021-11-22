@@ -89,4 +89,4 @@ Client.os.getram(): Promise<MetricResponse>
 ```
 corresponds to the [https://api.creeper.host/os/getram](https://creeperhost.docs.apiary.io/#/reference/0/server/get-server-ram-details/200?mc=reference%2F0%2Fserver%2Fget-server-ram-details%2F200) endpoint.
 
-I removed some methods from the above to avoid cluttering this page, but it's straight forward to add your own. If you really want to use this, contact me and I can set up a repo for us to collaborate. Also, if you have suggestions on how I could have improve this, let me know via [email](mailto:maxwell.leiter@gmail.com) or on [Twitter](https://twitter.com/Max_Leiter).
+I removed some methods from the above to avoid cluttering this page, but it's straight forward to add your own. If you really want to use this, contact me and I can set up a repo for us to collaborate. Also, if you have suggestions on how I can improve this, let me know via [email](mailto:maxwell.leiter@gmail.com) or on [Twitter](https://twitter.com/Max_Leiter).
