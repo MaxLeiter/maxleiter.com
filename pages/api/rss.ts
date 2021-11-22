@@ -46,7 +46,7 @@ const feeds: Feed[] = [
 
 const DESC_MAX = 300
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+async function rss(req: NextApiRequest, res: NextApiResponse) {
     const parser = new Parser()
     let items: Result[] = []
 
@@ -99,3 +99,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.setHeader('Cache-Control', `s-maxage=1, stale-while-revalidate`)
     res.status(200).json({ items })
 }
+
+export default rss

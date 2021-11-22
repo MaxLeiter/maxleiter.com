@@ -1,7 +1,7 @@
 module.exports = {
   swcMinify: true,
   images: {
-    formats: ['image/avif', 'image/webp']
+    formats: ['image/avif', 'image/webp'],
   },
   async redirects() {
     return [
