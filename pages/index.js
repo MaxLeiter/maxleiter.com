@@ -50,9 +50,10 @@ const About = ({ posts, projects }) => {
         />
         <h3>My posts</h3>
         <PostsList posts={posts} />
-        <p>
+        <footer>
           <Link href="/about">About this site</Link>
-        </p>
+          {process.env.NEXT_PUBLIC_SHA && <> &mdash; <Link external href={`https://github.com/maxleiter/maxleiter.com/commit/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}`}>{process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA.slice(0, 7)}</Link></>}
+        </footer>
       </article>
     </Page>
   )
