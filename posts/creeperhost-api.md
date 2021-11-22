@@ -5,7 +5,7 @@ slug: creeperhost-api
 date: Nov 22, 2021
 ---
 
-I've had a server on [Creeper Host](https://creeper.host) for around eight years now, and have used it for small side projects and hackathons. Lately, I've been trying to  automate more of my life and discovered that the API their in-house control panel uses is [available for general use](https://creeperhost.docs.apiary.io/). I'm making this post in case someone else ever wants to interact with their API via JavaScript. Maybe someday I'll create a proper repository, but for now my wrapper is incomplete and it's easier to just include here.
+I've had a server on [Creeper Host](https://creeper.host) for around eight years now, and have used it for small side projects and hackathons. Lately, I've been trying to  automate more of my life and discovered that the API their in-house control panel uses is [available for general use](https://creeperhost.docs.apiary.io/). I'm making this post in case someone else ever wants to interact with their API via JavaScript. Maybe someday I'll create a proper repository, but for now my wrapper is incomplete and it's easier to just include here. It was also a good chance to write some TypeScript from scratch, something I haven't had the opportunty to do very much of.
 
 To get started, you'll need to generate a Developer Token on the [control panel](https://creeperpanel.com). Navigate to the `Sub-accounts` page and generate a new API key at the bottom of the page:
 
@@ -87,4 +87,6 @@ You can use it by finding what you want to call on the Creeper Host docs and acc
 ```typescript
 Client.os.getram(): Promise<MetricResponse>
 ```
-I removed some methods from the above to avoid cluttering this page, but it's straight forward to add your own. If you really want to use this, contact me and I can set up a repo for us to collaborate. Also, if you have suggestions on how I could have improved this, let me know via [email](mailto:maxwell.leiter@gmail.com) or on [Twitter](https://twitter.com/MaxLeiter).
+corresponds to the [https://api.creeper.host/os/getram](https://creeperhost.docs.apiary.io/#/reference/0/server/get-server-ram-details/200?mc=reference%2F0%2Fserver%2Fget-server-ram-details%2F200) endpoint.
+
+I removed some methods from the above to avoid cluttering this page, but it's straight forward to add your own. If you really want to use this, contact me and I can set up a repo for us to collaborate. Also, if you have suggestions on how I could have improve this, let me know via [email](mailto:maxwell.leiter@gmail.com) or on [Twitter](https://twitter.com/MaxLeiter).
