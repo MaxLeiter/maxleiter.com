@@ -1,9 +1,7 @@
 module.exports = {
-  typescript: {
-    ignoreDevErrors: true,
-  },
-  experimental: {
-    stats: true,
+  swcMinify: true,
+  images: {
+    formats: ['image/avif', 'image/webp'],
   },
   async redirects() {
     return [

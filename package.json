@@ -2,7 +2,7 @@
   "name": "blog",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint . && prettier --write '**/*.js' --loglevel warn",
+    "lint": "next lint && prettier --write '**/*.js' --loglevel warn",
     "dev": "next -p 3000",
     "build": "yarn rss && next build",
     "rss": "node lib/rss"
@@ -10,11 +10,11 @@
   "pre-commit": "lint",
   "license": "MIT",
   "dependencies": {
-    "next": "^11.1.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "next": "^12.0.4",
+    "react": "^18.0.0-beta-fdc1d617a-20211118",
+    "react-dom": "^18.0.0-beta-fdc1d617a-20211118",
     "rss-parser": "^3.12.0",
-    "swr": "^1.0.0"
+    "swr": "^1.0.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.15.0",
@@ -24,6 +24,7 @@
     "@typescript-eslint/parser": "^4.30.0",
     "babel-plugin-module-resolver": "^4.1.0",
     "eslint": "^7.32.0",
+    "eslint-config-next": "^12.0.4",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-react": "^7.25.1",
     "eslint-plugin-react-hooks": "^4.2.0",
