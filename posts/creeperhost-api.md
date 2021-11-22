@@ -1,0 +1,92 @@
+---
+title: Creeper Host API wrapper in TypeScript
+description: In case someone also wants a quick wrapper for interacting with the Creeper Host REST API
+slug: creeperhost-api
+date: Nov 22, 2021
+---
+
+I've had a server on [Creeper Host](https://creeper.host) for around eight years now, and have used it for small side projects and hackathons. Lately, I've been trying to  automate more of my life and discovered that the API their in-house control panel uses is [available for general use](https://creeperhost.docs.apiary.io/). I'm making this post in case someone else ever wants to interact with their API via JavaScript. Maybe someday I'll create a proper repository, but for now my wrapper is incomplete and it's easier to just include here. It was also a good chance to write some TypeScript from scratch, something I haven't had the opportunty to do very much of.
+
+To get started, you'll need to generate a Developer Token on the [control panel](https://creeperpanel.com). Navigate to the `Sub-accounts` page and generate a new API key at the bottom of the page:
+
+![Screenshot of the Creeper Host control panel with a blue 'Generate Key' button](/blog/creeperhost/apiKey.png)
+
+Also, install [axios](https://axios-http.com/) (or change the below code to your favorite request library, I don't care):
+```bash
+    yarn add axios
+```
+Then, incorporate these two files:
+
+```typescript title=Client.ts collapsible
+import axios, { AxiosRequestConfig } from "axios";
+import { InitializationOptions, MetricResponse, RestartResponse } from "./types";
+
+export default class Client {
+    private instance: string;
+    constructor({ apiKey, apiSecret, apiUrl = 'https://api.creeper.host', instanceId}: InitializationOptions) {
+        axios.defaults.baseURL = apiUrl;
+
+        axios.defaults.headers.common['key'] = apiKey;
+        axios.defaults.headers.common['secret'] = apiSecret;
+        axios.defaults.headers.common['Content-Type'] = 'application/json';
+
+        this.instance = instanceId;
+    }
+
+    private async request<T = any>({ method = "GET", apiRoute, body }: { method: "GET" | "POST", apiRoute: string, body?: any}) {
+        const config: AxiosRequestConfig = {
+            method,
+            url: apiRoute,
+            data: body
+        }
+
+        console.log(`[${method}] ${apiRoute}`, body ? `\t ${JSON.stringify(body)}` : '');
+
+        const request = await axios.request<T>(config);
+        return request.data;
+    }
+
+    public os = {
+            getram: async () => {
+                return this.request<MetricResponse>({ method: "GET", apiRoute: "os/getram" });
+            },
+            getssd: async () => {
+                return this.request<MetricResponse>({ method: "GET", apiRoute: "os/getssd" });
+            },
+    }
+
+    public minecraft = {
+        restartserver: async () => {
+            return this.request<RestartResponse>({ method: "POST", apiRoute: "minecraft/restartserver", body: { instance: this.instance} });
+        },
+    }
+}
+```
+
+```typescript title=types.d.ts collapsible
+export type MetricResponse = {
+    status: 'success';
+    free: number;
+    used: number;
+} | {
+    status: 'error',
+    message: string
+}
+
+export type RestartResponse = {
+    status: 'success';
+    message: string;
+} | {
+    status: 'error',
+    message: string
+}
+```
+
+Finally, create an instance via `new Client({ apiKey, apiSecret, instanceId });`
+You can use it by finding what you want to call on the Creeper Host docs and accessing that on the client; I purposefully used the same naming scheme. For example,
+```typescript
+Client.os.getram(): Promise<MetricResponse>
+```
+corresponds to the [https://api.creeper.host/os/getram](https://creeperhost.docs.apiary.io/#/reference/0/server/get-server-ram-details/200?mc=reference%2F0%2Fserver%2Fget-server-ram-details%2F200) endpoint.
+
+I removed some methods from the above to avoid cluttering this page, but it's straight forward to add your own. If you really want to use this, contact me and I can set up a repo for us to collaborate. Also, if you have suggestions on how I could have improve this, let me know via [email](mailto:maxwell.leiter@gmail.com) or on [Twitter](https://twitter.com/MaxLeiter).
