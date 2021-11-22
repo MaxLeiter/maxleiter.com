@@ -12,6 +12,7 @@
   --main-content: 48rem;
   --radius: 8px;
   --inline-radius: 5px;
+  --header-height: 48px;
 
   /* Typography */
   --font-sans: -apple-system,BlinkMacSystemFont,'Roboto','Helvetica Neue', sans-serif;
