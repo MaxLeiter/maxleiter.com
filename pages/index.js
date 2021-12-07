@@ -33,7 +33,7 @@ const About = ({ posts, projects }) => {
           {' '} and {' '}
           <Link href="https://vercel.com" external>
             Vercel
-          </Link>{' '}
+          </Link>.{' '}
 
           I&apos;m interested in
           politics, tech, and building a fast, accessible web.
