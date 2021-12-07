@@ -27,18 +27,15 @@ const About = ({ posts, projects }) => {
         <Socials />
         <p>
           I&apos;ve previously worked at{' '}
+          <Link href="https://www.blend.com" external>
+            Blend
+          </Link>
+          {' '} and {' '}
           <Link href="https://vercel.com" external>
             Vercel
           </Link>{' '}
-          and{' '}
-          <Link href="https://www.uscannenbergmedia.com" external>
-            Annenberg Media
-          </Link>
-          . Next August, I&apos;ll be joining{' '}
-          <Link href="https://blend.com" external>
-            Blend
-          </Link>{' '}
-          as a software engineer on the quality team. I&apos;m interested in
+
+          I&apos;m interested in
           politics, tech, and building a fast, accessible web.
         </p>
 
