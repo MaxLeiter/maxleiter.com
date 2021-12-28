@@ -1,0 +1,44 @@
+---
+title: useMousetrap()
+description: A quick TypeScript React hook for Mousetrap.js
+slug: useMoustrap
+date: Dec 28, 2021
+published: true
+---
+
+I've been messing around with a React implementation of The Lounge lately (for no real reason except that I can) and wanted a functional way to use [Mousetrap](https://craig.is/killing/mice), which TL already uses.  The below hook let me replace the Vue use of Mousetrap (which was pretty much vanilla JS) in a React-like fashion. For bonus typing, add `@types/mousetrap` to your project.
+
+Usage is pretty simple:
+```ts
+useMousetrap("escape", (evt, combo) => {
+	evt.preventDefault
+}, "keypress")
+```
+
+```ts
+import mousetrap from "mousetrap"
+import { useEffect, useRef } from "react"
+
+const useMousetrap = (
+	handlerKey: string | string[],
+	handlerCallback: (evt: KeyboardEvent, combo: string) => void,
+	evtType?: "keypress" | "keydown" | "keyup",
+) => {
+	let actionRef = useRef(handlerCallback)
+
+	useEffect(() => {
+		mousetrap.bind(
+			handlerKey,
+			(evt: KeyboardEvent, combo: string) => {
+				typeof actionRef.current === "function" && actionRef.current(evt, combo)
+			},
+			evtType,
+		)
+		return () => {
+			mousetrap.unbind(handlerKey)
+		}
+	}, [evtType, handlerKey])
+}
+
+export default useMousetrap
+```
