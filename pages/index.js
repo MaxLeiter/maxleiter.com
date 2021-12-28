@@ -49,7 +49,7 @@ const About = ({ posts, projects }) => {
         <PostsList posts={posts} />
         <footer>
           <Link href="/about">About this site</Link>
-          {process.env.NEXT_PUBLIC_SHA && <> &mdash; <Link external href={`https://github.com/maxleiter/maxleiter.com/commit/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}`}>{process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA.slice(0, 7)}</Link></>}
+          {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA && <> &mdash; <Link external href={`https://github.com/maxleiter/maxleiter.com/commit/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}`}>{process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA.slice(0, 7)}</Link></>}
         </footer>
       </article>
     </Page>

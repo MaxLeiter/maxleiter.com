@@ -5,6 +5,9 @@
     margin-right: 5px;
     border-radius: var(--radius);
     color: var(--fg);
+    will-change: transform;
+    transition: transform 450ms !important;
+    transition-delay: 100ms;
 
 }
 
@@ -12,11 +15,18 @@
 .icon:focus-within {
     outline: none;
     color: var(--link);
-    transform: scale(1.15);
-    transition: all 200ms ease 100ms;
+    transition: transform 200ms !important;
+    transform: translateY(-5px);
 }
 
 .socials {
     display: inline-flex;
     align-items: center;
 }
+
+@media (prefers-reduced-motion: reduce) {
+    .icon,
+    .icon:hover {
+      transition: none;
+    }
+  }
