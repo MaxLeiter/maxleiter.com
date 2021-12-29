@@ -24,7 +24,7 @@
   --transition-slow: 0.3s ease-in-out;
 
   /* Dark Mode Colors */
-  --bg: #121212;
+  --bg: hsl(0, 0%, 7%);
   --fg: #fafbfc;
   --gray: #999;
   --light-gray: #444;

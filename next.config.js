@@ -1,5 +1,5 @@
 module.exports = {
-  swcMinify: true,
+  // swcMinify: true,
   images: {
     formats: ['image/avif', 'image/webp'],
   },
