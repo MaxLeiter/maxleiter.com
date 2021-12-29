@@ -240,6 +240,7 @@ const About = ({ posts, projects }) => {
           top: 0,
           width: `${width}px`,
           height:  `${height}px`,
+          opacity: 0.4
         }}
       />
     </Page>
