@@ -14,6 +14,7 @@ import {
   stateShader,
   textureShader,
 } from '@lib/shaders'
+import FadeIn from '@components/fade-in'
 // import RSS from '@components/icons/rss'
 // import ShiftBy from '@components/ShiftBy'
 const PROJECT_COUNT = 4
@@ -230,19 +231,21 @@ const About = ({ posts, projects }) => {
           )}
         </footer>
       </article>
-      <canvas
-        ref={canvas}
-        style={{
-          pointerEvents: 'none',
-          imageRendering: 'pixelated',
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          width: `${width}px`,
-          height:  `${height}px`,
-          opacity: 0.4
-        }}
-      />
+      <FadeIn duration={500}>
+        <canvas
+          ref={canvas}
+          style={{
+            pointerEvents: 'none',
+            imageRendering: 'pixelated',
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            width: `${width}px`,
+            height:  `${height}px`,
+            opacity: 0.4
+          }}
+        />
+      </FadeIn>
     </Page>
   )
 }
