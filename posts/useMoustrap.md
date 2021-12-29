@@ -1,7 +1,7 @@
 ---
 title: useMousetrap()
 description: A quick TypeScript React hook for Mousetrap.js
-slug: useMoustrap
+slug: useMousetrap
 date: Dec 28, 2021
 published: true
 ---
