@@ -31,9 +31,7 @@ const Post = ({
       description={description}
       showHeaderTitle={false}
       image={
-        og && og === true
-          ? `https://res.cloudinary.com/dsdlhtnpw/image/upload/${slug}.png`
-          : og
+        og ? og : ''
       }
     >
       <Head>

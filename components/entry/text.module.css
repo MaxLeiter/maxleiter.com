@@ -8,15 +8,22 @@
   color: var(--fg);
   outline: none;
   padding-top: var(--gap);
-  border-top: 1px solid var(--lighter-gray);
   padding-bottom: var(--gap-double);
-  border-bottom: none !important;
+  border: 1px solid var(--bg);
+  padding-left: var(--gap);
+  transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
+  border-radius: var(--radius);
+  will-change: transform, opacity;
+}
+
+.link:focus,
+.link:hover {
+  background: var(--lightest-gray);
 }
 
 .date,
 .type {
-  font-size: 1rem;
-  line-height: 30px;
+  font-size: .95rem;
   flex-basis: 5rem;
   white-space: nowrap;
   margin-right: var(--gap);
@@ -32,7 +39,7 @@
 .link:focus .title,
 .link:hover .icon,
 .link:focus .icon {
-  color: var(--gray);
+  color: var(--fg);
 }
 
 .title,
@@ -43,7 +50,7 @@
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: bold;
   transition: color var(--transition);
 }
@@ -51,14 +58,7 @@
 .description {
   color: var(--gray);
   margin-top: var(--gap-half);
-}
-
-.dot {
-  height: 10px;
-  width: 10px;
-  border-radius: 50%;
-  background: var(--color);
-  margin-left: var(--gap-double);
+  font-size: .95rem;
 }
 
 @media (max-width: 600px) {
@@ -68,6 +68,16 @@
   }
 }
 
-.date {
-  float: right;
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  margin-left: var(--gap);
+  background-color: var(--lighest-gray);
+  border: 1px solid var(--lighter-gray);
+  border-radius: var(--radius);
+  color: var(--gray);
+  font-size: 14px;
+  padding: 0 var(--gap-half);
+  transition: all 0.2s ease-in-out;
 }

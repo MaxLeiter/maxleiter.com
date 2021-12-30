@@ -1,9 +1,10 @@
 // https://www.joshwcomeau.com/snippets/react-components/fade-in/
 
+import { ReactNode } from 'react';
 import styles from './fade.module.css'
 
 type Props = {
-    children: Node,
+    children: ReactNode,
     duration?: number,
     delay?: number,
 }

@@ -20,7 +20,7 @@ const Header = ({ render, title, content }) => {
     )
   } else {
     return (
-      <nav className={styles.fakeNav}>
+      <nav className={styles.fakeNav} ariaHidden={true}>
         <div className={styles.header}>
           {title && <div className={styles.content}>{title}</div>}
         </div>

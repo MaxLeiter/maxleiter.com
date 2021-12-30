@@ -15,7 +15,7 @@ const Entry = ({
       <Link href={href} external={true}>
         {title}
       </Link>{' '}
-      &mdash; {role}
+      <div className={styles.badge}>{role}</div>
       {showYears && (
         <i style={{ float: 'right' }}>
           {years[0]} {years[1] ? '-' : ''} {years[1]}

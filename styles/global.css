@@ -33,7 +33,7 @@
   --article-color: #eaeaea;
   --header-bg: var(--bg);
   --gray-alpha: rgba(255, 255, 255, 0.5);
-  --selection: rgba(255, 255, 255, 0.99);
+  --selection: rgba(255, 255, 255, 0.88);
   --link: #579dff;
 
   /* Syntax Highlighting */
@@ -68,6 +68,11 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+}
+
+#__next {
+  height: 100%;
 }
 
 body {
@@ -75,6 +80,7 @@ body {
   font-family: var(--font-sans);
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 p,
@@ -196,6 +202,7 @@ td,
 th {
   border: 1px solid gray
 }
+
 
 @media print {
   :root {

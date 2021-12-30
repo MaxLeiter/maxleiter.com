@@ -10,10 +10,10 @@ export function loadShader(gl: WebGLRenderingContext, type: number, source: stri
   gl.shaderSource(shader, source);
 
   gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error("createShader: an error occurred compiling the shaders: ", type, source, gl.getShaderInfoLog(shader));
-  }
+  // Commented out because of https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices#dont_check_shader_compile_status_unless_linking_fails
+  // if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+  //   console.error("createShader: an error occurred compiling the shaders: ", type, source, gl.getShaderInfoLog(shader));
+  // }
   return shader;
 }
 
@@ -36,14 +36,14 @@ export function createProgram(gl: WebGLRenderingContext, vertexShader: WebGLShad
   return program;
 }
 
-// Shaders from https://jameshfisher.com/2017/10/22/webgl-game-of-life/
+// Shaders largely from https://jameshfisher.com/2017/10/22/webgl-game-of-life/
 export const stateShader = (size: number) => `
 precision mediump float;
 uniform sampler2D state;
 void main(void) {
   vec2 coord = vec2(gl_FragCoord)/${size}.0;
   gl_FragColor = texture2D(state, coord);
-  gl_FragColor.a = 0.1;
+  // gl_FragColor.a = 0.35;
 }
 `
 
@@ -67,8 +67,17 @@ void main(void) {
     wasAlive(coord+vec2(1.,0.)) +
     wasAlive(coord+vec2(1.,1.));
   bool nowAlive = wasAlive(coord) == 1 ? 2 <= aliveNeighbors && aliveNeighbors <= 3 : 3 == aliveNeighbors;
-  gl_FragColor = nowAlive ? vec4(.3,.3,.3,0.) : vec4(0., 0., 0., 0.);
-  gl_FragColor.a = 1.;
+  if (!nowAlive) gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  else if (nowAlive) {
+    // Color gradually based on number of neighbors
+    float color;
+    if (aliveNeighbors == 2) color = 0.2;
+    else if (aliveNeighbors == 3) color = 0.5;
+    else color = 0.0;
+    gl_FragColor = vec4(color, color, color, 1.0);
+    // set opacity to half
+    gl_FragColor.a = 0.1;
+  }
 
 }
 `

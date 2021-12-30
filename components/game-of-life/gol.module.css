@@ -1,0 +1,10 @@
+.gameOfLife {
+    z-index: 0;
+    pointer-events: none;
+    image-rendering: pixelated;
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* I'd rather do this in the shader but safari doesnt seem to suport setting the alpha there */
+    opacity: 0.2;
+}

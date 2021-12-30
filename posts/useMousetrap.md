@@ -4,6 +4,7 @@ description: A quick TypeScript React hook for Mousetrap.js
 slug: useMousetrap
 date: Dec 28, 2021
 published: true
+og: https://💻➡️📸.vercel.app/%60useMousetrap%60.png?theme=light&md=1&fontSize=100px&date=Dec%2029%2C%202021%0A
 ---
 
 I've been messing around with a React implementation of The Lounge lately (for no real reason except that I can) and wanted a functional way to use [Mousetrap](https://craig.is/killing/mice), which TL already uses.  The below hook let me replace the Vue use of Mousetrap (which was pretty much vanilla JS) in a React-like fashion. For bonus typing, add `@types/mousetrap` to your project.

@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import styles from './socials.module.css'
 import { GitHub, Twitter, LinkedIn, Mail } from '@components/icons'
-
+import Tooltip from '@components/tooltip'
 const Socials = () => {
   return (
     <div className={styles.socials}>
@@ -12,8 +12,11 @@ const Socials = () => {
           className={styles.icon}
           target="_blank"
           rel="noopener noreferrer"
+          tagIndex={0}
         >
-          <GitHub />
+          <Tooltip text={'GitHub'}>
+            <GitHub />
+          </Tooltip>
         </a>
       </Link>
       <Link external href="https://twitter.com/max_leiter">
@@ -23,7 +26,9 @@ const Socials = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Twitter />
+          <Tooltip text={'Twitter'}>
+            <Twitter />
+          </Tooltip>
         </a>
       </Link>
       <Link external href="https://linkedin.com/in/maxleiter">
@@ -33,7 +38,9 @@ const Socials = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <LinkedIn />
+          <Tooltip text={'LinkedIn'}>
+            <LinkedIn />
+          </Tooltip>
         </a>
       </Link>
       <Link external href="mailto:maxwell.leiter@gmail.com">
@@ -43,7 +50,9 @@ const Socials = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Mail />
+          <Tooltip text={'Email'}>
+            <Mail />
+          </Tooltip>
         </a>
       </Link>
     </div>

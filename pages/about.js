@@ -18,10 +18,6 @@ const About = ({ projects }) => {
           <Link external href="https://feathericons.com/">
             Feather Icons
           </Link>
-          . It was initially forked from the great{' '}
-          <Link external href="https://paco.sh">
-            paco.sh
-          </Link>
           . You can view the source on{' '}
           <Link external href="https://github.com/maxleiter/maxleiter.com">
             GitHub

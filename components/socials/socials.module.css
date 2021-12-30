@@ -1,4 +1,5 @@
 .icon {
+    user-select: none;
     display: inline-flex;
     padding: 15px;
     margin: -10px;
@@ -8,7 +9,6 @@
     will-change: transform;
     transition: transform 450ms !important;
     transition-delay: 100ms;
-
 }
 
 .icon:hover,
