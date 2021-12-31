@@ -35,7 +35,7 @@ const Post = ({
       title={title}
       description={description}
       showHeaderTitle={false}
-      image={!hidden ? `https://xn--hgi2158mjfa.vercel.app/${encodeURIComponent(title)}.png?theme=light&md=1&fontSize=80px&date=${encodeURIComponent(date)}` : undefined}
+      image={!hidden ? `https://xn--hgi2158mjfa.vercel.app/${encodeURIComponent(title)}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(date)}` : undefined}
     >
       <Head>
         {hidden && <meta name="robots" content="noindex" />}
