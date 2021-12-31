@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { RefObject, useEffect } from "react"
 
 // https://nullprogram.com/blog/2014/06/10/
