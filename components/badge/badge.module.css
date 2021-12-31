@@ -9,5 +9,4 @@
     color: var(--gray);
     font-size: 14px;
     padding: 0 var(--gap-half);
-    transition: all 0.2s ease-in-out;
 }

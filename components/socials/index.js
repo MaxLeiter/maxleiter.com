@@ -6,55 +6,55 @@ import Tooltip from '@components/tooltip'
 const Socials = () => {
   return (
     <div className={styles.socials}>
-      <Link external href="https://github.com/maxleiter">
-        <a
-          aria-label="Visit my GitHub"
-          className={styles.icon}
-          target="_blank"
-          rel="noopener noreferrer"
-          tagIndex={0}
-        >
-          <Tooltip text={'GitHub'}>
+      <Tooltip text={'GitHub'}>
+        <Link external href="https://github.com/maxleiter">
+          <a
+            aria-label="Visit my GitHub"
+            className={styles.icon}
+            target="_blank"
+            rel="noopener noreferrer"
+            tagIndex={0}
+          >
             <GitHub />
-          </Tooltip>
-        </a>
-      </Link>
-      <Link external href="https://twitter.com/max_leiter">
-        <a
-          aria-label="Visit my Twitter"
-          className={styles.icon}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Tooltip text={'Twitter'}>
+          </a>
+        </Link>
+      </Tooltip>
+      <Tooltip text={'Twitter'}>
+        <Link external href="https://twitter.com/max_leiter">
+          <a
+            aria-label="Visit my Twitter"
+            className={styles.icon}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Twitter />
-          </Tooltip>
-        </a>
-      </Link>
-      <Link external href="https://linkedin.com/in/maxleiter">
-        <a
-          aria-label="Visit my LinkedIn"
-          className={styles.icon}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Tooltip text={'LinkedIn'}>
+          </a>
+        </Link>
+      </Tooltip>
+      <Tooltip text={'LinkedIn'}>
+        <Link external href="https://linkedin.com/in/maxleiter">
+          <a
+            aria-label="Visit my LinkedIn"
+            className={styles.icon}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <LinkedIn />
-          </Tooltip>
-        </a>
-      </Link>
-      <Link external href="mailto:maxwell.leiter@gmail.com">
-        <a
-          aria-label="Email me"
-          className={styles.icon}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Tooltip text={'Email'}>
+          </a>
+        </Link>
+      </Tooltip>
+      <Tooltip text={'Email'}>
+        <Link external href="mailto:maxwell.leiter@gmail.com">
+          <a
+            aria-label="Email me"
+            className={styles.icon}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Mail />
-          </Tooltip>
-        </a>
-      </Link>
+          </a>
+        </Link>
+      </Tooltip>
     </div>
   )
 }

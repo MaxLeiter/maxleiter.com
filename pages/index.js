@@ -24,13 +24,7 @@ const Index = ({ posts, projects }) => {
   const [running, setRunning] = useState(false)
 
   const Icon = () => (
-    <Tooltip
-      text={running ? 'pause' : 'easteregg'}
-      onClick={() => setRunning(!running)}
-      style={{ cursor: 'pointer', color: 'var(--lightest-gray)', fontSize: 14 }}
-    >
-      {running ? <PauseIcon /> : <PlayIcon />}
-    </Tooltip>
+      <div style={{display: 'inline-flex', marginLeft: 'var(--gap)', cursor: 'pointer'}} onClick={() => setRunning(!running)}>{running ? <PauseIcon /> : <PlayIcon />}</div>
   )
 
   return (

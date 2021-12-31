@@ -18,7 +18,7 @@
     content: attr(aria-label);
     top: 0;
     left: 50%;
-    transition: all 0.03s ease-in-out;
+    transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
     transform: translate(-50%, calc(-100% - 10px));
 }
 

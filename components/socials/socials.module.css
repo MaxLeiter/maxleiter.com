@@ -1,22 +1,22 @@
 .icon {
     user-select: none;
     display: inline-flex;
-    padding: 15px;
-    margin: -10px;
-    margin-right: 5px;
     border-radius: var(--radius);
+    padding: var(--gap);
     color: var(--fg);
     will-change: transform;
-    transition: transform 450ms !important;
-    transition-delay: 100ms;
+    transition: all 0.1s cubic-bezier(.01,.88,.93,.07);;
+    line-height: 50%;
 }
 
+.icon:active,
 .icon:hover,
 .icon:focus-within {
     outline: none;
-    color: var(--link);
-    transition: transform 200ms !important;
-    transform: translateY(-5px);
+    color: var(--fg);
+    transition: all 200ms !important;
+    background: var(--lightest-gray);
+    /* transform: translateY(-5px); */
 }
 
 .socials {
