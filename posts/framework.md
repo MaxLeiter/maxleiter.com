@@ -3,7 +3,6 @@ title: Impressions of the Framework Laptop
 description: My thoughts on the Framework Laptop's hardware
 slug: framework
 date: Nov 3, 2021
-og: true
 ---
 
 I received my [Framework Laptop DIY edition](https://frame.work) a few days ago and have been setting it up software-wise. I have it running Manjaro Linux with the Sway window manager. This is my first time using a Wayland desktop, and oh has it been a learning experience. This post will be largely about the hardware, but I plan to make one about the software once I'm more happy with my setup.

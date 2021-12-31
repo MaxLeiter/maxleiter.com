@@ -4,7 +4,6 @@ export type Post = {
     date: string
     tags: string[]
     description: string
-    og: boolean
     published: boolean
     body: string
 }

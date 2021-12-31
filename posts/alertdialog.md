@@ -3,7 +3,6 @@ title: HTML5's role="alertdialog"
 description:
 slug: alertdialog
 date: Nov 16, 2021
-og: true
 published: false
 ---
 

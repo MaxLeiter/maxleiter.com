@@ -3,7 +3,6 @@ title: 	Adding ambient light support to Linux and GNOME
 description: A quick dive into Linux kernel drivers
 slug: MSHW018
 date: Dec 15, 2020
-og: true
 ---
 
 A couple of a weeks ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale. I love making devices run software they shouldn't, so I got to work dual-booting Linux on it. To my surprise, almost everything worked with the default Fedora 33 kernel, not including the touchscreen, the ambient light sensor, and the camera. After compiling and loading the great [linux-surface](https://github.com/linux-surface/linux-surface) kernel the touchscreen started to work but I found a [GitHub issue](https://github.com/linux-surface/linux-surface/issues/121) someone had made detailing that the ambient light sensor (a MSHW0184) isn't detected. This normally wouldn't matter a lot, but I'd discovered that GNOME supported adjusting the screen brightness based on the ambient light through [iio-sensor-proxy](https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/).

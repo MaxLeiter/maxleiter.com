@@ -18,30 +18,11 @@
     content: attr(aria-label);
     top: 0;
     left: 50%;
-    transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
+    transition: all 0.07s cubic-bezier(.01,.88,.93,.07);
     transform: translate(-50%, calc(-100% - 10px));
 }
 
 .tooltip:hover::after {
     opacity: 1;
     pointer-events: all;
-}
-
-.tooltip::before {
-    background-color: var(--lighter-gray);
-    content: ' ';
-    opacity: 0;
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    z-index: 999;
-    top: 0;
-    left: 50%;
-    will-change: translate, rotate;
-    transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
-    transform: translate(-50%, calc(-100% - 5px)) rotate(45deg);
-}
-
-.tooltip:hover::before {
-    opacity: 1;
 }
