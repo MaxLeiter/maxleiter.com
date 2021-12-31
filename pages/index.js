@@ -24,16 +24,18 @@ const Index = ({ posts, projects }) => {
   const [running, setRunning] = useState(false)
 
   const Icon = () => (
-    <Tooltip text={running ? 'pause' : 'easteregg'} onClick={() => setRunning(!running)} style={{cursor: 'pointer', color: 'var(--lightest-gray)', fontSize: 14}}>
+    <Tooltip
+      text={running ? 'pause' : 'easteregg'}
+      onClick={() => setRunning(!running)}
+      style={{ cursor: 'pointer', color: 'var(--lightest-gray)', fontSize: 14 }}
+    >
       {running ? <PauseIcon /> : <PlayIcon />}
     </Tooltip>
   )
 
   return (
     <>
-      <FadeIn>
-        {running && <GoL running={running} />}
-      </FadeIn>
+      <FadeIn>{running && <GoL running={running} />}</FadeIn>
       {/* <Link href="#" > */}
 
       <Page
@@ -45,7 +47,7 @@ const Index = ({ posts, projects }) => {
           <h1
             style={{ margin: 0, color: 'var(--link)', display: 'inline-block' }}
           >
-            Max Leiter 
+            Max Leiter
           </h1>
           <h2 style={{ margin: 0, lineHeight: '2.7rem' }}>
             Full-stack developer and student

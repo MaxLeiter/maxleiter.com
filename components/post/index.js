@@ -30,9 +30,7 @@ const Post = ({
       title={title}
       description={description}
       showHeaderTitle={false}
-      image={
-        og ? og : ''
-      }
+      image={og ? og : ''}
     >
       <Head>
         {hidden && <meta name="robots" content="noindex" />}

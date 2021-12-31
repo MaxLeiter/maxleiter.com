@@ -28,12 +28,12 @@ const Head = ({
       <meta httpEquiv="Content-Language" content="en" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content="@max_leiter" />
-      <meta property="og:site_name" content="Max Leiter's site"/>
+      <meta property="og:site_name" content="Max Leiter's site" />
       <meta name="apple-mobile-web-app-title" content="Max" />
       <meta name="author" content="Max Leiter" />
-      <meta property="og:type" content="website"/>
+      <meta property="og:type" content="website" />
       <meta charSet="utf-8" />
-      <meta property="og:locale" content="en"/>
+      <meta property="og:locale" content="en" />
 
       {/* RSS feed */}
       <link

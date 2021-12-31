@@ -17,9 +17,9 @@ const Entry = ({
       </Link>{' '}
       <div className={styles.badge}>{role}</div>
       {showYears && (
-        <i style={{ float: 'right' }}>
+        <div className={styles.badge}>
           {years[0]} {years[1] ? '-' : ''} {years[1]}
-        </i>
+        </div>
       )}
     </div>
     {/* {stars > 0 && <span className={styles.stars}>({stars} GitHub <Star size={12} />)</span>} */}
