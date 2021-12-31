@@ -18,12 +18,13 @@ type Props = types.Post & {
   previous?: types.Post
   next?: types.Post
   html: string
+  hidden: boolean
 }
 
 const Post = ({
   title,
   html,
-  published,
+  hidden,
   description,
   date,
   previous,
@@ -34,10 +35,10 @@ const Post = ({
       title={title}
       description={description}
       showHeaderTitle={false}
-      image={published ? `https://xn--hgi2158mjfa.vercel.app/${encodeURIComponent(title)}.png?theme=light&md=1&fontSize=80px&date=${encodeURIComponent(date)}` : undefined}
+      image={!hidden ? `https://xn--hgi2158mjfa.vercel.app/${encodeURIComponent(title)}.png?theme=light&md=1&fontSize=80px&date=${encodeURIComponent(date)}` : undefined}
     >
       <Head>
-        {!published && <meta name="robots" content="noindex" />}
+        {hidden && <meta name="robots" content="noindex" />}
         {date && <meta name="date" content={date} />}
       </Head>
 
