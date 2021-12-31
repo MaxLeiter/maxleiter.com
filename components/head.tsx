@@ -1,11 +1,18 @@
 import NextHead from 'next/head'
 
+type Props = {
+  title?: string
+  description?: string
+  image?: string
+  children?: React.ReactNode | React.ReactNode[]
+}
+
 const Head = ({
   title = 'Max Leiter',
   description = 'Full-stack developer and student',
   image = '',
   children,
-}) => {
+}: Props) => {
   return (
     <NextHead>
       {/* Title */}

@@ -1,8 +1,13 @@
 import Page from '@components/page'
 import PostsList from '@components/posts-list'
 import getPosts from '@lib/get-posts'
+import { Post } from '@lib/types'
 
-const Blog = ({ posts }) => {
+type Props = {
+  posts: Post[]
+}
+
+const Blog = ({ posts }: Props) => {
   return (
     <Page title="Blog" description="Writing about design and code.">
       <article>

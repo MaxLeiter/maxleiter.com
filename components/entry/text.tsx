@@ -3,7 +3,16 @@ import { memo } from 'react'
 import Link from '@components/link'
 import styles from './text.module.css'
 
-const TextEntry = ({ title, description, type, comment, href, as, date }) => {
+type Props = {
+  title: string
+  description?: string
+  type?: string
+  href: string
+  as?: string
+  date?: Date
+}
+
+const TextEntry = ({ title, description, type, href, as, date }: Props) => {
   return (
     <li className={styles.item}>
       <Link
@@ -12,7 +21,6 @@ const TextEntry = ({ title, description, type, comment, href, as, date }) => {
         external={!as}
         title={`${title}`}
         className={styles.link}
-        transition={false}
       >
         {type && <div className={styles.type}>{type}</div>}
         {date && (
@@ -20,9 +28,9 @@ const TextEntry = ({ title, description, type, comment, href, as, date }) => {
         )}
         <div>
           <p className={`${styles.title}`}>{title}</p>
-          {/* {description && (
+          {description && (
             <p className={`${styles.description}`}>{description}</p>
-          )} */}
+          )}
         </div>
       </Link>
     </li>

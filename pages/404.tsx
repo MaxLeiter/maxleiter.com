@@ -1,7 +1,12 @@
 import Error from '@components/error'
 import getPosts from '@lib/get-posts'
+import { Post } from '@lib/types'
 
-const NotFound = ({ posts }) => {
+type Props = {
+  posts: Post[]
+}
+
+const NotFound = ({ posts }: Props) => {
   return <Error status={404} posts={posts} />
 }
 

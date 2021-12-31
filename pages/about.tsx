@@ -1,7 +1,7 @@
 import Page from '@components/page'
 import Link from '@components/link'
 
-const About = ({ projects }) => {
+const About = () => {
   return (
     <Page title="About" description="About this website">
       <article>

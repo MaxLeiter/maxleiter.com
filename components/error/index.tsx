@@ -3,10 +3,16 @@ import Head from 'next/head'
 import Page from '@components/page'
 import PostsList from '@components/posts-list'
 import styles from './error.module.css'
+import { Post } from '@lib/types'
 
-const Error = ({ status, posts }) => {
+type Props = {
+  status: number
+  posts: Post[]
+}
+
+const Error = ({ status, posts }: Props) => {
   return (
-    <Page title={status || 'Error'}>
+    <Page description={`Error`} title={status.toString() || 'Error'}>
       <Head>
         <title>404 — Max Leiter</title>
       </Head>

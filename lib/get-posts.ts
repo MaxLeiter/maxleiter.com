@@ -1,6 +1,7 @@
 import matter from 'gray-matter'
 import fs from 'fs'
 import path from 'path'
+import type { Post } from './types'
 
 const getPosts = () => {
   const posts = fs
@@ -14,10 +15,10 @@ const getPosts = () => {
         return null
       }
 
-      return { ...data, body: content }
+      return { ...data, body: content } as Post
     })
     .filter(Boolean)
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .sort((a, b) => a && b ? new Date(b.date).getTime() - new Date(a.date).getTime() : 0)
 
   return posts
 }

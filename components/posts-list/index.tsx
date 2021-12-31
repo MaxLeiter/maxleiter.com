@@ -2,8 +2,14 @@ import { useState } from 'react'
 
 import TextEntry from '@components/entry/text'
 import styles from './posts-list.module.css'
+import type { Post } from '@lib/types'
 
-const Posts = ({ slug, posts, paginate }) => {
+type Props = {
+  posts: Post[]
+  paginate?: boolean
+}
+
+const Posts = ({ posts, paginate }: Props) => {
   const [showMore, setShowMore] = useState(3)
 
   return (
@@ -22,7 +28,6 @@ const Posts = ({ slug, posts, paginate }) => {
             as={`/blog/${post.slug}`}
             title={post.title}
             type={date}
-            description={post.description}
           />
         )
       })}

@@ -5,7 +5,7 @@
     padding: var(--gap);
     color: var(--fg);
     will-change: transform;
-    transition: all 0.1s cubic-bezier(.01,.88,.93,.07);;
+    transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
     line-height: 50%;
 }
 

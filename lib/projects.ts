@@ -1,4 +1,6 @@
-const Projects = [
+import type { Project } from "./types"
+
+const Projects: Project[] = [
   {
     title: 'X11 on iOS',
     description: 'Patched, compiled, and packaged X11 for iOS devices.',
@@ -86,7 +88,7 @@ const Projects = [
   }
 ]
 
-export default async function getProjects() {
+export default async function getProjects(): Promise<Project[]> {
   if (!process.env.GITHUB_TOKEN) {
     throw new Error(
       'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
@@ -103,7 +105,7 @@ export default async function getProjects() {
         const { stargazers_count, message } = await (
           await fetch(`https://api.github.com/repos/${user}/${repo}`, {
             headers: {
-              Authorization: process.env.GITHUB_TOKEN,
+              "Authorization": process.env.GITHUB_TOKEN ?? "",
             },
           })
         ).json()

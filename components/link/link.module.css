@@ -2,10 +2,11 @@
   outline: none;
   color: var(--link);
   text-decoration: none;
+  transition: box-shadow 80ms cubic-bezier(.01,.88,.93,.07) 0s;
+  will-change: box-shadow;
 }
 
 .transition:hover {
-  transition: box-shadow 100ms ease 0s;
   box-shadow: 0px 2px 0px var(--link);
 }
 

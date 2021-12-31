@@ -4,7 +4,12 @@ import Link from 'next/link'
 import styles from './header.module.css'
 import { ArrowLeft } from '@components/icons'
 
-const Header = ({ render, title, content }) => {
+type Props = {
+  render: boolean
+  title: string
+}
+
+const Header = ({ render, title }: Props) => {
   if (render) {
     return (
       <nav className={styles.nav}>
@@ -29,5 +34,4 @@ const Header = ({ render, title, content }) => {
   }
 }
 
-Header.displayName = 'Header'
 export default memo(Header)

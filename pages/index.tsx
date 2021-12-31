@@ -19,7 +19,7 @@ const PROJECT_COUNT = 3
 
 const GoL = dynamic(() => import('@components/game-of-life'))
 
-const Index = ({ posts, projects }) => {
+const Index = ({ posts, projects }: { posts: any, projects: any }) => {
   const [running, setRunning] = useState(false)
 
   const Icon = () => (
@@ -29,8 +29,6 @@ const Index = ({ posts, projects }) => {
   return (
     <>
       <FadeIn>{running && <GoL running={running} />}</FadeIn>
-      {/* <Link href="#" > */}
-
       <Page
         header={false}
         title=""

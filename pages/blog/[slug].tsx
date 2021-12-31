@@ -2,14 +2,22 @@ import Post from '@components/post'
 import getPosts from '@lib/get-posts'
 import renderMarkdown from '@lib/render-markdown'
 
+//@ts-ignore
 const PostPage = (props) => {
   return <Post {...props} />
 }
 
-export const getStaticProps = ({ params: { slug } }) => {
+type Props = {
+  params: {
+    slug: string
+  }
+}
+
+export const getStaticProps = ({ params: { slug } }: Props) => {
   const posts = getPosts()
-  const postIndex = posts.findIndex((p) => p.slug === slug)
+  const postIndex = posts.findIndex((p) => p?.slug === slug)
   const post = posts[postIndex]
+  if (!post) return { props: { post: null } }
   const { body, ...rest } = post
 
   return {
@@ -24,7 +32,7 @@ export const getStaticProps = ({ params: { slug } }) => {
 
 export const getStaticPaths = () => {
   return {
-    paths: getPosts().map((p) => `/blog/${p.slug}`),
+    paths: getPosts().map((p) => `/blog/${p?.slug}`),
     fallback: false,
   }
 }

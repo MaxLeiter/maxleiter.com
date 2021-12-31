@@ -1,5 +1,5 @@
 import marked from 'marked'
-import Highlight, { defaultProps } from 'prism-react-renderer'
+import Highlight, { defaultProps, Language } from 'prism-react-renderer'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { format } from 'prettier'
 
@@ -12,6 +12,7 @@ renderer.heading = (text, level, raw, slugger) => {
   const Component = `h${level}`
 
   return renderToStaticMarkup(
+    //@ts-ignore
     <Component>
       <a href={`#${id}`} id={id} className="header-link">
         {text}
@@ -23,37 +24,34 @@ renderer.heading = (text, level, raw, slugger) => {
 renderer.link = (href, _, text) =>
   `<a href=${href} target="_blank" rel="noopener noreferrer" class="${linkStyles.transition}">${text}</a>`
 
-renderer.image = function (href, title, text) {
+renderer.image = function (href, _, text) {
   return `<Image loading="lazy" src="${href}" alt="${text}" layout="fill" />`
 }
 
 renderer.checkbox = () => ''
 renderer.listitem = (text, task, checked) => {
   if (task) {
-    return `<li class="reset"><span class="check">&#8203;<input type="checkbox" disabled ${
-      checked ? 'checked' : ''
-    } /></span><span>${text}</span></li>`
+    return `<li class="reset"><span class="check">&#8203;<input type="checkbox" disabled ${checked ? 'checked' : ''
+      } /></span><span>${text}</span></li>`
   }
 
   return `<li>${text}</li>`
 }
 renderer.code = (code, options) => {
-  const opts = options.split(' ').map((o) => o.trim())
-  const language = opts[0]
-  const highlight = opts
-    .filter((o) => o.startsWith('highlight='))
+  const opts = options?.split(' ').map((o) => o.trim())
+  const language = opts?.length ? opts[0] : ''
+  const highlight = opts?.filter((o) => o.startsWith('highlight='))
     .pop()
     ?.replace('highlight=', '')
     .trim()
-  const raw = options.includes('raw')
+  const raw = options?.includes('raw')
 
-  const title = opts
-    .filter((o) => o.startsWith('title='))
+  const title = opts?.filter((o) => o.startsWith('title='))
     .pop()
     ?.replace('title=', '')
     .trim()
 
-  const collapsible = options.includes('collapsible')
+  const collapsible = options?.includes('collapsible')
 
   // Touch it up with Prettier
   let formattedCode = code
@@ -65,7 +63,7 @@ renderer.code = (code, options) => {
         singleQuote: true,
         parser: language === 'jsx' || language === 'jsx' ? 'babel' : language,
       })
-    } catch (e) {} // Don't really mind if it fails
+    } catch (e) { } // Don't really mind if it fails
   }
 
   if (collapsible) {
@@ -99,6 +97,7 @@ renderer.code = (code, options) => {
   )
 }
 
+//@ts-ignore because its not typed? https://marked.js.org/using_advanced
 marked.setOptions({
   gfm: true,
   breaks: true,
@@ -106,11 +105,19 @@ marked.setOptions({
   renderer,
 })
 
-const markdown = (markdown) => marked(markdown)
+//@ts-ignore
+const markdown = (markdown: string) => marked(markdown)
 
 export default markdown
 
-const Code = ({ code, language, highlight, title, ...props }) => {
+type Props = {
+  code: string,
+  language: string,
+  title?: string,
+  highlight?: string,
+}
+
+const Code = ({ code, language, highlight, title, ...props }: Props) => {
   if (!language)
     return (
       <>
@@ -119,37 +126,40 @@ const Code = ({ code, language, highlight, title, ...props }) => {
     )
 
   const highlightedLines = highlight
+    //@ts-ignore
     ? highlight.split(',').reduce((lines, h) => {
-        if (h.includes('-')) {
-          // Expand ranges like 3-5 into [3,4,5]
-          const [start, end] = h.split('-').map(Number)
-          const x = Array(end - start + 1)
-            .fill()
-            .map((_, i) => i + start)
-          return [...lines, ...x]
-        }
+      if (h.includes('-')) {
+        // Expand ranges like 3-5 into [3,4,5]
+        const [start, end] = h.split('-').map(Number)
+        const x = Array(end - start + 1)
+          .fill(-1)
+          .map((_, i) => i + start)
+        return [...lines, ...x]
+      }
 
-        return [...lines, Number(h)]
-      }, [])
+      return [...lines, Number(h)]
+    }, [])
     : []
 
   // https://mdxjs.com/guides/syntax-harkedighlighting#all-together
   return (
     <>
-      <Highlight {...defaultProps} code={code.trim()} language={language}>
+      <Highlight {...defaultProps} code={code.trim()} language={language as Language}>
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
           <code className={className} style={{ ...style }}>
             {tokens.map((line, i) => (
               <div
                 key={i}
                 {...getLineProps({ line, key: i })}
+                //@ts-ignore
                 style={
+                  //@ts-ignore
                   highlightedLines.includes(i + 1)
                     ? {
-                        background: 'var(--highlight)',
-                        margin: '0 -1rem',
-                        padding: '0 1rem',
-                      }
+                      background: 'var(--highlight)',
+                      margin: '0 -1rem',
+                      padding: '0 1rem',
+                    }
                     : null
                 }
               >

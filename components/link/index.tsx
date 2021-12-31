@@ -3,15 +3,25 @@ import NextLink from 'next/link'
 
 import styles from './link.module.css'
 
+type Props = {
+  external?: boolean
+  href: string
+  as?: string
+  title?: string
+  children: React.ReactNode
+  className?: string
+  transition?: boolean
+}
 const Link = ({
   external,
   href,
   as,
   children,
   className,
+  title,
   transition = true,
   ...props
-}) => {
+}: Props) => {
   const style = transition ? styles.transition + ` ${className}` : className
 
   if (external) {
@@ -21,6 +31,7 @@ const Link = ({
         target="_blank"
         rel="noopener noreferrer"
         className={style}
+        title={title}
         {...props}
       >
         {children}
@@ -31,7 +42,7 @@ const Link = ({
   return (
     <>
       <NextLink href={href} as={as}>
-        <a className={style} {...props}>
+        <a className={style} title={title} {...props}>
           {children}
         </a>
       </NextLink>
@@ -39,5 +50,4 @@ const Link = ({
   )
 }
 
-Link.displayName = 'Link'
 export default memo(Link)

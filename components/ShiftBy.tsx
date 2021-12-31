@@ -1,5 +1,11 @@
 // https://www.joshwcomeau.com/snippets/react-components/shift-by/
-function ShiftBy({ x = 0, y = 0, children }) {
+type Props = {
+  x?: number
+  y?: number
+  children: React.ReactNode
+}
+
+function ShiftBy({ x = 0, y = 0, children }: Props) {
   return (
     <div
       style={{
