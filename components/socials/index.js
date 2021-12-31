@@ -13,7 +13,6 @@ const Socials = () => {
             className={styles.icon}
             target="_blank"
             rel="noopener noreferrer"
-            tagIndex={0}
           >
             <GitHub />
           </a>
