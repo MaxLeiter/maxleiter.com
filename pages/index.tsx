@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import dynamic from 'next/dynamic'
+// import { useState } from 'react'
+// import dynamic from 'next/dynamic'
 
 import PostsList from '@components/posts-list'
 import Socials from '@components/socials'
@@ -11,24 +11,24 @@ import getPosts from '@lib/get-posts'
 import getProjects from '@lib/projects'
 // import RSS from '@components/icons/rss'
 // import ShiftBy from '@components/ShiftBy'
-import PauseIcon from '@components/icons/pause'
-import PlayIcon from '@components/icons/play'
-import FadeIn from '@components/fade-in'
+// import PauseIcon from '@components/icons/pause'
+// import PlayIcon from '@components/icons/play'
+// import FadeIn from '@components/fade-in'
 
 const PROJECT_COUNT = 3
 
-const GoL = dynamic(() => import('@components/game-of-life'))
+// const GoL = dynamic(() => import('@components/game-of-life'))
 
 const Index = ({ posts, projects }: { posts: any, projects: any }) => {
-  const [running, setRunning] = useState(false)
+  // const [running, setRunning] = useState(false)
 
-  const Icon = () => (
-      <div style={{display: 'inline-flex', marginLeft: 'var(--gap)', cursor: 'pointer'}} onClick={() => setRunning(!running)}>{running ? <PauseIcon /> : <PlayIcon />}</div>
-  )
+  // const Icon = () => (
+  //     <div style={{display: 'inline-flex', marginLeft: 'var(--gap)', cursor: 'pointer'}} onClick={() => setRunning(!running)}>{running ? <PauseIcon /> : <PlayIcon />}</div>
+  // )
 
   return (
     <>
-      <FadeIn>{running && <GoL running={running} />}</FadeIn>
+      {/* <FadeIn>{running && <GoL running={running} />}</FadeIn> */}
       <Page
         header={false}
         title=""
@@ -36,15 +36,15 @@ const Index = ({ posts, projects }: { posts: any, projects: any }) => {
       >
         <article>
           <h1
-            style={{ margin: 0, color: 'var(--link)', display: 'inline-block' }}
+            style={{ margin: 0, color: 'var(--link)' }}
           >
             Max Leiter
           </h1>
-          <h2 style={{ margin: 0, lineHeight: '2.7rem' }}>
+          <h2 style={{ margin: 0 }}>
             Full-stack developer and student
           </h2>
           <Socials />
-          <Icon />
+          {/* <Icon /> */}
           <h3>About me</h3>
           <AboutMe />
           <h3>My projects</h3>

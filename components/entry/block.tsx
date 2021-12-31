@@ -1,7 +1,7 @@
 import { memo } from 'react'
 
 import Link from '@components/link'
-import styles from './text.module.css'
+import styles from './block.module.css'
 
 type Props = {
   title: string
@@ -12,7 +12,7 @@ type Props = {
   date?: Date
 }
 
-const TextEntry = ({ title, description, type, href, as, date }: Props) => {
+const BlockEntry = ({ title, description, type, href, as, date }: Props) => {
   return (
     <li className={styles.item}>
       <Link
@@ -21,6 +21,7 @@ const TextEntry = ({ title, description, type, href, as, date }: Props) => {
         external={!as}
         title={`${title}`}
         className={styles.link}
+        transition={false}
       >
         {type && <div className={styles.type}>{type}</div>}
         {date && (
@@ -37,4 +38,4 @@ const TextEntry = ({ title, description, type, href, as, date }: Props) => {
   )
 }
 
-export default memo(TextEntry)
+export default memo(BlockEntry)

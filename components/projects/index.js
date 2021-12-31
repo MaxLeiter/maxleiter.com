@@ -11,7 +11,7 @@ const Projects = ({ count = -1, projects, showYears = true }) => {
         <Entry
           showYears={showYears}
           years={e.years}
-          stars={e.stars}
+          // stars={e.stars}
           key={e.title}
           href={e.href}
           internal={e.internal || false}

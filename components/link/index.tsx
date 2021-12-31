@@ -50,4 +50,5 @@ const Link = ({
   )
 }
 
+Link.displayName = 'Link'
 export default memo(Link)

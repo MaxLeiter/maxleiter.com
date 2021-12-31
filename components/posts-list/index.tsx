@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import TextEntry from '@components/entry/text'
+import BlockEntry from '@components/entry/block'
 import styles from './posts-list.module.css'
 import type { Post } from '@lib/types'
 
@@ -22,7 +22,7 @@ const Posts = ({ posts, paginate }: Props) => {
         })
 
         return (
-          <TextEntry
+          <BlockEntry
             key={`post-item-${post.slug}`}
             href="/blog/[slug]"
             as={`/blog/${post.slug}`}

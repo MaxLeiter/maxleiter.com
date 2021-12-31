@@ -7,7 +7,7 @@ type Props = {
   title: string
   description: string
   role: string
-  stars: number
+  // stars?: number
   years: number[]
   showYears: boolean
 }
@@ -17,7 +17,7 @@ const Entry = ({
   title,
   description,
   role,
-  stars = -1,
+  // stars = -1,
   years,
   showYears = true,
 }: Props) => (
