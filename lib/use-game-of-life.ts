@@ -17,12 +17,11 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
         if (!canvas) return
         if (!running) return
 
-        const size = 2048
+        // const size = 2048
 
-        console.log('Re-render')
-        const reduceMotion = window?.matchMedia(
-            '(prefers-reduced-motion: reduce)'
-        )?.matches
+        // const reduceMotion = window?.matchMedia(
+        //     '(prefers-reduced-motion: reduce)'
+        // )?.matches
     })
 }
 

@@ -3,10 +3,10 @@ import Entry from '@components/entry/block'
 import useSWR from 'swr'
 import { useState } from 'react'
 
-const fetcher = (url) => fetch(url).then((r) => r.json())
+const fetcher = (url: string) => fetch(url).then((r) => r.json())
 const RESULTS_PER_PAGE = 20
 
-const Feed = ({ page }) => {
+const Feed = ({ page }: { page: number }) => {
   const { data, error } = useSWR(
     `/api/rss?start=${page * RESULTS_PER_PAGE}&stop=${
       RESULTS_PER_PAGE * (page + 1)
@@ -17,7 +17,7 @@ const Feed = ({ page }) => {
   if (!data) return <div>loading...</div>
   const { items } = data
 
-  return items.map(({ item, name, org }) => {
+  return items.map(({ item, org }: { item: any, name: string, org: string }) => {
     const type =
       org === item.creator
         ? ''
@@ -36,7 +36,7 @@ const Feed = ({ page }) => {
   })
 }
 
-const RSS = ({ count = -1, projects, showYears = true }) => {
+const RSS = () => {
   const [page, setPage] = useState(0)
 
   return (

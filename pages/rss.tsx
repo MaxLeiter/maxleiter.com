@@ -1,7 +1,7 @@
 import Page from '@components/page'
 import RSS from '@components/rss'
 
-const RSS = () => {
+const RSSPage = () => {
   return (
     <Page
       title="My personal RSS feed"
@@ -12,4 +12,4 @@ const RSS = () => {
   )
 }
 
-export default RSS
+export default RSSPage
