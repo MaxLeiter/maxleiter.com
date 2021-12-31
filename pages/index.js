@@ -14,9 +14,8 @@ import getProjects from '@lib/projects'
 import PauseIcon from '@components/icons/pause'
 import PlayIcon from '@components/icons/play'
 import FadeIn from '@components/fade-in'
-import Tooltip from '@components/tooltip'
 
-const PROJECT_COUNT = 4
+const PROJECT_COUNT = 3
 
 const GoL = dynamic(() => import('@components/game-of-life'))
 
@@ -86,7 +85,7 @@ export const getStaticProps = async () => {
   return {
     props: {
       posts,
-      projects,
+      projects: projects,
     },
   }
 }
