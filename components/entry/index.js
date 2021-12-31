@@ -1,3 +1,4 @@
+import Badge from '@components/badge'
 import Link from '@components/link'
 import styles from './entry.module.css'
 
@@ -15,11 +16,11 @@ const Entry = ({
       <Link href={href} external={true}>
         {title}
       </Link>{' '}
-      <div className={styles.badge}>{role}</div>
+      <Badge>{role}</Badge>
       {showYears && (
-        <div className={styles.badge}>
+        <Badge>
           {years[0]} {years[1] ? '-' : ''} {years[1]}
-        </div>
+        </Badge>
       )}
     </div>
     {/* {stars > 0 && <span className={styles.stars}>({stars} GitHub <Star size={12} />)</span>} */}

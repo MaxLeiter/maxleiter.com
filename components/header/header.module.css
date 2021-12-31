@@ -10,6 +10,7 @@
   color: var(--fg);
 }
 
+.icon:active,
 .icon:hover,
 .icon:focus-within {
   outline: none;
