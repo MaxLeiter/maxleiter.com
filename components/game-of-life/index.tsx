@@ -9,7 +9,6 @@ const GoL = () => {
     const [running, setRunning] = useState(true)
     const [fps, setFps] = useState(35)
     const { width, height } = useDocumentSize()
-    console.log("GoL re-render")
     useGameOfLife({ canvas, width, running, fps })
 
     return (

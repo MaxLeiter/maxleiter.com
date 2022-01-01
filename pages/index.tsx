@@ -15,7 +15,6 @@ import GoL from '@components/game-of-life'
 // import PauseIcon from '@components/icons/pause'
 // import PlayIcon from '@components/icons/play'
 import FadeIn from '@components/fade-in'
-import { useState } from 'react'
 
 const PROJECT_COUNT = 3
 

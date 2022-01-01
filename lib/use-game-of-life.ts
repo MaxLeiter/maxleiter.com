@@ -10,7 +10,6 @@ type Props = {
     running: boolean
 }
 const useGol = ({ width, canvas, fps = 60, running }: Props) => {
-    console.log("running", running)
     const requestRef = useRef<number | null>(null);
 
     const cancelAnimation = () => {
@@ -19,8 +18,6 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
     }
 
     useEffect(() => {
-        console.log('Re-render')
-
         if (width && canvas.current) {
             const size = roundUp(width, 1024);
 
@@ -174,7 +171,6 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
 
                 nextStateIndex = previousStateIndex
                 setTimeout(() => {
-                    console.log("frame", running)
                     requestRef.current = requestAnimationFrame(animate)
                 }, 1000 / fps);
             }
