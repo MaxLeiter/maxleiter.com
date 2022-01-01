@@ -29,7 +29,7 @@ I try to use open-source where I can. If you know of an alternative to the few c
 - [NextDNS](https://nextdns.io/) is a secure DNS service (I downloaded the macOS client from the App Store)
 - [LastPass](https://www.lastpass.com/) is my password manager, but I'm currently looking to start self-hosting.
 - [Insomnia](https://insomnia.rest/) is my favorite REST client
-- [IINA](https://iina.io/]) is a nice media player 
+- [IINA](https://iina.io/) is a nice media player 
 - [VIA Configurator](https://caniusevia.com/) configures my keyboard
 - [Lagrange](https://github.com/skyjake/lagrange) for viewing Gemini articles
 - [yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable) is my node package manager of choice
