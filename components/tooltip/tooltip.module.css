@@ -1,6 +1,5 @@
 .tooltip {
     position: relative;
-    text-align: center;
 }
 
 .tooltip::after {
@@ -10,7 +9,6 @@
     color: var(--fg);
     padding: var(--gap-half) var(--gap);
     position: absolute;
-    text-align: center;
     z-index: 999;
     opacity: 0;
     pointer-events: none;

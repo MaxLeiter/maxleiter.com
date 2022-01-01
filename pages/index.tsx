@@ -9,18 +9,19 @@ import AboutMe from '@components/aboutme'
 import Page from '@components/page'
 import getPosts from '@lib/get-posts'
 import getProjects from '@lib/projects'
+import GoL from '@components/game-of-life'
 // import RSS from '@components/icons/rss'
 // import ShiftBy from '@components/ShiftBy'
 // import PauseIcon from '@components/icons/pause'
 // import PlayIcon from '@components/icons/play'
-// import FadeIn from '@components/fade-in'
+import FadeIn from '@components/fade-in'
+import { useState } from 'react'
 
 const PROJECT_COUNT = 3
 
 // const GoL = dynamic(() => import('@components/game-of-life'))
 
 const Index = ({ posts, projects }: { posts: any, projects: any }) => {
-  // const [running, setRunning] = useState(false)
 
   // const Icon = () => (
   //     <div style={{display: 'inline-flex', marginLeft: 'var(--gap)', cursor: 'pointer'}} onClick={() => setRunning(!running)}>{running ? <PauseIcon /> : <PlayIcon />}</div>
@@ -28,7 +29,7 @@ const Index = ({ posts, projects }: { posts: any, projects: any }) => {
 
   return (
     <>
-      {/* <FadeIn>{running && <GoL running={running} />}</FadeIn> */}
+      <FadeIn><GoL /></FadeIn>
       <Page
         header={false}
         title=""
