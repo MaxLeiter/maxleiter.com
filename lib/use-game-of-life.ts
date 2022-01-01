@@ -19,7 +19,7 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
 
     useEffect(() => {
         if (width && canvas.current) {
-            const size = roundUp(width, 1024);
+            const size = 1024
 
             const gl = canvas.current.getContext('webgl', { premultipliedAlpha: false, })
 
@@ -183,7 +183,4 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
     }, [canvas, fps, running, width])
 }
 
-const roundUp = (num: number, multiple: number) => {
-    return Math.ceil(num / multiple) * multiple
-}
 export default useGol
