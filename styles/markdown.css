@@ -34,6 +34,12 @@ article [id]::before {
 article ul {
   padding: 0;
   list-style-position: inside;
+  list-style-type: disc;
+}
+
+article ul ul {
+  margin-left: var(--gap-double);
+  list-style-position: inside;
   list-style-type: circle;
 }
 
