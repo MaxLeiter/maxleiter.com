@@ -6,7 +6,7 @@ date: Dec 31, 2021
 published: true
 ---
 
-First off, in the off-chance you're reading this today, happy new year! If you're reading this later, I hope $CURRENT_YEAR is treating you well. 
+In the off-chance you're reading this today, happy new year! If you're reading this later, I hope $CURRENT_YEAR is treating you well. 
 
 Before this post, I kept a list of my programs in my iCloud in case my computer broke or I was setting up a work laptop. After some recent events, I trust iCloud less than I once did, and figured the list can live here instead. Like the rest of my blog, this exists for me but hopefully you find it useful too. I plan to write an Arch Linux version of this soon. 
 
