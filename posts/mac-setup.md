@@ -26,7 +26,7 @@ I try to use open-source where I can. If you know of an alternative to the few c
 - [Fish](https://fishshell.com/) is user-friendly shell (seriously, I hate zsh/bash now)
     - [Fisher](https://github.com/jorgebucaran/fisher): Fish plugin manager
     - [fish-nvm](https://github.com/jorgebucaran/fish-nvm): [nvm](https://github.com/nvm-sh/nvm) wrapper
-- [NextDNS](https://nextdns.io/) is a secure DNS service (from App Store)
+- [NextDNS](https://nextdns.io/) is a secure DNS service (I downloaded the macOS client from the App Store)
 - [LastPass](https://www.lastpass.com/) is my password manager, but I'm currently looking to start self-hosting.
 - [Insomnia](https://insomnia.rest/) is my favorite REST client
 - [IINA](https://iina.io/]) is a nice media player 
