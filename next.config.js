@@ -4,6 +4,8 @@ module.exports = {
     formats: ['image/avif', 'image/webp'],
   },
 
+  reactStrictMode: true,
+
   async redirects() {
     return [
       {

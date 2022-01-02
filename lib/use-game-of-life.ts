@@ -95,7 +95,7 @@ const useGol = ({ width, canvas, fps = 60, running, spawnRate = 0.06 }: Props) =
             )
 
             const startState = new Uint8Array(size * size * 3)
-            for (let i = 0; i < size * size; i++) {
+            for (let i = 0; i < size * size * 3; i++) {
                 const intensity = Math.random() < spawnRate ? 255 : 0
                 startState[i] = intensity
                 startState[i + 1] = intensity
