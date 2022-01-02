@@ -79,6 +79,5 @@ void main(void) {
     // set opacity to half
     gl_FragColor.a = 0.1;
   }
-
 }
 `

@@ -7,9 +7,10 @@ type Props = {
     canvas: RefObject<HTMLCanvasElement>
     width?: number
     fps?: number
+    spawnRate: number
     running: boolean
 }
-const useGol = ({ width, canvas, fps = 60, running }: Props) => {
+const useGol = ({ width, canvas, fps = 60, running, spawnRate = 0.06 }: Props) => {
     const requestRef = useRef<number | null>(null);
 
     const cancelAnimation = () => {
@@ -27,7 +28,7 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
         }
 
         if (width && canvas.current) {
-            const size = 1024
+            const size = 2048
 
             const gl = canvas.current.getContext('webgl', { premultipliedAlpha: false, })
 
@@ -95,7 +96,7 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
 
             const startState = new Uint8Array(size * size * 3)
             for (let i = 0; i < size * size; i++) {
-                const intensity = Math.random() < 0.05 ? 255 : 0
+                const intensity = Math.random() < spawnRate ? 255 : 0
                 startState[i] = intensity
                 startState[i + 1] = intensity
                 startState[i + 2] = intensity
@@ -181,7 +182,7 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
                 return cancelAnimation()
             }
         }
-    }, [canvas, fps, running, width])
+    }, [canvas, fps, running, spawnRate, width])
 }
 
 export default useGol
