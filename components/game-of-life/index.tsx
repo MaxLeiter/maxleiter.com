@@ -12,6 +12,8 @@ const GoL = () => {
     const [fps, setFps] = useState(35)
     const { width, height } = useDocumentSize()
     useGameOfLife({ canvas, width, running, fps })
+
+    // Disable on start if preferReducedMotion
     useEffect(() => {
         if (preferReducedMotion) {
             setRunning(false)

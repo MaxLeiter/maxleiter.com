@@ -16,8 +16,16 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
         if (requestRef.current)
             cancelAnimationFrame(requestRef.current);
     }
+    
 
     useEffect(() => {
+        if (typeof window === "undefined") return
+        if (!width) return
+        if (!canvas || !canvas.current) return
+        if (!running) {
+            return cancelAnimation()
+        }
+
         if (width && canvas.current) {
             const size = 1024
 
@@ -148,13 +156,6 @@ const useGol = ({ width, canvas, fps = 60, running }: Props) => {
 
             let nextStateIndex = 0;
             const animate = () => {
-                if (typeof window === "undefined") return
-                if (!width) return
-                if (!canvas || !canvas.current) return
-                if (!running) {
-                    return cancelAnimation()
-                }
-
                 const previousStateIndex = 1 - nextStateIndex
 
                 gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[nextStateIndex])

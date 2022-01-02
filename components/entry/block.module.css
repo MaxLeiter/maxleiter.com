@@ -9,13 +9,14 @@
   outline: none;
   padding-top: var(--gap);
   padding-bottom: var(--gap-double);
-  border: 1px solid var(--bg);
   padding-left: var(--gap);
   transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
   border-radius: var(--radius);
   will-change: transform, opacity;
+  cursor: pointer;
 }
 
+.item:focus,
 .link:active,
 .link:focus,
 .link:hover {

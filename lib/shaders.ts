@@ -71,8 +71,9 @@ void main(void) {
   else if (nowAlive) {
     // Color gradually based on number of neighbors
     float color;
+    if (aliveNeighbors == 1) color = 0.1;
     if (aliveNeighbors == 2) color = 0.2;
-    else if (aliveNeighbors == 3) color = 0.5;
+    else if (aliveNeighbors == 3) color = 0.4;
     else color = 0.0;
     gl_FragColor = vec4(color, color, color, 1.0);
     // set opacity to half

@@ -24,8 +24,7 @@ const Posts = ({ posts, paginate }: Props) => {
         return (
           <BlockEntry
             key={`post-item-${post.slug}`}
-            href="/blog/[slug]"
-            as={`/blog/${post.slug}`}
+            href={`/blog/${post.slug}`}
             title={post.title}
             type={date}
           />

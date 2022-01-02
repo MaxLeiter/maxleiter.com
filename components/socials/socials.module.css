@@ -7,6 +7,9 @@
     will-change: transform;
     transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
     line-height: 50%;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
 }
 
 .icon:active,
@@ -15,6 +18,7 @@
     outline: none;
     color: var(--fg);
     transition: all 200ms !important;
+    box-shadow: none;
     background: var(--lightest-gray);
     /* transform: translateY(-5px); */
 }

@@ -11,6 +11,7 @@ type Props = {
   children: React.ReactNode
   className?: string
   transition?: boolean
+  tabIndex?: number
 }
 const Link = ({
   external,
@@ -20,6 +21,7 @@ const Link = ({
   className,
   title,
   transition = true,
+  tabIndex = 0,
   ...props
 }: Props) => {
   const style = transition ? styles.transition + ` ${className}` : className
@@ -30,8 +32,9 @@ const Link = ({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className={style}
+        className={className ? `${style} ${className}` : style}
         title={title}
+        tabIndex={tabIndex}
         {...props}
       >
         {children}
@@ -42,7 +45,7 @@ const Link = ({
   return (
     <>
       <NextLink href={href} as={as}>
-        <a className={style} title={title} {...props}>
+        <a className={className ? `${style} ${className}` : style} title={title} {...props} tabIndex={tabIndex}>
           {children}
         </a>
       </NextLink>
@@ -50,5 +53,4 @@ const Link = ({
   )
 }
 
-Link.displayName = 'Link'
 export default memo(Link)

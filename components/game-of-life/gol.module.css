@@ -49,7 +49,8 @@
     }
   
 
-    .controlsOverlay span {
+    .controlsOverlay span,
+    .controlsOverlay input {
         display: none;
     }
 }
