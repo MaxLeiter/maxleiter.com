@@ -26,7 +26,7 @@ const Entry = ({
       <Link href={href} external={true}>
         {title}
       </Link>{' '}
-      <Badge>{role}</Badge>
+      <Badge className={styles.badge}>{role}</Badge>
       {showYears && (
         <Badge>
           {years[0]} {years[1] ? '-' : ''} {years[1]}

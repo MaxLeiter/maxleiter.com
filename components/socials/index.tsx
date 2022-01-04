@@ -27,7 +27,7 @@ const Socials = () => {
         tooltip="GitHub"
       />
       <SocialButton
-        href="https://twitter.com/maxleiter"
+        href="https://twitter.com/max_leiter"
         icon={<Twitter />}
         tooltip="Twitter"
       />

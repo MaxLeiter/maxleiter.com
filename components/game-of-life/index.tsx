@@ -1,3 +1,4 @@
+import Badge from "@components/badge"
 import Button from "@components/button"
 import { useReducedMotion } from "@lib/media-query-hooks"
 import useDocumentSize from "@lib/use-document-size"
@@ -26,7 +27,7 @@ const GoL = () => {
     return (
         <>
             <div className={styles.controlsOverlay}>
-                <h5 style={{margin:' var(--gap-half)'}}> Game of Life </h5>
+                <h5 style={{margin:' var(--gap-half)'}}> Game of Life <Badge>Experimental</Badge> </h5>
                 <Button onClick={() => setRunning(!running)}>{running ? 'Stop' : 'Start'}</Button>
                 <span>Zoom: {resolution}%
                     <input type="range" step="10" min="0" max="100" value={resolution} onChange={(e) => setResolution(parseInt(e.target.value))} />

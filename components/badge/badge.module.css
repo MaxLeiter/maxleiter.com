@@ -2,7 +2,6 @@
     display: inline-flex;
     align-items: center;
     font-size: 14px;
-    margin-left: var(--gap);
     background-color: var(--lighest-gray);
     border: 1px solid var(--lighter-gray);
     border-radius: var(--radius);

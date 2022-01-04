@@ -15,3 +15,7 @@
 .wrapper i {
   color: var(--gray-alpha);
 }
+
+.badge {
+  margin-left: var(--gap-half);
+}
