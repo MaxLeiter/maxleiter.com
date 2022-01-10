@@ -54,7 +54,7 @@ const Index = ({ posts, projects }: { posts: any, projects: any }) => {
             projects={projects}
           />
           <h3>My posts</h3>
-          <PostsList posts={posts} />
+          <PostsList posts={posts} paginate={true} />
           <footer>
             <Link href="/about">About this site</Link>
             {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA && (

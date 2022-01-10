@@ -1,6 +1,6 @@
 ---
 title: Pin your npm/yarn dependencies
-description:
+description: Why you should you pin your dependencies
 slug: pin-dependencies
 date: Jan 9, 2022
 # published: false

@@ -4,7 +4,7 @@
 }
 
 .button {
-  margin-top: var(--small-gap);
+  margin-top: var(--gap-half);
   width: 100%;
   cursor: pointer;
   border-radius: var(--radius);

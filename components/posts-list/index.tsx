@@ -7,10 +7,11 @@ import type { Post } from '@lib/types'
 type Props = {
   posts: Post[]
   paginate?: boolean
+  showDescription?: boolean
 }
 
-const Posts = ({ posts, paginate }: Props) => {
-  const [showMore, setShowMore] = useState(3)
+const Posts = ({ posts, paginate, showDescription }: Props) => {
+  const [showMore, setShowMore] = useState(4)
 
   return (
     <ul className={styles.container}>
@@ -28,13 +29,14 @@ const Posts = ({ posts, paginate }: Props) => {
             title={post.title}
             type={date}
             as={`/blog/${post.slug}`}
+            description={showDescription ? post.description : undefined}
           />
         )
       })}
       {paginate && showMore < posts.length && (
         <button
           onClick={() => {
-            setShowMore(showMore + 3)
+            setShowMore(showMore + 4)
           }}
           className={styles.button}
         >

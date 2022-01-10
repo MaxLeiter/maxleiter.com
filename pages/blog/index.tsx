@@ -12,7 +12,7 @@ const Blog = ({ posts }: Props) => {
     <Page title="Blog" description="Writing about design and code.">
       <article>
         <ul>
-          <PostsList posts={posts} />
+          <PostsList showDescription={true} posts={posts} />
         </ul>
       </article>
     </Page>
