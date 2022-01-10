@@ -1,15 +1,15 @@
 import Badge from "@components/badge"
 import Button from "@components/button"
-import { useReducedMotion } from "@lib/media-query-hooks"
+// import { useReducedMotion } from "@lib/media-query-hooks"
 import useDocumentSize from "@lib/use-document-size"
 import useGameOfLife from "@lib/use-game-of-life"
-import { RefObject, useEffect, useRef, useState } from "react"
+import { RefObject, useRef, useState } from "react"
 import styles from './gol.module.css'
 
 const GoL = () => {
     const canvas = useRef() as RefObject<HTMLCanvasElement>
-    const preferReducedMotion = useReducedMotion();
-    const [running, setRunning] = useState(!preferReducedMotion)
+    // const preferReducedMotion = useReducedMotion();
+    const [running, setRunning] = useState(false)
     const [fps, setFps] = useState(35)
     const [spawnRate, setSpawnRate] = useState(0.06)
     const [resolution, setResolution] = useState(0)
@@ -17,17 +17,18 @@ const GoL = () => {
     const { width, height } = useDocumentSize()
     useGameOfLife({ canvas, width, running, fps, spawnRate })
 
-    // Disable on start if preferReducedMotion
-    useEffect(() => {
-        if (preferReducedMotion) {
-            setRunning(false)
-        }
-    }, [preferReducedMotion])
+    // // Disable on start if preferReducedMotion
+    // useEffect(() => {
+    //     if (preferReducedMotion) {
+    //         setRunning(false)
+    //     }
+    // }, [preferReducedMotion])
 
     return (
         <>
             <div className={styles.controlsOverlay}>
-                <h5 style={{margin:' var(--gap-half)'}}> Game of Life <Badge>Experimental</Badge> </h5>
+                <h5 style={{margin:' var(--gap-half)'}}> Game of Life </h5>
+                <Badge className={styles.badge}>Experimental</Badge>
                 <Button onClick={() => setRunning(!running)}>{running ? 'Stop' : 'Start'}</Button>
                 <span>Zoom: {resolution}%
                     <input type="range" step="10" min="0" max="100" value={resolution} onChange={(e) => setResolution(parseInt(e.target.value))} />

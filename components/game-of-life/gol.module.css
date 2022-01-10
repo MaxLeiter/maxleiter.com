@@ -14,7 +14,7 @@
     top: 0;
     left: 0;
     width: 180px;
-    height: 180px;
+    min-height: 300;
     padding: var(--gap-half);
     z-index: 999;
     pointer-events: all;
@@ -24,6 +24,12 @@
     /* // nice gradient background */
     background-color: var(--bg);
     opacity: .8;
+}
+
+.badge {
+    margin-top: var(--gap);
+    margin-bottom: var(--gap);
+    padding: var(--gap-quarter);
 }
 
 /* On mobile, make it full-width and a row */

@@ -85,6 +85,13 @@ const Projects: Project[] = [
     href: 'https://easyarty.com',
     role: 'Creator',
     years: ['2021'],
+  },
+  {
+    title: "Vercel Raycast",
+    description: "A Raycast extension for managing Vercel via its REST API.",
+    href: "https://github.com/MaxLeiter/vercel-raycast",
+    role: "Creator",
+    years: ["2022"],
   }
 ]
 
