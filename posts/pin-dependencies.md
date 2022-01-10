@@ -32,7 +32,7 @@ If you do this, I also recommend some sort of dependency management so you stay 
 
 You may have noticed npm and yarn generate `package-lock.json` and `yarn.lock` when you run `npm i` and `yarn`, respectively. The lockfiles allow every version of every sub-dependency to be pinned, while modifying the package.json only guarantees we pin the immediate dependency (which may not pin its own dependencies).
 
-One problem with relying on lockfiles is that they and their semantics are confusing. In my experience, many new-to-npm users expect `npm i` to function like `npm ci`, and are unaware of the differences. `npm i` is based on the `node_modules` folder, and will actually add dependencies in node_modules to your package.json if they're not present. This means you can remove the line in your package.json, run `npm i`, and the dependency will re-appear. 
+One problem with relying on lockfiles is that they and their semantics are confusing. In my experience, many new-to-npm users expect `npm i` to function like `npm ci`, and are unaware of the differences. `npm i` can update `package-lock.json`, whereas `npm ci` will only read from it. 
 
 
 > Tip: You almost always want to use `npm ci`
@@ -40,7 +40,9 @@ One problem with relying on lockfiles is that they and their semantics are confu
 
 Meanwhile, with yarn, `yarn install` will install the version in the yarn.lock, regardless of the version in the package.json. Good for security? Sure. Good for the developer experience? Not so much. You need to use `yarn upgrade <package>` in order to fetch the version in the package.json if it's more recent than specified in the yarn.lock. It's now far more difficult to determine *when* something is updated. If you've ever found yourself staring at a yarn.lock diff you'll know what I mean. 
 
+Lockfiles are good tools, but can be difficult and unintuitive to work with.
+
 ### In conclusion
-Use lockfiles, but have your package.json be the source of truth. Pin your dependencies so you have a human-friendly, readable method to audit your dependencies and ensure a specific version is installed. Automate some process to make sure you remain up-to-date.
+Use lockfiles for pinning transitive dependencies, but have your package.json be the source of truth. Pin your dependencies so you have a human-friendly, readable method to audit your dependencies and ensure a specific version is installed. Automate some process to make sure you remain up-to-date.
 
 If you disagree or have comments, feel free to [email me](mailto:maxwell.leiter@gmail.com) or reach out on [Twitter](https://twitter.com/max_leiter).
