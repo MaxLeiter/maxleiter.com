@@ -19,7 +19,7 @@ const BlockEntry = ({ title, description, type, href, as, date }: Props) => {
         href={href}
         as={as}
         external={!as}
-        title={`${title}`}
+        title={description || title}
         className={styles.link}
         transition={false}
       >

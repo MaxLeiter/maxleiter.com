@@ -21,14 +21,6 @@ article img {
   border-radius: var(--radius);
 }
 
-article [id]::before {
-  content: '';
-  display: block;
-  height: 70px;
-  margin-top: -70px;
-  visibility: hidden;
-}
-
 /* Lists */
 
 article ul {
@@ -48,6 +40,12 @@ article ol {
   list-style-position: inside;
 }
 
+article ol > li > ul {
+  margin-left: var(--gap-double);
+  list-style-position: inside;
+  list-style-type: circle;
+}
+
 article ul li.reset {
   display: flex;
   align-items: flex-start;
@@ -61,6 +59,8 @@ article ul li.reset .check {
   align-items: center;
   margin-right: 0.51rem;
 }
+
+
 
 /* Checkbox */
 

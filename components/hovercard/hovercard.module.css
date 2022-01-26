@@ -1,0 +1,14 @@
+.card {
+    position: absolute;
+    display: block;
+    background-color: var(--lighter-gray);
+    border-radius: var(--radius);
+    color: var(--fg);
+    padding: var(--gap-half) var(--gap);
+    position: absolute;
+    z-index: 999;
+    width: 200px;
+    transition: all 0.07s cubic-bezier(.01,.88,.93,.07);
+    transform: translate(-50%, calc(-100% - 10px));
+    pointer-events: all;
+}

@@ -7,10 +7,9 @@ import type { Post } from '@lib/types'
 type Props = {
   posts: Post[]
   paginate?: boolean
-  showDescription?: boolean
 }
 
-const Posts = ({ posts, paginate, showDescription }: Props) => {
+const Posts = ({ posts, paginate }: Props) => {
   const [showMore, setShowMore] = useState(4)
 
   return (
@@ -29,7 +28,7 @@ const Posts = ({ posts, paginate, showDescription }: Props) => {
             title={post.title}
             type={date}
             as={`/blog/${post.slug}`}
-            description={showDescription ? post.description : undefined}
+            description={post.description}
           />
         )
       })}

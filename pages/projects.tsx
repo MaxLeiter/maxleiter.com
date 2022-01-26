@@ -10,7 +10,7 @@ type Props = {
 const Projects = ({ projects }: Props) => {
   return (
     <Page title="Projects" description="Most of my projects">
-      <ProjectList projects={projects} />
+      <ProjectList showYears={true} count={projects.length} projects={projects} />
     </Page>
   )
 }

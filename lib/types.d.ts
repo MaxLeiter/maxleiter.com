@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 export type Post = {
     title: string
     slug: string
@@ -13,4 +15,6 @@ export type Project = {
     href: string
     role: string
     years: string[]
+    stars?: number | string
+    cardInfo?: ReactNode
 }
