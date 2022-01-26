@@ -1,6 +1,6 @@
 ---
 title: How to start contributing to open-source projects
-description: A small guide on my steps to finding projects and contributing changes
+description: A small guide to finding projects and contributing changes
 slug: contributing-to-oss
 date: Jan 25, 2022
 published: true
