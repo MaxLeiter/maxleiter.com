@@ -42,6 +42,10 @@
   --keyword: #fff;
   --name: #fff;
   --highlight: #2e2e2e;
+
+  /* Fading */
+  --timing: 0.3s;
+  --fade-in: var(--timing) ease-in-out;
 }
 
 * {

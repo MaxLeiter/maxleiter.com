@@ -26,6 +26,10 @@
     opacity: .8;
 }
 
+.controlsOverlay a {
+    color: var(--link);
+}
+
 .badge {
     margin-top: var(--gap);
     margin-bottom: var(--gap);

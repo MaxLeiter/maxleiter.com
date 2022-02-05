@@ -6,7 +6,7 @@ const AboutMe = () => (
     <Link href="https://www.blend.com" external>
       Blend
     </Link>{' '}
-    and{' '}
+    and in August I will be joining{' '}
     <Link href="https://vercel.com" external>
       Vercel
     </Link>

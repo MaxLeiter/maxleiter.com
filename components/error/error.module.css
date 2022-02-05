@@ -22,9 +22,7 @@
 .second,
 .third {
   opacity: 0;
-  animation-name: fadeIn;
-  animation-duration: 1s;
-  animation-timing-function: ease-in;
+  animation: fadeIn var(--timing) ease-in;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
 }
@@ -34,10 +32,11 @@
 }
 
 .second {
-  animation-delay: 1.2s;
+  animation-delay: calc(var(--timing) * 2);
 }
 
 .third {
-  animation-delay: 2.4s;
+  animation-delay: calc(var(--timing) * 3);;
 }
+
 

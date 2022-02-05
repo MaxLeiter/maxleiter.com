@@ -3,6 +3,7 @@ import Button from "@components/button"
 // import { useReducedMotion } from "@lib/media-query-hooks"
 import useDocumentSize from "@lib/use-document-size"
 import useGameOfLife from "@lib/use-game-of-life"
+import Link from "next/link"
 import { RefObject, useRef, useState } from "react"
 import styles from './gol.module.css'
 
@@ -31,14 +32,14 @@ const GoL = () => {
                 <Badge className={styles.badge}>Experimental</Badge>
                 <Button onClick={() => setRunning(!running)}>{running ? 'Stop' : 'Start'}</Button>
                 <span>Zoom: {resolution}%
-                    <input type="range" step="10" min="0" max="100" value={resolution} onChange={(e) => setResolution(parseInt(e.target.value))} />
+                    <input disabled={!running} type="range" step="10" min="0" max="100" value={resolution} onChange={(e) => setResolution(parseInt(e.target.value))} />
                 </span>
                 <span>FPS: {fps}
-                    <input type="range" min="1" max="60" value={fps} onChange={(e) => setFps(parseInt(e.target.value))} />
+                    <input disabled={!running} type="range" min="1" max="60" value={fps} onChange={(e) => setFps(parseInt(e.target.value))} />
                 </span>
-                <span>Living likelihood: {spawnRate}
-                    <input type="range" step=".01" min="0" max="0.5" value={spawnRate} onChange={(e) => setSpawnRate(parseFloat(e.target.value))} />
-                </span>
+                <p>
+                    The <Link href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"><a>game of life</a></Link> simulation runs entirely on your GPU using WebGL via shaders. Inspired by <a href="https://nullprogram.com/blog/2014/06/10/">nullprogram</a> and some others.
+                </p>
             </div>
             {running && width && height && <canvas
                 ref={canvas}
