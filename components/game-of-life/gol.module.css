@@ -12,10 +12,9 @@
 .controlsOverlay {
     position: absolute;
     top: 0;
-    left: 0;
+    padding: var(--gap);
     width: 180px;
     min-height: 300;
-    padding: var(--gap-half);
     z-index: 999;
     pointer-events: all;
     display: flex;
@@ -36,7 +35,6 @@
     padding: var(--gap-quarter);
 }
 
-/* On mobile, make it full-width and a row */
 @media screen and (max-width: 1000px) {
     .controlsOverlay {
         position: fixed;
@@ -60,8 +58,7 @@
     }
   
 
-    .controlsOverlay span,
-    .controlsOverlay input {
+    .controlsOverlay {
         display: none;
     }
 }

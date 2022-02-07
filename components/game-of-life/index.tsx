@@ -12,7 +12,7 @@ const GoL = () => {
     // const preferReducedMotion = useReducedMotion();
     const [running, setRunning] = useState(false)
     const [fps, setFps] = useState(35)
-    const [spawnRate, setSpawnRate] = useState(0.06)
+    const [spawnRate] = useState(0.06)
     const [resolution, setResolution] = useState(0)
     
     const { width, height } = useDocumentSize()
