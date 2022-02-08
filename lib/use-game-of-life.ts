@@ -172,9 +172,9 @@ const useGol = ({ width, canvas, fps = 60, running, spawnRate = 0.06 }: Props) =
                 gl.drawElements(gl.TRIANGLE_FAN, 4, gl.UNSIGNED_BYTE, 0)
 
                 nextStateIndex = previousStateIndex
-                setTimeout(() => {
+                // setTimeout(() => {
                     requestRef.current = requestAnimationFrame(animate)
-                }, 1000 / fps);
+                // }, 1000 / fps);
             }
             requestRef.current = requestAnimationFrame(animate);
 
