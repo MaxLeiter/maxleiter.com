@@ -17,7 +17,6 @@
     "swr": "^1.0.1"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.15.0",
     "@types/marked": "^4.0.1",
     "@types/node": "^17.0.12",
     "@types/prettier": "^2.4.2",
