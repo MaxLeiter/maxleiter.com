@@ -1,5 +1,5 @@
 import NextHead from 'next/head'
-
+import { useRouter } from 'next/router'
 type Props = {
   title?: string
   description?: string
@@ -13,6 +13,8 @@ const Head = ({
   image = '',
   children,
 }: Props) => {
+  const router = useRouter()
+  const url = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}${router.asPath}`
   return (
     <NextHead>
       {/* Title */}
@@ -28,7 +30,7 @@ const Head = ({
       <meta name="og:image" content={image} />
 
       {/* URL */}
-      <meta name="og:url" content="https://maxleiter.com" />
+      <meta name="og:url" content={url} />
 
       {/* General */}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
