@@ -11,12 +11,12 @@ const GoL = () => {
     const canvas = useRef() as RefObject<HTMLCanvasElement>
     // const preferReducedMotion = useReducedMotion();
     const [running, setRunning] = useState(false)
-    const [fps, setFps] = useState(35)
+    // const [fps, setFps] = useState(35)
     const [spawnRate] = useState(0.06)
     const [resolution, setResolution] = useState(0)
     
     const { width, height } = useDocumentSize()
-    useGameOfLife({ canvas, width, running, fps, spawnRate })
+    useGameOfLife({ canvas, width, running, spawnRate })
 
     // // Disable on start if preferReducedMotion
     // useEffect(() => {
@@ -34,9 +34,9 @@ const GoL = () => {
                 <span>Zoom: {resolution}%
                     <input disabled={!running} type="range" step="10" min="0" max="100" value={resolution} onChange={(e) => setResolution(parseInt(e.target.value))} />
                 </span>
-                <span>FPS: {fps}
+                {/* <span>FPS: {fps}
                     <input disabled={!running} type="range" min="1" max="60" value={fps} onChange={(e) => setFps(parseInt(e.target.value))} />
-                </span>
+                </span> */}
                 <p>
                     The <Link href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"><a>game of life</a></Link> simulation runs entirely on your GPU using WebGL via shaders. Inspired by <a href="https://nullprogram.com/blog/2014/06/10/">nullprogram</a> and some others.
                 </p>
