@@ -6,6 +6,14 @@ module.exports = {
 
   reactStrictMode: true,
 
+  // experimental: {
+  //   concurrentFeatures: true,
+  //   serverComponents: true,
+  // },
+
+  experimental: {
+    optimizeCss: true,
+  },
   async redirects() {
     return [
       {
