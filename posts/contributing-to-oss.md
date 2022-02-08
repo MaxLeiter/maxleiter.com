@@ -3,7 +3,6 @@ title: How to start contributing to open-source projects
 description: A small guide to finding projects and contributing changes
 slug: contributing-to-oss
 date: Jan 25, 2022
-published: true
 ---
 One of the most common questions I'm asked by my computer science friends and lower-level students is how they can contribute to an open-source project. In order for me to organize and share my thoughts I thought I'd write something here.
 
