@@ -8,33 +8,47 @@ const getDate = new Date().toISOString()
 const DOMAIN = process.env.NEXT_PUBLIC_VERCEL_URL || "https://maxleiter.com"
 
 const formatted = (sitemap: string) => prettier.format(sitemap, { parser: 'html' });
+type Page = {
+  path: string
+  lastmod: string
+}
 
 (async () => {
-  const pages = await globby([
+  const pagePaths = await globby([
     // include
     'pages/*.tsx',
     // exclude
     '!pages/_*.tsx',
+    '!pages/404.tsx',
   ])
+
+  const pages: Page[] = pagePaths.map((pagePath) => {
+    const path = pagePath.replace(/^pages\//, '').replace(/\.tsx$/, '')
+    const lastmod = fs.statSync(pagePath).mtime.toISOString()
+    return { path, lastmod }
+  })
 
   const blogPosts = getPosts()
   for (const post of blogPosts) {
     if (post)
-      pages.push(`posts/${post.slug}.tsx`)
+      pages.push({
+        path: `blog/${post.slug}`,
+        lastmod: new Date(post.date).toISOString(),
+      })
   }
 
   const pagesSitemap = `
     ${pages
       .map((page) => {
-        const path = page
+        const path = page.path
           .replace('../pages/', '')
           .replace('.tsx', '')
           .replace(/\/index/g, '')
         const routePath = path === 'index' ? '' : path
         return `
           <url>
-            <loc>${DOMAIN}/${routePath}</loc>
-            <lastmod>${getDate}</lastmod>
+            <loc>https://${DOMAIN}/${routePath}</loc>
+            <lastmod>${page.lastmod}</lastmod>
           </url>
         `
       })
