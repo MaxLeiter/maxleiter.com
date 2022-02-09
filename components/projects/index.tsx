@@ -3,7 +3,7 @@ import styles from './projects.module.css'
 import Entry from '@components/entry'
 
 import type { Project } from "@lib/types"
-import { Star } from '@components/icons'
+// import { Star } from '@components/icons'
 
 type Props = {
   count: number

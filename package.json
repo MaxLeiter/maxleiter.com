@@ -5,7 +5,8 @@
     "lint": "next lint && prettier --write '**/*.js' --loglevel warn",
     "dev": "next -p 3000",
     "build": "yarn rss && next build",
-    "rss": "node lib/rss"
+    "rss": "node lib/rss",
+    "sitemap": "ts-node lib/sitemap"
   },
   "pre-commit": "lint",
   "license": "MIT",
@@ -14,6 +15,7 @@
     "react": "^18.0.0-rc.0",
     "react-dom": "^18.0.0-rc.0",
     "rss-parser": "^3.12.0",
+    "sitemap": "^7.1.1",
     "swr": "^1.0.1"
   },
   "devDependencies": {
@@ -22,6 +24,7 @@
     "@types/prettier": "^2.4.2",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.11",
+    "@types/rss": "^0.0.29",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
     "babel-plugin-module-resolver": "^4.1.0",
@@ -39,6 +42,7 @@
     "prettier": "^2.3.2",
     "prism-react-renderer": "^1.2.1",
     "rss": "^1.2.2",
+    "ts-node": "^10.5.0",
     "typescript": "^4.4.2",
     "typescript-plugin-css-modules": "^3.4.0"
   },
