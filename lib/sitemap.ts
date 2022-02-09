@@ -3,9 +3,8 @@ import globby from 'globby'
 import prettier from 'prettier'
 import path from "path"
 import getPosts from "./get-posts"
-const getDate = new Date().toISOString()
 
-const DOMAIN = process.env.NEXT_PUBLIC_VERCEL_URL || "https://maxleiter.com"
+const DOMAIN = "maxleiter.com"
 
 const formatted = (sitemap: string) => prettier.format(sitemap, { parser: 'html' });
 type Page = {

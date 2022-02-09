@@ -14,7 +14,7 @@ const Head = ({
   children,
 }: Props) => {
   const router = useRouter()
-  const url = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}${router.asPath}`
+  const url = `https://maxleiter.com${router.asPath}`
   return (
     <NextHead>
       {/* Title */}
