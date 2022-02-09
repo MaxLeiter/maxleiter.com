@@ -12,15 +12,16 @@ const formatted = (sitemap: string) => prettier.format(sitemap, { parser: 'html'
 (async () => {
   const pages = await globby([
     // include
-    '../pages/*.tsx',
+    'pages/*.tsx',
     // exclude
-    '!../pages/_*.tsx',
+    '!pages/_*.tsx',
   ])
+  console.log(pages)
 
   const blogPosts = getPosts()
   for (const post of blogPosts) {
     if (post)
-      pages.push(`/posts/${post.slug}.tsx`)
+      pages.push(`posts/${post.slug}.tsx`)
   }
 
   const pagesSitemap = `
