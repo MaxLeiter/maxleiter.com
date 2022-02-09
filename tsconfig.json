@@ -4,8 +4,8 @@
     "baseUrl": ".",
     "allowJs": true,
     "jsx": "preserve",
-    "target": "esnext",
-    "module": "esnext",
+    "target": "ES2017",
+    // "module": "esnext",
     "lib": [
       "dom",
       "es2019"

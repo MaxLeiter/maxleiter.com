@@ -16,7 +16,6 @@ const formatted = (sitemap: string) => prettier.format(sitemap, { parser: 'html'
     // exclude
     '!pages/_*.tsx',
   ])
-  console.log(pages)
 
   const blogPosts = getPosts()
   for (const post of blogPosts) {

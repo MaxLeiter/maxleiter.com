@@ -4,7 +4,7 @@
   "scripts": {
     "lint": "next lint && prettier --write '**/*.js' --loglevel warn",
     "dev": "next -p 3000",
-    "build": "yarn rss && next build",
+    "build": "yarn rss && yarn sitemap && next build",
     "rss": "node lib/rss",
     "sitemap": "ts-node lib/sitemap"
   },
