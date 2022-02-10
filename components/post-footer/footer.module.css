@@ -1,0 +1,4 @@
+.footer a {
+    color: var(--link);
+    transition: color 0.1s ease-in-out;
+}

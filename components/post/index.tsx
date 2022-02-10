@@ -4,6 +4,7 @@ import Navigation from './navigation'
 import Page from '@components/page'
 import styles from './post.module.css'
 import type types from '@lib/types'
+import PostFooter from '@components/post-footer'
 
 function escapeHtml(unsafe: string) {
   return unsafe
@@ -49,7 +50,7 @@ const Post = ({
           }">${escapeHtml(title)}</h1>${html}`,
         }}
       />
-
+      <PostFooter />
       <Navigation previous={previous} next={next} />
     </Page>
   )

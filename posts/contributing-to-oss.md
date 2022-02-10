@@ -48,8 +48,6 @@ And loads more. I didn't even mention the vast number of open-source software li
 * Discover and grow comfortable with your tools for grepping and exploring unfamiliar code bases 
 * Don't be afraid to reach out to the maintainers and community; develop communication skills
 
-<hr />
-
 [^1]:. <small>One of the few better feelings is fixing a bug in software you made that someone else reported.</small> [⏎](/blog/contributing-to-oss#ref:1)
 [^2]:. <small>If the README does not exist, consider that a red flag. If the CONTRIBUTING file does not exist, consider asking the maintainers if you could help draft one.</small> [⏎](/blog/contributing-to-oss#ref:2)
 [^3]:. <small>If you haven't worked professionally in CS yet, this is likely your first code review, and they're highly prevalent in the industry, so try extra hard to learn from your mistakes and take note of what you like and dislike about the review left for you.</small> [⏎](/blog/contributing-to-oss#ref:3)
