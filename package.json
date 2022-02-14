@@ -5,8 +5,8 @@
     "lint": "next lint && prettier --write '**/*.js' --loglevel warn",
     "dev": "next -p 3000",
     "build": "yarn rss && yarn sitemap && next build",
-    "rss": "node lib/rss",
-    "sitemap": "ts-node lib/sitemap"
+    "rss": "ts-node --project ./node.tsconfig.json scripts/rss",
+    "sitemap": "ts-node --project ./node.tsconfig.json scripts/sitemap"
   },
   "pre-commit": "lint",
   "license": "MIT",

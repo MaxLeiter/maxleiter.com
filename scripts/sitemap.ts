@@ -1,16 +1,12 @@
 import fs from 'fs'
 import globby from 'globby'
+import path from 'path'
+import getPosts from '../lib/get-posts'
 import prettier from 'prettier'
-import path from "path"
-import getPosts from "./get-posts"
 
 const DOMAIN = "maxleiter.com"
 
 const formatted = (sitemap: string) => prettier.format(sitemap, { parser: 'html' });
-type Page = {
-  path: string
-  lastmod: string
-}
 
 (async () => {
   const pagePaths = await globby([
@@ -21,7 +17,7 @@ type Page = {
     '!pages/404.tsx',
   ])
 
-  const pages: Page[] = pagePaths.map((pagePath) => {
+  const pages = pagePaths.map((pagePath) => {
     const path = pagePath.replace(/^pages\//, '').replace(/\.tsx$/, '')
     const lastmod = fs.statSync(pagePath).mtime.toISOString()
     return { path, lastmod }
@@ -68,3 +64,4 @@ type Page = {
   const formattedSitemap = formatted(generatedSitemap)
   fs.writeFileSync(path.join(__dirname, '../public/sitemap-common.xml'), formattedSitemap, 'utf-8')
 })()
+

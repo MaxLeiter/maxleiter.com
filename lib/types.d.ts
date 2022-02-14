@@ -7,6 +7,7 @@ export type Post = {
     tags: string[]
     description: string
     body: string
+    lastModified: number
 }
 
 export type Project = {
