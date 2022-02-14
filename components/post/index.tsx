@@ -29,14 +29,24 @@ const Post = ({
   description,
   date,
   previous,
+  lastModified,
   next,
 }: Props) => {
+  const postDate = new Date(date)
+  const lastModifiedDate = lastModified ? new Date(lastModified) : undefined
+  const isDateDifferent = lastModifiedDate && lastModifiedDate.getDate() !== postDate.getDate()
+  const formattedLastModifiedDate = lastModifiedDate?.toLocaleDateString('default', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
   return (
     <Page
       title={title}
       description={description}
       showHeaderTitle={false}
-      image={!hidden ? `https://xn--hgi2158mjfa.vercel.app/${encodeURIComponent(title)}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(date)}` : undefined}
+      image={!hidden ? `https://💻➡📸.vercel.app/${encodeURIComponent(title)}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(date)}` : undefined}
     >
       <Head>
         {hidden && <meta name="robots" content="noindex" />}
@@ -45,7 +55,7 @@ const Post = ({
 
       <article
         dangerouslySetInnerHTML={{
-          __html: `<span class="${styles.date}">${date}</span><h1 class="${
+          __html: `<span class="${styles.date}">${date} ${isDateDifferent ? `(last modified ${formattedLastModifiedDate})` : ""}</span><h1 class="${
             styles.title
           }">${escapeHtml(title)}</h1>${html}`,
         }}
