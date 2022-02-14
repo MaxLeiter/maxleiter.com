@@ -46,10 +46,10 @@ const Projects: Project[] = [
     years: ['2016', 'present'],
   },
   {
-    title: 'MSHW018 driver for Linux kernel',
+    title: 'MSHW0184 driver for Linux kernel',
     description:
-      'Support for the MSHW018 device (used in Microsoft Surfaces) in the Linux kernel.',
-    href: 'blog/MSHW018',
+      'Support for the MSHW0184 device (used in Microsoft Surfaces) in the Linux kernel.',
+    href: 'blog/MSHW0184',
     role: 'Creator',
     years: ['2021'],
   },
