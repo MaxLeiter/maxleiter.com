@@ -55,7 +55,7 @@ const Post = ({
 
       <article
         dangerouslySetInnerHTML={{
-          __html: `<span class="${styles.date}">${date} ${isDateDifferent ? `(last modified ${formattedLastModifiedDate})` : ""}</span><h1 class="${
+          __html: `<span class="${styles.date}">${date} ${isDateDifferent ? `<span class="${styles.modified}">last modified ${formattedLastModifiedDate}` : ""}</span></span><h1 class="${
             styles.title
           }">${escapeHtml(title)}</h1>${html}`,
         }}

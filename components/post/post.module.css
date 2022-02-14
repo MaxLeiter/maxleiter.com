@@ -3,6 +3,13 @@
   font-size: 1rem;
 }
 
+.modified {
+  color: var(--gray);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: var(--gap-half);
+}
+
 .title {
   margin-top: 1rem;
 }
