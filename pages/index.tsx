@@ -9,7 +9,7 @@ import AboutMe from '@components/aboutme'
 import Page from '@components/page'
 import getPosts from '@lib/get-posts'
 import getProjects from '@lib/projects'
-import GoL from '@components/game-of-life'
+// import GoL from '@components/game-of-life'
 // import RSS from '@components/icons/rss'
 // import ShiftBy from '@components/ShiftBy'
 // import PauseIcon from '@components/icons/pause'
@@ -28,7 +28,7 @@ const Index = ({ posts, projects }: { posts: any, projects: any }) => {
 
   return (
     <>
-      <FadeIn><GoL /></FadeIn>
+      {/* <FadeIn><GoL /></FadeIn> */}
       <Page
         header={false}
         title=""
