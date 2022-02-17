@@ -38,3 +38,8 @@ export const getStaticPaths = () => {
 }
 
 export default PostPage
+
+export const config = {
+  unstable_JsPreload: false,
+  unstable_runtimeJS: false,
+};

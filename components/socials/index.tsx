@@ -13,7 +13,8 @@ const SocialButton = ({ tooltip, href, icon }: SocialButtonProps) => {
   return (
     <Tooltip text={tooltip}>
       <Link href={href} className={styles.icon}>
-            {icon}
+        {icon}
+        <span className={styles["sr-only"]}>{tooltip}</span>
       </Link>
     </Tooltip>
   )

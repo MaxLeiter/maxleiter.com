@@ -1,36 +1,45 @@
 .icon {
-    user-select: none;
-    display: inline-flex;
-    border-radius: var(--radius);
-    padding: var(--gap);
-    color: var(--fg);
-    will-change: transform;
-    transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
-    line-height: 50%;
-    background-color: transparent;
-    cursor: pointer;
-    border: none;
+  user-select: none;
+  display: inline-flex;
+  border-radius: var(--radius);
+  padding: var(--gap);
+  color: var(--fg);
+  will-change: transform;
+  transition: all 0.1s cubic-bezier(0.01, 0.88, 0.93, 0.07);
+  line-height: 50%;
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
 }
 
 .icon:active,
 .icon:hover,
 .icon:focus-within {
-    outline: none;
-    color: var(--fg);
-    transition: all 200ms !important;
-    box-shadow: none;
-    background: var(--lightest-gray);
-    /* transform: translateY(-5px); */
+  outline: none;
+  color: var(--fg);
+  transition: all 200ms !important;
+  box-shadow: none;
+  background: var(--lightest-gray);
+  /* transform: translateY(-5px); */
 }
 
 .socials {
-    display: inline-flex;
-    align-items: center;
+  display: inline-flex;
+  align-items: center;
+}
+
+.sr-only {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .icon,
-    .icon:hover {
-      transition: none;
-    }
+  .icon,
+  .icon:hover {
+    transition: none;
   }
+}

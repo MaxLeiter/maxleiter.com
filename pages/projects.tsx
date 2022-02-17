@@ -24,4 +24,10 @@ export const getStaticProps = async () => {
   }
 }
 
+export const config = {
+  unstable_JsPreload: false,
+  unstable_runtimeJS: false,
+};
+
+
 export default Projects

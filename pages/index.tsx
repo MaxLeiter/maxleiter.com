@@ -9,18 +9,19 @@ import AboutMe from '@components/aboutme'
 import Page from '@components/page'
 import getPosts from '@lib/get-posts'
 import getProjects from '@lib/projects'
+import { Post, Project } from '@lib/types'
 // import GoL from '@components/game-of-life'
 // import RSS from '@components/icons/rss'
 // import ShiftBy from '@components/ShiftBy'
 // import PauseIcon from '@components/icons/pause'
 // import PlayIcon from '@components/icons/play'
-import FadeIn from '@components/fade-in'
+// import FadeIn from '@components/fade-in'
 
 const PROJECT_COUNT = 3
 
 // const GoL = dynamic(() => import('@components/game-of-life'))
 
-const Index = ({ posts, projects }: { posts: any, projects: any }) => {
+const Index = ({ posts, projects }: { posts: Post[], projects: Project[] }) => {
 
   // const Icon = () => (
   //     <div style={{display: 'inline-flex', marginLeft: 'var(--gap)', cursor: 'pointer'}} onClick={() => setRunning(!running)}>{running ? <PauseIcon /> : <PlayIcon />}</div>
@@ -28,7 +29,6 @@ const Index = ({ posts, projects }: { posts: any, projects: any }) => {
 
   return (
     <>
-      {/* <FadeIn><GoL /></FadeIn> */}
       <Page
         header={false}
         title=""
@@ -54,7 +54,7 @@ const Index = ({ posts, projects }: { posts: any, projects: any }) => {
             projects={projects}
           />
           <h3>My posts</h3>
-          <PostsList posts={posts} paginate={true} />
+          <PostsList posts={posts} paginate={false} />
           <footer>
             <Link href="/about">About this site</Link>
             {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA && (
@@ -89,7 +89,8 @@ export const getStaticProps = async () => {
 }
 
 export const config = {
-  // unstable_runtimeJS: false,
-}
+  unstable_JsPreload: false,
+  unstable_runtimeJS: false,
+};
 
 export default Index
