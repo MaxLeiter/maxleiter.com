@@ -23,7 +23,7 @@ const formatted = (sitemap: string) => prettier.format(sitemap, { parser: 'html'
     return { path, lastmod }
   })
 
-  const blogPosts = getPosts()
+  const blogPosts = await getPosts()
   for (const post of blogPosts) {
     if (post)
       pages.push({

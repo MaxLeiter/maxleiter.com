@@ -13,8 +13,8 @@ type Props = {
   }
 }
 
-export const getStaticProps = ({ params: { slug } }: Props) => {
-  const posts = getPosts()
+export const getStaticProps = async ({ params: { slug } }: Props) => {
+  const posts = await getPosts()
   const postIndex = posts.findIndex((p) => p?.slug === slug)
   const post = posts[postIndex]
   if (!post) return { props: { post: null } }
@@ -30,9 +30,9 @@ export const getStaticProps = ({ params: { slug } }: Props) => {
   }
 }
 
-export const getStaticPaths = () => {
+export const getStaticPaths = async () => {
   return {
-    paths: getPosts().map((p) => `/blog/${p?.slug}`),
+    paths: (await getPosts()).map((p) => `/blog/${p?.slug}`),
     fallback: false,
   }
 }

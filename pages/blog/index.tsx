@@ -19,8 +19,8 @@ const Blog = ({ posts }: Props) => {
   )
 }
 
-export const getStaticProps = () => {
-  const posts = getPosts()
+export const getStaticProps = async () => {
+  const posts = await getPosts()
 
   return {
     props: {
