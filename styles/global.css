@@ -15,7 +15,8 @@
   --header-height: 48px;
 
   /* Typography */
-  --font-sans: -apple-system,BlinkMacSystemFont,'Roboto','Helvetica Neue', sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue',
+    sans-serif;
   --font-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo',
     monospace;
 
@@ -159,33 +160,6 @@ code {
   font-family: var(--font-mono);
 }
 
-.clamp {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  overflow: hidden;
-}
-
-.clamp-2 {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-
-.flex {
-  display: flex;
-}
-
-kbd {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  padding: 2px 7px;
-  font-weight: 600;
-  background: var(--lighter-gray);
-  border-radius: 5px;
-}
-
 summary {
   cursor: pointer;
   outline: none;
@@ -204,9 +178,8 @@ table {
 
 td,
 th {
-  border: 1px solid gray
+  border: 1px solid gray;
 }
-
 
 @media print {
   :root {

@@ -8,12 +8,3 @@
 .card {
   font-size: 16px;
 }
-
-.stars {
-  display: inline-flex;
-  align-items: center;
-}
-
-.stars svg {
-  margin-left: 4px;
-}
