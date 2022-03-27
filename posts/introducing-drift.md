@@ -11,7 +11,7 @@ I've wanted a Gist alternative for years, but it wasn't until I saw [this tweet]
 
 > "What is the absolute closest thing to GitHub Gist that can be self-hosted? In terms of design and functionality. Hosts images and markdown, rendered. Creates links that can be private or public. Uses/requires registration. I have looked at dozens of pastebin-like things." - <a href="https://twitter.com/emilyst" style="color: var(--link);">@emilyst</a>
 
-If you're response to that is "why?", I recommend reading ['Why you should start self-hosting'](https://rohanrd.xyz/posts/why-you-should-start-self-hosting/) by Rohan Deshumkh. Also know that I have a habit of starting time consuming weekend projects to procrastinate school work, and this seemed like an especially fun one.
+If your response to that is "why?", I recommend reading ['Why you should start self-hosting'](https://rohanrd.xyz/posts/why-you-should-start-self-hosting/) by Rohan Deshumkh. Also know that I have a habit of starting time consuming weekend projects to procrastinate school work, and this seemed like an especially fun one.
 
 The primary goal of Drift is to capture the value proposition of GitHub. Syntax highlighting, markdown rendering, straight to the point. There are tons of self-hostable pastebins, and none target an experience like Gist. You can try a demo [here](https://drift.maxleiter.com).
 
