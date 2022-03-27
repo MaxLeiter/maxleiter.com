@@ -5,7 +5,7 @@ slug: introducing-drift
 date: Mar 26, 2022
 ---
 
-_[View this post on Drift](https://paste.maxleiter.com/post/5b84092d-ea73-4ae2-960d-19805f72106c)_
+_[View this post on Drift](https://paste.maxleiter.com/post/e63d766e-c33f-4094-9a15-dbf43e60fa53)_
 
 I've wanted a Gist alternative for years, but it wasn't until I saw [this tweet](https://twitter.com/emilyst/status/1499858264346935297) I decided to sit down and build it:
 
@@ -23,7 +23,7 @@ And here's a screenshot of viewing a post, which you can visit in your browser [
 
 <img src="/blog/drift/view-post.png" alt="A page showing a post title, the ability to download all files a ZIP archive, a dropdown to jump to specific files, and a file titled 'webpack.config.js' with javascript highlighted code." />
 
-For prototyping, I used the [geist-ui library](https://geist-ui.dev) for the basic design components. It's _very_ JavaScript reliant, but I've already begun working on replacing it with in-house elements. So if you're reading this from Hacker News are were planning to complain it doesn't work &mdash; I'm sorry!
+For prototyping, I used the [geist-ui library](https://geist-ui.dev) for the basic design components. It's _very_ JavaScript reliant, but I've already begun working on replacing it with in-house elements. So if you're reading this from Hacker News and were planning to complain it doesn't work &mdash; I'm sorry!
 
 Rendering markdown, after multiple iterations, is done and stored on the server. This means that published posts can be rendered at build-time or on the server thanks to Next.js's SSR support. For editing, I've set-up a Next.js lambda function that receives markdown from the client and returns HTML.
 
