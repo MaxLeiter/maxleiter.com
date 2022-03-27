@@ -37,4 +37,4 @@ I'm particularly happy with the drag-and-drop uploading tied with the automatic 
 
 The majority of these features are largely thanks to the Node and React ecosystems, so thank you to the maintainers of those projects.
 
-If Drift is interesting to you, please feel free to contribute, regardless of skill level. There have already been numerous community contributions, including the logo and docker-compose. I've tried to keep it fairly simple, so the back-end is a simple Express server and the client is a Next.js React app. You can join #drift on [Libera.Chat](https://libera.chat) to get in touch.
+If Drift is interesting to you, please feel free to contribute, regardless of skill level. There have already been numerous community contributions, including the logo and docker-compose. I've tried to keep it fairly simple, so the back-end is a simple Express server and the client is a Next.js React app. You can join #drift on [Libera.Chat](https://libera.chat) to get in touch. You can find Drift on GitHub [here](https://github.com/maxleiter/drift).
