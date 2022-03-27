@@ -12,6 +12,7 @@ article p {
   color: var(--article-color);
 }
 
+article video,
 article img {
   max-width: 100%;
   /* width: var(--main-content); */
@@ -44,6 +45,13 @@ article ol > li > ul {
   margin-left: var(--gap-double);
   list-style-position: inside;
   list-style-type: circle;
+}
+
+article blockquote {
+  border: 2px solid var(--light-gray);
+  background: var(--lightest-gray);
+  padding: var(--gap);
+  color: var(--article-color);
 }
 
 /* Code Snippets */
