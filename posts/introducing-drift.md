@@ -5,7 +5,7 @@ slug: introducing-drift
 date: Mar 26, 2022
 ---
 
-_[View this post on Drift](https://paste.maxleiter.com/post/e63d766e-c33f-4094-9a15-dbf43e60fa53)_
+_[View this post on Drift](https://drift.maxleiter.com/post/da87c6b3-8a57-435c-9228-daa705642165)_
 
 I've wanted a Gist alternative for years, but it wasn't until I saw [this tweet](https://twitter.com/emilyst/status/1499858264346935297) I decided to sit down and build it:
 
