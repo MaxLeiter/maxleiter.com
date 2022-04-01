@@ -5,3 +5,10 @@
 .badge {
   margin-left: var(--gap-half);
 }
+
+.split {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--gap-half);
+}

@@ -11,6 +11,13 @@ const Projects: Project[] = [
     years: ['2020'],
   },
   {
+    title: 'Drift',
+    description: 'A self-hostable and open-source alternative to GitHub Gist and Pastebin.',
+    href: 'https://github.com/maxleiter/drift',
+    role: 'Creator',
+    years: ['2022', 'present'],
+  },
+  {
     title: 'The Lounge',
     description:
       'Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.',
