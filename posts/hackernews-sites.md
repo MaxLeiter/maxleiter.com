@@ -17,7 +17,7 @@ If I were to do this all again, I would absolutely not choose JavaScript. Just 0
 
 ## The stats:
 
-Of the 721 top level comments, 692 contained links and were analyzed at the time of writing. I only looked at the first link in a comment, timed out after 30 seconds, and skipped invalid/self-signed certificates.
+Of the 721 top level comments, 692 contained links and were analyzed at the time of writing. I only looked at the first link in a comment, timed out after 30 seconds, and skipped invalid/self-signed certificates. Also not that none of the categories are exclusive &mdash; sites can count towards multiple stats.
 
 #### Some fun ones:
 
