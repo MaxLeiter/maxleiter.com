@@ -1,6 +1,6 @@
 ---
 title: How hackers* run their sites
-description: An analysis based on 1000+ personal websites
+description: An analysis based on 700 personal websites
 slug: hacker-sites
 date: Apr 7, 2022
 ---
