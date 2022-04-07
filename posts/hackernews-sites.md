@@ -7,7 +7,7 @@ date: Apr 7, 2022
 
 <small>\* hackers: users of hacker news</small>
 
-Yesterday, when I probably should have been doing something productive, I instead [asked hacker news users for links to their personal sites](<(https://news.ycombinator.com/item?id=30934529)>).
+Yesterday, when I probably should have been doing something productive, I instead [asked hacker news users for links to their personal sites](https://news.ycombinator.com/item?id=30934529).
 
 It got far more replies than I expected (over 1000 at the time of writing) so I had the idea to do some scraping and see how commenters build and host their sites.
 
