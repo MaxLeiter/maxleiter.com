@@ -28,35 +28,37 @@ Of the 721 top level comments, 692 contained links and were analyzed at the time
 
 #### The scraped stuff:
 
-- Contains JavaScript: 567
-- Github Pages: 146
-- Cloudflare: 141
-- Nginx: 114
-- Netlify: 83
-- Apache: 70
-- Vercel: 50
-- Bootstrap: 45
-- Gatsby: 30
-- Nextjs: 28
-- Amazon S3: 27
-- Wordpress: 22
-- Cloudfront: 17
-- Express: 16
-- PHP: 14
-- Caddy: 9
-- Litespeed: 8
-- Open Resty: 8
-- Google App Engine: 3
-- FlyIO: 3
-- MicorosftIIS: 3
-- Drupal: 2
-- Tailwind: 2
-- Lighttpd: 2
-- Godlighty: 1
-- Perl: 1
-- Neocities: 1
-- Asp.NET: 1
-- Gatsby Cloud: 1
-- Openbsd Httpd: 1
+- Contains JavaScript: 567 (81%)
+- Github Pages: 146 (21%)
+- Cloudflare: 141 (20%)
+- Nginx: 114 (16%)
+- Netlify: 83 (11%)
+- Apache: 70 (10%)
+- Vercel: 50 (7%)
+- Bootstrap: 45 (6.5%)
+- Gatsby: 30 (4.3%)
+- Nextjs: 28 (4%)
+- Amazon S3: 27 (3.9%)
+- Wordpress: 22 (3.2%)
+- Cloudfront: 17 (2.5%)
+- Express: 16 (2.3%)
+- PHP: 14 (2%)
+- Caddy: 9 (1.3%)
+- Litespeed: 8 (1.5%)
+- Open Resty: 8 (1.5%)
+- Google App Engine: 3 (0.43%)
+- FlyIO: 3 (0.43%)
+- MicorosftIIS: 3 (0.43%)
+- Drupal: 2 (0.29%)
+- Tailwind: 2 (0.29%)
+- Lighttpd: 2 (0.29%)
+- Godlighty: 1 (0.14%)
+- Perl: 1 (0.14%)
+- Neocities: 1 (0.14%)
+- Asp.NET: 1 (0.14%)
+- Gatsby Cloud: 1 (0.14%)
+- Openbsd Httpd: 1 (0.14%)
 
 Instead of using a proper DOM scraping library or anything, I just search the headers and page text. Not the most efficient or accurate, so if you find an issue please let me know! You can see my source code [here](https://paste.maxleiter.com/post/17dd30b8-4fd2-4270-a8a4-c6aab73a0211), although I'd recommend just doing it yourself from scratch and not scarring your eyes.
+
+Thanks to Hacker News user retSava for [this comment](https://news.ycombinator.com/item?id=30954558) providing percentages, something I overlooked.
