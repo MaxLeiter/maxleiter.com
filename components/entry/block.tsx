@@ -1,5 +1,3 @@
-import { memo } from 'react'
-
 import Link from '@components/link'
 import styles from './block.module.css'
 
@@ -25,17 +23,15 @@ const BlockEntry = ({ title, description, type, href, as, date }: Props) => {
       >
         {type && <div className={styles.type}>{type}</div>}
         {date && (
-          <div className={styles.date}>{date.toLocaleDateString('en-US')}</div>
+          <span className={styles.date}>{date.toLocaleDateString('en-US')}</span>
         )}
-        <div>
-          <p className={`${styles.title}`}>{title}</p>
+          <h4 className={`${styles.title}`}>{title}</h4>
           {description && (
-            <p className={`${styles.description}`}>{description}</p>
+            <sub className={`${styles.description}`}>{description}</sub>
           )}
-        </div>
       </Link>
     </li>
   )
 }
 
-export default memo(BlockEntry)
+export default BlockEntry

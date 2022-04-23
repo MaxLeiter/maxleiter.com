@@ -1,5 +1,3 @@
-// import { useState } from 'react'
-// import dynamic from 'next/dynamic'
 
 import PostsList from '@components/posts-list'
 import Socials from '@components/socials'
@@ -10,23 +8,11 @@ import Page from '@components/page'
 import getPosts from '@lib/get-posts'
 import getProjects from '@lib/projects'
 import { Post, Project } from '@lib/types'
-// import GoL from '@components/game-of-life'
-// import RSS from '@components/icons/rss'
-// import ShiftBy from '@components/ShiftBy'
-// import PauseIcon from '@components/icons/pause'
-// import PlayIcon from '@components/icons/play'
-// import FadeIn from '@components/fade-in'
 
 const PROJECT_COUNT = 3
 
-// const GoL = dynamic(() => import('@components/game-of-life'))
 
 const Index = ({ posts, projects }: { posts: Post[], projects: Project[] }) => {
-
-  // const Icon = () => (
-  //     <div style={{display: 'inline-flex', marginLeft: 'var(--gap)', cursor: 'pointer'}} onClick={() => setRunning(!running)}>{running ? <PauseIcon /> : <PlayIcon />}</div>
-  // )
-
   return (
     <>
       <Page
@@ -44,7 +30,6 @@ const Index = ({ posts, projects }: { posts: Post[], projects: Project[] }) => {
             Full-stack developer and student
           </h2>
           <Socials />
-          {/* <Icon /> */}
           <h3>About me</h3>
           <AboutMe />
           <h3>My projects</h3>

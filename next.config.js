@@ -1,16 +1,16 @@
-module.exports = {
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
+
+module.exports = withBundleAnalyzer({
   swcMinify: true,
   images: {
     formats: ['image/avif', 'image/webp'],
   },
 
   reactStrictMode: true,
-
-  // experimental: {
-  //   concurrentFeatures: true,
-  //   serverComponents: true,
-  // },
-
+  pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js'],
   experimental: {
     optimizeCss: true,
   },
@@ -23,4 +23,5 @@ module.exports = {
       },
     ]
   },
-}
+})
+

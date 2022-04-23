@@ -40,6 +40,11 @@ article ol {
   padding: 0;
   list-style-position: inside;
 }
+/* 
+article ol li:not(:last-child),
+article ul li:not(:last-child) {
+  margin-bottom: var(--gap);
+} */
 
 article ol > li > ul {
   margin-left: var(--gap-double);
@@ -47,6 +52,7 @@ article ol > li > ul {
   list-style-type: circle;
 }
 
+article aside,
 article blockquote {
   border: 2px solid var(--light-gray);
   background: var(--lightest-gray);
@@ -84,8 +90,16 @@ article pre {
 /* Linkable Headers */
 
 .header-link {
+  padding-top: var(--header-height);
   color: inherit;
   text-decoration: none;
+}
+
+sup {
+  font-size: 0.8em;
+  vertical-align: super;
+  line-height: 1;
+  padding-top: var(--header-height);
 }
 
 .header-link::after {
@@ -97,4 +111,10 @@ article pre {
 
 .header-link:hover::after {
   opacity: 1;
+}
+
+@media screen and (max-width: 760px) {
+  .header-link::after {
+    opacity: .5;
+  }
 }
