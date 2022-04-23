@@ -4,6 +4,8 @@ description: A list of simple tips for developing a more accessible and user-fri
 slug: easy-site-improvements
 date: Apr 23, 2022
 ---
+Below is a short list I wrote up for people who are comfortable building websites (with any technology) but want to improve their work, whether that be in terms of loading speeds, software quality, or accessibility.
+
 
 TL;DR:
 - [Use WAVE](/blog/easy-site-improvements#wave)
@@ -18,7 +20,7 @@ TL;DR:
 ![Screenshot of the WAVE tool being used on webaim.org](/blog/site-improvements/webaim.png)
 
 #### Compress your images
-Loading times are important. Someone more business savvy than me would say something about bounce rates and loading times being correlated, but I won't do that. There are a lot of tools for automizing this, like [WebP Express](https://wordpress.org/plugins/webp-express/) for WordPress, but no complicated infrastructure is necessary. For things similar to this blog I manually compress the images locally using [ImageOptim](https://imageoptim.com/mac), an open-source Mac app. Be sure to use the right tool for the job though; for example, I use [svgo](https://github.com/svg/svgo) for optimizing SVGs. I also haven't found a better PNG optimizer than the online https://tinypng.com/, so if you have a replacement that works locally please let me know!
+Loading times are important. Someone more business savvy than me would say something about bounce rates and loading times being correlated, but I won't do that. There are a lot of tools for automating this, like [WebP Express](https://wordpress.org/plugins/webp-express/) for WordPress, but no complicated infrastructure is necessary. For things similar to this blog I manually compress the images locally using [ImageOptim](https://imageoptim.com/mac), an open-source Mac app. Be sure to use the right tool for the job though; for example, I use [svgo](https://github.com/svg/svgo) for optimizing SVGs. I also haven't found a better PNG optimizer than the online https://tinypng.com/, so if you have a replacement that works locally please let me know!
 
 #### Embrace semantic HTML
 This has been [covered](https://webflow.com/blog/html5-semantic-elements-and-webflow-the-essential-guide) [pretty](https://www.semrush.com/blog/semantic-html5-guide/) [extensively](https://www.freecodecamp.org/news/semantic-html5-elements/) so I’ll keep it short, but use tags like `header`, `footer`, `nav`, and `main`. MDN has a great list of all the valid elements here: https://developer.mozilla.org/en-US/docs/Web/HTML/Element. Using semantic HTML means you can avoid manually assigning `role` tags while keeping your HTML legible for yourself and the page usable for users of assistive technologies. Be sure to also familiarize yourself with and use the [relevant ARIA labels](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label) when a semantic element isn't possible or if they would improve the user experience. 
