@@ -82,8 +82,9 @@ const Talks = ({
                     <Input value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search"
+                        aria-label="Search talk titles and descriptions"
                     />
-                    <span>
+                    <span className={styles.selects}>
                         <select className={styles.sort} value={sort} onChange={onSortChange}>
                             <option value="date">Sort by date</option>
                             <option value="title">Sort by title</option>

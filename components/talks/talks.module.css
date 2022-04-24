@@ -6,10 +6,17 @@
     gap: var(--gap);
 }
 
+.selects {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap);
+}
+
 .sort {
     height: 40px;
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: var(--inline-radius);
     background: var(--lighter-gray);
     font-size: 1.1rem;
     font-weight: bold;
@@ -31,7 +38,11 @@
     }
 
     .filterSettings .sort {
-        margin-top: var(--gap);
         width: 100%;
+    }
+
+    .selects {
+        flex-direction: column;
+        margin-top: var(--gap);
     }
 }

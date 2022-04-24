@@ -102,7 +102,13 @@
 
 @media (max-width: 768px) {
   .videoCard .embed .playButton {
-    top: 70%;
+    top: 60%;
+  }
+}
+
+@media (max-width: 480px) {
+  .videoCard .embed .playButton {
+    top: 80%;
   }
 }
 
