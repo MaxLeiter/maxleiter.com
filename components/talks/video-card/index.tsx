@@ -41,13 +41,13 @@ const VideoCard = (
             )
         } else {
             return (
-                <span className={styles.embed} onClick={handleClick}><Image
+                <span className={styles.embed} onClick={handleClick}><span className={styles.playButton}><Play /></span><Image
                     src={thumbnail}
                     alt={title}
                     width={560}
                     height={315}
 
-                /><span className={styles.playButton}><Play /></span></span>
+                /></span>
             )
         }
     }

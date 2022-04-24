@@ -42,18 +42,16 @@
 
 .videoCard .embed .playButton {
   position: absolute;
-  top: 50%;
+  top: 55%;
   left: 50%;
-  transform: scale(3) translate(-35%, 45%);
+  transform: scale(3) translate(-25%, 45%);
   background: var(--gray-alpha);
   width: 25px;
   height: 25px;
   border-radius: 30%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   cursor: pointer;
   color: var(--gray-alpha);
+  z-index: 1;
 }
 
 .videoCard .embed {
@@ -88,7 +86,7 @@
   padding: var(--gap);
   border-left: 3px solid var(--link);
   /* display: inline-block; */
-  float: left; 
+  float: left;
   margin: 0 -250px;
 }
 
@@ -100,6 +98,12 @@
   padding: 4px;
   background: var(--bg);
   border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+  .videoCard .embed .playButton {
+    top: 70%;
+  }
 }
 
 @media (max-width: 1250px) {
@@ -115,4 +119,5 @@
     border-left: none;
     border-bottom: 1px solid var(--link);
   }
+
 }
