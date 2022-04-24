@@ -1,5 +1,5 @@
 ---
-title: Easy ways to improve your websites
+title: Easy ways to improve your websites accessibility and performance
 description: A list of simple tips for developing a more accessible and user-friendly web.
 slug: easy-site-improvements
 date: Apr 23, 2022
