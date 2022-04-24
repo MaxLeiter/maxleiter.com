@@ -14,21 +14,21 @@ TL;DR:
 - [Don’t use JavaScript to replace browser controls](/blog/easy-site-improvements#dont-use-javascript-to-replace-browser-controls)
 - [Invest in learning your developer tools](/blog/easy-site-improvements#invest-in-learning-your-developer-tools)
 
-#### WAVE 
+## WAVE 
 
 [WAVE](https://wave.webaim.org/) is a suite of tools for finding, diagnosing, and fixing accessibility problems. It's my first step for finding the lowest hanging improvements. It helps you not just fix your errors but understand them by guiding you through the relevant part of the HTML5 spec in plain language. Below you can see a screenshot of the tool being applied to https://webaim.org. 
 ![Screenshot of the WAVE tool being used on webaim.org](/blog/site-improvements/webaim.png)
 
-#### Compress your images
+## Compress your images
 Loading times are important. Someone more business savvy than me would say something about bounce rates and loading times being correlated, but I won't do that. There are a lot of tools for automating this, like [WebP Express](https://wordpress.org/plugins/webp-express/) for WordPress, but no complicated infrastructure is necessary. For things similar to this blog I manually compress the images locally using [ImageOptim](https://imageoptim.com/mac), an open-source Mac app. Be sure to use the right tool for the job though; for example, I use [svgo](https://github.com/svg/svgo) for optimizing SVGs. I also haven't found a better PNG optimizer than the online https://tinypng.com/, so if you have a replacement that works locally please let me know!
 
-#### Embrace semantic HTML
+## Embrace semantic HTML
 This has been [covered](https://webflow.com/blog/html5-semantic-elements-and-webflow-the-essential-guide) [pretty](https://www.semrush.com/blog/semantic-html5-guide/) [extensively](https://www.freecodecamp.org/news/semantic-html5-elements/) so I’ll keep it short, but use tags like `header`, `footer`, `nav`, and `main`. MDN has a great list of all the valid elements here: https://developer.mozilla.org/en-US/docs/Web/HTML/Element. Using semantic HTML means you can avoid manually assigning `role` tags while keeping your HTML legible for yourself and the page usable for users of assistive technologies. Be sure to also familiarize yourself with and use the [relevant ARIA labels](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label) when a semantic element isn't possible or if they would improve the user experience. 
 
-#### Don’t use JavaScript to replace browser controls
-Unlike a lot of other advice that will say don’t do this because users might have JavaScript disabled, I think the more important reason to do this is you can’t do it better than the browser (after all, 99.4% of users have JavaScript enabled[^1]). I don’t say this because the browser developers are “better” than you, but because the user is used to the browser’s controls. The first item of this list should really be “don’t subvert the users' expectations.” *Don’t subvert the users' expectations.* Handling the nuances of keyboard and event handling, form submissions, and state are difficult enough. 
+## Don’t use JavaScript to replace browser controls
+Unlike a lot of other advice that will say don’t do this because users might have JavaScript disabled, I think the more important reason to do this is you can’t do it better than the browser (after all, 99.4% of users have JavaScript enabled[^1]). I don’t say this because the browser developers are “better” than you, but because the user is used to the browser’s controls. The first item of this list should really be “don’t subvert the users' expectations.” *Don’t subvert the users' expectations.* Handling the nuances of keyboard and event handling, form submissions, and similar are difficult enough. 
 
-#### Invest in learning your developer tools
+## Invest in learning your developer tools
 I don’t mean how to view the console and read `console.log`s. I mean investing in learning how to use the debugger, read the network tab, inspect (and understand) [memory snapshots](https://www.bitdegree.org/learn/chrome-memory-tab), and monitor your bundle size to be sure you’re not including unnecessary dependencies. If you’re using Next.js, I recommend setting up the [@next/bundle-analyzer](https://www.npmjs.com/package/@next/bundle-analyzer) package. If you’re using react, redux or vue, check out their browser extensions for useful debugging tools and component inspection. 
 
-[^1]:. <small>According to https://webaim.org/projects/screenreadersurvey9/#javascript, which absolutely has some selection bias.</small> [⏎](/blog/contributing-to-oss#ref:1)
+[^1]:. According to https://webaim.org/projects/screenreadersurvey9/#javascript, which absolutely has some selection bias. [⏎](/blog/easy-site-improvements#ref:1)
