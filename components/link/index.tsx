@@ -3,7 +3,9 @@ import NextLink from 'next/link'
 
 import styles from './link.module.css'
 
-type Props = {
+// Inherit default link props from NextLink or <a>
+type LinkProps = React.ComponentProps<typeof NextLink>
+type Props = LinkProps & {
   external?: boolean
   href: string
   as?: string
@@ -13,6 +15,7 @@ type Props = {
   transition?: boolean
   tabIndex?: number
 }
+
 const Link = ({
   external,
   href,

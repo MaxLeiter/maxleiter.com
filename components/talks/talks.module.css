@@ -14,7 +14,7 @@
     font-size: 1.1rem;
     font-weight: bold;
     padding: 0 var(--gap-half);
-    color: var(--dark-gray);
+    color: var(--fg);
 }
 
 .filterSettings {
@@ -23,4 +23,15 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: var(--gap);
+}
+
+@media (max-width: 768px) {
+    .filterSettings {
+        flex-direction: column;
+    }
+
+    .filterSettings .sort {
+        margin-top: var(--gap);
+        width: 100%;
+    }
 }

@@ -1,9 +1,8 @@
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import styles from './badge.module.css'
 
-type Props = {
-    children: ReactNode | ReactNode[],
-    className?: string,
+type Props = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
+    children: ReactNode
 }
 
 const Badge = ({ children, className }: Props) => {

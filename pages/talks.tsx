@@ -9,6 +9,10 @@ export type Talk = {
     date: string,
     id: string,
     thumbnail: string,
+    myDescription: string,
+    channel: string,
+    views?: number,
+    likes?: number,
 }
 
 type TalkPage = NextPage<InferGetStaticPropsType<typeof getStaticProps>>
