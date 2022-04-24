@@ -1997,6 +1997,11 @@ lodash.camelcase@^4.3.0:
   resolved "https://registry.yarnpkg.com/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
   integrity sha1-soqmKIorn8ZRA1x3EfZathkDMaY=
 
+lodash.debounce@^4.0.8:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
+  integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
+
 lodash.merge@^4.6.2:
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
@@ -2994,6 +2999,11 @@ scheduler@^0.21.0:
   dependencies:
     loose-envify "^1.1.0"
 
+scrape-youtube@^2.1.14:
+  version "2.1.14"
+  resolved "https://registry.yarnpkg.com/scrape-youtube/-/scrape-youtube-2.1.14.tgz#218e83c4547cdbbe580f7cafa7bf2cf0764535cf"
+  integrity sha512-gJIk66t0+LOBBvQ9KP24VIWb2CpLlhUZNPRuMtlSnMELPimpx06enOj8QssSK925YPFpzdCAkERjsjHo1lTlYA==
+
 section-matter@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/section-matter/-/section-matter-1.0.0.tgz#e9041953506780ec01d59f292a19c7b850b84167"
@@ -3483,3 +3493,8 @@ yn@3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
+
+youtubei@^0.0.1-rc.35:
+  version "0.0.1-rc.35"
+  resolved "https://registry.yarnpkg.com/youtubei/-/youtubei-0.0.1-rc.35.tgz#764e9bb758f05917215b83d6593e6381d21f049c"
+  integrity sha512-OXq3/7s6rhT0ejwbQm5r3uW0qCs6PUhboMFy3ZdUx4JdSY2WDr44DOdKtzPh4D8prHhqB/Q2NZMyEiFNHZFPlA==

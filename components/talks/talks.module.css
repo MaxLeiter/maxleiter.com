@@ -1,0 +1,26 @@
+.talks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap);
+}
+
+.sort {
+    height: 40px;
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--lighter-gray);
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 0 var(--gap-half);
+    color: var(--dark-gray);
+}
+
+.filterSettings {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--gap);
+}

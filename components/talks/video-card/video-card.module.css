@@ -1,0 +1,62 @@
+.videoCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background: var(--lighter-gray);
+  gap: var(--gap-half);
+}
+
+.videoCard .content {
+  padding: var(--gap-half);
+  padding-top: 0;
+}
+
+.videoCard .content h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+.videoCard .content p {
+  font-size: 1.1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.videoCard iframe {
+  width: 100%;
+}
+
+.videoCard img {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+/* add a play button on the img */
+
+.videoCard .embed .playButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: scale(3) translate(-35%, 45%);
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: var(--gray-alpha);
+}
+
+.videoCard .embed {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
