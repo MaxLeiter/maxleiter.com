@@ -62,7 +62,7 @@ const Talks = ({
                     <option value="date">Sort by date</option>
                     <option value="title">Sort by title</option>
                 </select>
-                <select className={styles.sort} value={asc} onChange={(e) => setAsc(e.target.value === 'true')}>
+                <select className={styles.sort} value={asc.toString()} onChange={(e) => setAsc(e.target.value === 'true')}>
                     <option value="false">Descending</option>
                     <option value="true">Ascending</option>
                 </select>
