@@ -7,11 +7,12 @@ import Input from '@components/input'
 import PostFooter from '@components/post-footer'
 import Badge from '@components/badge'
 import tagStyles from './tags.module.css'
+
+type SortOption = 'date' | 'title' | 'views' | 'likes' | 'length'
+
 const Talks = ({ talks }: { talks: Array<Talk> }) => {
   const [search, setSearch] = React.useState('')
-  const [sort, setSort] = React.useState<'date' | 'title' | 'views' | 'likes'>(
-    'views'
-  )
+  const [sort, setSort] = React.useState<SortOption>('views')
   const [asc, setAsc] = React.useState(false)
   const [selectedTags, setSelectedTags] = React.useState<Array<string>>([])
 
@@ -69,6 +70,12 @@ const Talks = ({ talks }: { talks: Array<Talk> }) => {
             return b.likes - a.likes
           }
         }
+      } else if (sort === 'length') {
+        if (asc) {
+          return a.lengthSeconds - b.lengthSeconds
+        } else {
+          return b.lengthSeconds - a.lengthSeconds
+        }
       } else {
         return 0
       }
@@ -78,7 +85,7 @@ const Talks = ({ talks }: { talks: Array<Talk> }) => {
 
   const onSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     console.log(e.target.value)
-    setSort(e.target.value as 'date' | 'title' | 'views' | 'likes')
+    setSort(e.target.value as SortOption)
   }
 
   const allTagsWithCount = React.useMemo(() => {
@@ -145,6 +152,7 @@ const Talks = ({ talks }: { talks: Array<Talk> }) => {
               <option value="title">Sort by title</option>
               <option value="views">Sort by views</option>
               <option value="likes">Sort by likes</option>
+              <option value="length">Sort by length</option>
             </select>
             <select
               className={styles.sort}

@@ -15,7 +15,10 @@ const Header = ({ render, title }: Props) => {
       <nav className={styles.nav}>
         <div className={styles.header}>
           <Link href="/">
-            <a aria-label="Navigate Home" className={socialStyles.icon}>
+            <a
+              aria-label="Navigate Home"
+              className={`${socialStyles.icon} ${styles.icon}`}
+            >
               <Home />
             </a>
           </Link>

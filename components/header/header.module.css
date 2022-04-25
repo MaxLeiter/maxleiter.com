@@ -1,15 +1,12 @@
 .icon {
-  display: inline-flex;
-  padding: 15px;
-  margin: -10px;
-  color: var(--fg);
+  color: var(--gray) !important;
 }
 
 .icon:active,
 .icon:hover,
 .icon:focus-within {
   outline: none;
-  color: var(--link);
+  color: var(--fg) !important;
 }
 
 .nav {

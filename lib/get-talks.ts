@@ -1,11 +1,11 @@
 import { Talk } from 'pages/talks'
-import { Client } from 'youtubei'
+import { Client, Video } from 'youtubei'
 import Talks from '@data/talks.json'
 
 const youtube = new Client()
 
 const getTalks = async (): Promise<Array<Talk>> => {
-  const promises = Talks.talks.map(({ url }) => youtube.getVideo(url))
+  const promises = Talks.talks.map(({ url }) => youtube.getVideo<Video>(url))
   const results = await Promise.all(promises)
   const resultsWithDescription = results.map((video) => {
     const talk = Talks.talks.find(({ url }) => {
@@ -39,6 +39,7 @@ const getTalks = async (): Promise<Array<Talk>> => {
           views: result.viewCount,
           likes: result.likeCount,
           tags: result.tags,
+          lengthSeconds: result.duration,
         }
       }
       return null

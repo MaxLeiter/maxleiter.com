@@ -13,7 +13,8 @@ export type Talk = {
   channel: string
   views?: number
   likes?: number
-  tags?: string[]
+  tags: string[]
+  lengthSeconds: number
 }
 
 type TalkPage = NextPage<InferGetStaticPropsType<typeof getStaticProps>>

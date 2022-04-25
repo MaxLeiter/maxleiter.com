@@ -8,6 +8,7 @@ import { Talk } from 'pages/talks'
 import { useState } from 'react'
 import styles from './video-card.module.css'
 import tagStyles from '../tags.module.css'
+import secondsToTime from '@lib/seconds-to-time'
 const VideoCard = ({
   talk: {
     title,
@@ -20,6 +21,7 @@ const VideoCard = ({
     views,
     likes,
     tags,
+    lengthSeconds,
   },
 }: {
   talk: Talk
@@ -85,6 +87,7 @@ const VideoCard = ({
         {/* </Link> */}
         {views ? <Badge>{views.toLocaleString()} views</Badge> : ''}
         {likes ? <Badge>{likes.toLocaleString()} likes</Badge> : ''}
+        <Badge>{secondsToTime(lengthSeconds)}</Badge>
         <div className={styles.content}>
           <Link external href={`https://www.youtube.com/watch?v=${id}`}>
             <h2>{title}</h2>
