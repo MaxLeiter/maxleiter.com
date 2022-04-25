@@ -2,7 +2,7 @@ import Link from '@components/link'
 import styles from './projects.module.css'
 import Entry from '@components/entry'
 
-import type { Project } from "@lib/types"
+import type { Project } from '@lib/types'
 // import { Star } from '@components/icons'
 
 type Props = {
@@ -32,11 +32,7 @@ const Projects = ({ count = -1, projects, showYears = true }: Props) => {
       })}
       {count > 0 && count < projects.length && (
         <li>
-          See some more on{' '}
-          <Link href="/projects">
-            {' '}
-            this page
-          </Link>
+          See some more on <Link href="/projects"> this page</Link>
         </li>
       )}
     </ul>

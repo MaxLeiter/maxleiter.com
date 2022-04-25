@@ -1,6 +1,6 @@
-import Link from "@components/link"
-import ReactDOMServer from "react-dom/server"
-import type { Project } from "./types"
+import Link from '@components/link'
+import ReactDOMServer from 'react-dom/server'
+import type { Project } from './types'
 
 const Projects: Project[] = [
   {
@@ -12,7 +12,8 @@ const Projects: Project[] = [
   },
   {
     title: 'Drift',
-    description: 'A self-hostable and open-source alternative to GitHub Gist and Pastebin.',
+    description:
+      'A self-hostable and open-source alternative to GitHub Gist and Pastebin.',
     href: 'https://github.com/maxleiter/drift',
     role: 'Creator',
     years: ['2022', 'present'],
@@ -24,10 +25,16 @@ const Projects: Project[] = [
     href: 'https://github.com/thelounge/thelounge',
     role: 'Maintainer',
     years: ['2016', 'present'],
-    cardInfo: ReactDOMServer.renderToString(<div>
-      <Link href="https://demo.thelounge.chat" external={true}>Demo</Link>
-      <Link href="https://github.com/thelounge" external={true}>GitHub</Link>
-    </div>),
+    cardInfo: ReactDOMServer.renderToString(
+      <div>
+        <Link href="https://demo.thelounge.chat" external={true}>
+          Demo
+        </Link>
+        <Link href="https://github.com/thelounge" external={true}>
+          GitHub
+        </Link>
+      </div>
+    ),
   },
   {
     title: 'KnightOS',
@@ -62,7 +69,8 @@ const Projects: Project[] = [
   },
   {
     title: 'jsonTree',
-    description: 'A 2kb JavaScript library for generating HTML trees from JSON.',
+    description:
+      'A 2kb JavaScript library for generating HTML trees from JSON.',
     href: 'https://github.com/maxleiter/jsontree',
     role: 'Creator',
     years: ['2015'],
@@ -86,26 +94,26 @@ const Projects: Project[] = [
   {
     title: 'EO-tracker',
     description:
-      'A quick tool for viewing recent President\'s executive orders.',
+      "A quick tool for viewing recent President's executive orders.",
     href: 'https://eo-tracker.vercel.app/',
     role: 'Creator',
     years: ['2020'],
   },
   {
-    title: "easyarty.com",
+    title: 'easyarty.com',
     description:
-      "A web app for calculating artillery distances in the video game Hell Let Loose.",
+      'A web app for calculating artillery distances in the video game Hell Let Loose.',
     href: 'https://easyarty.com',
     role: 'Creator',
     years: ['2021'],
   },
   {
-    title: "Vercel Raycast",
-    description: "A Raycast extension for managing Vercel via its REST API.",
-    href: "https://github.com/MaxLeiter/vercel-raycast",
-    role: "Creator",
-    years: ["2022"],
-  }
+    title: 'Vercel Raycast',
+    description: 'A Raycast extension for managing Vercel via its REST API.',
+    href: 'https://github.com/MaxLeiter/vercel-raycast',
+    role: 'Creator',
+    years: ['2022'],
+  },
 ]
 
 export default async function getProjects(): Promise<Project[]> {
@@ -125,7 +133,7 @@ export default async function getProjects(): Promise<Project[]> {
         const { stargazers_count, message } = await (
           await fetch(`https://api.github.com/repos/${user}/${repo}`, {
             headers: {
-              "Authorization": process.env.GITHUB_TOKEN ?? "",
+              Authorization: process.env.GITHUB_TOKEN ?? '',
             },
           })
         ).json()

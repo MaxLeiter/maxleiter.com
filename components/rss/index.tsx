@@ -17,23 +17,25 @@ const Feed = ({ page }: { page: number }) => {
   if (!data) return <div>loading...</div>
   const { items } = data
 
-  return items.map(({ item, org }: { item: any, name: string, org: string }) => {
-    const type =
-      org === item.creator
-        ? ''
-        : `${org} ${item.creator ? '—' : ''} ${item.creator}`
+  return items.map(
+    ({ item, org }: { item: any; name: string; org: string }) => {
+      const type =
+        org === item.creator
+          ? ''
+          : `${org} ${item.creator ? '—' : ''} ${item.creator}`
 
-    return (
-      <Entry
-        key={item.guid}
-        title={item.title}
-        date={new Date(item.pubDate)}
-        type={type}
-        description={item.description}
-        href={item.link}
-      />
-    )
-  })
+      return (
+        <Entry
+          key={item.guid}
+          title={item.title}
+          date={new Date(item.pubDate)}
+          type={type}
+          description={item.description}
+          href={item.link}
+        />
+      )
+    }
+  )
 }
 
 const RSS = () => {

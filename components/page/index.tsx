@@ -2,7 +2,6 @@ import Head from '@components/head'
 import Header from '@components/header'
 import styles from './page.module.css'
 
-
 type Props = {
   header?: boolean
   title: string

@@ -34,19 +34,31 @@ const Post = ({
 }: Props) => {
   const postDate = new Date(date)
   const lastModifiedDate = lastModified ? new Date(lastModified) : undefined
-  const isDateDifferent = lastModifiedDate && lastModifiedDate.getDate() !== postDate.getDate()
-  const formattedLastModifiedDate = lastModifiedDate?.toLocaleDateString('default', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
+  const isDateDifferent =
+    lastModifiedDate && lastModifiedDate.getDate() !== postDate.getDate()
+  const formattedLastModifiedDate = lastModifiedDate?.toLocaleDateString(
+    'default',
+    {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }
+  )
 
   return (
     <Page
       title={title}
       description={description}
       showHeaderTitle={false}
-      image={!hidden ? `https://💻➡📸.vercel.app/${encodeURIComponent(title)}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(date)}` : undefined}
+      image={
+        !hidden
+          ? `https://💻➡📸.vercel.app/${encodeURIComponent(
+              title
+            )}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(
+              date
+            )}`
+          : undefined
+      }
     >
       <Head>
         {hidden && <meta name="robots" content="noindex" />}
@@ -55,9 +67,13 @@ const Post = ({
 
       <article
         dangerouslySetInnerHTML={{
-          __html: `<span class="${styles.date}">${date} ${isDateDifferent ? `<span class="${styles.modified}">last modified ${formattedLastModifiedDate}` : ""}</span></span><h1 class="${
-            styles.title
-          }">${escapeHtml(title)}</h1>${html}`,
+          __html: `<span class="${styles.date}">${date} ${
+            isDateDifferent
+              ? `<span class="${styles.modified}">last modified ${formattedLastModifiedDate}`
+              : ''
+          }</span></span><h1 class="${styles.title}">${escapeHtml(
+            title
+          )}</h1>${html}`,
         }}
       />
       <PostFooter />

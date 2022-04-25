@@ -1,15 +1,16 @@
-import fs from 'fs';
-import RSS from 'rss';
-import path from 'path';
-import { marked } from 'marked';
-import matter from 'gray-matter';
+import fs from 'fs'
+import RSS from 'rss'
+import path from 'path'
+import { marked } from 'marked'
+import matter from 'gray-matter'
 
 const posts = fs
   .readdirSync(path.resolve(__dirname, '../posts/'))
   .filter((file) => path.extname(file) === '.md')
   .map((file) => {
     const postContent = fs.readFileSync(`./posts/${file}`, 'utf8')
-    const { data, content }: { data: any, content: string } = matter(postContent)
+    const { data, content }: { data: any; content: string } =
+      matter(postContent)
     return { ...data, body: content }
   })
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())

@@ -8,17 +8,19 @@ type Props = {
 }
 
 // eslint-disable-next-line react/display-name
-const Button = forwardRef(({ onClick, children, disabled }: Props, ref: Ref<HTMLButtonElement>) => {
-  return (
-    <button
-      onClick={onClick}
-      className={styles.button}
-      disabled={disabled}
-      ref={ref}
-    >
-      {children}
-    </button>
-  )
-})
+const Button = forwardRef(
+  ({ onClick, children, disabled }: Props, ref: Ref<HTMLButtonElement>) => {
+    return (
+      <button
+        onClick={onClick}
+        className={styles.button}
+        disabled={disabled}
+        ref={ref}
+      >
+        {children}
+      </button>
+    )
+  }
+)
 
 export default Button

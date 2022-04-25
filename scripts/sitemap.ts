@@ -4,11 +4,12 @@ import path from 'path'
 import getPosts from '../lib/get-posts'
 import prettier from 'prettier'
 
-const DOMAIN = "maxleiter.com"
+const DOMAIN = 'maxleiter.com'
 
-const formatted = (sitemap: string) => prettier.format(sitemap, { parser: 'html' });
+const formatted = (sitemap: string) =>
+  prettier.format(sitemap, { parser: 'html' })
 
-(async () => {
+;(async () => {
   const pagePaths = await globby([
     // include
     'pages/*.tsx',
@@ -62,6 +63,9 @@ const formatted = (sitemap: string) => prettier.format(sitemap, { parser: 'html'
   `
 
   const formattedSitemap = formatted(generatedSitemap)
-  fs.writeFileSync(path.join(__dirname, '../public/sitemap-common.xml'), formattedSitemap, 'utf-8')
+  fs.writeFileSync(
+    path.join(__dirname, '../public/sitemap-common.xml'),
+    formattedSitemap,
+    'utf-8'
+  )
 })()
-

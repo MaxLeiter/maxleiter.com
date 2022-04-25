@@ -1,4 +1,3 @@
-
 import PostsList from '@components/posts-list'
 import Socials from '@components/socials'
 import ProjectList from '@components/projects'
@@ -11,8 +10,7 @@ import { Post, Project } from '@lib/types'
 
 const PROJECT_COUNT = 3
 
-
-const Index = ({ posts, projects }: { posts: Post[], projects: Project[] }) => {
+const Index = ({ posts, projects }: { posts: Post[]; projects: Project[] }) => {
   return (
     <>
       <Page
@@ -21,14 +19,8 @@ const Index = ({ posts, projects }: { posts: Post[], projects: Project[] }) => {
         description="Max Leiter's personal website and projects."
       >
         <article>
-          <h1
-            style={{ margin: 0, color: 'var(--link)' }}
-          >
-            Max Leiter
-          </h1>
-          <h2 style={{ margin: 0 }}>
-            Full-stack developer and student
-          </h2>
+          <h1 style={{ margin: 0, color: 'var(--link)' }}>Max Leiter</h1>
+          <h2 style={{ margin: 0 }}>Full-stack developer and student</h2>
           <Socials />
           <h3>About me</h3>
           <AboutMe />
@@ -76,6 +68,6 @@ export const getStaticProps = async () => {
 export const config = {
   unstable_JsPreload: false,
   unstable_runtimeJS: false,
-};
+}
 
 export default Index

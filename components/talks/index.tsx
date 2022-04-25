@@ -1,112 +1,185 @@
-import React from "react"
-import Page from "@components/page"
-import type { Talk } from "pages/talks"
-import VideoCard from "./video-card"
+import React from 'react'
+import Page from '@components/page'
+import type { Talk } from 'pages/talks'
+import VideoCard from './video-card'
 import styles from './talks.module.css'
-import Input from "@components/input"
-const Talks = ({
-    talks,
-}: {
-    talks: Array<Talk>,
-}) => {
-    const [search, setSearch] = React.useState('')
-    const [sort, setSort] = React.useState<'date' | 'title' | 'views' | 'likes'>('views')
-    const [asc, setAsc] = React.useState(false)
+import Input from '@components/input'
+import PostFooter from '@components/post-footer'
+import Badge from '@components/badge'
+import tagStyles from './tags.module.css'
+const Talks = ({ talks }: { talks: Array<Talk> }) => {
+  const [search, setSearch] = React.useState('')
+  const [sort, setSort] = React.useState<'date' | 'title' | 'views' | 'likes'>(
+    'views'
+  )
+  const [asc, setAsc] = React.useState(false)
+  const [selectedTags, setSelectedTags] = React.useState<Array<string>>([])
 
-    const filteredTalks = React.useMemo(
-        () => {
-            const filtered = search ? talks.filter(talk => talk.title.toLowerCase().includes(search.toLowerCase()) || talk.description.toLowerCase().includes(search.toLowerCase())) : talks
-            const sorted = filtered.sort((a, b) => {
-                if (sort === 'date') {
-                    const aDate = new Date(a.date)
-                    const bDate = new Date(b.date)
-                    if (aDate > bDate) {
-                        return asc ? 1 : -1
-                    } else if (aDate < bDate) {
-                        return asc ? -1 : 1
-                    } else {
-                        return 0
-                    }
-                } else if (sort === 'title') {
-                    if (asc) {
-                        return a.title.localeCompare(b.title)
-                    } else {
-                        return b.title.localeCompare(a.title)
-                    }
-                } else if (sort === 'views') {
-                    if (!a.views) {
-                        return 1
-                    } else if (!b.views) {
-                        return -1
-                    } else {
-                        if (asc) {
-                            return a.views - b.views
-                        } else {
-                            return b.views - a.views
-                        }
-                    }
-                } else if (sort === 'likes') {
-                    if (!a.likes) {
-                        return 1
-                    } else if (!b.likes) {
-                        return -1
-                    } else {
-                        if (asc) {
-                            return a.likes - b.likes
-                        } else {
-                            return b.likes - a.likes
-                        }
-                    }
-                } else {
-                    return 0
-                }
-            })
-            return sorted
-        }, [asc, search, sort, talks]
-    )
+  const filteredTalks = React.useMemo(() => {
+    const filteredBySearch = search
+      ? talks.filter(
+          (talk) =>
+            talk.title.toLowerCase().includes(search.toLowerCase()) ||
+            talk.description.toLowerCase().includes(search.toLowerCase())
+        )
+      : talks
+    const filteredByTags = selectedTags.length
+      ? filteredBySearch.filter((talk) =>
+          selectedTags.every((tag) => talk.tags?.includes(tag))
+        )
+      : filteredBySearch
+    const sorted = filteredByTags.sort((a, b) => {
+      if (sort === 'date') {
+        const aDate = new Date(a.date)
+        const bDate = new Date(b.date)
+        if (aDate > bDate) {
+          return asc ? 1 : -1
+        } else if (aDate < bDate) {
+          return asc ? -1 : 1
+        } else {
+          return 0
+        }
+      } else if (sort === 'title') {
+        if (asc) {
+          return a.title.localeCompare(b.title)
+        } else {
+          return b.title.localeCompare(a.title)
+        }
+      } else if (sort === 'views') {
+        if (!a.views) {
+          return 1
+        } else if (!b.views) {
+          return -1
+        } else {
+          if (asc) {
+            return a.views - b.views
+          } else {
+            return b.views - a.views
+          }
+        }
+      } else if (sort === 'likes') {
+        if (!a.likes) {
+          return 1
+        } else if (!b.likes) {
+          return -1
+        } else {
+          if (asc) {
+            return a.likes - b.likes
+          } else {
+            return b.likes - a.likes
+          }
+        }
+      } else {
+        return 0
+      }
+    })
+    return sorted
+  }, [asc, search, selectedTags, sort, talks])
 
-    const onSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log(e.target.value)
-        setSort(e.target.value as 'date' | 'title' | 'views' | 'likes')
-    }
+  const onSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log(e.target.value)
+    setSort(e.target.value as 'date' | 'title' | 'views' | 'likes')
+  }
 
-    return (
-        <>
-            <Page
-                header={false}
-                title=""
-                description="A curated and sortable list of interesting tech talks"
+  const allTagsWithCount = React.useMemo(() => {
+    const tags = filteredTalks.reduce((acc, talk) => {
+      talk.tags?.forEach((tag) => {
+        if (acc[tag]) {
+          acc[tag]++
+        } else {
+          acc[tag] = 1
+        }
+      })
+      return acc
+    }, {} as { [tag: string]: number })
+    return Object.entries(tags).sort((a, b) => {
+      if (a[1] > b[1]) {
+        return -1
+      } else if (a[1] < b[1]) {
+        return 1
+      } else {
+        if (a[0] > b[0]) {
+          return 1
+        } else if (a[0] < b[0]) {
+          return -1
+        } else {
+          return 0
+        }
+      }
+    })
+  }, [filteredTalks])
+
+  const onTagClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    const tag = e.currentTarget.textContent
+    if (!tag) return
+
+    const tagWithoutCount = tag.substring(0, tag.lastIndexOf(' '))
+    const newSelectedTags = selectedTags.includes(tagWithoutCount)
+      ? selectedTags.filter((t) => t !== tagWithoutCount)
+      : [...selectedTags, tagWithoutCount]
+    setSelectedTags(newSelectedTags)
+  }
+
+  return (
+    <>
+      <Page
+        header={false}
+        title=""
+        description="A curated and sortable list of interesting tech talks"
+      >
+        <h1>Talks I&apos;ve enjoyed</h1>
+        <div className={styles.filterSettings}>
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search"
+            aria-label="Search talk titles and descriptions"
+          />
+          <span className={styles.selects}>
+            <select
+              className={styles.sort}
+              value={sort}
+              onChange={onSortChange}
             >
-                <h1>Talks I&apos;ve enjoyed</h1>
-                <div className={styles.filterSettings}>
-                    <Input value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search"
-                        aria-label="Search talk titles and descriptions"
-                    />
-                    <span className={styles.selects}>
-                        <select className={styles.sort} value={sort} onChange={onSortChange}>
-                            <option value="date">Sort by date</option>
-                            <option value="title">Sort by title</option>
-                            <option value="views">Sort by views</option>
-                            <option value="likes">Sort by likes</option>
-                        </select>
-                        <select className={styles.sort} value={asc.toString()} onChange={(e) => setAsc(e.target.value === 'true')}>
-                            <option value="false">Descending</option>
-                            <option value="true">Ascending</option>
-                        </select>
-                    </span>
-                </div>
-                <div className={styles.talks} key={sort}>
-                    {filteredTalks.map(
-                        (talk) => {
-                            return <VideoCard key={talk.id} talk={talk} />
-                        }
-                    )}
-                </div>
-            </Page>
-        </>
-    )
+              <option value="date">Sort by date</option>
+              <option value="title">Sort by title</option>
+              <option value="views">Sort by views</option>
+              <option value="likes">Sort by likes</option>
+            </select>
+            <select
+              className={styles.sort}
+              value={asc.toString()}
+              onChange={(e) => setAsc(e.target.value === 'true')}
+            >
+              <option value="false">Descending</option>
+              <option value="true">Ascending</option>
+            </select>
+          </span>
+        </div>
+        <div className={tagStyles.tags} style={{ marginBottom: 'var(--gap)' }}>
+          {allTagsWithCount.map((tag) => (
+            <Badge
+              key={`sort-${tag[0]}`}
+              className={`${tagStyles.tag} ${
+                selectedTags.includes(tag[0]) ? tagStyles.selected : ''
+              }`}
+            >
+              <a onClick={onTagClick}>
+                {tag[0]} ({tag[1]})
+              </a>
+            </Badge>
+          ))}
+        </div>
+        <div className={styles.talks} key={sort}>
+          {filteredTalks.map((talk) => {
+            return <VideoCard key={talk.id} talk={talk} />
+          })}
+        </div>
+        <PostFooter />
+      </Page>
+    </>
+  )
 }
 
 export default Talks

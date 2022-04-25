@@ -10,7 +10,11 @@ type Props = {
 const Projects = ({ projects }: Props) => {
   return (
     <Page title="Projects" description="Most of my projects">
-      <ProjectList showYears={true} count={projects.length} projects={projects} />
+      <ProjectList
+        showYears={true}
+        count={projects.length}
+        projects={projects}
+      />
     </Page>
   )
 }
@@ -27,7 +31,6 @@ export const getStaticProps = async () => {
 export const config = {
   unstable_JsPreload: false,
   unstable_runtimeJS: false,
-};
-
+}
 
 export default Projects

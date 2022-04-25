@@ -23,12 +23,14 @@ const BlockEntry = ({ title, description, type, href, as, date }: Props) => {
       >
         {type && <div className={styles.type}>{type}</div>}
         {date && (
-          <span className={styles.date}>{date.toLocaleDateString('en-US')}</span>
+          <span className={styles.date}>
+            {date.toLocaleDateString('en-US')}
+          </span>
         )}
-          <h4 className={`${styles.title}`}>{title}</h4>
-          {description && (
-            <sub className={`${styles.description}`}>{description}</sub>
-          )}
+        <h4 className={`${styles.title}`}>{title}</h4>
+        {description && (
+          <sub className={`${styles.description}`}>{description}</sub>
+        )}
       </Link>
     </li>
   )

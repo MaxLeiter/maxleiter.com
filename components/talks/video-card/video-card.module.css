@@ -110,8 +110,15 @@
   .videoCard .embed .playButton {
     top: 80%;
   }
-}
 
+  .tags {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+}
 @media (max-width: 1250px) {
   .wrapper {
     flex-direction: column;
@@ -124,6 +131,6 @@
     border-radius: 0;
     border-left: none;
     border-bottom: 1px solid var(--link);
+    top: 0;
   }
-
 }

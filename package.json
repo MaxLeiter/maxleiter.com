@@ -2,7 +2,7 @@
   "name": "blog",
   "version": "1.0.0",
   "scripts": {
-    "lint": "next lint && prettier --write '**/*.js' --loglevel warn",
+    "lint": "next lint && prettier --write '**/*.{js,ts,tsx}' --loglevel warn",
     "dev": "next-remote-watch ./posts -p 3000",
     "build": "yarn rss && yarn sitemap && next build",
     "rss": "ts-node --project ./node.tsconfig.json scripts/rss",

@@ -48,7 +48,12 @@ const Link = ({
   return (
     <>
       <NextLink href={href} as={as}>
-        <a className={className ? `${style} ${className}` : style} title={title} {...props} tabIndex={tabIndex}>
+        <a
+          className={className ? `${style} ${className}` : style}
+          title={title}
+          {...props}
+          tabIndex={tabIndex}
+        >
           {children}
         </a>
       </NextLink>

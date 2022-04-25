@@ -1,0 +1,38 @@
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--gap-half);
+}
+
+.tag {
+  background-color: var(--lightest-gray);
+  border: 1px solid var(--lightest-gray);
+  border-radius: var(--radius);
+  color: var(--gray);
+  font-size: 14px;
+  padding: 0 var(--gap-half);
+}
+
+
+.tag a {
+  color: var(--dark-gray);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tag a:hover {
+  color: var(--link);
+}
+
+.selected {
+  background-color: var(--link);
+  border-color: var(--link);
+  color: var(--fg);
+}
+
+.selected a:hover {
+  color:  var(--fg);
+}
+

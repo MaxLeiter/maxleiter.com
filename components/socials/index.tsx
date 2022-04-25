@@ -14,7 +14,7 @@ const SocialButton = ({ tooltip, href, icon }: SocialButtonProps) => {
     <Tooltip text={tooltip}>
       <Link href={href} className={styles.icon}>
         {icon}
-        <span className={styles["sr-only"]}>{tooltip}</span>
+        <span className={styles['sr-only']}>{tooltip}</span>
       </Link>
     </Tooltip>
   )
@@ -42,7 +42,6 @@ const Socials = () => {
         icon={<Mail />}
         tooltip="Email"
       />
-
     </div>
   )
 }
