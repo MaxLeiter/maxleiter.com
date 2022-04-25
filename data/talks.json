@@ -82,7 +82,7 @@
     },
     {
       "url": "https://www.youtube.com/watch?v=M3BM9TB-8yA",
-      "tags": ["Node", "JavaScript", "V8", "JSConf EU", "Compilers"],
+      "tags": ["Node", "JavaScript", "V8", "JSConf EU"],
       "description": "Ryan Dahl covers his mistakes in writing Node, and ends with (semi-famously) introducing Deno."
     }
   ]
