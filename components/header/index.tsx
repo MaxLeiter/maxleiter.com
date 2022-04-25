@@ -2,8 +2,8 @@ import { memo } from 'react'
 import Link from 'next/link'
 
 import styles from './header.module.css'
-import { ArrowLeft } from '@components/icons'
-
+import Home from '@components/icons/home'
+import socialStyles from '../socials/socials.module.css'
 type Props = {
   render: boolean
   title: string
@@ -15,8 +15,8 @@ const Header = ({ render, title }: Props) => {
       <nav className={styles.nav}>
         <div className={styles.header}>
           <Link href="/">
-            <a aria-label="Navigate Home" className={styles.icon}>
-              <ArrowLeft />
+            <a aria-label="Navigate Home" className={socialStyles.icon}>
+              <Home />
             </a>
           </Link>
           {title && <div className={styles.content}>{title}</div>}

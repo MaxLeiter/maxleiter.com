@@ -124,11 +124,10 @@ const Talks = ({ talks }: { talks: Array<Talk> }) => {
   return (
     <>
       <Page
-        header={false}
-        title=""
+        header={true}
+        title="Talks"
         description="A curated and sortable list of interesting tech talks"
       >
-        <h1>Talks I&apos;ve enjoyed</h1>
         <div className={styles.filterSettings}>
           <Input
             value={search}
