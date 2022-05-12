@@ -92,7 +92,7 @@ const IeOrCss = ({ questions }: IEQuizProps) => {
     <>
       <p>
         Welcome! This quiz is inspired by the{' '}
-        <Link href="https://www.youtube.com/watch?v=Ck-e3hd3pKw" external>
+        <Link href="https://youtu.be/Ck-e3hd3pKw?t=22032" external>
           syntax.fm live session
         </Link>{' '}
         at Reactathon 2022. You can test your knowledge of new CSS features by
