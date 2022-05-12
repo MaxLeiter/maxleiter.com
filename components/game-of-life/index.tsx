@@ -1,8 +1,8 @@
 import Badge from '@components/badge'
 import Button from '@components/button'
 // import { useReducedMotion } from "@lib/media-query-hooks"
-import useDocumentSize from '@lib/use-document-size'
-import useGameOfLife from '@lib/use-game-of-life'
+import useDocumentSize from '@lib/hooks/use-document-size'
+import useGameOfLife from '@lib/hooks/use-game-of-life'
 import Link from 'next/link'
 import { RefObject, useRef, useState } from 'react'
 import styles from './gol.module.css'

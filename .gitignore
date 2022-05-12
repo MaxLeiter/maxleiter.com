@@ -9,7 +9,13 @@ dist/
 packages/
 yalc.lock
 .yalc
-.env.local
-.env
+.env*
 
 .vercel
+
+# Supabase
+.supabase
+
+# Supabase
+**/supabase/.branches
+**/supabase/.temp

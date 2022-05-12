@@ -84,7 +84,6 @@ const Talks = ({ talks }: { talks: Array<Talk> }) => {
   }, [asc, search, selectedTags, sort, talks])
 
   const onSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log(e.target.value)
     setSort(e.target.value as SortOption)
   }
 

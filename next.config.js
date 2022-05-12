@@ -13,6 +13,7 @@ module.exports = withBundleAnalyzer({
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js'],
   experimental: {
     optimizeCss: true,
+    reactRoot: true,
   },
   async redirects() {
     return [

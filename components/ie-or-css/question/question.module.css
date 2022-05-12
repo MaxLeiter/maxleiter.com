@@ -1,0 +1,71 @@
+.wrapper {
+    margin-top: var(--gap-double);
+    border: 1px solid var(--gray);
+    padding: var(--gap);
+    border-radius: var(--radius);
+}
+
+.pre {
+    margin-bottom: var(--gap);
+    overflow-x: scroll;
+}
+.buttons button {
+    transition: border 0.1s;
+}
+
+.buttons button:disabled[data-correct="true"][data-voted-for="true"] {
+    border: 2px solid green;
+}
+
+.buttons button:disabled[data-correct="false"][data-voted-for="true"] {
+    border: 2px solid red;
+}
+
+
+/* a line with line with children left and right, width is assigned in JS */
+.line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 1.15rem;
+    margin-top: var(--gap);
+    background: var(--lighter-gray);
+    color: var(--gray);
+    font-weight: 500;
+    transition: background-color var(--transition), color var(--transition);
+}
+
+.line .left, .line .right {
+    display: block;
+    height: 100%;
+    font-size: 1rem;
+    line-height: 1.15rem;
+    text-align: center;
+    user-select: none;
+    color: var(--fg);
+}
+
+.line .left {
+    border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.line .right {
+    border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.line *[data-correct="true"] {
+    background: green;
+}
+
+.line *[data-correct="false"] {
+    background: red;
+}
+
+.votes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--gray);
+}

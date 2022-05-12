@@ -5,15 +5,7 @@ import Page from '@components/page'
 import styles from './post.module.css'
 import type types from '@lib/types'
 import PostFooter from '@components/post-footer'
-
-function escapeHtml(unsafe: string) {
-  return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
-}
+import { escapeHtml } from '@lib/escape-html'
 
 type Props = types.Post & {
   previous?: types.Post

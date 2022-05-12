@@ -1,5 +1,3 @@
-import Link from '@components/link'
-import ReactDOMServer from 'react-dom/server'
 import type { Project } from './types'
 
 const Projects: Project[] = [
@@ -25,16 +23,6 @@ const Projects: Project[] = [
     href: 'https://github.com/thelounge/thelounge',
     role: 'Maintainer',
     years: ['2016', 'present'],
-    cardInfo: ReactDOMServer.renderToString(
-      <div>
-        <Link href="https://demo.thelounge.chat" external={true}>
-          Demo
-        </Link>
-        <Link href="https://github.com/thelounge" external={true}>
-          GitHub
-        </Link>
-      </div>
-    ),
   },
   {
     title: 'KnightOS',
@@ -117,11 +105,11 @@ const Projects: Project[] = [
 ]
 
 export default async function getProjects(): Promise<Project[]> {
-  if (!process.env.GITHUB_TOKEN) {
-    throw new Error(
-      'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
-    )
-  }
+  // if (!process.env.GITHUB_TOKEN) {
+  //   throw new Error(
+  //     'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
+  //   )
+  // }
 
   const withStars = await Promise.all(
     Projects.map(async (proj) => {
