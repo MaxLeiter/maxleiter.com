@@ -7,7 +7,7 @@ date: May 15, 2022
 This post starts with a brief introduction. If you want to jump down to the tutorial, click [here](/blog/supabase-next-analytics#how). You can also see the live updating views in action in the top right of this page! The analytics events themselves require no JavaScript and occur completely on the server thanks to the [new (in beta) Next.js middleware](https://nextjs.org/docs/advanced-features/middleware). If you have JavaScript enabled, the view count should live update thanks to Supabase Realtime. You can try it by opening the page in a new tab and eyeing the view count.
 
 **Contents**
-- [Motiviations](/blog/supabase-next-analytics#motivations)
+- [Motivations](/blog/supabase-next-analytics#motivations)
 - [How to do it](/blog/supabase-next-analytics#how)
     - [Supabase: Setting up the Database and Realtime](/blog/supabase-next-analytics#supabase-setting-up-the-database-and-realtime)
     - [Next.js: Adding server-side analytics](/blog/supabase-next-analytics#nextjs-adding-server-side-analytics)
