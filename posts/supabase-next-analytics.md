@@ -8,10 +8,11 @@ This post starts with a brief introduction. If you want to jump down to the tuto
 
 **Contents**
 - [Motiviations](/blog/supabase-next-analytics#motivations)
-- [How](/blog/supabase-next-analytics#how)
+- [How to do it](/blog/supabase-next-analytics#how)
     - [Supabase: Setting up the Database and Realtime](/blog/supabase-next-analytics#supabase-setting-up-the-database-and-realtime)
     - [Next.js: Adding server-side analytics](/blog/supabase-next-analytics#nextjs-adding-server-side-analytics)
     - [Next.js: Adding a live updating view counter](/blog/supabase-next-analytics#nextjs-adding-a-live-updating-view-counter)
+- [Next steps](/blog/supabase-next-analytics#next-steps)
 
 ## Motivations
 When possible, I avoid requiring JavaScript and exposing my users to unnecessary tracking. The problem is that I decided I wanted to track views on my blog, and [Next.js analytics](https://nextjs.org/analytics) don't provide the vanity metrics I'm looking for. I previously used [Matomo](https://matomo.org/) analyzing my nginx log, and while matomo is a fantastic piece of open-source software, I don't want to mess with the PHP API (or use PHP for the first time in ~7 years) in order to get post views on the front-end.
