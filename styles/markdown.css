@@ -17,7 +17,7 @@ article img {
   max-width: 100%;
   /* width: var(--main-content); */
   width: auto;
-  margin: auto;
+  margin: var(--gap-half) auto;
   display: block;
   border-radius: var(--radius);
 }
@@ -56,8 +56,9 @@ article aside,
 article blockquote {
   border: 2px solid var(--light-gray);
   background: var(--lightest-gray);
-  padding: var(--gap);
+  padding: var(--gap-half) var(--gap);
   color: var(--article-color);
+  margin: var(--gap-half) 0;
 }
 
 /* Code Snippets */
@@ -111,6 +112,15 @@ sup {
 
 .header-link:hover::after {
   opacity: 1;
+}
+
+article > ol > li > p:first-child {
+  display: inline;
+}
+
+article details {
+  margin-top: var(--gap-half);
+  margin-bottom: var(--gap-half);
 }
 
 @media screen and (max-width: 760px) {

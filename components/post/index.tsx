@@ -45,7 +45,7 @@ const Post = ({
 
   // Subscribe to view updates
   useEffect(() => {
-    supabase
+    const sub = supabase
       .from('analytics')
       .on('UPDATE', (payload) => {
         if (payload.new.id === id) {
@@ -56,7 +56,7 @@ const Post = ({
       .subscribe()
 
     return () => {
-      supabase.removeAllSubscriptions()
+      sub.unsubscribe()
     }
   }, [id])
 
