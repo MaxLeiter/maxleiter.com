@@ -1,15 +1,22 @@
-.date {
+.wrapper .date {
   font-weight: 500;
   font-size: 1rem;
 }
 
-.modified {
+.wrapper .modified {
   color: var(--gray);
   font-size: 0.8rem;
   font-weight: 500;
   margin-left: var(--gap-half);
 }
 
-.title {
+.wrapper .title {
   margin-top: 1rem;
 }
+
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+

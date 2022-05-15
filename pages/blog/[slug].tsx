@@ -27,6 +27,7 @@ export const getStaticProps = async ({ params: { slug } }: Props) => {
       ...rest,
       html: renderMarkdown(body),
     },
+    revalidate: 10,
   }
 }
 
@@ -39,7 +40,7 @@ export const getStaticPaths = async () => {
 
 export default PostPage
 
-export const config = {
-  unstable_JsPreload: false,
-  unstable_runtimeJS: false,
-}
+// export const config = {
+//   unstable_JsPreload: false,
+//   unstable_runtimeJS: false,
+// }

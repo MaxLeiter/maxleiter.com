@@ -23,7 +23,13 @@
   background: var(--lightest-gray);
 }
 
-.date,
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.wrapper .date,
+.wrapper .views,
 .type {
   font-size: .95rem;
   flex-basis: 5rem;

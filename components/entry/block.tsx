@@ -8,9 +8,10 @@ type Props = {
   href: string
   as?: string
   date?: Date
+  views?: number
 }
 
-const BlockEntry = ({ title, description, type, href, as, date }: Props) => {
+const BlockEntry = ({ title, description, type, href, as, date, views }: Props) => {
   return (
     <li className={styles.item}>
       <Link
@@ -22,11 +23,19 @@ const BlockEntry = ({ title, description, type, href, as, date }: Props) => {
         transition={false}
       >
         {type && <div className={styles.type}>{type}</div>}
-        {date && (
-          <span className={styles.date}>
-            {date.toLocaleDateString('en-US')}
-          </span>
-        )}
+        {(date || views) && <div className={styles.wrapper}>
+          {date && (
+            <span className={styles.date}>
+              {date.toLocaleDateString('en-US')}
+            </span>
+          )}
+          {views ? (
+            <span className={styles.views}>
+              {views.toLocaleString()} {views === 1 ? 'view' : 'views'}
+            </span>
+          ) : null}
+        </div>}
+
         <h4 className={`${styles.title}`}>{title}</h4>
         {description && (
           <sub className={`${styles.description}`}>{description}</sub>

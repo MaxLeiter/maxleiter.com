@@ -53,8 +53,6 @@ const vote: NextApiHandler = async (
 
 
   if (!error) {
-    console.log(data)
-
     res.status(200).json({ success: true })
   } else {
     console.error(error)
