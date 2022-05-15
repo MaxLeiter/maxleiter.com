@@ -1,5 +1,5 @@
 ---
-title: Live updating page views with Supabase and Next.js in 10 minutes
+title: Live updating page views with Supabase and Next.js in 15 minutes
 description: 
 slug: supabase-next-analytics
 date: May 15, 2022
