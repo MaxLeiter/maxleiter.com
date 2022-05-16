@@ -3,6 +3,8 @@ const PUBLIC_FILE = /\.(.*)$/
 
 export const middleware: NextMiddleware = async (req, event) => {
     const pathname = req.nextUrl.pathname
+    const referer = req.headers.get('referer') || ''
+
     const isPageRequest =
 		!PUBLIC_FILE.test(pathname) &&
 		!pathname.startsWith("/api")
@@ -20,11 +22,15 @@ export const middleware: NextMiddleware = async (req, event) => {
         const slug = pathname.slice(pathname.indexOf("/")) || "/"
 
         const URL = process.env.NODE_ENV === 'production' ? 'https://maxleiter.com/api/view' : 'http://localhost:3000/api/view'
-        const res = await fetch(`${URL}?slug=${slug}`, {
+        const res = await fetch(URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({
+                slug,
+                referer,
+            }),
         })
 
         if (res.status !== 200) {

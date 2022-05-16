@@ -2,8 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import supabase from '@lib/supabase/private'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const page_slug = req.query.slug
-    const http_referer = req.headers.referer || ""
+    const page_slug = req.body.slug
+    const http_referer = req.body.referer
 
     if (req.method === 'POST') {
         await supabase.rpc('increment_page_view', { page_slug });

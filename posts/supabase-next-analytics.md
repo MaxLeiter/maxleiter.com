@@ -199,9 +199,9 @@ Note that this tutorial expects you to already have a Next.js project. If you do
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: {
-                    slug
-                }
+                body: JSON.stringify({
+                    slug,
+                }),
             })
 
             if (res.status !== 200) {
