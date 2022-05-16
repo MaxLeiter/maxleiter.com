@@ -26,6 +26,16 @@ module.exports = withBundleAnalyzer({
         source: '/atom',
         destination: '/feed.xml',
         permanent: true,
+      },
+      {
+        source: '/feed',
+        destination: '/feed.xml',
+        permanent: true,
+      },
+      {
+        source: '/rss',
+        destination: '/feed.xml',
+        permanent: true,
       }
     ]
   },
