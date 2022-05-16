@@ -22,6 +22,11 @@ module.exports = withBundleAnalyzer({
         destination: '/blog/X11',
         permanent: true,
       },
+      {
+        source: '/atom',
+        destination: '/feed.xml',
+        permanent: true,
+      }
     ]
   },
 })
