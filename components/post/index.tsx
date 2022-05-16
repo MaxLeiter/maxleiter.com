@@ -9,7 +9,7 @@ import PostFooter from '@components/post-footer'
 import { escapeHtml } from '@lib/escape-html'
 import supabase from '@lib/supabase/public'
 
-type Props = types.Post & {
+export type PostProps = types.Post & {
   previous?: types.Post
   next?: types.Post
   html: string
@@ -27,7 +27,7 @@ const Post = ({
   next,
   slug,
   views
-}: Props) => {
+}: PostProps) => {
   const postDate = new Date(date)
   const lastModifiedDate = lastModified ? new Date(lastModified) : undefined
   const isDateDifferent =

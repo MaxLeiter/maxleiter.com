@@ -1,9 +1,8 @@
-import Post from '@components/post'
+import Post, { PostProps } from '@components/post'
 import getPosts from '@lib/get-posts'
 import renderMarkdown from '@lib/render-markdown'
 
-//@ts-ignore
-const PostPage = (props) => {
+const PostPage = (props: PostProps) => {
   return <Post {...props} />
 }
 
@@ -26,8 +25,7 @@ export const getStaticProps = async ({ params: { slug } }: Props) => {
       next: posts[postIndex - 1] || null,
       ...rest,
       html: renderMarkdown(body),
-    },
-    revalidate: 10,
+    } as PostProps,
   }
 }
 
