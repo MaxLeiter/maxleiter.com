@@ -117,7 +117,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
     npm install @supabase/supabase-js
     ```
 
-3. Create two `supabase/public.js` and `supabase/private.js` where you want to; I put them in `lib`. `Private` will contain a connection with the `service_role` key while `public` will use the anon one. Two files aren't necessary, but I like distinguishing them so I can be sure which I'm using.
+3. Create two files, `supabase/public.js` and `supabase/private.js`, where you want to; I put them in `lib`. `Private` will contain a connection with the `service_role` key while `public` will use the anon one. Two files aren't necessary, but I like distinguishing them so I can be sure which I'm using.
 
     They should each look something like this:
 
@@ -152,9 +152,9 @@ Note that this tutorial expects you to already have a Next.js project. If you do
     ```
 
 
-    The only different between `private` and `public` is the second argument passed to `createClient`: change that depending on which you want to use.
+    The only difference between `private` and `public` is the second argument passed to `createClient`: change that depending on which you want to use.
 
-4. Create an [API route](https://nextjs.org/docs/api-routes/introduction) for submitting views. You could do this directly from the middleware but adding it as a serverless function gives you more freedom to extend it in the future. Also note that anyone can trigger this function, so you may want to protect with by adding a new environment variable and sending that with the request from the middleware. Then, only your server requests will ever have that value and can be verified as legitimate.
+4. Create an [API route](https://nextjs.org/docs/api-routes/introduction) for submitting views. You could do this directly from the middleware but adding it as a serverless function gives you more freedom to extend it in the future. Also note that anyone can trigger this function, so you may want to protect it by adding a new environment variable and sending that with the request from the middleware. Then, only your server requests will ever have that value and can be verified as legitimate.
 
     ```typescript title=pages/api/view.ts
     import { NextApiRequest, NextApiResponse } from "next";
@@ -175,7 +175,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
 
     > The above code is in TypeScript; if you want JavaScript, you can remove the first `import` and change the function definition to `const handler = async (req, res) =>`. I included this to try and encourage you to try TypeScript if you aren't already; it's very helpful for exploring unfamiliar APIs, like the Next.js requests and responses.
 
-5. Create a `pages/_middleware.{jsx,tsx}` file. The middleware will run on the server before every page request; nothing inside it is ever exposed to the client so we can safely use our private Supabase lib if we want. However, we'll actually just ping our API handler instead. 
+5. Create a `pages/_middleware.{jsx,tsx}` file. The middleware will run on the server before every page request; nothing inside it is ever exposed to the client so we can safely use our private Supabase lib. However, we'll actually just send a POST request to our API handler instead. 
 
     ```typescript pages/_middleware.tsx
     import { NextMiddleware, NextResponse,  } from 'next/server'
@@ -217,7 +217,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
     }
     ```
 
-6. You should now test loading pages and viewing the Supabase dashboard to verify your views table is updating. If it's not, verify your connection details and try exploring the Supabase logs.
+6. You should now verify your views table is updating by loading pages and viewing the Supabase dashboard. If it's not updating, verify your connection details and try exploring the Supabase logs.
 
 
 ### Next.js: Adding a live-updating view counter
@@ -272,7 +272,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
     }
     ```
 
-4. And there you have it! Automatically updating analytics that don't require JavaScript to be recorded!
+4. And there you have it! Automatically updating analytics that don't require JavaScript to be recorded! You can verify it works by opening the page in a new tab.
 
 ### Next steps
 
@@ -280,3 +280,4 @@ There's quite a lot you can do from here, but here are some recommendations:
 1. Only allow unique visitors, perhaps by storing IP hashes or using localStorage. This could probably be accomplished with Supabase Edge functions? 
 2. Build a visualization page for interacting and querying the results
 3. Expand your analytics to include things like keeping track of the `referer` value. 
+4. Ignore certain user agents to reflect a more accurate view count 
