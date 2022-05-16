@@ -11,8 +11,8 @@ const getPosts = async () => {
     posts
       .filter((file) => path.extname(file) === '.md')
       .map(async (file) => {
-        const path = `./posts/${file}`
-        const postContent = await fs.readFile(path, 'utf8')
+        const filePath = `./posts/${file}`
+        const postContent = await fs.readFile(filePath, 'utf8')
         const { data, content } = matter(postContent)
 
         if (data.published === false) {

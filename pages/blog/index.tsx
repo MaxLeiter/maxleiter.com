@@ -30,8 +30,3 @@ export const getStaticProps = async () => {
 }
 
 export default Blog
-
-export const config = {
-  unstable_JsPreload: false,
-  unstable_runtimeJS: false,
-}
