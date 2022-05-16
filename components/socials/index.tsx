@@ -1,7 +1,7 @@
 import Link from '@components/link'
 
 import styles from './socials.module.css'
-import { GitHub, Twitter, LinkedIn, Mail } from '@components/icons'
+import { GitHub, Twitter, LinkedIn, Mail, RSS } from '@components/icons'
 import Tooltip from '@components/tooltip'
 
 type SocialButtonProps = {
@@ -41,6 +41,11 @@ const Socials = () => {
         href="mailto:maxwell.leiter@gmail.com"
         icon={<Mail />}
         tooltip="Email"
+      />
+      <SocialButton
+        href="/feed.xml"
+        icon={<RSS />}
+        tooltip="RSS"
       />
     </div>
   )

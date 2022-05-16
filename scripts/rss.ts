@@ -34,8 +34,9 @@ const main = () => {
     title: 'Max Leiter',
     site_url: 'https://maxleiter.com',
     feed_url: 'https://maxleiter.com/feed.xml',
-    image_url: 'https://maxleiter.com/og.png',
+    // image_url: 'https://maxleiter.com/og.png',
     language: 'en',
+    description: 'Max Leiter\'s blog',
   })
 
   posts.forEach((post) => {
