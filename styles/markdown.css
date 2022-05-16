@@ -114,7 +114,7 @@ sup {
   opacity: 1;
 }
 
-article > ol > li > p:first-child {
+article ol li p:first-child {
   display: inline;
 }
 

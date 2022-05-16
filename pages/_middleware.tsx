@@ -8,6 +8,10 @@ export const middleware: NextMiddleware = async (req, event) => {
 		!pathname.startsWith("/api")
 
     const sendAnalytics = async () => {
+        if (process.env.NODE_ENV !== "production") {
+            return
+        }
+        
         if (req.ua?.isBot) {
             console.log('Bot/crawler detected, not sending analytics')
             return

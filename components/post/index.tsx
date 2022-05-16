@@ -6,8 +6,8 @@ import Page from '@components/page'
 import styles from './post.module.css'
 import type types from '@lib/types'
 import PostFooter from '@components/post-footer'
-import { escapeHtml } from '@lib/escape-html'
 import supabase from '@lib/supabase/public'
+import FadeIn from '@components/fade-in'
 
 export type PostProps = types.Post & {
   previous?: types.Post
@@ -40,7 +40,7 @@ const Post = ({
       year: 'numeric',
     }
   )
-  const [updatedViews, setViews] = useState(views)
+  const [updatedViews, setViews] = useState<number>()
   const [id, setId] = useState<number>()
 
   // Subscribe to view updates
@@ -60,6 +60,12 @@ const Post = ({
     }
   }, [id])
 
+  useEffect(() => {
+    if (views && !updatedViews) {
+      setViews(views)
+    }
+  }, [views, updatedViews])
+
   // Update view count, as the post view count from props is from the last time the page was built
   useEffect(() => {
     supabase.from('analytics').select('view_count, id').filter('slug', 'eq', `/blog/${slug}`).then((res) => {
@@ -68,7 +74,7 @@ const Post = ({
         setViews(res.body[0].view_count)
       }
     })
-    }, [slug])
+  }, [slug])
 
   return (
     <Page
@@ -90,16 +96,22 @@ const Post = ({
         {date && <meta name="date" content={date} />}
       </Head>
 
-      <article
-        dangerouslySetInnerHTML={{
-          __html: `<div class="${styles.wrapper}"><span class="${styles.date}">${date} ${isDateDifferent
-              ? `<span class="${styles.modified}">last modified ${formattedLastModifiedDate}`
-              : ''
-            }</span><span class="views">${updatedViews.toLocaleString()} views</span></div></span><h1 class="${styles.title}">${escapeHtml(
-              title
-            )}</h1>${html}`,
-        }}
-      />
+      <article>
+        <div className={styles.wrapper}>
+          <span className={styles.date}>
+            {date} {isDateDifferent && (
+              <span className={styles.modified}>
+                last modified {formattedLastModifiedDate}
+              </span>
+            )}
+          </span>
+          <FadeIn>{updatedViews} views</FadeIn>
+        </div>
+        <h1 className={styles.title}>{title}</h1>
+        <div
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </article>
       <PostFooter />
       <Navigation previous={previous} next={next} />
     </Page>

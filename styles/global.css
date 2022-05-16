@@ -67,7 +67,7 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-size: calc(1rem);
+  font-size: calc(1.02rem);
   background: var(--bg);
   color: var(--fg);
   text-rendering: optimizeLegibility;

@@ -1,10 +1,18 @@
 import fs from 'fs'
 import globby from 'globby'
 import path from 'path'
-import getPosts from '../lib/get-posts'
 import prettier from 'prettier'
+import dotenv from 'dotenv'
 
 const DOMAIN = 'maxleiter.com'
+
+dotenv.config( { 
+  path: path.resolve(__dirname, '../.env'),
+  debug: true
+})
+
+// must be imported after dotenv config()
+import getPosts from '../lib/get-posts'
 
 const formatted = (sitemap: string) =>
   prettier.format(sitemap, { parser: 'html' })
