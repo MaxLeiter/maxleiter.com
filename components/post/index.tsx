@@ -26,7 +26,6 @@ const Post = ({
   lastModified,
   next,
   slug,
-  views
 }: PostProps) => {
   const postDate = new Date(date)
   const lastModifiedDate = lastModified ? new Date(lastModified) : undefined
@@ -59,12 +58,6 @@ const Post = ({
       sub.unsubscribe()
     }
   }, [id])
-
-  useEffect(() => {
-    if (views && !updatedViews) {
-      setViews(views)
-    }
-  }, [views, updatedViews])
 
   // Update view count, as the post view count from props is from the last time the page was built
   useEffect(() => {
@@ -105,7 +98,7 @@ const Post = ({
               </span>
             )}
           </span>
-          <FadeIn>{updatedViews} views</FadeIn>
+          {updatedViews && <FadeIn>{updatedViews} views</FadeIn>}
         </div>
         <h1 className={styles.title}>{title}</h1>
         <div
