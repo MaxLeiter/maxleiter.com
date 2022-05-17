@@ -1,0 +1,14 @@
+name: update-index-cron
+on:
+  schedule:
+    # every 24 hours at 12am
+    - cron: '0 0 * * *'
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send POST Request
+        run: |
+          curl --request POST \
+          --url 'https://maxleiter.com/api/revalidate \
+          --header 'x-secret-key ${{ secrets.SECRET_KEY }}'

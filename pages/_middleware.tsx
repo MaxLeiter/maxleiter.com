@@ -26,6 +26,7 @@ export const middleware: NextMiddleware = async (req, event) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'x-secret-key': process.env.SECRET_KEY || '',
             },
             body: JSON.stringify({
                 slug,
