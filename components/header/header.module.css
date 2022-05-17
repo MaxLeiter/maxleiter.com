@@ -19,10 +19,6 @@
   backdrop-filter: saturate(180%) blur(20px);
 }
 
-.fakeNav {
-  margin: var(--small-gap) auto var(--gap) auto;
-}
-
 .header {
   height: var(--header-height);
   margin: 0 auto;
@@ -40,10 +36,6 @@
 }
 
 @media (max-width: 960px) {
-  .fakeNav {
-    margin: 0;
-  }
-
   .nav {
     margin: var(--gap-double) 0;
   }

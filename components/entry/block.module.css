@@ -10,6 +10,7 @@
   padding-top: var(--gap);
   padding-bottom: var(--gap-double);
   padding-left: var(--gap);
+  padding-right: var(--gap);
   transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
   border-radius: var(--radius);
   will-change: transform, opacity;
@@ -54,10 +55,10 @@
 .description {
   word-break: break-word;
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.5;
 }
 
-.title {
+.title {  
   font-size: 1.15rem;
   font-weight: bold;
   transition: color var(--transition);
@@ -66,7 +67,6 @@
 .description {
   color: var(--gray);
   margin-top: var(--gap-half);
-  font-size: .95rem;
 }
 
 @media (max-width: 600px) {

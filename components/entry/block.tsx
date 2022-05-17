@@ -26,7 +26,11 @@ const BlockEntry = ({ title, description, type, href, as, date, views }: Props) 
         {(date || views) && <div className={styles.wrapper}>
           {date && (
             <span className={styles.date}>
-              {date.toLocaleDateString('en-US')}
+              {date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
             </span>
           )}
           {views ? (
@@ -38,7 +42,7 @@ const BlockEntry = ({ title, description, type, href, as, date, views }: Props) 
 
         <h4 className={`${styles.title}`}>{title}</h4>
         {description && (
-          <sub className={`${styles.description}`}>{description}</sub>
+          <p className={styles.description}>{description}</p>
         )}
       </Link>
     </li>
