@@ -17,7 +17,6 @@
 
 
 .tag a {
-  color: var(--dark-gray);
   text-decoration: none;
   cursor: pointer;
 }
@@ -29,7 +28,7 @@
 .selected {
   background-color: var(--link);
   border-color: var(--link);
-  color: var(--fg);
+  color: var(--bg);
 }
 
 .selected a:hover {

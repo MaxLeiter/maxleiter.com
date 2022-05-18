@@ -11,7 +11,8 @@ import supabase from '@lib/supabase/public'
 import FadeIn from '@components/fade-in'
 import socialStyles from '@components/socials/socials.module.css'
 import Home from '@components/icons/home'
-import useIsVisible from '@lib/hooks/use-is-visible'
+import ThemeSwitcher from '@components/theme-switcher'
+import Tooltip from '@components/tooltip'
 
 export type PostProps = types.Post & {
   previous?: types.Post
@@ -73,10 +74,6 @@ const Post = ({
     })
   }, [slug])
 
-  // header scroll effect
-  const [headerRef, isVisible = false] = useIsVisible({
-    // threshold: 0.5,
-  })
   return (
     <Page
       title={title}
@@ -99,21 +96,18 @@ const Post = ({
       </Head>
 
       <div className={styles.header}>
-        <Link href="/">
-          <a
-            aria-label="Navigate Home"
-            className={`${socialStyles.icon} ${styles.icon}`}
-          >
-              <Home />
-          </a>
-
-        </Link>
+        <Tooltip text={"Navigate home"}>
+          <Link href="/">
+            <a
+              className={`${socialStyles.icon} ${styles.icon}`}
+            >
+                <Home />
+            </a>
+          </Link>
+        </Tooltip>
+        <ThemeSwitcher className={styles.icon}/>
       </div>
-      {!isVisible && (
-        <FadeIn><div className={`${styles.header} ${styles.scrolled}`} style={{display: 'block'}}>
-          <div className={styles.content}>{title}</div>
-        </div></FadeIn>
-      )}
+  
       <article>
         <div className={styles.wrapper}>
           <span className={styles.date}>
@@ -125,7 +119,7 @@ const Post = ({
           </span>
           {updatedViews && <FadeIn>{updatedViews} views</FadeIn>}
         </div>
-        <h1 className={styles.title} ref={headerRef}>{title}</h1>
+        <h1 className={styles.title}>{title}</h1>
         <div
           dangerouslySetInnerHTML={{ __html: html }}
         />

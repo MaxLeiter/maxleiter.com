@@ -2266,6 +2266,11 @@ next-remote-watch@^1.0.0:
     commander "^5.0.0"
     express "^4.17.1"
 
+next-themes@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/next-themes/-/next-themes-0.2.0.tgz#fdc507f61e95b3ae513dee8d4783bcec8c02e3a3"
+  integrity sha512-myhpDL4vadBD9YDSHiewqvzorGzB03N84e+3LxCwHRlM/hiBOaW+UsKsQojQAzC7fdcJA0l2ppveXcYaVV+hxQ==
+
 next-tick@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.1.0.tgz#1836ee30ad56d67ef281b22bd199f709449b35eb"

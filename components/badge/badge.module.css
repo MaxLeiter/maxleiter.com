@@ -2,8 +2,8 @@
     display: inline-flex;
     align-items: center;
     font-size: 14px;
-    background-color: var(--lighest-gray);
-    border: 1px solid var(--lighter-gray);
+    background-color: var(--lighter-gray);
+    border: 1px solid var(--light-gray);
     border-radius: var(--radius);
     color: var(--gray);
     font-size: 14px;
