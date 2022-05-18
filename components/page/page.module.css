@@ -22,6 +22,10 @@
   pointer-events: none;
 }
 
+[data-theme="light"] .fade {
+  background: linear-gradient(to bottom, transparent, hsl(240, 8%, 66%));
+}
+
 @media (max-width: 960px) {
   .fade {
     display: none;
