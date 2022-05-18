@@ -9,7 +9,7 @@ type Props = {
 
 const Head = ({
   title = 'Max Leiter',
-  description = 'Full-stack developer and student',
+  description = 'My blog and miscellaneous pages',
   image = '',
   children,
 }: Props) => {

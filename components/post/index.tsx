@@ -74,7 +74,7 @@ const Post = ({
   }, [slug])
 
   // header scroll effect
-  const [headerRef, isVisible] = useIsVisible({
+  const [headerRef, isVisible = false] = useIsVisible({
     // threshold: 0.5,
   })
   return (
