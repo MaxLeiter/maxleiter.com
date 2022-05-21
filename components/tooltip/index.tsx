@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import React from 'react'
 import styles from './tooltip.module.css'
 
 const Tooltip = ({
@@ -10,8 +11,12 @@ const Tooltip = ({
   children: ReactNode | ReactNode[]
 }) => {
   return (
-    <span aria-label={text} className={styles.tooltip} {...otherProps}>
-      {children}
+    <span className={styles.tooltip} data-label={text} {...otherProps}>
+      {React.Children.map(children, (child) =>
+        React.isValidElement(child) && React.cloneElement(child, {
+          'aria-label': text,
+        })
+      )}
     </span>
   )
 }
