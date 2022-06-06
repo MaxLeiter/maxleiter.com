@@ -25,6 +25,13 @@ const Projects: Project[] = [
     years: ['2016', 'present'],
   },
   {
+    title: 'SortableJS-vue3',
+    description: "A TypeScript wrapper for SortableJS that's built for Vue 3.",
+    href: 'https://sortablejs-vue3.maxleiter.com/',
+    role: 'Creator',
+    years: ['2022 - present'],
+  },
+  {
     title: 'KnightOS',
     description:
       'Open-source unix-like operating system for z80-based calculators written entirely in z80 asm.',
@@ -108,7 +115,7 @@ const Projects: Project[] = [
     href: 'https://git-visualizer.maxleiter.com',
     role: 'Creator',
     years: ['2022'],
-  }
+  },
 ]
 
 export default async function getProjects(): Promise<Project[]> {
