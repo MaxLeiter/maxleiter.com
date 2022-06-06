@@ -14,7 +14,7 @@ export const middleware: NextMiddleware = async (req, event) => {
             return
         }
         
-        if (req.ua?.isBot || referer.includes("mleiter.vercel.app")) {
+        if (req.ua?.isBot || referer.includes("mleiter.vercel.app") || req.ua?.ua.includes("node-fetch")) {
             console.log('Bot/crawler detected, not sending analytics')
             return
         }
