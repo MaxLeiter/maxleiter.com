@@ -2,7 +2,7 @@
   "root": true,
   "extends": "next",
   "parser": "@typescript-eslint/parser",
-  "plugins": ["react-hooks", "@typescript-eslint"],
+  "plugins": ["@typescript-eslint"],
   "env": {
     "browser": true,
     "commonjs": true,

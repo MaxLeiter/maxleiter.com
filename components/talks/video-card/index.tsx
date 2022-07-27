@@ -79,15 +79,17 @@ const VideoCard = ({
         </aside>
       )}
       <section className={styles.videoCard}>
-        {/* <Link external href={`https://www.youtube.com/watch?v=${id}`}> */}
-        <Badge>Published {date}</Badge>
-        {/* </Link> */}
-        {/* <Link external href={`https://www.youtube.com/${channel}`}> */}
-        <Badge>{channel}</Badge>
-        {/* </Link> */}
-        {views ? <Badge>{views.toLocaleString()} views</Badge> : ''}
-        {likes ? <Badge>{likes.toLocaleString()} likes</Badge> : ''}
-        <Badge>{secondsToTime(lengthSeconds)}</Badge>
+        <div className={styles.badges}>
+          {/* <Link external href={`https://www.youtube.com/watch?v=${id}`}> */}
+          <Badge>Published {date}</Badge>
+          {/* </Link> */}
+          {/* <Link external href={`https://www.youtube.com/${channel}`}> */}
+          <Badge>{channel}</Badge>
+          {/* </Link> */}
+          {views ? <Badge>{views.toLocaleString()} views</Badge> : ''}
+          {likes ? <Badge>{likes.toLocaleString()} likes</Badge> : ''}
+          <Badge>{secondsToTime(lengthSeconds)}</Badge>
+        </div>
         <div className={styles.content}>
           <Link external href={`https://www.youtube.com/watch?v=${id}`}>
             <h2>{title}</h2>

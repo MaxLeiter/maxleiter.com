@@ -33,27 +33,45 @@
     {
       "description": "What can we learn from SQL, Prolog, ML, and Smalltalk? You might notice a trend on this page due to my interest in early programming languages... This video also has *great* charts of the introduction of language paradigms.",
       "url": "https://www.youtube.com/watch?v=0fpDlAEQio4",
-      "tags": ["SQL", "Prolog", "ML", "Smalltalk", "NDC Oslo", "Language design"]
+      "tags": [
+        "SQL",
+        "Prolog",
+        "ML",
+        "Smalltalk",
+        "NDC Oslo",
+        "Language design"
+      ]
     },
     {
       "description": "Dan Ingalls, the original implementor and designer of the Smalltalk virtual machine at Xerox PARC, demonstrates the power of Smalltalk on the Alto. Sprinkled with great Xerox PARC stories.",
       "url": "https://www.youtube.com/watch?v=uknEhXyZgsg",
-        "tags": ["Smalltalk", "Alto", "Xerox PARC", "Language design", "Operating systems"]
+      "tags": [
+        "Smalltalk",
+        "Alto",
+        "Xerox PARC",
+        "Language design",
+        "Operating systems"
+      ]
     },
     {
       "description": "Dylan Beattie imagines if the web was created with an alternate history: no google, no FireFox, no WWW.",
       "url": "https://www.youtube.com/watch?v=9CSjlZeqKOc",
-        "tags": ["JavaScript", "NDC Oslo"]
+      "tags": ["JavaScript", "NDC Oslo"]
     },
     {
       "description": "Why is Rust a good investment for 'future-proof' software?",
       "url": "https://www.youtube.com/watch?v=A3AdN7U24iU",
-      "tags": ["Rust", "Compilers", "Emerging Technologies Conf", "Language design"]
+      "tags": [
+        "Rust",
+        "Compilers",
+        "Emerging Technologies Conf",
+        "Language design"
+      ]
     },
     {
       "description": "Andrew Kelley demonstrates the flexibility and power of Zig by creating a portable Vulkan program with no libc dependency.",
       "url": "https://www.youtube.com/watch?v=pq1XqP4-qOo",
-        "tags": ["Zig", "Compilers", "Linux", "Language design"]
+      "tags": ["Zig", "Compilers", "Linux", "Language design"]
     },
     {
       "description": "An introduction to the BEAM virtual machine and its capabilities. ",
@@ -63,17 +81,17 @@
     {
       "description": "A talk focusing on the power of the collective, but with amazingly interesting tidbits related to CRISPR and bringing back extinct species.",
       "url": "https://www.youtube.com/watch?v=xJbXk7NldnM",
-        "tags": ["Biology"]
+      "tags": ["Biology"]
     },
     {
       "description": "It's frankly terrifying the length to which North Korea has gone to spy on their citizens.",
       "url": "https://www.youtube.com/watch?v=8LGDM9exlZw",
-        "tags": ["Operating systems", "Reverse engineering"]
+      "tags": ["Operating systems", "Reverse engineering"]
     },
     {
-      "description": "Dylan Beattie is the best conference speaker I've seen, and I feel like this is his best talk (it's definitely his most popular). In this, Beattie explores why code is beautiful, and he shows examples too.",
+      "description": "Dylan Beattie is the best conference speaker I've seen, and I feel like this is his best talk (it's definitely his most popular). In this, Beattie demonstrates why code is beautiful through estoric languages.",
       "url": "https://www.youtube.com/watch?v=6avJHaC3C2U",
-        "tags": ["Language design",  "NDC London"]
+      "tags": ["Language design", "NDC London"]
     },
     {
       "description": "A design-focused talk; Wichary explores the complexity behind typography, language, and a platform as complex as Figma.",

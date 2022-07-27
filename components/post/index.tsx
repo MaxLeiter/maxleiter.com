@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 
 import Navigation from './navigation'
@@ -28,8 +28,8 @@ const Post = ({
   previous,
   lastModified,
   next,
-  slug,
-}: PostProps) => {
+}: // slug,
+  PostProps) => {
   const postDate = new Date(date)
   const lastModifiedDate = lastModified ? new Date(lastModified) : undefined
   const isDateDifferent =
@@ -43,7 +43,7 @@ const Post = ({
     }
   )
   // const [updatedViews, setViews] = useState<number>()
-  const [id, setId] = useState<number>()
+  // const [id, setId] = useState<number>()
 
   // Subscribe to view updates
   // useEffect(() => {
@@ -81,10 +81,10 @@ const Post = ({
       image={
         !hidden
           ? `https://💻➡📸.vercel.app/${encodeURIComponent(
-              title
-            )}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(
-              date
-            )}`
+            title
+          )}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(
+            date
+          )}`
           : undefined
       }
     >
