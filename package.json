@@ -4,9 +4,10 @@
   "scripts": {
     "lint": "next lint && prettier --write '**/*.{js,ts,tsx}' --loglevel warn",
     "dev": "next dev",
-    "build": "yarn rss && yarn sitemap && next build",
-    "rss": "ts-node --project ./node.tsconfig.json scripts/rss",
-    "sitemap": "ts-node --project ./node.tsconfig.json scripts/sitemap",
+    "build": "concurrently \"yarn:build-*\"",
+    "build-next": "next build",
+    "build-rss": "ts-node --project ./node.tsconfig.json scripts/rss",
+    "build-sitemap": "ts-node --project ./node.tsconfig.json scripts/sitemap",
     "analyze": "ANALYZE=true yarn build",
     "start": "next start"
   },
@@ -36,6 +37,7 @@
     "@types/rss": "0.0.29",
     "@typescript-eslint/eslint-plugin": "5.30.5",
     "@typescript-eslint/parser": "5.30.5",
+    "concurrently": "^7.3.0",
     "critters": "0.0.16",
     "dotenv": "16.0.1",
     "eslint": "8.19.0",
