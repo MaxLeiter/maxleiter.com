@@ -2,7 +2,6 @@ import matter from 'gray-matter'
 import fs from 'fs/promises'
 import path from 'path'
 import type { Post } from './types'
-import supabase from './supabase/private'
 
 const getPosts = async () => {
   const posts = await fs.readdir('./posts/')
@@ -32,16 +31,15 @@ const getPosts = async () => {
         //   lastModified = new Date(commitInfo[0].commit.committer.date * 1000).getTime()
         // }
 
-        let viewCount = 0;
+        // let viewCount = 0
 
+        // const { data: views } = await supabase.from('analytics').select('view_count').filter('slug', 'eq', `/blog/${data.slug}`);
 
-          const { data: views } = await supabase.from('analytics').select('view_count').filter('slug', 'eq', `/blog/${data.slug}`);
+        // if (views?.length) {
+        //   viewCount = views[0].view_count
+        // }
 
-          if (views?.length) {
-            viewCount = views[0].view_count
-          }
-
-        return { ...data, body: content, views: viewCount } as Post
+        return { ...data, body: content } as Post
       })
   )
   const filtered = postsWithMetadata

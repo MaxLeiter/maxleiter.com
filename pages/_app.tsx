@@ -5,7 +5,9 @@ import '@styles/global.css'
 import { ThemeProvider } from 'next-themes'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  return (<ThemeProvider disableTransitionOnChange enableSystem={true}>
+  return (
+    <ThemeProvider disableTransitionOnChange enableSystem={true}>
       <Component {...pageProps} />
-    </ThemeProvider>)
+    </ThemeProvider>
+  )
 }

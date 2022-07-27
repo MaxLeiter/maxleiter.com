@@ -6,9 +6,9 @@ if (typeof window !== 'undefined') {
   throw new Error('This script must be run on the server.')
 }
 
-dotenv.config( { 
+dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
-  debug: true
+  debug: true,
 })
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {

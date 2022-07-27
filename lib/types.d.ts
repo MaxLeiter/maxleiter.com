@@ -6,7 +6,7 @@ export type Post = {
   description: string
   body: string
   lastModified?: number
-  views: number
+  // views: number
 }
 
 export type Project = {

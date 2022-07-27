@@ -20,7 +20,7 @@ const Index = ({ posts, projects }: { posts: Post[]; projects: Project[] }) => {
       >
         <article>
           <h1 style={{ margin: 0, color: 'var(--link)' }}>Max Leiter</h1>
-          <h2 style={{ margin: 0}}>Full-stack developer</h2>
+          <h2 style={{ margin: 0 }}>Full-stack developer</h2>
           <Socials />
           <h3>About me</h3>
           <AboutMe />

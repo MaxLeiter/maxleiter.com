@@ -43,11 +43,7 @@ const Socials = () => {
         icon={<Mail />}
         tooltip="Email"
       />
-      <SocialButton
-        href="/feed.xml"
-        icon={<RSS />}
-        tooltip="RSS"
-      />
+      <SocialButton href="/feed.xml" icon={<RSS />} tooltip="RSS" />
       <ThemeSwitcher />
     </div>
   )

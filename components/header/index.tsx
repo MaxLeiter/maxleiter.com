@@ -24,7 +24,7 @@ const Header = ({ render, title }: Props) => {
               <Home />
             </a>
           </Link>
-            <ThemeSwitcher className={styles.icon}/>
+          <ThemeSwitcher className={styles.icon} />
           {title && <div className={styles.content}>{title}</div>}
         </div>
       </nav>

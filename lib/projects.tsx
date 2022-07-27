@@ -111,7 +111,8 @@ const Projects: Project[] = [
   },
   {
     title: 'GitHub Activity Visualizer',
-    description: "A React and d3.js tool for visualizing a user's GitHub activity.",
+    description:
+      "A React and d3.js tool for visualizing a user's GitHub activity.",
     href: 'https://git-visualizer.maxleiter.com',
     role: 'Creator',
     years: ['2022'],

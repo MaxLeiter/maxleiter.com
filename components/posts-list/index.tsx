@@ -29,7 +29,7 @@ const Posts = ({ posts, paginate }: Props) => {
             date={new Date(date)}
             as={`/blog/${post.slug}`}
             description={post.description}
-            views={post.views}
+            // views={post.views}
           />
         )
       })}

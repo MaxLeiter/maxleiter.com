@@ -12,10 +12,13 @@ const Tooltip = ({
 }) => {
   return (
     <span className={styles.tooltip} data-label={text} {...otherProps}>
-      {React.Children.map(children, (child) =>
-        React.isValidElement(child) && React.cloneElement(child, {
-          'aria-label': text,
-        })
+      {React.Children.map(
+        children,
+        (child) =>
+          React.isValidElement(child) &&
+          React.cloneElement(child, {
+            'aria-label': text,
+          })
       )}
     </span>
   )

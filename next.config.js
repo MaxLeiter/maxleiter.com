@@ -36,7 +36,7 @@ module.exports = withBundleAnalyzer({
         source: '/rss',
         destination: '/feed.xml',
         permanent: true,
-      }
+      },
     ]
   },
 })

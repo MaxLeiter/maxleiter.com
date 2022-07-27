@@ -7,8 +7,6 @@ import Page from '@components/page'
 import styles from './post.module.css'
 import type types from '@lib/types'
 import PostFooter from '@components/post-footer'
-import supabase from '@lib/supabase/public'
-import FadeIn from '@components/fade-in'
 import socialStyles from '@components/socials/socials.module.css'
 import Home from '@components/icons/home'
 import ThemeSwitcher from '@components/theme-switcher'
@@ -44,35 +42,35 @@ const Post = ({
       year: 'numeric',
     }
   )
-  const [updatedViews, setViews] = useState<number>()
+  // const [updatedViews, setViews] = useState<number>()
   const [id, setId] = useState<number>()
 
   // Subscribe to view updates
-  useEffect(() => {
-    const sub = supabase
-      .from('analytics')
-      .on('UPDATE', (payload) => {
-        if (payload.new.id === id) {
-          const newViews = payload.new.view_count
-          setViews(newViews)
-        }
-      })
-      .subscribe()
+  // useEffect(() => {
+  //   const sub = supabase
+  //     .from('analytics')
+  //     .on('UPDATE', (payload) => {
+  //       if (payload.new.id === id) {
+  //         const newViews = payload.new.view_count
+  //         setViews(newViews)
+  //       }
+  //     })
+  //     .subscribe()
 
-    return () => {
-      sub.unsubscribe()
-    }
-  }, [id])
+  //   return () => {
+  //     sub.unsubscribe()
+  //   }
+  // }, [id])
 
   // Update view count, as the post view count from props is from the last time the page was built
-  useEffect(() => {
-    supabase.from('analytics').select('view_count, id').filter('slug', 'eq', `/blog/${slug}`).then((res) => {
-      if (res.body?.length) {
-        setId(res.data[0].id)
-        setViews(res.body[0].view_count)
-      }
-    })
-  }, [slug])
+  // useEffect(() => {
+  //   supabase.from('analytics').select('view_count, id').filter('slug', 'eq', `/blog/${slug}`).then((res) => {
+  //     if (res.body?.length) {
+  //       setId(res.data[0].id)
+  //       setViews(res.body[0].view_count)
+  //     }
+  //   })
+  // }, [slug])
 
   return (
     <Page
@@ -83,10 +81,10 @@ const Post = ({
       image={
         !hidden
           ? `https://💻➡📸.vercel.app/${encodeURIComponent(
-            title
-          )}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(
-            date
-          )}`
+              title
+            )}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(
+              date
+            )}`
           : undefined
       }
     >
@@ -96,37 +94,34 @@ const Post = ({
       </Head>
 
       <div className={styles.header}>
-        <Tooltip text={"Navigate home"}>
+        <Tooltip text={'Navigate home'}>
           <Link href="/">
-            <a
-              className={`${socialStyles.icon} ${styles.icon}`}
-            >
-                <Home />
+            <a className={`${socialStyles.icon} ${styles.icon}`}>
+              <Home />
             </a>
           </Link>
         </Tooltip>
-        <ThemeSwitcher className={styles.icon}/>
+        <ThemeSwitcher className={styles.icon} />
       </div>
-  
+
       <article>
         <div className={styles.wrapper}>
           <span className={styles.date}>
-            {date} {isDateDifferent && (
+            {date}{' '}
+            {isDateDifferent && (
               <span className={styles.modified}>
                 last modified {formattedLastModifiedDate}
               </span>
             )}
           </span>
-          {updatedViews && <FadeIn>{updatedViews} views</FadeIn>}
+          {/* {updatedViews && <FadeIn>{updatedViews} views</FadeIn>} */}
         </div>
         <h1 className={styles.title}>{title}</h1>
-        <div
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <div dangerouslySetInnerHTML={{ __html: html }} />
       </article>
       <PostFooter />
       <Navigation previous={previous} next={next} />
-    </Page >
+    </Page>
   )
 }
 
