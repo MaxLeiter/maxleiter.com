@@ -1,0 +1,41 @@
+---
+title: The Node ecosystem (still) has tooling problems
+description: It shouldn't take this much work to publish a small library
+slug: node-has-tooling-problems
+date: Jul 30, 2022
+---
+
+I recently published a [small npm package](https://github.com/maxleiter/sortablejs-vue3) containing a Vue library. The package is written in TypeScript powered by Vite, which I (wrongly) assumed would mediate most of my woes. 
+
+![Obi Wan gif of him sarcastically saying "Oh, this is going to be easy"](/blog/node-tooling/obiwan.gif)
+
+First, I used Vite to build a small front-end site to demonstrate the library. This let me test the component and demonstrate usage in the same repository. Getting this working was fairly straight forward for someone with experience wrangling TypeScript configurations, but I imagine for a less experienced developer it could've been a daunting task. I ended up with two tsconfigs, `tsconfig.node.json` and `tsconfig.site.json`, had to figure out module resolution, realized I needed `vue-tsc`, and had a multitude of other minor roadblocks. The nicest thing about Vite is it is *fast*, which made working on this manageable.
+
+Second, I had to figure out how to publish a library. After lots of research (AKA reading Reddit threads and blog posts), I figured out the proper incantation of `tsc` parameters, `package.json` options, and tsconfigs to get something almost functional by channeling the Unix Magic wizard:
+
+<img src="/blog/node-tooling/unix-poster.jpg" alt="Unix Magic poster, a wizard crafting a potion surrounded by ingredients named after Unix tools" height="500" />
+
+ I added a \*third\* tsconfig, `tsconfig.dist.json` (that also extends `tsconfig.node.json`), added a new `vite.config.ts` for distribution (which required special options for passing to rollup), and I added something like the following to my package.json:
+
+```json
+  "types": "./dist/types/main.d.ts",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/sortablejs-vue3.umd.js",
+  "module": "./dist/sortablejs-vue3.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/sortablejs-vue3.es.js",
+      "require": "./dist/sortablejs-vue3.umd.js"
+    }
+  },
+```
+
+The next thing I did was establish some tooling. I set-up Prettier with an npm script to format my code (which requires two new configuration files), a GitHub bot for updating dependencies (which requires a configuration file), and Vercel for deploying the demo site. Someone later submit a pull request for auto-publishing to npm when new tags are pushed, which required a `.github/` directory to be made. 
+
+Now I was ready to release the library! Or so I thought: for some reason, `.github/` was being included in the package contents. After some digging, I found I needed to add an `.npmignore`, something I've done in the past but forgot about. Thankfully, using it again caused me to remember that npm defaults to using your `.gitignore`, and when you add an npmignore it *no longer does!* I copied the contents of my `.gitignore` over and added a line for `.github`.   
+
+Finally, I had a publishable library!
+
+You can see the code at https://github.com/MaxLeiter/sortablejs-vue3, and I hope it's helpful to anyone looking to publish something similar in the future.
