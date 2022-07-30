@@ -37,7 +37,7 @@
     "@types/rss": "0.0.29",
     "@typescript-eslint/eslint-plugin": "5.30.5",
     "@typescript-eslint/parser": "5.30.5",
-    "concurrently": "^7.3.0",
+    "concurrently": "7.3.0",
     "critters": "0.0.16",
     "dotenv": "16.0.1",
     "eslint": "8.20.0",
