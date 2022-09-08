@@ -51,7 +51,7 @@ async function rss(req: NextApiRequest, res: NextApiResponse) {
 
   const { start, stop } = req.query
 
-  if (Array.isArray(start) || Array.isArray(stop)) {
+  if (Array.isArray(start) || Array.isArray(stop) || !start || !stop) {
     throw new Error('Start and stop invalid')
   }
 

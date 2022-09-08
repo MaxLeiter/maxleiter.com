@@ -6,7 +6,7 @@ import { ThemeProvider } from 'next-themes'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ThemeProvider disableTransitionOnChange enableSystem={true}>
+    <ThemeProvider disableTransitionOnChange enableSystem={true} >
       <Component {...pageProps} />
     </ThemeProvider>
   )

@@ -17,6 +17,7 @@ const Tooltip = ({
         (child) =>
           React.isValidElement(child) &&
           React.cloneElement(child, {
+            // @ts-ignore
             'aria-label': text,
           })
       )}

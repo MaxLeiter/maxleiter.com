@@ -10,7 +10,7 @@ export default async function handler(
     return res.status(401).json({ message: 'Invalid secret' })
 
   try {
-    await res.unstable_revalidate('/')
+    await res.revalidate('/')
     return res.json({ revalidated: true })
   } catch (err) {
     // If there was an error, Next.js will continue
