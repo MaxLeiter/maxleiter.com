@@ -1,4 +1,4 @@
-import { NextMiddleware, NextResponse } from 'next/server'
+import { NextMiddleware, NextResponse, userAgent } from 'next/server'
 const PUBLIC_FILE = /\.(.*)$/
 
 export const middleware: NextMiddleware = async (req, event) => {
@@ -8,15 +8,16 @@ export const middleware: NextMiddleware = async (req, event) => {
   const isPageRequest =
     !PUBLIC_FILE.test(pathname) && !pathname.startsWith('/api')
 
+  const {isBot, ua} = userAgent(req)
   const sendAnalytics = async () => {
     if (process.env.NODE_ENV !== 'production') {
       return
     }
 
     if (
-      req.ua?.isBot ||
+      isBot ||
       referer.includes('mleiter.vercel.app') ||
-      req.ua?.ua.includes('node-fetch')
+      ua.includes('node-fetch')
     ) {
       console.log('Bot/crawler detected, not sending analytics')
       return

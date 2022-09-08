@@ -20,6 +20,7 @@ const SocialButton = ({ tooltip, href, icon }: SocialButtonProps) => {
     </Tooltip>
   )
 }
+
 const Socials = () => {
   return (
     <div className={styles.socials}>
