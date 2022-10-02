@@ -1,6 +1,6 @@
 import Talks from '@components/talks'
 import getTalks from '@lib/get-talks'
-import type { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
+import { experimental_use as use } from 'react'
 
 export type Talk = {
   title: string
@@ -17,21 +17,14 @@ export type Talk = {
   lengthSeconds: number
 }
 
-type TalkPage = NextPage<InferGetStaticPropsType<typeof getStaticProps>>
+const fetchTalks = async () => {
+  const talks = await getTalks()
+  return talks
+}
 
-const TalksPage: TalkPage = ({ talks }) => {
+const TalksPage = () => {
+  const talks = use(fetchTalks())
   return <Talks talks={talks} />
 }
 
 export default TalksPage
-
-export const getStaticProps: GetStaticProps<{
-  talks: Array<Talk>
-}> = async () => {
-  const talks = await getTalks()
-  return {
-    props: {
-      talks,
-    },
-  }
-}

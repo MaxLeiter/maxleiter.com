@@ -22,8 +22,11 @@
   pointer-events: none;
 }
 
-[data-theme='light'] .fade {
-  background: linear-gradient(to bottom, transparent, hsl(0, 0%, 90%));
+/* color scheme light */
+@media (prefers-color-scheme: light) {
+  .fade {
+    background: linear-gradient(to bottom, transparent, hsl(0, 0%, 90%));
+  }
 }
 
 @media (max-width: 960px) {

@@ -1,6 +1,8 @@
+'client'
+
 import React from 'react'
-import Page from '@components/page'
-import type { Talk } from 'pages/talks'
+// import Page from '@components/page'
+import type { Talk } from 'app/(subpages)/talks/page'
 import VideoCard from './video-card'
 import styles from './talks.module.css'
 import Input from '@components/input'
@@ -129,61 +131,51 @@ const Talks = ({ talks }: { talks: Array<Talk> }) => {
 
   return (
     <>
-      <Page
-        header={true}
-        title="Talks"
-        description="A curated and sortable list of interesting tech talks"
-      >
-        <div className={styles.filterSettings}>
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search"
-            aria-label="Search talk titles and descriptions"
-          />
-          <span className={styles.selects}>
-            <select
-              className={styles.sort}
-              value={sort}
-              onChange={onSortChange}
-            >
-              <option value="date">Sort by date</option>
-              <option value="title">Sort by title</option>
-              <option value="views">Sort by views</option>
-              <option value="likes">Sort by likes</option>
-              <option value="length">Sort by length</option>
-            </select>
-            <select
-              className={styles.sort}
-              value={asc.toString()}
-              onChange={(e) => setAsc(e.target.value === 'true')}
-            >
-              <option value="false">Descending</option>
-              <option value="true">Ascending</option>
-            </select>
-          </span>
-        </div>
-        <div className={tagStyles.tags} style={{ marginBottom: 'var(--gap)' }}>
-          {allTagsWithCount.map((tag) => (
-            <Badge
-              key={`sort-${tag[0]}`}
-              className={`${tagStyles.tag} ${
-                selectedTags.includes(tag[0]) ? tagStyles.selected : ''
-              }`}
-            >
-              <a onClick={onTagClick}>
-                {tag[0]} ({tag[1]})
-              </a>
-            </Badge>
-          ))}
-        </div>
-        <div className={styles.talks} key={sort}>
-          {filteredTalks.map((talk) => {
-            return <VideoCard key={talk.id} talk={talk} />
-          })}
-        </div>
-        <PostFooter />
-      </Page>
+      <div className={styles.filterSettings}>
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search"
+          aria-label="Search talk titles and descriptions"
+        />
+        <span className={styles.selects}>
+          <select className={styles.sort} value={sort} onChange={onSortChange}>
+            <option value="date">Sort by date</option>
+            <option value="title">Sort by title</option>
+            <option value="views">Sort by views</option>
+            <option value="likes">Sort by likes</option>
+            <option value="length">Sort by length</option>
+          </select>
+          <select
+            className={styles.sort}
+            value={asc.toString()}
+            onChange={(e) => setAsc(e.target.value === 'true')}
+          >
+            <option value="false">Descending</option>
+            <option value="true">Ascending</option>
+          </select>
+        </span>
+      </div>
+      <div className={tagStyles.tags} style={{ marginBottom: 'var(--gap)' }}>
+        {allTagsWithCount.map((tag) => (
+          <Badge
+            key={`sort-${tag[0]}`}
+            className={`${tagStyles.tag} ${
+              selectedTags.includes(tag[0]) ? tagStyles.selected : ''
+            }`}
+          >
+            <a onClick={onTagClick}>
+              {tag[0]} ({tag[1]})
+            </a>
+          </Badge>
+        ))}
+      </div>
+      <div className={styles.talks} key={sort}>
+        {filteredTalks.map((talk) => {
+          return <VideoCard key={talk.id} talk={talk} />
+        })}
+      </div>
+      <PostFooter />
     </>
   )
 }

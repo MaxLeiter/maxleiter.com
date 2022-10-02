@@ -31,7 +31,7 @@ const Link = ({
 
   if (external) {
     return (
-      <a
+      <NextLink
         href={href}
         target="_blank"
         rel="noopener noreferrer"
@@ -41,21 +41,21 @@ const Link = ({
         {...props}
       >
         {children}
-      </a>
+      </NextLink>
     )
   }
 
   return (
     <>
-      <NextLink href={href} as={as}>
-        <a
-          className={className ? `${style} ${className}` : style}
-          title={title}
-          {...props}
-          tabIndex={tabIndex}
-        >
-          {children}
-        </a>
+      <NextLink
+        href={href}
+        as={as}
+        title={title}
+        className={className ? `${style} ${className}` : style}
+        {...props}
+        tabIndex={tabIndex}
+      >
+        {children}
       </NextLink>
     </>
   )

@@ -10,10 +10,8 @@ const PostFooter = () => {
     href: string
     children: React.ReactNode
   }) => (
-    <Link href={href}>
-      <a target="_blank" rel="noopener noreferrer">
-        {children}
-      </a>
+    <Link href={href} target="_blank" rel="noopener noreferrer">
+      {children}
     </Link>
   )
   return (

@@ -1,3 +1,5 @@
+'client'
+
 import { useEffect, useState } from 'react'
 import supabase from '@lib/supabase/public'
 import Question from './question'

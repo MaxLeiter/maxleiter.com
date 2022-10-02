@@ -1,10 +1,12 @@
+'client'
+
 import Badge from '@components/badge'
 import FadeIn from '@components/fade-in'
 import Info from '@components/icons/info'
 import Play from '@components/icons/play'
 import Link from '@components/link'
 import Image from 'next/image'
-import { Talk } from 'pages/talks'
+import type { Talk } from 'app/(subpages)/talks/page'
 import { useState } from 'react'
 import styles from './video-card.module.css'
 import tagStyles from '../tags.module.css'

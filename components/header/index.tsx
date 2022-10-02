@@ -4,7 +4,7 @@ import Link from 'next/link'
 import styles from './header.module.css'
 import Home from '@components/icons/home'
 import socialStyles from '../socials/socials.module.css'
-import ThemeSwitcher from '@components/theme-switcher'
+// import ThemeSwitcher from '@components/theme-switcher'
 
 type Props = {
   render: boolean
@@ -16,15 +16,14 @@ const Header = ({ render, title }: Props) => {
     return (
       <nav className={styles.nav}>
         <div className={styles.header}>
-          <Link href="/">
-            <a
-              aria-label="Navigate Home"
-              className={`${socialStyles.icon} ${styles.icon}`}
-            >
-              <Home />
-            </a>
+          <Link
+            href="/"
+            aria-label="Navigate Home"
+            className={`${socialStyles.icon} ${styles.icon}`}
+          >
+            <Home />
           </Link>
-          <ThemeSwitcher className={styles.icon} />
+          {/* <ThemeSwitcher className={styles.icon} /> */}
           {title && <div className={styles.content}>{title}</div>}
         </div>
       </nav>

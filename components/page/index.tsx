@@ -1,4 +1,4 @@
-import Head from '@components/head'
+// import Head from '@components/head'
 import Header from '@components/header'
 import styles from './page.module.css'
 
@@ -14,18 +14,18 @@ type Props = {
 const Page = ({
   header = true,
   title,
-  description,
-  image,
+  // description,
+  // image,
   showHeaderTitle = true,
   children,
 }: Props) => {
   return (
     <div className={styles.wrapper}>
-      <Head
+      {/* <Head
         title={`${title ? `${title} - ` : ''}Max Leiter`}
         description={description}
         image={image}
-      />
+      /> */}
 
       <Header render={header} title={showHeaderTitle ? title : ''} />
       <main className={styles.main}>{children}</main>

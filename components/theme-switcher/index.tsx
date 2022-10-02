@@ -1,3 +1,5 @@
+'client'
+
 import { Moon, Sun } from '@components/icons'
 import { useTheme } from 'next-themes'
 import socialStyles from '@components/socials/socials.module.css'

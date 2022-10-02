@@ -1,34 +1,25 @@
-import Head from 'next/head'
-import Link from 'next/link'
 
-import Navigation from './navigation'
-import Page from '@components/page'
-import styles from './post.module.css'
 import type types from '@lib/types'
-import PostFooter from '@components/post-footer'
-import socialStyles from '@components/socials/socials.module.css'
-import Home from '@components/icons/home'
-import ThemeSwitcher from '@components/theme-switcher'
-import Tooltip from '@components/tooltip'
+import styles from './post.module.css'
 
-export type PostProps = types.Post & {
+export type PostProps = Omit<types.Post, 'body'> & {
   previous?: types.Post
   next?: types.Post
   html: string
-  hidden: boolean
+  hidden?: boolean
 }
 
 const Post = ({
   title,
   html,
-  hidden,
-  description,
+  // hidden,
+  // description,
   date,
-  previous,
+  // previous,
   lastModified,
-  next,
+  // next,
 }: // slug,
-  PostProps) => {
+PostProps) => {
   const postDate = new Date(date)
   const lastModifiedDate = lastModified ? new Date(lastModified) : undefined
   const isDateDifferent =
@@ -72,55 +63,37 @@ const Post = ({
   // }, [slug])
 
   return (
-    <Page
-      title={title}
-      description={description}
-      showHeaderTitle={false}
-      header={false}
-      image={
-        !hidden
-          ? `https://💻➡📸.vercel.app/${encodeURIComponent(
-            title
-          )}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(
-            date
-          )}`
-          : undefined
-      }
-    >
-      <Head>
-        {hidden && <meta name="robots" content="noindex" />}
-        {date && <meta name="date" content={date} />}
-      </Head>
-
-      <div className={styles.header}>
-        <Tooltip text={'Navigate home'}>
-          <Link href="/">
-            <a className={`${socialStyles.icon} ${styles.icon}`}>
-              <Home />
-            </a>
-          </Link>
-        </Tooltip>
-        <ThemeSwitcher className={styles.icon} />
+    // <Page
+    //   title={title}
+    //   description={description}
+    //   showHeaderTitle={false}
+    //   header={false}
+    //   image={
+    //     !hidden
+    //       ? `https://💻➡📸.vercel.app/${encodeURIComponent(
+    //         title
+    //       )}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(
+    //         date
+    //       )}`
+    //       : undefined
+    //   }
+    // >
+    <>
+      <div className={styles.wrapper}>
+        <span className={styles.date}>
+          {date}{' '}
+          {isDateDifferent && (
+            <span className={styles.modified}>
+              last modified {formattedLastModifiedDate}
+            </span>
+          )}
+        </span>
+        {/* {updatedViews && <FadeIn>{updatedViews} views</FadeIn>} */}
       </div>
-
-      <article>
-        <div className={styles.wrapper}>
-          <span className={styles.date}>
-            {date}{' '}
-            {isDateDifferent && (
-              <span className={styles.modified}>
-                last modified {formattedLastModifiedDate}
-              </span>
-            )}
-          </span>
-          {/* {updatedViews && <FadeIn>{updatedViews} views</FadeIn>} */}
-        </div>
-        <h1 className={styles.title}>{title}</h1>
-        <div dangerouslySetInnerHTML={{ __html: html }} />
-      </article>
-      <PostFooter />
-      <Navigation previous={previous} next={next} />
-    </Page>
+      <h1 className={styles.title}>{title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+    </>
+    // </Page>
   )
 }
 

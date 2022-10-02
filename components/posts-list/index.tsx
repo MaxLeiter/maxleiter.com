@@ -1,3 +1,5 @@
+'client'
+
 import { useState } from 'react'
 
 import BlockEntry from '@components/entry/block'

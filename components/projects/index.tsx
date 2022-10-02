@@ -11,7 +11,7 @@ type Props = {
   showYears: boolean
 }
 
-const Projects = ({ count = -1, projects, showYears = true }: Props) => {
+const Projects = ({ count = -1, projects = [], showYears = true }: Props) => {
   const sliced = projects.slice(0, count > 0 ? count : projects.length)
   sliced.sort((a, b) => parseInt(b.years[0]) - parseInt(a.years[0]))
 

@@ -7,7 +7,7 @@ const AboutMe = () => (
       <Link href="https://www.blend.com" external>
         Blend
       </Link>{' '}
-      and am currently building at {' '}
+      and am currently building at{' '}
       <Link href="https://vercel.com" external>
         Vercel
       </Link>

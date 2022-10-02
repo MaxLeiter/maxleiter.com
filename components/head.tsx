@@ -1,5 +1,6 @@
-import NextHead from 'next/head'
-import { useRouter } from 'next/router'
+'client'
+
+import { usePathname } from 'next/dist/client/components/hooks-client'
 type Props = {
   title?: string
   description?: string
@@ -13,10 +14,10 @@ const Head = ({
   image = '',
   children,
 }: Props) => {
-  const router = useRouter()
-  const url = `https://maxleiter.com${router.asPath}`
+  const pathname = usePathname()
+  const url = `https://maxleiter.com${pathname}`
   return (
-    <NextHead>
+    <>
       {/* Title */}
       <title>{title}</title>
       <meta name="og:title" content={title} />
@@ -68,7 +69,7 @@ const Head = ({
       />
 
       {children}
-    </NextHead>
+    </>
   )
 }
 

@@ -43,10 +43,10 @@ const getPosts = async () => {
       })
   )
   const filtered = postsWithMetadata
-    .filter(Boolean)
+    .filter((post) => post !== null)
     .sort((a, b) =>
       a && b ? new Date(b.date).getTime() - new Date(a.date).getTime() : 0
-    )
+    ) as Post[]
   return filtered
 }
 

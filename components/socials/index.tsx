@@ -3,7 +3,7 @@ import Link from '@components/link'
 import styles from './socials.module.css'
 import { GitHub, Twitter, LinkedIn, Mail, RSS } from '@components/icons'
 import Tooltip from '@components/tooltip'
-import ThemeSwitcher from '@components/theme-switcher'
+// import ThemeSwitcher from '@components/theme-switcher'
 
 type SocialButtonProps = {
   href: string
@@ -45,7 +45,7 @@ const Socials = () => {
         tooltip="Email"
       />
       <SocialButton href="/feed.xml" icon={<RSS />} tooltip="RSS" />
-      <ThemeSwitcher />
+      {/* <ThemeSwitcher /> */}
     </div>
   )
 }

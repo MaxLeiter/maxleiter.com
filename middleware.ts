@@ -2,13 +2,14 @@ import { NextMiddleware, NextResponse, userAgent } from 'next/server'
 const PUBLIC_FILE = /\.(.*)$/
 
 export const middleware: NextMiddleware = async (req, event) => {
+  console.log(req, event)
   const pathname = req.nextUrl.pathname
   const referer = req.headers.get('referer') || ''
 
   const isPageRequest =
     !PUBLIC_FILE.test(pathname) && !pathname.startsWith('/api')
 
-  const {isBot, ua} = userAgent(req)
+  const { isBot, ua } = userAgent(req)
   const sendAnalytics = async () => {
     if (process.env.NODE_ENV !== 'production') {
       return
