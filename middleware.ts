@@ -2,7 +2,6 @@ import { NextMiddleware, NextResponse, userAgent } from 'next/server'
 const PUBLIC_FILE = /\.(.*)$/
 
 export const middleware: NextMiddleware = async (req, event) => {
-  console.log(req, event)
   const pathname = req.nextUrl.pathname
   const referer = req.headers.get('referer') || ''
 

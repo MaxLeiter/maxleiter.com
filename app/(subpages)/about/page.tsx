@@ -1,9 +1,7 @@
-import Page from '@components/page'
 import Link from '@components/link'
 
 const About = () => {
   return (
-    // <Page title="About" description="About this website">
     <article>
       <p>
         This site is built on{' '}
@@ -25,7 +23,6 @@ const About = () => {
         .
       </p>
     </article>
-    // </Page>
   )
 }
 

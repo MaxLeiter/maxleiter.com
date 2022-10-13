@@ -1,6 +1,6 @@
 import Post from '@components/post'
 import getPosts from '@lib/get-posts'
-// import renderMarkdown from '@lib/render-markdown'
+import renderMarkdown from '@lib/render-markdown'
 import { experimental_use as use } from 'react'
 
 export const config = {
@@ -18,7 +18,7 @@ async function getData({ slug }: { slug: string }) {
     previous: posts[postIndex + 1] || null,
     next: posts[postIndex - 1] || null,
     ...rest,
-    html: body,
+    html: renderMarkdown(body),
   }
 }
 
@@ -31,17 +31,6 @@ const PostPage = ({
 }) => {
   const post = use(getData(params))
   return <Post {...post} />
-}
-
-export async function generateStaticParams() {
-  const params = (await getPosts()).map((p) => {
-    return {
-      ...p,
-      slug: p.slug,
-    }
-  })
-
-  return params
 }
 
 // export const getStaticProps = async ({ params: { slug } }: Props) => {
