@@ -79,10 +79,14 @@ const Post = ({
       header={false}
       image={
         !hidden
-          ? `https://💻➡📸.vercel.app/${encodeURIComponent(
-            title
-          )}.png?theme=light&md=1&fontSize=75px&date=${encodeURIComponent(
-            date
+          ? `/api/og?title=${encodeURIComponent(title)}&date=${encodeURIComponent(
+            postDate
+              .toLocaleDateString('default', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })
+              .replace(',', '')
           )}`
           : undefined
       }

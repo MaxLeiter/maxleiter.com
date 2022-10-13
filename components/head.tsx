@@ -15,6 +15,8 @@ const Head = ({
 }: Props) => {
   const router = useRouter()
   const url = `https://maxleiter.com${router.asPath}`
+
+  const domain = process.env.NODE_ENV === 'production' ? 'https://maxleiter.com' : (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000')
   return (
     <NextHead>
       {/* Title */}
@@ -26,8 +28,8 @@ const Head = ({
       <meta name="og:description" content={description} />
 
       {/* Image */}
-      <meta name="twitter:image" content={image} />
-      <meta name="og:image" content={image} />
+      <meta name="twitter:image" content={`${domain}${image}`} />
+      <meta name="og:image" content={`${domain}${image}`} />
 
       {/* URL */}
       <meta name="og:url" content={url} />
