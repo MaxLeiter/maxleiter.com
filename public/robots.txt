@@ -5,6 +5,5 @@ Allow: /*
 Allow: /blog/*
 Allow: /api/og
 
-Disallow: /api/*
 Disallow: /_next/*
 Disallow: /js
