@@ -3,6 +3,7 @@ Sitemap: https://maxleiter.com/sitemap-common.xml
 
 Allow: /*
 Allow: /blog/*
+Allow: /api/og
 
 Disallow: /api/*
 Disallow: /_next/*
