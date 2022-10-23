@@ -11,7 +11,7 @@ specifiers:
   '@types/rss': 0.0.29
   '@typescript-eslint/eslint-plugin': 5.36.2
   '@typescript-eslint/parser': 5.36.2
-  '@vercel/og': ^0.0.18
+  '@vercel/og': 0.0.18
   concurrently: 7.4.0
   critters: 0.0.16
   dotenv: 16.0.2
@@ -26,7 +26,7 @@ specifiers:
   next: 12.3.1
   next-remote-watch: 1.0.0
   next-themes: 0.2.1
-  postcss: ^8.4.18
+  postcss: 8.4.18
   postcss-flexbugs-fixes: 5.0.2
   postcss-hover-media-feature: 1.0.2
   postcss-preset-env: 7.8.1
