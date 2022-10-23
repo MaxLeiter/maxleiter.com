@@ -3,7 +3,8 @@
   display: inline-flex;
   border-radius: var(--radius);
   padding: var(--gap);
-  color: var(--fg);
+  color: var(--gray-alpha);
+
   will-change: transform;
   transition: all 0.1s cubic-bezier(0.01, 0.88, 0.93, 0.07);
   line-height: 50%;

@@ -32,7 +32,6 @@
   --lighter-gray: #222;
   --lightest-gray: #1a1a1a;
   --article-color: #eaeaea;
-  --header-bg: var(--bg);
   --gray-alpha: rgba(255, 255, 255, 0.5);
   --selection: rgba(255, 255, 255, 0.88);
   --link: #579dff;
@@ -50,17 +49,16 @@
 }
 
 [data-theme='light'] {
-  --bg: #fff;
-  --fg: #000;
+  --bg: #FFF;
+  --fg: #444;
   --gray: rgb(100, 100, 100);
   --light-gray: rgb(222, 222, 222);
   --lighter-gray: rgb(240, 240, 240);
   --lightest-gray: rgb(245, 245, 245);
   --article-color: #212121;
-  --header-bg: rgba(255, 255, 255, 0.8);
   --gray-alpha: rgba(19, 20, 21, 0.5);
   --selection: rgba(0, 0, 0, 0.99);
-  --link: #3f72ba;
+  --link: #6669FF;
 
   --token: #666;
   --comment: #999;
@@ -80,24 +78,20 @@
 }
 
 html {
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 html,
 body {
   padding: 0;
   margin: 0;
-  font-size: calc(1.02rem);
   background: var(--bg);
   color: var(--fg);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
-}
-
-#__next {
-  height: 100%;
+  font-size: 16px;
 }
 
 body {
@@ -111,7 +105,7 @@ body {
 p,
 li {
   letter-spacing: -0.33px;
-  font-size: 1.12rem;
+  font-size: 1.2rem;
 }
 
 h1,
@@ -126,24 +120,24 @@ h6 {
 }
 
 h1 {
-  font-size: 2.5rem;
+  font-size: 2.3rem;
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.89px;
 }
 
 h2 {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
   letter-spacing: -0.69px;
 }
 
 h3 {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   letter-spacing: -0.47px;
 }
 
 h4 {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   letter-spacing: -0.33px;
 }
 
@@ -210,7 +204,6 @@ th {
     --lighter-gray: #f5f5f5;
     --lightest-gray: #fafafa;
     --article-color: #212121;
-    --header-bg: var(--bg);
     --gray-alpha: rgba(19, 20, 21, 0.5);
     --selection: rgba(0, 0, 0, 0.99);
 

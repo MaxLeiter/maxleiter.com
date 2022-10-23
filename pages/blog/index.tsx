@@ -10,11 +10,9 @@ type Props = {
 const Blog = ({ posts }: Props) => {
   return (
     <Page title="Blog" description="Writing about design and code.">
-      <article>
-        <ul>
-          <PostsList posts={posts} />
-        </ul>
-      </article>
+      <ul>
+        <PostsList posts={posts} />
+      </ul>
     </Page>
   )
 }

@@ -32,10 +32,7 @@
 .wrapper .date,
 .wrapper .views,
 .type {
-  font-size: .95rem;
-  flex-basis: 5rem;
-  white-space: nowrap;
-  margin-right: var(--gap);
+  font-size: 1rem;
   color: var(--gray);
 }
 

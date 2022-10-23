@@ -4,7 +4,6 @@ import Link from '@components/link'
 const About = () => {
   return (
     <Page title="About" description="About this website">
-      <article>
         <p>
           This site is built on{' '}
           <Link external href="https://nextjs.com">
@@ -24,7 +23,6 @@ const About = () => {
           </Link>
           .
         </p>
-      </article>
     </Page>
   )
 }

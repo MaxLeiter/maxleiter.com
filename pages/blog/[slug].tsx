@@ -1,9 +1,10 @@
+import FadeIn from '@components/fade-in'
 import Post, { PostProps } from '@components/post'
 import getPosts from '@lib/get-posts'
 import renderMarkdown from '@lib/render-markdown'
 
 const PostPage = (props: PostProps) => {
-  return <Post {...props} />
+  return <FadeIn><Post {...props} /></FadeIn>
 }
 
 type Props = {

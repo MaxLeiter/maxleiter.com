@@ -11,12 +11,7 @@
 }
 
 .nav {
-  z-index: 10;
   margin: var(--small-gap) auto var(--gap) auto;
-  position: sticky;
-  top: 0;
-  background-color: var(--header-bg);
-  backdrop-filter: saturate(180%) blur(20px);
 }
 
 .header {

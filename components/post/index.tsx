@@ -28,7 +28,7 @@ const Post = ({
   lastModified,
   next,
 }: // slug,
-  PostProps) => {
+PostProps) => {
   const postDate = new Date(date)
   const lastModifiedDate = lastModified ? new Date(lastModified) : undefined
   const isDateDifferent =
@@ -79,15 +79,17 @@ const Post = ({
       header={false}
       image={
         !hidden
-          ? `/api/og?title=${encodeURIComponent(title)}&date=${encodeURIComponent(
-            postDate
-              .toLocaleDateString('default', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })
-              .replace(',', '')
-          )}`
+          ? `/api/og?title=${encodeURIComponent(
+              title
+            )}&date=${encodeURIComponent(
+              postDate
+                .toLocaleDateString('default', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+                .replace(',', '')
+            )}`
           : undefined
       }
     >
@@ -100,11 +102,11 @@ const Post = ({
         <Tooltip text={'Navigate home'}>
           <Link href="/">
             <a className={`${socialStyles.icon} ${styles.icon}`}>
-              <Home />
+              <Home size={28} />
             </a>
           </Link>
         </Tooltip>
-        <ThemeSwitcher className={styles.icon} />
+        <ThemeSwitcher className={styles.icon} iconSize={28} />
       </div>
 
       <article>

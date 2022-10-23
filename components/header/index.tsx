@@ -21,7 +21,7 @@ const Header = ({ render, title }: Props) => {
               aria-label="Navigate Home"
               className={`${socialStyles.icon} ${styles.icon}`}
             >
-              <Home />
+              <Home size={28} />
             </a>
           </Link>
           <ThemeSwitcher className={styles.icon} />

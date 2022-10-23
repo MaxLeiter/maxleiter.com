@@ -4,17 +4,13 @@ import socialStyles from '@components/socials/socials.module.css'
 import Tooltip from '@components/tooltip'
 import { useEffect, useState } from 'react'
 
-const ThemeSwitcher = ({ className = '' }: { className?: string }) => {
+const ThemeSwitcher = ({ className = '', iconSize = 24 }: { className?: string, iconSize?: number }) => {
   const { theme: activeTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  if (!mounted) {
-    return null
-  }
 
   return (
     <Tooltip text={activeTheme === 'light' ? 'Dark mode' : 'Light mode'}>
@@ -23,7 +19,7 @@ const ThemeSwitcher = ({ className = '' }: { className?: string }) => {
         aria-label="Change the theme"
         className={`${socialStyles.icon} ${className}`}
       >
-        {activeTheme === 'light' ? <Moon /> : <Sun />}
+        {mounted && activeTheme === 'light' ? <Moon size={iconSize} /> : <Sun size={iconSize} />}
       </button>
     </Tooltip>
   )
