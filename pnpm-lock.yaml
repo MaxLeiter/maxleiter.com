@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@next/bundle-analyzer': 12.2.5
+  '@next/bundle-analyzer': 12.3.1
   '@supabase/supabase-js': 1.35.6
   '@types/marked': 4.0.7
   '@types/node': 18.7.16
@@ -16,7 +16,7 @@ specifiers:
   critters: 0.0.16
   dotenv: 16.0.2
   eslint: 8.23.0
-  eslint-config-next: 12.2.5
+  eslint-config-next: 12.3.1
   eslint-plugin-import: 2.26.0
   eslint-plugin-react: 7.31.7
   eslint-plugin-react-hooks: 4.6.0
@@ -44,7 +44,7 @@ specifiers:
   youtubei: 0.0.1-rc.36
 
 dependencies:
-  '@next/bundle-analyzer': 12.2.5
+  '@next/bundle-analyzer': 12.3.1
   '@supabase/supabase-js': 1.35.6
   '@vercel/og': 0.0.18
   lodash.debounce: 4.0.8
@@ -72,7 +72,7 @@ devDependencies:
   critters: 0.0.16
   dotenv: 16.0.2
   eslint: 8.23.0
-  eslint-config-next: 12.2.5_yqf6kl63nyoq5megxukfnom5rm
+  eslint-config-next: 12.3.1_yqf6kl63nyoq5megxukfnom5rm
   eslint-plugin-import: 2.26.0_iepzrjnvahcxaf6zc7cutko6om
   eslint-plugin-react: 7.31.7_eslint@8.23.0
   eslint-plugin-react-hooks: 4.6.0_eslint@8.23.0
@@ -324,8 +324,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@next/bundle-analyzer/12.2.5:
-    resolution: {integrity: sha512-lj7ese4GnfbO8tCc9/g1O3/hzgb+pVkrsNgfF929CgZHCFQxplqxY++MIO4aCFwzt0vDx0KL78LOVxzjDDKjlA==}
+  /@next/bundle-analyzer/12.3.1:
+    resolution: {integrity: sha512-2f/eei0YqZZBMTs4g1+HbgHyAFH5MbI/w9wLXmE8ly9SFze2D40sRH46JcC//EFVM/TIynVBh5sxn9CVO/vtxg==}
     dependencies:
       webpack-bundle-analyzer: 4.3.0
     transitivePeerDependencies:
@@ -337,8 +337,8 @@ packages:
     resolution: {integrity: sha512-9P9THmRFVKGKt9DYqeC2aKIxm8rlvkK38V1P1sRE7qyoPBIs8l9oo79QoSdPtOWfzkbDAVUqvbQGgTMsb8BtJg==}
     dev: false
 
-  /@next/eslint-plugin-next/12.2.5:
-    resolution: {integrity: sha512-VBjVbmqEzGiOTBq4+wpeVXt/KgknnGB6ahvC/AxiIGnN93/RCSyXhFRI4uSfftM2Ba3w7ZO7076bfKasZsA0fw==}
+  /@next/eslint-plugin-next/12.3.1:
+    resolution: {integrity: sha512-sw+lTf6r6P0j+g/n9y4qdWWI2syPqZx+uc0+B/fRENqfR3KpSid6MIKqc9gNwGhJASazEQ5b3w8h4cAET213jw==}
     dependencies:
       glob: 7.1.7
     dev: true
@@ -1566,8 +1566,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-config-next/12.2.5_yqf6kl63nyoq5megxukfnom5rm:
-    resolution: {integrity: sha512-SOowilkqPzW6DxKp3a3SYlrfPi5Ajs9MIzp9gVfUDxxH9QFM5ElkR1hX5m/iICJuvCbWgQqFBiA3mCMozluniw==}
+  /eslint-config-next/12.3.1_yqf6kl63nyoq5megxukfnom5rm:
+    resolution: {integrity: sha512-EN/xwKPU6jz1G0Qi6Bd/BqMnHLyRAL0VsaQaWA7F3KkjAgZHi4f1uL1JKGWNxdQpHTW/sdGONBd0bzxUka/DJg==}
     peerDependencies:
       eslint: ^7.23.0 || ^8.0.0
       typescript: '>=3.3.1'
@@ -1575,7 +1575,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@next/eslint-plugin-next': 12.2.5
+      '@next/eslint-plugin-next': 12.3.1
       '@rushstack/eslint-patch': 1.2.0
       '@typescript-eslint/parser': 5.36.2_yqf6kl63nyoq5megxukfnom5rm
       eslint: 8.23.0
