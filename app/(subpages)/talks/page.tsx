@@ -1,6 +1,5 @@
 import Talks from '@components/talks'
 import getTalks from '@lib/get-talks'
-import { experimental_use as use } from 'react'
 
 export type Talk = {
   title: string
@@ -22,9 +21,10 @@ const fetchTalks = async () => {
   return talks
 }
 
-const TalksPage = () => {
-  const talks = use(fetchTalks())
+const TalksPage = async () => {
+  const talks = await fetchTalks()
   return <Talks talks={talks} />
 }
 
 export default TalksPage
+export const config = { runtime: 'experimental-edge' }

@@ -9,3 +9,6 @@
   box-shadow: 0px 2px 0px var(--link);
 }
 
+.link {
+  color: var(--link);
+}

@@ -1,6 +1,5 @@
 import supabase from '@lib/supabase/private'
 import IeOrCss from '@components/ie-or-css'
-import { experimental_use as use } from 'react'
 
 const fetchQuestions = async () => {
   let { data, error } = await supabase.from('Questions').select('id,question')
@@ -14,8 +13,8 @@ const fetchQuestions = async () => {
   return randomized
 }
 
-const IeQuiz = () => {
-  const questions = use(fetchQuestions())
+const IeQuiz = async () => {
+  const questions = await fetchQuestions()
   return (
     // <Page
     //   title="IE or CSS3?"
@@ -28,3 +27,4 @@ const IeQuiz = () => {
 
 export default IeQuiz
 
+export const config = { runtime: 'experimental-edge' }

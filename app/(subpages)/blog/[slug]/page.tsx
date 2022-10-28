@@ -1,11 +1,11 @@
 import Post from '@components/post'
 import getPosts from '@lib/get-posts'
 import renderMarkdown from '@lib/render-markdown'
-import { experimental_use as use } from 'react'
 
 export const config = {
   dynamic: 'error',
   dynamicParams: false, // default
+  runtime: 'experimental-edge',
 }
 
 async function getData({ slug }: { slug: string }) {
@@ -22,14 +22,14 @@ async function getData({ slug }: { slug: string }) {
   }
 }
 
-const PostPage = ({
+const PostPage = async ({
   params,
 }: {
   params: {
     slug: string
   }
 }) => {
-  const post = use(getData(params))
+  const post = await getData(params)
   return <Post {...post} />
 }
 

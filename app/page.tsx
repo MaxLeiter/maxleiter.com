@@ -5,7 +5,6 @@ import Link from '@components/link'
 import AboutMe from '@components/aboutme'
 import getPosts from '@lib/get-posts'
 import getProjects from '@lib/projects'
-import { experimental_use as use } from 'react'
 import Header from '@components/header'
 
 const PROJECT_COUNT = 3
@@ -20,9 +19,9 @@ const fetchProjects = async () => {
   return projects || []
 }
 
-const Index = () => {
-  const posts = use(fetchPosts())
-  const projects = use(fetchProjects())
+const Index = async () => {
+  const posts = await fetchPosts()
+  const projects = await fetchProjects()
 
   return (
     <article>
@@ -60,3 +59,7 @@ const Index = () => {
 }
 
 export default Index
+
+export const config = {
+  runtime: 'experimental-edge',
+}

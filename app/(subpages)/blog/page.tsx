@@ -1,14 +1,13 @@
 import PostsList from '@components/posts-list'
 import getPosts from '@lib/get-posts'
-import { experimental_use as use } from 'react'
 
 async function fetchPosts() {
   const posts = await getPosts()
   return posts
 }
 
-const Blog = () => {
-  const posts = use(fetchPosts())
+const Blog = async () => {
+  const posts = await fetchPosts()
 
   return (
     <article>

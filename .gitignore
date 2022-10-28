@@ -19,3 +19,5 @@ yalc.lock
 # Supabase
 **/supabase/.branches
 **/supabase/.temp
+
+.vscode

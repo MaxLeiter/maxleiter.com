@@ -1,4 +1,4 @@
-'client'
+'use client'
 
 import styles from './rss.module.css'
 import Entry from '@components/entry/block'

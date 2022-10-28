@@ -1,4 +1,4 @@
-'client'
+'use client'
 
 import Button from '@components/button'
 import Highlight, { defaultProps } from 'prism-react-renderer'

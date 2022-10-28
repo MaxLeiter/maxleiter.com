@@ -21,7 +21,7 @@ const Link = ({
   href,
   as,
   children,
-  className,
+  className = 'link',
   title,
   transition = true,
   tabIndex = 0,
@@ -35,7 +35,7 @@ const Link = ({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className={className ? `${style} ${className}` : style}
+        className={style}
         title={title}
         tabIndex={tabIndex}
         {...props}
@@ -51,7 +51,7 @@ const Link = ({
         href={href}
         as={as}
         title={title}
-        className={className ? `${style} ${className}` : style}
+        className={style}
         {...props}
         tabIndex={tabIndex}
       >

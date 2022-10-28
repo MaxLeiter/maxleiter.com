@@ -1,4 +1,4 @@
-'client'
+'use client'
 
 import Badge from '@components/badge'
 import FadeIn from '@components/fade-in'

@@ -1,4 +1,4 @@
-'client'
+'use client'
 
 import React from 'react'
 // import Page from '@components/page'
