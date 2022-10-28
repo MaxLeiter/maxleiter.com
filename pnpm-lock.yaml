@@ -11,6 +11,7 @@ specifiers:
   '@types/rss': 0.0.29
   '@typescript-eslint/eslint-plugin': 5.36.2
   '@typescript-eslint/parser': 5.36.2
+  '@vercel/analytics': ^0.1.2
   '@vercel/og': ^0.0.18
   concurrently: 7.4.0
   critters: 0.0.16
@@ -25,7 +26,7 @@ specifiers:
   marked: 4.1.0
   next: 12.3.1
   next-remote-watch: 1.0.0
-  next-themes: 0.2.1
+  next-themes: 0.2.0
   postcss: ^8.4.18
   postcss-flexbugs-fixes: 5.0.2
   postcss-hover-media-feature: 1.0.2
@@ -46,11 +47,12 @@ specifiers:
 dependencies:
   '@next/bundle-analyzer': 12.2.5
   '@supabase/supabase-js': 1.35.6
+  '@vercel/analytics': 0.1.2_react@18.2.0
   '@vercel/og': 0.0.18
   lodash.debounce: 4.0.8
   next: 12.3.1_biqbaboplfbrettd7655fr4n2y
   next-remote-watch: 1.0.0
-  next-themes: 0.2.1_azq6kxkn3od7qdylwkyksrwopy
+  next-themes: 0.2.0_azq6kxkn3od7qdylwkyksrwopy
   postcss: 8.4.18
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -769,6 +771,14 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
+  /@vercel/analytics/0.1.2_react@18.2.0:
+    resolution: {integrity: sha512-eV2XRMRQJzPcwAskfNicAwFr5+e/u76JcS2fJooWvaT9xAg/sX0RzkgRxDZXPjnRts2ErvjhoETmbnquAMBY9A==}
+    peerDependencies:
+      react: ^16.8||^17||^18
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /@vercel/og/0.0.18:
     resolution: {integrity: sha512-cEid22FkiNrgJ/HtawA6V3+x2jhP+KqwwNG97afFsFmZ/oPsh3Bm01NzCVSpeR96/aPaT2/59pbFXGxulxgp7g==}
     engines: {node: '>=16'}
@@ -921,7 +931,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.21.4
-      caniuse-lite: 1.0.30001422
+      caniuse-lite: 1.0.30001423
       fraction.js: 4.2.0
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -992,7 +1002,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001422
+      caniuse-lite: 1.0.30001423
       electron-to-chromium: 1.4.284
       node-releases: 2.0.6
       update-browserslist-db: 1.0.10_browserslist@4.21.4
@@ -1026,8 +1036,8 @@ packages:
     resolution: {integrity: sha512-dU+Tx2fsypxTgtLoE36npi3UqcjSSMNYfkqgmoEhtZrraP5VWq0K7FkWVTYa8eMPtnU/G2txVsfdCJTn9uzpuQ==}
     dev: false
 
-  /caniuse-lite/1.0.30001422:
-    resolution: {integrity: sha512-hSesn02u1QacQHhaxl/kNMZwqVG35Sz/8DgvmgedxSH8z9UUpcDYSPYgsj3x5dQNRcNp6BwpSfQfVzYUTm+fog==}
+  /caniuse-lite/1.0.30001423:
+    resolution: {integrity: sha512-09iwWGOlifvE1XuHokFMP7eR38a0JnajoyL3/i87c8ZjRWRrdKo1fqjNfugfBD0UDBIOz0U+jtNhJ0EPm1VleQ==}
 
   /chalk/2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -2753,8 +2763,8 @@ packages:
       - supports-color
     dev: false
 
-  /next-themes/0.2.1_azq6kxkn3od7qdylwkyksrwopy:
-    resolution: {integrity: sha512-B+AKNfYNIzh0vqQQKqQItTS8evEouKD7H5Hj3kmuPERwddR2TxvDSFZuTj6T7Jfn1oyeUyJMydPl1Bkxkh0W7A==}
+  /next-themes/0.2.0_azq6kxkn3od7qdylwkyksrwopy:
+    resolution: {integrity: sha512-myhpDL4vadBD9YDSHiewqvzorGzB03N84e+3LxCwHRlM/hiBOaW+UsKsQojQAzC7fdcJA0l2ppveXcYaVV+hxQ==}
     peerDependencies:
       next: '*'
       react: '*'
@@ -2789,7 +2799,7 @@ packages:
     dependencies:
       '@next/env': 12.3.1
       '@swc/helpers': 0.4.11
-      caniuse-lite: 1.0.30001422
+      caniuse-lite: 1.0.30001423
       postcss: 8.4.14
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
