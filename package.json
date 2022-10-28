@@ -47,6 +47,7 @@
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-react": "7.31.7",
     "eslint-plugin-react-hooks": "4.6.0",
+    "globby": "^13.1.2",
     "gray-matter": "4.0.3",
     "marked": "4.1.0",
     "postcss-flexbugs-fixes": "5.0.2",
