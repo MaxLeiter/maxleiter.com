@@ -6,10 +6,7 @@
     "jsx": "preserve",
     "target": "es2020",
     "module": "esnext",
-    "lib": [
-      "dom",
-      "es2019"
-    ],
+    "lib": ["dom", "es2019"],
     "noEmit": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
@@ -30,27 +27,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "paths": {
-      "@components/*": [
-        "components/*"
-      ],
-      "@lib/*": [
-        "lib/*"
-      ],
-      "@styles/*": [
-        "styles/*"
-      ],
-      "@data/*": [
-        "data/*"
-      ]
+      "@components/*": ["components/*"],
+      "@lib/*": ["lib/*"],
+      "@styles/*": ["styles/*"],
+      "@data/*": ["data/*"]
     },
     "incremental": true
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js"
-  ]
+  "exclude": ["node_modules"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js"],
 }
