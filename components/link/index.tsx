@@ -46,18 +46,16 @@ const Link = ({
   }
 
   return (
-    <>
-      <NextLink
-        href={href}
-        as={as}
-        title={title}
-        className={style}
-        {...props}
-        tabIndex={tabIndex}
-      >
-        {children}
-      </NextLink>
-    </>
+    <NextLink
+      href={href}
+      as={as}
+      title={title}
+      className={style}
+      {...props}
+      tabIndex={tabIndex}
+    >
+      {children}
+    </NextLink>
   )
 }
 

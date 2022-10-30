@@ -1,6 +1,7 @@
 // import Header from '@components/header'
-import styles from '@components/page/page.module.css'
+import styles from './page.module.css'
 import '@styles/global.css'
+import AnalyticsWrapper from './analytics-wrapper'
 
 export default function RootLayout({
   children,
@@ -8,23 +9,20 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      {/* eslint-disable-next-line @next/next/no-head-element */}
-      <head>
-        <title>Max Leiter&apos;s Website</title>
-      </head>
-      <body>
-        <div className={styles.wrapper}>
-          {/* <Head
-            title={`${title ? `${title} - ` : ''}Max Leiter`}
-            description={description}
-            image={image}
-          /> */}
-          <main className={styles.main}>{children}</main>
-          <div className={styles.fade} />
-        </div>
-      </body>
-    </html>
+    // <ServerThemeProvider enableSystem>
+      <html lang="en">
+        <head>
+          
+        </head>
+        <body>
+          <div className={styles.wrapper}>
+            <main className={styles.main}>{children}</main>
+            <div className={styles.fade} />
+          </div>
+          <AnalyticsWrapper />
+        </body>
+      </html>
+    // </ServerThemeProvider>
   )
 }
 

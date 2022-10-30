@@ -8,7 +8,6 @@ module.exports = ({
     formats: ['image/avif', 'image/webp'],
     domains: ['i.ytimg.com'],
   },
-
   reactStrictMode: true,
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js'],
   experimental: {

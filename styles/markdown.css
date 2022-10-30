@@ -91,7 +91,7 @@ article pre {
 /* Linkable Headers */
 
 .header-link {
-  padding-top: var(--header-height);
+  /* padding-top: var(--header-height); */
   color: inherit;
   text-decoration: none;
 }

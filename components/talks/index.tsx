@@ -1,12 +1,11 @@
 'use client'
 
 import React from 'react'
-// import Page from '@components/page'
 import type { Talk } from 'app/(subpages)/talks/page'
 import VideoCard from './video-card'
 import styles from './talks.module.css'
 import Input from '@components/input'
-import PostFooter from '@components/post-footer'
+import PostFooter from 'app/(subpages)/blog/[slug]/post/post-footer'
 import Badge from '@components/badge'
 import tagStyles from './tags.module.css'
 

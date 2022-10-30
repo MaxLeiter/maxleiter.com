@@ -4,7 +4,7 @@ import Button from '@components/button'
 import Highlight, { defaultProps } from 'prism-react-renderer'
 import { useEffect, useState } from 'react'
 import styles from './question.module.css'
-import { QuestionWithVotes } from '../'
+import { QuestionWithVotes } from '..'
 import FadeIn from '@components/fade-in'
 
 const getLocalStorageKeyString = (id: string) => `question-${id}`

@@ -119,44 +119,48 @@ const Projects: Project[] = [
   },
 ]
 
-export default async function getProjects(): Promise<Project[]> {
+export function getProjects() {
+  return Projects;
+}
+
+// export default async function getProjects(): Promise<Project[]> {
   // if (!process.env.GITHUB_TOKEN) {
   //   throw new Error(
   //     'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
   //   )
   // }
 
-  const withStars = await Promise.all(
-    Projects.map(async (proj) => {
-      const split = proj.href.split('/')
-      //[ 'https:', '', 'github.com', 'maxleiter', 'jsontree' ]
-      if (split[2] === 'github.com') {
-        const user = split[3]
-        const repo = split[4]
-        const { stargazers_count, message } = await (
-          await fetch(`https://api.github.com/repos/${user}/${repo}`, {
-            headers: {
-              Authorization: process.env.GITHUB_TOKEN ?? '',
-            },
-          })
-        ).json()
-        // rate limited
-        if (!stargazers_count && message) {
-          return {
-            ...proj,
-            stars: 29,
-          }
-        }
+//   const withStars = await Promise.all(
+//     Projects.map(async (proj) => {
+//       const split = proj.href.split('/')
+//       //[ 'https:', '', 'github.com', 'maxleiter', 'jsontree' ]
+//       if (split[2] === 'github.com') {
+//         const user = split[3]
+//         const repo = split[4]
+//         const { stargazers_count, message } = await (
+//           await fetch(`https://api.github.com/repos/${user}/${repo}`, {
+//             headers: {
+//               Authorization: process.env.GITHUB_TOKEN ?? '',
+//             },
+//           })
+//         ).json()
+//         // rate limited
+//         if (!stargazers_count && message) {
+//           return {
+//             ...proj,
+//             stars: 29,
+//           }
+//         }
 
-        return {
-          ...proj,
-          stars: stargazers_count,
-        }
-      } else {
-        return { ...proj, stars: -1 }
-      }
-    })
-  )
+//         return {
+//           ...proj,
+//           stars: stargazers_count,
+//         }
+//       } else {
+//         return { ...proj, stars: -1 }
+//       }
+//     })
+//   )
 
-  return withStars
-}
+//   return withStars
+// }

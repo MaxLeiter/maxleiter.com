@@ -1,6 +1,8 @@
 .container {
   max-width: var(--main-content);
-  margin: 0 auto;
+  /* remove ul margins */
+  margin: 0;
+  padding: 0;
 }
 
 .button {

@@ -17,7 +17,7 @@ const Posts = ({ posts, paginate }: Props) => {
   return (
     <ul className={styles.container}>
       {posts.slice(0, paginate ? showMore : undefined).map((post) => {
-        const date = new Date(post.date).toLocaleDateString('default', {
+        const date = new Date(post.date).toLocaleDateString('en-US', {
           month: 'numeric',
           day: 'numeric',
           year: 'numeric',

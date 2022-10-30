@@ -1,5 +1,5 @@
 import supabase from '@lib/supabase/private'
-import IeOrCss from '@components/ie-or-css'
+import IeOrCss from 'app/ie-or-css'
 
 const fetchQuestions = async () => {
   let { data, error } = await supabase.from('Questions').select('id,question')
@@ -15,14 +15,7 @@ const fetchQuestions = async () => {
 
 const IeQuiz = async () => {
   const questions = await fetchQuestions()
-  return (
-    // <Page
-    //   title="IE or CSS3?"
-    //   description="A short quiz wondering if given code snippers are for internet explorer or CSS3"
-    // >
-    <IeOrCss questions={questions} />
-    // </Page>
-  )
+  return <IeOrCss questions={questions} />
 }
 
 export default IeQuiz

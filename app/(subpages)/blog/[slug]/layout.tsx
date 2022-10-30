@@ -1,4 +1,3 @@
-import PostFooter from '@components/post-footer'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,8 +7,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {date && <meta name="date" content={date} />}
       </Head> */}
       <article>{children}</article>
-      <PostFooter />
-      {/* <Navigation previous={previous} next={next} /> */}
     </>
   )
 }

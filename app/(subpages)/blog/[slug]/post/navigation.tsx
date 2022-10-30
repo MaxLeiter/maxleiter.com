@@ -1,13 +1,14 @@
 import Link from '@components/link'
+import { Post } from '@lib/types'
 
 import styles from './navigation.module.css'
 
-const Previous = ({ previous, next }) => {
+const Navigation = ({ previous, next }: { previous?: Post; next?: Post }) => {
   return (
     <div className={styles.navigation}>
       <div className={styles.previous}>
         {previous && (
-          <Link href={`/blog/${previous.slug}`} scroll>
+          <Link href="/blog/[slug]" as={`/blog/${previous.slug}`}>
             <div className={styles.title}>← Older</div>
             {previous.title}
           </Link>
@@ -16,7 +17,7 @@ const Previous = ({ previous, next }) => {
 
       <div className={styles.next}>
         {next && (
-          <Link href={`/blog/${next.slug}`}>
+          <Link href="/blog/[slug]" as={`/blog/${next.slug}`}>
             <div className={styles.title}>Newer →</div>
             {next.title}
           </Link>
@@ -26,4 +27,4 @@ const Previous = ({ previous, next }) => {
   )
 }
 
-export default Previous
+export default Navigation

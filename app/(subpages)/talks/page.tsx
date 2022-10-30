@@ -27,4 +27,3 @@ const TalksPage = async () => {
 }
 
 export default TalksPage
-export const config = { runtime: 'experimental-edge' }

@@ -1,17 +1,16 @@
 import ProjectList from '@components/projects'
-import getProjects from '@lib/projects'
+import { getProjects } from '@lib/projects'
 
-export const fetchProjects = async () => {
-  const projects = await getProjects()
+export const fetchProjects = () => {
+  const projects = getProjects()
   return projects
 }
 
 const Projects = async () => {
-  const projects = await fetchProjects()
+  const projects = fetchProjects()
   return (
     <ProjectList showYears={true} count={projects.length} projects={projects} />
   )
 }
 
 export default Projects
-export const config = { runtime: 'experimental-edge' }

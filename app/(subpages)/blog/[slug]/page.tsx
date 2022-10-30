@@ -1,12 +1,9 @@
-import Post from '@components/post'
+import Post from 'app/(subpages)/blog/[slug]/post'
 import getPosts from '@lib/get-posts'
 import renderMarkdown from '@lib/render-markdown'
+import FadeIn from '@components/fade-in'
 
-export const config = {
-  dynamic: 'error',
-  dynamicParams: false, // default
-  runtime: 'experimental-edge',
-}
+export const dynamicParams = true;
 
 async function getData({ slug }: { slug: string }) {
   const posts = await getPosts()
@@ -22,6 +19,11 @@ async function getData({ slug }: { slug: string }) {
   }
 }
 
+export async function generateStaticParams() { 
+  const posts = await getPosts();
+  return posts.map((post) => ({ slug: post.slug }))
+}
+
 const PostPage = async ({
   params,
 }: {
@@ -30,7 +32,11 @@ const PostPage = async ({
   }
 }) => {
   const post = await getData(params)
-  return <Post {...post} />
+  return (
+    <FadeIn>
+      <Post {...post} />
+    </FadeIn>
+  )
 }
 
 // export const getStaticProps = async ({ params: { slug } }: Props) => {
@@ -58,8 +64,3 @@ const PostPage = async ({
 // }
 
 export default PostPage
-
-// export const config = {
-//   unstable_JsPreload: false,
-//   unstable_runtimeJS: false,
-// }

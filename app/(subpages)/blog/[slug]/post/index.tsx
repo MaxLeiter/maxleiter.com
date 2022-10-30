@@ -1,4 +1,6 @@
+import PostFooter from './post-footer'
 import type types from '@lib/types'
+import Navigation from './navigation'
 import styles from './post.module.css'
 
 export type PostProps = Omit<types.Post, 'body'> & {
@@ -11,14 +13,11 @@ export type PostProps = Omit<types.Post, 'body'> & {
 const Post = ({
   title,
   html,
-  // hidden,
-  // description,
   date,
-  // previous,
+  previous,
   lastModified,
-}: // next,
-// slug,
-PostProps) => {
+  next,
+}: PostProps) => {
   const postDate = new Date(date)
   const lastModifiedDate = lastModified ? new Date(lastModified) : undefined
   const isDateDifferent =
@@ -33,16 +32,18 @@ PostProps) => {
   )
 
   return (
-    <div className={styles.wrapper}>
-      <span className={styles.date}>
-        {date}{' '}
-        {isDateDifferent && (
-          <span className={styles.modified}>
-            last modified {formattedLastModifiedDate}
-          </span>
-        )}
-      </span>
-
+    <>
+      <div className={styles.wrapper}>
+        <span className={styles.date}>
+          {date}{' '}
+          {isDateDifferent && (
+            <span className={styles.modified}>
+              last modified {formattedLastModifiedDate}
+            </span>
+          )}
+        </span>
+        {/* {updatedViews && <FadeIn>{updatedViews} views</FadeIn>} */}
+      </div>
       {/* <div className={styles.header}>
         <Tooltip text={'Navigate home'}>
           <Link href="/">
@@ -55,7 +56,9 @@ PostProps) => {
       </div> */}
       <h1 className={styles.title}>{title}</h1>
       <div dangerouslySetInnerHTML={{ __html: html }} />
-    </div>
+      <PostFooter />
+      <Navigation previous={previous} next={next} />
+    </>
   )
 }
 

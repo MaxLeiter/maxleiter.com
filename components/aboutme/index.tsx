@@ -1,7 +1,7 @@
 import Link from '@components/link'
 
 const AboutMe = () => (
-  <article>
+  <>
     <p>
       I&apos;ve previously worked at{' '}
       <Link href="https://www.blend.com" external>
@@ -18,7 +18,7 @@ const AboutMe = () => (
       You can view a list of talks I recommend watching or listening to on{' '}
       <Link href="/talks">this page</Link>.
     </p>
-  </article>
+  </>
 )
 
 export default AboutMe

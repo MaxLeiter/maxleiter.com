@@ -4,7 +4,7 @@ import ProjectList from '@components/projects'
 import Link from '@components/link'
 import AboutMe from '@components/aboutme'
 import getPosts from '@lib/get-posts'
-import getProjects from '@lib/projects'
+import { getProjects } from '@lib/projects'
 import Header from '@components/header'
 
 const PROJECT_COUNT = 3
@@ -59,7 +59,3 @@ const Index = async () => {
 }
 
 export default Index
-
-export const config = {
-  runtime: 'experimental-edge',
-}

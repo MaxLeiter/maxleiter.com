@@ -1,26 +1,34 @@
-'use client'
-import { usePathname } from 'next/router'
 type Props = {
-  title?: string
-  description?: string
+  title: string
+  description: string
   image?: string
-  children?: React.ReactNode | React.ReactNode[]
+  hidden?: boolean
+  date?: string
+  lastModified?: string
+  author?: string
+  path: `/${string}`
 }
 
-const Head = ({
-  title = 'Max Leiter',
-  description = 'My blog and miscellaneous pages',
-  image = '',
-  children,
-}: Props) => {
-  const pathname = usePathname()
-  const url = `https://maxleiter.com${pathname}`
+export function getHeadTags({
+  title,
+  description,
+  image,
+  hidden,
+  date,
+  lastModified,
+  author = 'Max Leiter',
+  path,
+}: Props) {
+  const domain =
+    process.env.NODE_ENV === 'production'
+      ? 'https://maxleiter.com'
+      : process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : 'http://localhost:3000'
 
-  const domain = process.env.NODE_ENV === 'production' ? 'https://maxleiter.com' : (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000')
   return (
     <>
-      {/* Title */}
-      <title>{title}</title>
+      {title.indexOf("Max Leiter") > -1 ? <title>{title}</title> : <title>{title} - {author}</title>}
       <meta name="og:title" content={title} />
 
       {/* Description */}
@@ -32,7 +40,7 @@ const Head = ({
       <meta name="og:image" content={`${domain}${image}`} />
 
       {/* URL */}
-      <meta name="og:url" content={url} />
+      <meta name="og:url" content={`${domain}${path}`} />
 
       {/* General */}
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -41,7 +49,7 @@ const Head = ({
       <meta name="twitter:site" content="@max_leiter" />
       <meta property="og:site_name" content="Max Leiter's site" />
       <meta name="apple-mobile-web-app-title" content="Max" />
-      <meta name="author" content="Max Leiter" />
+      <meta name="author" content={author} />
       <meta property="og:type" content="website" />
       <meta charSet="utf-8" />
       <meta property="og:locale" content="en" />
@@ -69,9 +77,9 @@ const Head = ({
         key="dynamic-favicon"
       />
 
-      {children}
+      {date && <meta name="date" content={date} />}
+      {lastModified && <meta name="last-modified" content={lastModified} />}
+      {hidden && <meta name="robots" content="noindex" />}
     </>
   )
 }
-
-export default Head
