@@ -1,9 +1,8 @@
 import Post from 'app/(subpages)/blog/[slug]/post'
 import getPosts from '@lib/get-posts'
 import renderMarkdown from '@lib/render-markdown'
-import FadeIn from '@components/fade-in'
 
-export const dynamicParams = true;
+export const dynamicParams = false
 
 async function getData({ slug }: { slug: string }) {
   const posts = await getPosts()
@@ -19,8 +18,8 @@ async function getData({ slug }: { slug: string }) {
   }
 }
 
-export async function generateStaticParams() { 
-  const posts = await getPosts();
+export async function generateStaticParams() {
+  const posts = await getPosts()
   return posts.map((post) => ({ slug: post.slug }))
 }
 
@@ -32,11 +31,7 @@ const PostPage = async ({
   }
 }) => {
   const post = await getData(params)
-  return (
-    <FadeIn>
-      <Post {...post} />
-    </FadeIn>
-  )
+  return <Post {...post} />
 }
 
 // export const getStaticProps = async ({ params: { slug } }: Props) => {

@@ -1,7 +1,7 @@
 import ProjectList from '@components/projects'
 import { getProjects } from '@lib/projects'
 
-export const fetchProjects = () => {
+const fetchProjects = () => {
   const projects = getProjects()
   return projects
 }
