@@ -20,7 +20,7 @@
     "@vercel/og": "^0.0.18",
     "globby": "^11.0.0",
     "lodash.debounce": "4.0.8",
-    "next": "13.0.1",
+    "next": "13.0.2-canary.0",
     "next-remote-watch": "1.0.0",
     "next-themes": "npm:@wits/next-themes@0.2.7",
     "postcss": "8.4.18",
