@@ -16,7 +16,12 @@ const Head = ({
   const pathname = usePathname()
   const url = `https://maxleiter.com${pathname}`
 
-  const domain = process.env.NODE_ENV === 'production' ? 'https://maxleiter.com' : (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000')
+  const domain =
+    process.env.NODE_ENV === 'production'
+      ? 'https://maxleiter.com'
+      : process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : 'http://localhost:3000'
   return (
     <>
       {/* Title */}

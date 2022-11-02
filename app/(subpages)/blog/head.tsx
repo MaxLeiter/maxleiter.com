@@ -1,4 +1,4 @@
-import { getHeadTags } from "@lib/get-head-tags"
+import { getHeadTags } from '@lib/get-head-tags'
 
 export default function Head() {
   const title = 'Blog'

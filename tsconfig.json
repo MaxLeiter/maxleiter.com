@@ -34,7 +34,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "paths": {
-      "@components/*": ["components/*"],
+      "@components/*": ["app/components/*"],
       "@lib/*": ["lib/*"],
       "@styles/*": ["styles/*"],
       "@data/*": ["data/*"],

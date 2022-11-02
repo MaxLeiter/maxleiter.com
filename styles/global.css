@@ -7,7 +7,7 @@
   --gap-half: 0.5rem;
   --gap: 1rem;
   --gap-double: 2rem;
-  --small-gap: 4rem;
+  --small-gap: 2rem;
   --big-gap: 4rem;
   --main-content: 48rem;
   --radius: 8px;
@@ -26,6 +26,7 @@
 
   /* Dark Mode Colors */
   --bg: hsl(0, 0%, 7%);
+  --bg-alpha: hsla(0, 0%, 7%, 0.9);
   --fg: #fafbfc;
   --gray: #999;
   --light-gray: #444;
@@ -51,6 +52,7 @@
 @media (prefers-color-scheme: light) {
   :root {
     --bg: #fff;
+    --bg-alpha: hsla(0, 0%, 100%, 0.9);
     --fg: #444;
     --gray: rgb(100, 100, 100);
     --light-gray: rgb(222, 222, 222);
@@ -165,11 +167,18 @@ button {
 }
 
 p a,
+article a,
 a.reset {
   outline: none;
-  color: var(--fg);
+  color: var(--link);
   text-decoration: none;
   transition: background-color var(--transition), color var(--transition);
+}
+
+p a:hover,
+article a:hover,
+a.reset:hover {
+  color: var(--link);
 }
 
 pre,

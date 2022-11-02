@@ -28,7 +28,11 @@ export function getHeadTags({
 
   return (
     <>
-      {title.indexOf("Max Leiter") > -1 ? <title>{title}</title> : <title>{title} - {author}</title>}
+      {title.indexOf('Max Leiter') > -1 ? (
+        <title>{title}</title>
+      ) : (
+        <title>{`${title} - ${author}`}</title>
+      )}
       <meta name="og:title" content={title} />
 
       {/* Description */}

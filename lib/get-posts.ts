@@ -55,45 +55,4 @@ export const getPost = async (slug: string) => {
   return posts.find((post) => post.slug === slug)
 }
 
-// Edge version, without FS access
-// const getPosts = async () => {
-//   const posts = await fetch(
-//     'https://api.github.com/repos/maxleiter/maxleiter.com/contents/posts?ref=master'
-//   )
-//   const postsJson = await posts.json()
-//   const postsWithMetadata = await Promise.all(
-//     postsJson
-//       .filter((file: any) => path.extname(file.name) === '.md')
-//       .map(async (file: any) => {
-//         const postContent = await fetch(file.download_url)
-//         const postContentText = await postContent.text()
-//         const { data, content } = matter(postContentText)
-
-//         if (data.published === false) {
-//           return null
-//         }
-
-//         return { ...data, body: content } as Post
-//       })
-//   )
-//   const filtered = postsWithMetadata
-//     .filter((post) => post !== null)
-//     .sort((a, b) =>
-//       a && b ? new Date(b.date).getTime() - new Date(a.date).getTime() : 0
-//     ) as Post[]
-//   return filtered
-// }
-
-// export const getPost = async (slug: string) => {
-//   const post = await fetch(
-//     `https://api.github.com/repos/maxleiter/maxleiter.com/contents/posts/${slug}.md?ref=master`
-//   )
-//   const postJson = await post.json()
-//   const postContent = await fetch(postJson.download_url)
-//   const postContentText = await postContent.text()
-//   const { data, content } = matter(postContentText)
-
-//   return { ...data, body: content } as Post
-// }
-
 export default getPosts

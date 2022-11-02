@@ -2,7 +2,7 @@
 //   enabled: process.env.ANALYZE === 'true',
 // })
 /** @type {import('next').NextConfig} */
-module.exports = ({
+module.exports = {
   swcMinify: true,
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -13,9 +13,6 @@ module.exports = ({
   experimental: {
     // Required:
     appDir: true,
-    // Recommended for new `<Link>` and `<Image>` behavior
-    // Enables `<Link>` without `<a>`. When migrating an existing app use the codemod as outlined here: https://github.com/vercel/next.js/pull/36436
-    newNextLinkBehavior: true,
     // Recommended, will be the default in the next major version:
     // Enable browserslist handling, which is required for legacyBrowsers: false
     browsersListForSwc: true,
@@ -47,4 +44,4 @@ module.exports = ({
       },
     ]
   },
-})
+}

@@ -12,7 +12,7 @@ type Props = LinkProps & {
   title?: string
   children: React.ReactNode
   className?: string
-  transition?: boolean
+  noLinkClass?: boolean
   tabIndex?: number
 }
 
@@ -23,11 +23,11 @@ const Link = ({
   children,
   className = 'link',
   title,
-  transition = true,
+  noLinkClass = false,
   tabIndex = 0,
   ...props
 }: Props) => {
-  const style = transition ? styles.transition + ` ${className}` : className
+  const style = noLinkClass ? className : `${styles.link} ${className}`
 
   if (external) {
     return (

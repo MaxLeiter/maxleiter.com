@@ -4,6 +4,11 @@ import renderMarkdown from '@lib/render-markdown'
 
 export const dynamicParams = false
 
+export async function generateStaticParams() {
+  const posts = await getPosts()
+  return posts.map((post) => ({ slug: post.slug }))
+}
+
 async function getData({ slug }: { slug: string }) {
   const posts = await getPosts()
   const postIndex = posts.findIndex((p) => p?.slug === slug)
@@ -16,11 +21,6 @@ async function getData({ slug }: { slug: string }) {
     ...rest,
     html: renderMarkdown(body),
   }
-}
-
-export async function generateStaticParams() {
-  const posts = await getPosts()
-  return posts.map((post) => ({ slug: post.slug }))
 }
 
 const PostPage = async ({

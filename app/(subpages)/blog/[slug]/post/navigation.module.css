@@ -1,5 +1,4 @@
 .navigation {
-  margin: var(--gap) 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -8,7 +7,18 @@
 .previous, .next {
   font-weight: 500;
   transition: color var(--transition);
+  flex: 0 0 45%;
 }
+
+@media (min-width: 768px) {
+  .previous {
+    text-align: left;
+  }
+  .next {
+    text-align: right;
+  }
+}
+
 
 .next {
   text-align: right;
@@ -16,7 +26,7 @@
 
 .title {
   font-weight: normal;
-  margin-bottom: var(--gap-half);
+  margin-bottom: var(--gap-quarter);
 }
 
 .previous:hover, .next:hover,

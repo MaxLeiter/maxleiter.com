@@ -6,6 +6,8 @@ import AboutMe from '@components/aboutme'
 import getPosts from '@lib/get-posts'
 import { getProjects } from '@lib/projects'
 import Header from '@components/header'
+import styles from './page.module.css'
+import TimeOfDay from './timer'
 
 const PROJECT_COUNT = 3
 
@@ -14,21 +16,25 @@ const fetchPosts = async () => {
   return posts || []
 }
 
-const fetchProjects = async () => {
-  const projects = await getProjects()
+const fetchProjects = () => {
+  const projects = getProjects()
   return projects || []
 }
 
 const Index = async () => {
   const posts = await fetchPosts()
-  const projects = await fetchProjects()
+  const projects = fetchProjects()
 
   return (
-    <article>
+    <>
       <Header render={false} title="" />
-      <h1 style={{ margin: 0, color: 'var(--link)' }}>Max Leiter</h1>
-      <h2 style={{ margin: 0 }}>Full-stack developer</h2>
-      <Socials />
+      <div className={styles.heading}>
+        <span>
+          <h1 style={{ margin: 0, color: 'var(--link)' }}>Max Leiter</h1>
+          <h2 style={{ margin: 0 }}>Full-stack developer</h2>
+        </span>
+        <Socials />
+      </div>
       <h3>About me</h3>
       <AboutMe />
       <h3>My projects</h3>
@@ -39,7 +45,7 @@ const Index = async () => {
       />
       <h3>My posts</h3>
       <PostsList posts={posts} paginate={false} />
-      <footer>
+      <footer className={styles.footer}>
         <Link href="/about">About this site</Link>
         {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA && (
           <>
@@ -53,8 +59,9 @@ const Index = async () => {
             </Link>
           </>
         )}
+        <TimeOfDay />
       </footer>
-    </article>
+    </>
   )
 }
 

@@ -1,3 +1,8 @@
+.socials {
+  display: inline-flex;
+  align-items: center;
+}
+
 .icon {
   user-select: none;
   display: inline-flex;
@@ -23,20 +28,6 @@
   box-shadow: none !important;
   background: var(--lightest-gray) !important;
   /* transform: translateY(-5px); */
-}
-
-.socials {
-  display: inline-flex;
-  align-items: center;
-}
-
-.sr-only {
-  position: absolute;
-  left: -10000px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {

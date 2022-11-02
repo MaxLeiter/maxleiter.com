@@ -120,15 +120,15 @@ const Projects: Project[] = [
 ]
 
 export function getProjects() {
-  return Projects;
+  return Projects
 }
 
 // export default async function getProjects(): Promise<Project[]> {
-  // if (!process.env.GITHUB_TOKEN) {
-  //   throw new Error(
-  //     'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
-  //   )
-  // }
+// if (!process.env.GITHUB_TOKEN) {
+//   throw new Error(
+//     'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
+//   )
+// }
 
 //   const withStars = await Promise.all(
 //     Projects.map(async (proj) => {

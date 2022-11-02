@@ -4,18 +4,18 @@ export const config = {
   runtime: 'experimental-edge',
 }
 
-const font = fetch(new URL('../../fonts/Inter-Medium.ttf', import.meta.url)).then(
-  (res) => res.arrayBuffer()
-);
+const font = fetch(
+  new URL('../../fonts/Inter-Medium.ttf', import.meta.url)
+).then((res) => res.arrayBuffer())
 
 const handler = async (req: NextRequest) => {
-  const fontData = await font;
-  const { searchParams } = new URL(req.url);
-  const title = searchParams.get('title');
-  const date = searchParams.get('date');
+  const fontData = await font
+  const { searchParams } = new URL(req.url)
+  const title = searchParams.get('title')
+  const date = searchParams.get('date')
 
   if (!title || !date) {
-    return new Response('Missing title or date', { status: 400 });
+    return new Response('Missing title or date', { status: 400 })
   }
 
   return new ImageResponse(
@@ -65,7 +65,7 @@ const handler = async (req: NextRequest) => {
             maxWidth: 700,
             textAlign: 'center',
             lineHeight: 1.3,
-            color: 'white'
+            color: 'white',
           }}
         >
           {title && (
@@ -100,7 +100,7 @@ const handler = async (req: NextRequest) => {
           name: 'Inter',
           data: fontData,
           weight: 500,
-        }
+        },
       ],
       width: 1200,
       height: 630,

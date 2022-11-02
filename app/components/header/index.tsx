@@ -4,6 +4,7 @@ import Link from 'next/link'
 import styles from './header.module.css'
 import Home from '@components/icons/home'
 import socialStyles from '../socials/socials.module.css'
+import Tooltip from '@components/tooltip'
 // import ThemeSwitcher from '@components/theme-switcher'
 
 type Props = {
@@ -16,13 +17,11 @@ const Header = ({ render, title }: Props) => {
     return (
       <nav className={styles.nav}>
         <div className={styles.header}>
-          <Link
-            href="/"
-            aria-label="Navigate Home"
-            className={`${socialStyles.icon} ${styles.icon}`}
-          >
-            <Home size={28} />
-          </Link>
+          <Tooltip text={'Navigate home'}>
+            <Link href="/" className={`${socialStyles.icon} ${styles.icon}`}>
+              <Home size={28} />
+            </Link>
+          </Tooltip>
           {/* <ThemeSwitcher className={styles.icon} /> */}
           {title && <div className={styles.content}>{title}</div>}
         </div>
