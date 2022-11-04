@@ -13,9 +13,6 @@ module.exports = {
   experimental: {
     // Required:
     appDir: true,
-    // Recommended, will be the default in the next major version:
-    // Enable browserslist handling, which is required for legacyBrowsers: false
-    browsersListForSwc: true,
     // Change the default compilation output to ESModules compatible browsers
     legacyBrowsers: false,
     optimizeCss: true,
