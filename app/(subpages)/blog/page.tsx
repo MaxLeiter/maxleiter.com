@@ -11,9 +11,7 @@ const Blog = async () => {
 
   return (
     <article>
-      <ul>
-        <PostsList posts={posts} />
-      </ul>
+      <PostsList posts={posts} />
     </article>
   )
 }
