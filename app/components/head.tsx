@@ -1,5 +1,7 @@
 'use client'
-import { usePathname } from 'next/router'
+
+import { usePathname } from 'next/navigation'
+
 type Props = {
   title?: string
   description?: string
