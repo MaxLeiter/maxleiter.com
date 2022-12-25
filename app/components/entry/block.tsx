@@ -6,18 +6,15 @@ type Props = {
   description?: string
   type?: string
   href: string
-  as?: string
   date?: Date
   // views?: number
 }
 
-const BlockEntry = ({ title, description, type, href, as, date }: Props) => {
+const BlockEntry = ({ title, description, type, href, date }: Props) => {
   return (
     <li className={styles.item}>
       <Link
         href={href}
-        as={as}
-        external={!as}
         title={description || title}
         className={styles.link}
         noLinkClass

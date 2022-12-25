@@ -106,12 +106,12 @@ const TimeDisplay = ({ format }: { format: Intl.DateTimeFormatOptions }) => {
   }, [])
 
   return (
-    <>
+    <span suppressHydrationWarning>
       {time.toLocaleTimeString('en-US', {
         timeZone: 'America/Los_Angeles',
         ...format,
       })}
-    </>
+    </span>
   )
 }
 const MemoTimeDisplay = React.memo(TimeDisplay)

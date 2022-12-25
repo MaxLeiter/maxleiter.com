@@ -29,7 +29,6 @@ const Posts = ({ posts, paginate }: Props) => {
             href={`/blog/${post.slug}`}
             title={post.title}
             date={new Date(date)}
-            as={`/blog/${post.slug}`}
             description={post.description}
             // views={post.views}
           />

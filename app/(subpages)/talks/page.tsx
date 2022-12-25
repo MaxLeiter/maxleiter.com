@@ -26,4 +26,6 @@ const TalksPage = async () => {
   return <Talks talks={talks} />
 }
 
+export const dynamic = 'force-static'
+
 export default TalksPage

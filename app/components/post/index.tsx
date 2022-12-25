@@ -43,16 +43,6 @@ PostProps) => {
         )}
       </span>
 
-      {/* <div className={styles.header}>
-        <Tooltip text={'Navigate home'}>
-          <Link href="/">
-            <a className={`${socialStyles.icon} ${styles.icon}`}>
-              <Home size={28} />
-            </a>
-          </Link>
-        </Tooltip>
-        <ThemeSwitcher className={styles.icon} iconSize={28} />
-      </div> */}
       <h1 className={styles.title}>{title}</h1>
       <div dangerouslySetInnerHTML={{ __html: html }} />
     </div>

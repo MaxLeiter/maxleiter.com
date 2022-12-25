@@ -1,6 +1,8 @@
 .heading {
   display: flex;
   justify-content: space-between;
+  height: 90px;
+  margin-top: var(--header-height);
 }
 
 @media (max-width: 768px) {

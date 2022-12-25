@@ -1,9 +1,9 @@
 'use client'
 
 import { Moon, Sun } from '@components/icons'
-import { ThemeProvider, useTheme } from 'next-themes'
 import socialStyles from '@components/socials/socials.module.css'
 import Tooltip from '@components/tooltip'
+import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 
 const ThemeSwitcher = ({
@@ -21,21 +21,19 @@ const ThemeSwitcher = ({
   }, [])
 
   return (
-    <ThemeProvider enableSystem>
-      <Tooltip text={activeTheme === 'light' ? 'Dark mode' : 'Light mode'}>
-        <button
-          onClick={() => setTheme(activeTheme === 'light' ? 'dark' : 'light')}
-          aria-label="Change the theme"
-          className={`${socialStyles.icon} ${className}`}
-        >
-          {mounted && activeTheme === 'light' ? (
-            <Moon size={iconSize} />
-          ) : (
-            <Sun size={iconSize} />
-          )}
-        </button>
-      </Tooltip>
-    </ThemeProvider>
+    <Tooltip text={activeTheme === 'light' ? 'Dark mode' : 'Light mode'}>
+      <button
+        onClick={() => setTheme(activeTheme === 'light' ? 'dark' : 'light')}
+        aria-label="Change the theme"
+        className={`${socialStyles.icon} ${className}`}
+      >
+        {mounted && activeTheme === 'light' ? (
+          <Moon size={iconSize} />
+        ) : (
+          <Sun size={iconSize} />
+        )}
+      </button>
+    </Tooltip>
   )
 }
 

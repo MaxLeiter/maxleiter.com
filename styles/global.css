@@ -15,7 +15,7 @@
   --header-height: 48px;
 
   /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue',
+   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue',
     sans-serif;
   --font-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo',
     monospace;
@@ -82,10 +82,6 @@
   color: var(--bg);
 }
 
-html {
-  line-height: 1.55;
-}
-
 html,
 body {
   padding: 0;
@@ -95,8 +91,8 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100%;
   font-size: 16px;
+  line-height: 28px;
 }
 
 body {
@@ -109,8 +105,7 @@ body {
 
 p,
 li {
-  letter-spacing: -0.33px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 h1,
@@ -121,29 +116,24 @@ h5,
 h6 {
   font-family: var(--font-sans);
   font-weight: 600;
-  line-height: 1.75;
+  line-height: 1.25;
 }
 
 h1 {
   font-size: 2.3rem;
   font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.89px;
 }
 
 h2 {
   font-size: 1.6rem;
-  letter-spacing: -0.69px;
 }
 
 h3 {
   font-size: 1.4rem;
-  letter-spacing: -0.47px;
 }
 
 h4 {
   font-size: 1.3rem;
-  letter-spacing: -0.33px;
 }
 
 hr {

@@ -5,10 +5,8 @@
 
   color: var(--gray-alpha);
   cursor: pointer;
-  transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 .button:hover {
   color: var(--gray);
-  transform: translateY(-2px);
 }

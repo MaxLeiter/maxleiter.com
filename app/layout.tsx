@@ -2,6 +2,9 @@
 import styles from './layout.module.css'
 import '@styles/global.css'
 import AnalyticsWrapper from './analytics-wrapper'
+import { Inter }  from "@next/font/google";
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export default function RootLayout({
   children,
@@ -9,9 +12,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    // <ServerThemeProvider enableSystem>
-    <html lang="en">
-      <head></head>
+    <html lang="en" className={inter.variable}>
+      <head />
       <body>
         <div className={styles.wrapper}>
           <main className={styles.main}>{children}</main>
@@ -20,7 +22,6 @@ export default function RootLayout({
         <AnalyticsWrapper />
       </body>
     </html>
-    // </ServerThemeProvider>
   )
 }
 

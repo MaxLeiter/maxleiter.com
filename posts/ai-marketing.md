@@ -5,7 +5,7 @@ slug: marketing-ai
 date: Oct 13, 2022
 ---
 
-> If you find yourself disliking this, skip to the conclusion.
+> If you find yourself disliking this, jump to the conclusion.
 
 AI is the end of marketing. It's not going away, but it's changing the game. The goal of marketing has always been to create a customer experience that leads to sales. When you think about it, that makes sense; good marketing is an effective way to reach customers who are likely interested in your product or service. What's more, it builds brand loyalty by allowing consumers to experience an emotional connection with your company via high-quality content or products/services that speak directly to their needs as well as their wants and desires."
 

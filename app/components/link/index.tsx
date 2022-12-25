@@ -8,7 +8,6 @@ type LinkProps = React.ComponentProps<typeof NextLink>
 type Props = LinkProps & {
   external?: boolean
   href: string
-  as?: string
   title?: string
   children: React.ReactNode
   className?: string
@@ -19,7 +18,6 @@ type Props = LinkProps & {
 const Link = ({
   external,
   href,
-  as,
   children,
   className = 'link',
   title,
@@ -48,7 +46,6 @@ const Link = ({
   return (
     <NextLink
       href={href}
-      as={as}
       title={title}
       className={style}
       {...props}
@@ -59,4 +56,4 @@ const Link = ({
   )
 }
 
-export default memo(Link)
+export default (Link)

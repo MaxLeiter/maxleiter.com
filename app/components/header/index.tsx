@@ -17,12 +17,9 @@ const Header = ({ render, title }: Props) => {
     return (
       <nav className={styles.nav}>
         <div className={styles.header}>
-          <Tooltip text={'Navigate home'}>
-            <Link href="/" className={`${socialStyles.icon} ${styles.icon}`}>
-              <Home size={28} />
-            </Link>
-          </Tooltip>
-          {/* <ThemeSwitcher className={styles.icon} /> */}
+          <Link href="/" className={`${socialStyles.icon} ${styles.icon}`}>
+            <Home size={28} />
+          </Link>
           {title && <div className={styles.content}>{title}</div>}
         </div>
       </nav>

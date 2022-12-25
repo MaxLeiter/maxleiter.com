@@ -5,7 +5,6 @@ import Link from '@components/link'
 import AboutMe from '@components/aboutme'
 import getPosts from '@lib/get-posts'
 import { getProjects } from '@lib/projects'
-import Header from '@components/header'
 import styles from './page.module.css'
 import TimeOfDay from './timer'
 
@@ -27,7 +26,6 @@ const Index = async () => {
 
   return (
     <>
-      <Header render={false} title="" />
       <div className={styles.heading}>
         <span>
           <h1 style={{ margin: 0, color: 'var(--link)' }}>Max Leiter</h1>
@@ -66,3 +64,5 @@ const Index = async () => {
 }
 
 export default Index
+
+export const dynamic = "force-static";

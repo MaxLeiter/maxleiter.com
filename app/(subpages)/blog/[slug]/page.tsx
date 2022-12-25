@@ -3,6 +3,7 @@ import getPosts from '@lib/get-posts'
 import renderMarkdown from '@lib/render-markdown'
 
 export const dynamicParams = false
+export const dynamic = "force-static";
 
 export async function generateStaticParams() {
   const posts = await getPosts()
@@ -33,29 +34,5 @@ const PostPage = async ({
   const post = await getData(params)
   return <Post {...post} />
 }
-
-// export const getStaticProps = async ({ params: { slug } }: Props) => {
-//   const posts = await getPosts()
-//   const postIndex = posts.findIndex((p) => p?.slug === slug)
-//   const post = posts[postIndex]
-//   if (!post) return { props: { post: null } }
-//   const { body, ...rest } = post
-
-//   return {
-//     props: {
-//       previous: posts[postIndex + 1] || null,
-//       next: posts[postIndex - 1] || null,
-//       ...rest,
-//       html: renderMarkdown(body),
-//     } as PostProps,
-//   }
-// }
-
-// export const getStaticPaths = async () => {
-//   return {
-//     paths: (await getPosts()).map((p) => `/blog/${p?.slug}`),
-//     fallback: false,
-//   }
-// }
 
 export default PostPage

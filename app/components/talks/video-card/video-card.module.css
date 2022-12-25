@@ -12,7 +12,10 @@
 
 .videoCard .content {
   padding: var(--gap-half);
-  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--gap-half);
 }
 
 .videoCard .content h2 {
@@ -23,9 +26,10 @@
 }
 
 .videoCard .content p {
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin: 0;
   padding: 0;
+  line-height: 1.25;
 }
 
 .videoCard iframe {
@@ -65,6 +69,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--gap);
+  max-width: 100%;
 }
 
 .wrapper section {
