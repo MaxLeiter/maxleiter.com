@@ -1,6 +1,3 @@
-import Head from 'next/head'
-
-import Page from '@components/page'
 import PostsList from '@components/posts-list'
 import styles from './error.module.css'
 
@@ -13,11 +10,7 @@ type Props = {
 
 const Error = ({ status, posts }: Props) => {
   return (
-    <Page description={`Error`} title={status.toString() || 'Error'}>
-      <Head>
-        <title>404 — Max Leiter</title>
-      </Head>
-
+    <>
       {status === 404 ? (
         <section>
           <h1 className={styles.first}>
@@ -34,7 +27,7 @@ const Error = ({ status, posts }: Props) => {
           <p>An error occurred.</p>
         </section>
       )}
-    </Page>
+    </>
   )
 }
 
