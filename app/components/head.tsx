@@ -12,7 +12,7 @@ type Props = {
 const Head = ({
   title = 'Max Leiter',
   description = 'My blog and miscellaneous pages',
-  image = '',
+  image = '/api/og?title=Max%20Leiter%27s%20site',
   children,
 }: Props) => {
   const pathname = usePathname()
