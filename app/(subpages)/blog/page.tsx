@@ -11,6 +11,3 @@ const Blog = async () => {
 }
 
 export default Blog
-
-export const config = { runtime: 'experimental-edge' }
-
