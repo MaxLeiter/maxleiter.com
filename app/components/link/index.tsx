@@ -1,4 +1,3 @@
-import { memo } from 'react'
 import NextLink from 'next/link'
 
 import styles from './link.module.css'
