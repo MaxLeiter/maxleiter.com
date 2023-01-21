@@ -3,7 +3,7 @@ import getPosts from '@lib/get-posts'
 import renderMarkdown from '@lib/render-markdown'
 
 export const dynamicParams = false
-export const dynamic = "force-static";
+export const dynamic = 'force-static'
 
 export async function generateStaticParams() {
   const posts = await getPosts()

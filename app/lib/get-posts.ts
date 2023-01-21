@@ -3,7 +3,7 @@ import path from 'path'
 import type { Post } from './types'
 import fs from 'fs/promises'
 
-const getPosts = async () => {
+async function getPosts() {
   const posts = await fs.readdir('./posts/')
 
   const postsWithMetadata = await Promise.all(
@@ -50,7 +50,7 @@ const getPosts = async () => {
   return filtered
 }
 
-export const getPost = async (slug: string) => {
+export async function getPost(slug: string) {
   const posts = await getPosts()
   return posts.find((post) => post.slug === slug)
 }
