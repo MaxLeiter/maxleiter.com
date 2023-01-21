@@ -21,13 +21,13 @@ const Index = async () => {
   return (
     <>
       <div className={styles.heading}>
-        <span>
-          <h1 style={{ margin: 0, color: 'var(--link)' }}>Max Leiter</h1>
-          <h2 style={{ margin: 0 }}>Full-stack developer</h2>
+        <span className={styles.headingText}>
+          <h1>Max Leiter</h1>
+          <h2>Full-stack developer</h2>
         </span>
         <Socials />
       </div>
-      <h3>About me</h3>
+      <h3 className={styles.secondHeading}>About me</h3>
       <AboutMe />
       <h3>My projects</h3>
       <ProjectList
