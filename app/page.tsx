@@ -41,19 +41,23 @@ const Index = async () => {
         <PostListRSC paginate={false} />
       </Suspense>
       <footer className={styles.footer}>
-        <Link href="/about">About this site</Link>
-        {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA && (
-          <>
-            {' '}
-            &mdash;{' '}
-            <Link
-              external
-              href={`https://github.com/maxleiter/maxleiter.com/commit/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}`}
-            >
-              {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA.slice(0, 7)}
-            </Link>
-          </>
-        )}
+        <span>
+          <Link href="/about">About this site</Link>
+          {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ? (
+            <>
+              {' '}
+              &mdash;{' '}
+              <Link
+                external
+                href={`https://github.com/maxleiter/maxleiter.com/commit/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}`}
+              >
+                {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA.slice(0, 7)}
+              </Link>
+            </>
+          ) : (
+            <> &mdash; some git SHA</>
+          )}
+        </span>
         <TimeOfDay />
       </footer>
     </>
