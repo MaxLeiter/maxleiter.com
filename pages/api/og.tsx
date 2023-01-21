@@ -1,21 +1,21 @@
 import { ImageResponse } from '@vercel/og'
 import { NextRequest } from 'next/server'
 export const config = {
-  runtime: 'experimental-edge',
+  runtime: 'edge',
 }
 
-const font = fetch(new URL('../../fonts/Inter-Medium.ttf', import.meta.url)).then(
+const font = fetch(new URL('./fonts/Inter-Medium.ttf', import.meta.url)).then(
   (res) => res.arrayBuffer()
-);
+)
 
 const handler = async (req: NextRequest) => {
-  const fontData = await font;
-  const { searchParams } = new URL(req.url);
-  const title = searchParams.get('title');
-  const date = searchParams.get('date');
+  const fontData = await font
+  const { searchParams } = new URL(req.url)
+  const title = searchParams.get('title')
+  const date = searchParams.get('date')
 
-  if (!title || !date) {
-    return new Response('Missing title or date', { status: 400 });
+  if (!title) {
+    return new Response('Missing title', { status: 400 })
   }
 
   return new ImageResponse(
@@ -26,19 +26,19 @@ const handler = async (req: NextRequest) => {
           height: '100%',
           width: '100%',
           alignItems: 'center',
-          justifyContent: 'center',
           letterSpacing: '-.02em',
           fontWeight: 700,
           background: '#000',
+          flexDirection: 'column',
         }}
       >
         <div
           style={{
-            left: 35,
-            top: 35,
-            position: 'absolute',
             display: 'flex',
-            alignItems: 'center',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            width: '100%',
+            padding: '10px 50px',
           }}
         >
           <span
@@ -52,33 +52,6 @@ const handler = async (req: NextRequest) => {
           >
             maxleiter.com
           </span>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            padding: '20px 50px',
-            margin: '0 42px',
-            fontSize: 40,
-            width: 'auto',
-            maxWidth: 700,
-            textAlign: 'center',
-            lineHeight: 1.3,
-            color: 'white'
-          }}
-        >
-          {title && (
-            <div
-              style={{
-                fontSize: 65,
-                fontWeight: 900,
-                marginBottom: 40,
-              }}
-            >
-              {title}
-            </div>
-          )}
           {date && (
             <div
               style={{
@@ -92,6 +65,33 @@ const handler = async (req: NextRequest) => {
             </div>
           )}
         </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            padding: '0 50px',
+            color: 'white',
+            textAlign: 'center',
+            height: 630 - 50 - 50,
+            maxWidth: 1000,
+          }}
+        >
+          {title && (
+            <div
+              style={{
+                fontSize: 65,
+                fontWeight: 900,
+                marginBottom: 40,
+                lineHeight: 1.1,
+              }}
+            >
+              {title}
+            </div>
+          )}
+        </div>
       </div>
     ),
     {
@@ -100,7 +100,7 @@ const handler = async (req: NextRequest) => {
           name: 'Inter',
           data: fontData,
           weight: 500,
-        }
+        },
       ],
       width: 1200,
       height: 630,

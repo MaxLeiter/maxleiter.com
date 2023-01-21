@@ -8,7 +8,7 @@ export const middleware: NextMiddleware = async (req, event) => {
   const isPageRequest =
     !PUBLIC_FILE.test(pathname) && !pathname.startsWith('/api')
 
-  const {isBot, ua} = userAgent(req)
+  const { isBot, ua } = userAgent(req)
   const sendAnalytics = async () => {
     if (process.env.NODE_ENV !== 'production') {
       return

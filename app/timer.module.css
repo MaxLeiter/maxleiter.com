@@ -1,0 +1,12 @@
+.button {
+  background: none;
+  border: none;
+  padding: 0;
+
+  color: var(--gray-alpha);
+  cursor: pointer;
+}
+
+.button:hover {
+  color: var(--gray);
+}

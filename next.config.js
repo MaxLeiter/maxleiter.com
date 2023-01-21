@@ -1,19 +1,21 @@
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-})
-
-module.exports = withBundleAnalyzer({
+// const withBundleAnalyzer = require('@next/bundle-analyzer')({
+//   enabled: process.env.ANALYZE === 'true',
+// })
+/** @type {import('next').NextConfig} */
+module.exports = {
   swcMinify: true,
   images: {
     formats: ['image/avif', 'image/webp'],
     domains: ['i.ytimg.com'],
   },
-
   reactStrictMode: true,
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js'],
   experimental: {
-    optimizeCss: false,
-    reactRoot: true,
+    // Required:
+    appDir: true,
+    // Change the default compilation output to ESModules compatible browsers
+    legacyBrowsers: false,
+    optimizeCss: true,
   },
   async redirects() {
     return [
@@ -39,4 +41,4 @@ module.exports = withBundleAnalyzer({
       },
     ]
   },
-})
+}

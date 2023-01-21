@@ -1,0 +1,18 @@
+.heading {
+  display: flex;
+  justify-content: space-between;
+  height: 90px;
+  margin-top: var(--header-height);
+}
+
+@media (max-width: 768px) {
+  .heading {
+    flex-direction: column;
+  }
+}
+
+.footer {
+    margin-top: var(--small-gap);
+    display: flex;
+    justify-content: space-between;
+}
