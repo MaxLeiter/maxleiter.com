@@ -1,8 +1,21 @@
 .heading {
   display: flex;
   justify-content: space-between;
-  height: 90px;
   margin-top: var(--header-height);
+}
+
+@media screen and (max-width: 768px) {
+  .secondHeading {
+    margin-top: var(--gap-half);
+  }
+}
+
+.headingText > * {
+  margin: 0;
+}
+
+.headingText h1 {
+  color: var(--link);
 }
 
 @media (max-width: 768px) {
@@ -12,7 +25,7 @@
 }
 
 .footer {
-    margin-top: var(--small-gap);
-    display: flex;
-    justify-content: space-between;
+  margin-top: var(--small-gap);
+  display: flex;
+  justify-content: space-between;
 }
