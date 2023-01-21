@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import type { Talk } from 'app/(subpages)/talks/page'
+import type { Talk } from 'app/(subpages)/talks/page-backup'
 import VideoCard from './video-card'
 import styles from './talks.module.css'
 import Input from '@components/input'

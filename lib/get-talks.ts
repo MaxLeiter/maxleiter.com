@@ -1,4 +1,4 @@
-import { Talk } from 'app/(subpages)/talks/page'
+import { Talk } from 'app/(subpages)/talks/page-backup'
 import { Client, Video } from 'youtubei'
 import Talks from '@data/talks.json'
 
