@@ -14,5 +14,3 @@ const Projects = async () => {
 }
 
 export default Projects
-
-export const config = { runtime: 'experimental-edge' }
