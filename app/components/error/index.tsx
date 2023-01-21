@@ -5,7 +5,7 @@ import { Post } from '@lib/types'
 
 type Props = {
   status: number
-  posts: Post[]
+  posts: Promise<Post[]>
 }
 
 const Error = ({ status, posts }: Props) => {

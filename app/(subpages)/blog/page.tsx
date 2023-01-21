@@ -1,19 +1,16 @@
-import PostsList from '@components/posts-list'
-import getPosts from '@lib/get-posts'
-
-async function fetchPosts() {
-  const posts = await getPosts()
-  return posts
-}
+import { PostListRSC } from '@components/posts-list/rsc'
+import { Suspense } from 'react'
 
 const Blog = async () => {
-  const posts = await fetchPosts()
-
   return (
-    <article>
-      <PostsList posts={posts} />
-    </article>
+    <Suspense fallback={<div>Loading...</div>}>
+      {/* @ts-expect-error async rsc support */}
+      <PostListRSC paginate={true} />
+    </Suspense>
   )
 }
 
 export default Blog
+
+export const config = { runtime: 'experimental-edge' }
+

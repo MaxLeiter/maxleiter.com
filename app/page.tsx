@@ -7,13 +7,10 @@ import getPosts from '@lib/get-posts'
 import { getProjects } from '@lib/projects'
 import styles from './page.module.css'
 import TimeOfDay from './timer'
+import { Suspense } from 'react'
+import { PostListRSC } from '@components/posts-list/rsc'
 
 const PROJECT_COUNT = 3
-
-const fetchPosts = async () => {
-  const posts = await getPosts()
-  return posts || []
-}
 
 const fetchProjects = () => {
   const projects = getProjects()
@@ -21,7 +18,6 @@ const fetchProjects = () => {
 }
 
 const Index = async () => {
-  const posts = await fetchPosts()
   const projects = fetchProjects()
 
   return (
@@ -42,7 +38,10 @@ const Index = async () => {
         projects={projects}
       />
       <h3>My posts</h3>
-      <PostsList posts={posts} paginate={false} />
+      <Suspense fallback={<div>Loading...</div>}>
+        {/* @ts-expect-error async rsc support */}
+        <PostListRSC paginate={false} />
+      </Suspense>
       <footer className={styles.footer}>
         <Link href="/about">About this site</Link>
         {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA && (
@@ -65,4 +64,4 @@ const Index = async () => {
 
 export default Index
 
-export const dynamic = "force-static";
+export const dynamic = 'force-static'

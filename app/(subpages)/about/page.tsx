@@ -4,11 +4,11 @@ const About = () => {
   return (
     <article>
       <p>
-        This site is built on{' '}
+        This site is built on the{' '}
         <Link external href="https://nextjs.com">
-          Next.js
+          Next.js 13
         </Link>{' '}
-        and deployed via{' '}
+        App Directory and is deployed via{' '}
         <Link external href="https://vercel.com/home">
           Vercel
         </Link>

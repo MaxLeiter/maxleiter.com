@@ -14,10 +14,10 @@ const AboutMe = () => (
       . I&apos;m interested in politics, tech, and building a fast, accessible
       web.
     </p>
-    <p>
+    {/* <p>
       You can view a list of talks I recommend watching or listening to on{' '}
       <Link href="/talks">this page</Link>.
-    </p>
+    </p> */}
   </>
 )
 

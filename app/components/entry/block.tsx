@@ -18,6 +18,7 @@ const BlockEntry = ({ title, description, type, href, date }: Props) => {
         title={description || title}
         className={styles.link}
         noLinkClass
+        scroll={true}
       >
         {type && <div className={styles.type}>{type}</div>}
         {date && (
