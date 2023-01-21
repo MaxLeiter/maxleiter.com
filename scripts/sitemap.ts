@@ -5,7 +5,7 @@ import prettier from 'prettier'
 
 const DOMAIN = 'maxleiter.com'
 
-import getPosts from '../lib/get-posts'
+// import getPosts from '@lib/get-posts'
 
 const formatted = (sitemap: string) =>
   prettier.format(sitemap, { parser: 'html' })
