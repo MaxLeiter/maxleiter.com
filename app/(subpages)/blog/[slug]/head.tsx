@@ -28,7 +28,6 @@ export default async function Head({
           day: 'numeric',
           year: 'numeric',
         })
-        .replace(',', '')
     )}`,
   })
 }

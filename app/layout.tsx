@@ -14,7 +14,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <head />
       <body>
         <div className={styles.wrapper}>
           <main className={styles.main}>{children}</main>
