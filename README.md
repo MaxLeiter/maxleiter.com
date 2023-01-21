@@ -1,9 +1,9 @@
 ## My personal site
 
 ### Getting started
-1. Install the `yarn` package manager: https://yarnpkg.com/
-2. Run `yarn` in the project directory
-3. Run `yarn dev` to start a local developer server
+1. Install the `pnpm` package manager: https://pnpm.io/
+2. Run `pnpm` in the project directory
+3. Run `pnpm dev` to start a local developer server
 
 
 ### Environment variables
@@ -13,7 +13,7 @@
  
 
 ### Usage:
-- `yarn <command>`:
+- `pnpm <command>`:
     - `lint`: automatically lints files
     - `dev`: start a local instance with live reloading
     - `rss`: generate an RSS feed 
@@ -23,12 +23,13 @@
     - `start`: start a production instance built via `yarn build`
 
 ### Directory structure:
-- `components/`: react components
-- `data/`: static data that can eventually be moved to a DB or something
-- `lib/`: hooks, 3rd party API stuff, utils functions
-- `pages/`: next.js pages (the actual routes that are rendered)
-    - `pages/api`: nextjs API routes
+- app
+ - `components/`: react components
+ - `data/`: static data that can eventually be moved to a DB or something
+ - `lib/`: hooks, 3rd party API stuff, utils functions
+ - `pages/`: next.js pages (the actual routes that are rendered)
+ - `styles/`: contains the global styles
+- `pages/api`: nextjs API routes
 - `posts/`: markdown files rendered at build time 
 - `public/`: images for blog, favicon, built files
 - `scripts/`: contain the scripts for building the sitemap and RSS feed
-- `styles/`: contains the global styles
