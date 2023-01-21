@@ -8,7 +8,8 @@ type Props = {
   posts: Promise<Post[]>
 }
 
-const Error = ({ status, posts }: Props) => {
+const Error = async ({ status, posts: postsPromise }: Props) => {
+  const posts = await postsPromise
   return (
     <>
       {status === 404 ? (
