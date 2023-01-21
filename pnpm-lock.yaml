@@ -36,8 +36,8 @@ specifiers:
   postcss-preset-env: 7.8.1
   prettier: ^2.8.3
   prism-react-renderer: 1.3.5
-  react: 18.3.0-next-ee8509801-20230117
-  react-dom: 18.3.0-next-ee8509801-20230117
+  react: 18.3.0-next-fecc288b7-20221025
+  react-dom: 18.3.0-next-fecc288b7-20221025
   rss: 1.2.2
   rss-parser: 3.12.0
   sitemap: 7.1.1
@@ -52,20 +52,20 @@ dependencies:
   '@next/bundle-analyzer': 12.3.1
   '@next/font': 13.1.4-canary.1
   '@supabase/supabase-js': 1.35.6
-  '@vercel/analytics': 0.1.8_2wvn72cmuko2zblr42ro46kmmy
+  '@vercel/analytics': 0.1.8_cb5ruxkz3bqlxwvs2j6rdcpmja
   '@vercel/og': 0.0.27
   globby: 11.1.0
   lodash.debounce: 4.0.8
-  next: 13.1.4-canary.1_3wo2ieqc7gpnqphaqcnusvy44e
+  next: 13.1.4-canary.1_d6rcamawdo45avnz6jxiy6p4si
   next-remote-watch: 2.0.0_next@13.1.4-canary.1
-  next-themes: 0.2.1_jbn7zifry3t5ifkly5ud5lvlxi
+  next-themes: 0.2.1_xhh3ugnkobhyv75pexvmn4x5zy
   postcss: 8.4.21
   prettier: 2.8.3
-  react: 18.3.0-next-ee8509801-20230117
-  react-dom: 18.3.0-next-ee8509801-20230117_2wvn72cmuko2zblr42ro46kmmy
+  react: 18.3.0-next-fecc288b7-20221025
+  react-dom: 18.3.0-next-fecc288b7-20221025_cb5ruxkz3bqlxwvs2j6rdcpmja
   rss-parser: 3.12.0
   sitemap: 7.1.1
-  swr: 2.0.1_2wvn72cmuko2zblr42ro46kmmy
+  swr: 2.0.1_cb5ruxkz3bqlxwvs2j6rdcpmja
   tiny-glob: 0.2.9
   youtubei: 0.0.1-rc.36
 
@@ -92,7 +92,7 @@ devDependencies:
   postcss-flexbugs-fixes: 5.0.2_postcss@8.4.21
   postcss-hover-media-feature: 1.0.2_postcss@8.4.21
   postcss-preset-env: 7.8.1_postcss@8.4.21
-  prism-react-renderer: 1.3.5_2wvn72cmuko2zblr42ro46kmmy
+  prism-react-renderer: 1.3.5_cb5ruxkz3bqlxwvs2j6rdcpmja
   rss: 1.2.2
   ts-node: 10.9.1_yw6xa4t7bqskzhgfioyr35wfuq
   typescript: 4.8.2
@@ -850,12 +850,12 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@vercel/analytics/0.1.8_2wvn72cmuko2zblr42ro46kmmy:
+  /@vercel/analytics/0.1.8_cb5ruxkz3bqlxwvs2j6rdcpmja:
     resolution: {integrity: sha512-PQrOI8BJ9qUiVJuQfnKiJd15eDjDJH9TBKsNeMrtelT4NAk7d9mBVz1CoZkvoFnHQ0OW7Xnqmr1F2nScfAnznQ==}
     peerDependencies:
       react: ^16.8||^17||^18
     dependencies:
-      react: 18.3.0-next-ee8509801-20230117
+      react: 18.3.0-next-fecc288b7-20221025
     dev: false
 
   /@vercel/og/0.0.27:
@@ -2893,28 +2893,28 @@ packages:
       chokidar: 3.5.3
       commander: 5.1.0
       express: 4.18.2
-      next: 13.1.4-canary.1_3wo2ieqc7gpnqphaqcnusvy44e
+      next: 13.1.4-canary.1_d6rcamawdo45avnz6jxiy6p4si
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /next-themes/0.2.1_jbn7zifry3t5ifkly5ud5lvlxi:
+  /next-themes/0.2.1_xhh3ugnkobhyv75pexvmn4x5zy:
     resolution: {integrity: sha512-B+AKNfYNIzh0vqQQKqQItTS8evEouKD7H5Hj3kmuPERwddR2TxvDSFZuTj6T7Jfn1oyeUyJMydPl1Bkxkh0W7A==}
     peerDependencies:
       next: '*'
       react: '*'
       react-dom: '*'
     dependencies:
-      next: 13.1.4-canary.1_3wo2ieqc7gpnqphaqcnusvy44e
-      react: 18.3.0-next-ee8509801-20230117
-      react-dom: 18.3.0-next-ee8509801-20230117_2wvn72cmuko2zblr42ro46kmmy
+      next: 13.1.4-canary.1_d6rcamawdo45avnz6jxiy6p4si
+      react: 18.3.0-next-fecc288b7-20221025
+      react-dom: 18.3.0-next-fecc288b7-20221025_cb5ruxkz3bqlxwvs2j6rdcpmja
     dev: false
 
   /next-tick/1.1.0:
     resolution: {integrity: sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==}
     dev: false
 
-  /next/13.1.4-canary.1_3wo2ieqc7gpnqphaqcnusvy44e:
+  /next/13.1.4-canary.1_d6rcamawdo45avnz6jxiy6p4si:
     resolution: {integrity: sha512-EJEqJcAVHWosdo6V2CbpOHTZiZWCERm+gte+X0qvcb6rppoJUZeHgY8zBjIiy24Bow0LySMm4MnPSmSOOtd1Mg==}
     engines: {node: '>=14.6.0'}
     hasBin: true
@@ -2936,9 +2936,9 @@ packages:
       '@swc/helpers': 0.4.14
       caniuse-lite: 1.0.30001431
       postcss: 8.4.14
-      react: 18.3.0-next-ee8509801-20230117
-      react-dom: 18.3.0-next-ee8509801-20230117_2wvn72cmuko2zblr42ro46kmmy
-      styled-jsx: 5.1.1_2wvn72cmuko2zblr42ro46kmmy
+      react: 18.3.0-next-fecc288b7-20221025
+      react-dom: 18.3.0-next-fecc288b7-20221025_cb5ruxkz3bqlxwvs2j6rdcpmja
+      styled-jsx: 5.1.1_cb5ruxkz3bqlxwvs2j6rdcpmja
     optionalDependencies:
       '@next/swc-android-arm-eabi': 13.1.4-canary.1
       '@next/swc-android-arm64': 13.1.4-canary.1
@@ -3613,12 +3613,12 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /prism-react-renderer/1.3.5_2wvn72cmuko2zblr42ro46kmmy:
+  /prism-react-renderer/1.3.5_cb5ruxkz3bqlxwvs2j6rdcpmja:
     resolution: {integrity: sha512-IJ+MSwBWKG+SM3b2SUfdrhC+gu01QkV2KmRQgREThBfSQRoufqRfxfHUxpG1WcaFjP+kojcFyO9Qqtpgt3qLCg==}
     peerDependencies:
       react: '>=0.14.9'
     dependencies:
-      react: 18.3.0-next-ee8509801-20230117
+      react: 18.3.0-next-fecc288b7-20221025
     dev: true
 
   /prop-types/15.8.1:
@@ -3672,22 +3672,22 @@ packages:
       unpipe: 1.0.0
     dev: false
 
-  /react-dom/18.3.0-next-ee8509801-20230117_2wvn72cmuko2zblr42ro46kmmy:
-    resolution: {integrity: sha512-blD1rTRADFysokt9B/9KJnIei2PT4gUqQcjdFWb3lLYjJ7GunqNb7v+a0cKmJGhT6cf8kGPM2BsKhX/WxdYotw==}
+  /react-dom/18.3.0-next-fecc288b7-20221025_cb5ruxkz3bqlxwvs2j6rdcpmja:
+    resolution: {integrity: sha512-EczZNIcOXzLFyPhSXpplVFekfUvbtHRC68TVAPfCopn8YxjMg2ROVgYs1VdSnEu2JlXKvpeIbjexAuhDprsp/A==}
     peerDependencies:
-      react: 18.3.0-next-ee8509801-20230117
+      react: 18.3.0-next-fecc288b7-20221025
     dependencies:
       loose-envify: 1.4.0
-      react: 18.3.0-next-ee8509801-20230117
-      scheduler: 0.24.0-next-ee8509801-20230117
+      react: 18.3.0-next-fecc288b7-20221025
+      scheduler: 0.24.0-next-fecc288b7-20221025
     dev: false
 
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: true
 
-  /react/18.3.0-next-ee8509801-20230117:
-    resolution: {integrity: sha512-gmEF7K4tQKY9yH1iTglHYmOrf6do08XaECS8bTAdX3B8RXXls5JhqPVgOKgvKg1dVkLzt0qn6cAHE4GWP4+F3A==}
+  /react/18.3.0-next-fecc288b7-20221025:
+    resolution: {integrity: sha512-lKvCNWRO9XPy8q7hLd0ODK/4Oqr54r3Vr49Y7EyNBz/kfsmNT6Vx0F69KRz/eGcbt1XDvtbA7KZd+mh8w3wONQ==}
     engines: {node: '>=0.10.0'}
     dependencies:
       loose-envify: 1.4.0
@@ -3830,8 +3830,8 @@ packages:
   /sax/1.2.4:
     resolution: {integrity: sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==}
 
-  /scheduler/0.24.0-next-ee8509801-20230117:
-    resolution: {integrity: sha512-WNterR0s5UDpOka2BUbfUQfXjA2GQJDsioeWcUYd551HePW8vHqoW3WDNBFcbNBT9Wf/YfUfweMdkJbRHCBalg==}
+  /scheduler/0.24.0-next-fecc288b7-20221025:
+    resolution: {integrity: sha512-D2r7z/2EbRXXz4k8XRQab2l71zARIwmZzLLGPAM936/dW1iF835+FMwnOe4Iep96vNJAdQavqJBP4Fm+/MadsQ==}
     dependencies:
       loose-envify: 1.4.0
     dev: false
@@ -4059,7 +4059,7 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /styled-jsx/5.1.1_2wvn72cmuko2zblr42ro46kmmy:
+  /styled-jsx/5.1.1_cb5ruxkz3bqlxwvs2j6rdcpmja:
     resolution: {integrity: sha512-pW7uC1l4mBZ8ugbiZrcIsiIvVx1UmTfw7UkC3Um2tmfUq9Bhk8IiyEIPl6F8agHgjzku6j0xQEZbfA5uSgSaCw==}
     engines: {node: '>= 12.0.0'}
     peerDependencies:
@@ -4073,7 +4073,7 @@ packages:
         optional: true
     dependencies:
       client-only: 0.0.1
-      react: 18.3.0-next-ee8509801-20230117
+      react: 18.3.0-next-fecc288b7-20221025
     dev: false
 
   /stylus/0.54.8:
@@ -4117,14 +4117,14 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /swr/2.0.1_2wvn72cmuko2zblr42ro46kmmy:
+  /swr/2.0.1_cb5ruxkz3bqlxwvs2j6rdcpmja:
     resolution: {integrity: sha512-6z4FpS9dKAay7axedlStsPahEw25nuMlVh4GHkuPpGptbmEEP8v/+kr0GkAE/7ErUs25U2VFOnZQz3AWfkmXdw==}
     engines: {pnpm: '7'}
     peerDependencies:
       react: ^16.11.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      react: 18.3.0-next-ee8509801-20230117
-      use-sync-external-store: 1.2.0_2wvn72cmuko2zblr42ro46kmmy
+      react: 18.3.0-next-fecc288b7-20221025
+      use-sync-external-store: 1.2.0_cb5ruxkz3bqlxwvs2j6rdcpmja
     dev: false
 
   /synckit/0.8.4:
@@ -4332,12 +4332,12 @@ packages:
     deprecated: Please see https://github.com/lydell/urix#deprecated
     dev: true
 
-  /use-sync-external-store/1.2.0_2wvn72cmuko2zblr42ro46kmmy:
+  /use-sync-external-store/1.2.0_cb5ruxkz3bqlxwvs2j6rdcpmja:
     resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      react: 18.3.0-next-ee8509801-20230117
+      react: 18.3.0-next-fecc288b7-20221025
     dev: false
 
   /utf-8-validate/5.0.10:
