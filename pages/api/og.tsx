@@ -14,8 +14,8 @@ const handler = async (req: NextRequest) => {
   const title = searchParams.get('title')
   const date = searchParams.get('date')
 
-  if (!title || !date) {
-    return new Response('Missing title or date', { status: 400 })
+  if (!title) {
+    return new Response('Missing title', { status: 400 })
   }
 
   return new ImageResponse(
