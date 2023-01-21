@@ -14,7 +14,7 @@
   "pre-commit": "lint",
   "license": "MIT",
   "dependencies": {
-    "@next/bundle-analyzer": "12.3.1",
+    "@next/bundle-analyzer": "13.1.4",
     "@next/font": "13.1.4-canary.1",
     "@supabase/supabase-js": "1.35.6",
     "@vercel/analytics": "^0.1.8",
