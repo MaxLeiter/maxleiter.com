@@ -4,6 +4,14 @@ description: A step-by-step guide to page views and server analytics
 slug: supabase-next-analytics
 date: May 15, 2022
 ---
+<details>
+    <summary>Please read</summary>
+    <p>
+        This post was written for the (now stable) beta Next.js middleware. If you want your own analytics, I recommend looking 
+        at <a href="https://vercel.com/analytics">Vercel's solution.</a>
+    </p>
+</details>
+
 This post starts with a brief introduction. If you want to jump down to the tutorial, click [here](/blog/supabase-next-analytics#how). You can also see the live updating views in action in the top right of this page! The analytics events themselves require no JavaScript and occur completely on the server thanks to the [new (in beta) Next.js middleware](https://nextjs.org/docs/advanced-features/middleware). If you have JavaScript enabled, the view count should live update thanks to Supabase Realtime. You can try it by opening the page in a new tab and eyeing the view count.
 
 
