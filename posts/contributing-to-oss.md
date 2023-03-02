@@ -4,7 +4,7 @@ description: A small guide to finding projects and contributing changes
 slug: contributing-to-oss
 date: Jan 25, 2022
 ---
-One of the most common questions I'm asked by my computer science friends and lower-level students is how they can contribute to an open-source project. In order for me to organize and share my thoughts I thought I'd write something here.
+One of the most common questions I'm asked by my computer science friends and students is how they can contribute to an open-source project. In order for me to organize and share my thoughts I thought I'd write something here.
 
 First off, it's a good idea! Contributing to projects is a fantastic way to build experience, connections, and improve a piece of software you use or rely on. I've grown immensely through maintaining my few projects and contributing to a hand full of others. I've gained experience in community management, team communication, code review, dependency management, and the list goes on. This post is focused on programming, but don't forget that issue management, documentation, user support, and bug reporting are all valuable ways you can contribute. 
 
