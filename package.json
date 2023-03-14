@@ -15,7 +15,6 @@
   "license": "MIT",
   "dependencies": {
     "@next/bundle-analyzer": "13.1.5-canary.2",
-    "@next/font": "13.1.5-canary.2",
     "@supabase/supabase-js": "1.35.6",
     "@vercel/analytics": "^0.1.8",
     "@vercel/og": "^0.0.27",

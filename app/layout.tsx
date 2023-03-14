@@ -2,7 +2,7 @@
 import styles from './layout.module.css'
 import '@styles/global.css'
 import AnalyticsWrapper from './analytics-wrapper'
-import { Inter } from '@next/font/google'
+import { Inter } from 'next/font/google'
 import ScrollUp from '@components/scroll-up'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })

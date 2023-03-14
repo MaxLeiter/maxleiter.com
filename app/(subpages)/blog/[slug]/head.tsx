@@ -22,12 +22,11 @@ export default async function Head({
     image: `/api/og?title=${encodeURIComponent(
       title
     )}&date=${encodeURIComponent(
-      new Date(date)
-        .toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        })
+      new Date(date).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
     )}`,
   })
 }

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import supabase from '@lib/supabase/public'
 import Question from './question'
 import styles from './ie-or-css.module.css'
-import Link from '@components/link'
 import Button from '@components/button'
 
 export type QuestionType = {
@@ -22,9 +21,9 @@ export type IEQuizProps = {
   questions: QuestionType[]
 }
 
-const UselessButton = ({ text }: { text: string }) => (
+export const UselessButton = ({ text }: { text: string }) => (
   <Button
-    style={{ display: 'inline-block', width: '100px', margin: 2 }}
+    style={{ display: 'inline-block', width: '100px', height: 36, margin: 2 }}
     onClick={() => alert("That's the idea!")}
   >
     {text}
@@ -92,31 +91,6 @@ const IeOrCss = ({ questions }: IEQuizProps) => {
 
   return (
     <>
-      <p>
-        Welcome! This quiz is inspired by the{' '}
-        <Link href="https://youtu.be/Ck-e3hd3pKw?t=22032" external>
-          syntax.fm live session
-        </Link>{' '}
-        at Reactathon 2022. You can test your knowledge of new CSS features by
-        voting below, and your results will be saved to a database and updated
-        in realtime for all other visitors using Supabase. You can view the
-        source{' '}
-        <Link
-          external
-          href="https://github.com/MaxLeiter/maxleiter.com/blob/master/pages/ie-or-css3.tsx"
-        >
-          here
-        </Link>
-        .
-      </p>
-      <p>
-        If you think the feature displayed is new, vote for CSS by clicking{' '}
-        <UselessButton text={'CSS3'} />
-      </p>
-      <p>
-        If you think the feature is Internet Explorer specific or was used to
-        target IE, click <UselessButton text={'IE'} />
-      </p>
       <p>Good luck!</p>
       <ul className={styles.list}>
         {questionsWithVotes.map((question, index) => (

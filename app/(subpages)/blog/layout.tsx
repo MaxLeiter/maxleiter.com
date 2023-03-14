@@ -13,4 +13,3 @@ export default function BlogLayout({
 }
 
 export const config = { runtime: 'experimental-edge' }
-
