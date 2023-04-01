@@ -26,8 +26,8 @@ dependencies:
     specifier: ^0.0.27
     version: 0.0.27
   bright:
-    specifier: link:../bright/lib
-    version: link:../bright/lib
+    specifier: ^0.7.0
+    version: 0.7.0(react@18.2.0)
   globby:
     specifier: ^11.0.0
     version: 11.1.0
@@ -191,6 +191,10 @@ packages:
     dependencies:
       regenerator-runtime: 0.13.10
     dev: true
+
+  /@code-hike/lighter@0.4.1:
+    resolution: {integrity: sha512-6sYXpIHsklu98o+G8V7TyaxNJrD/2NaHjTIKKqjSRJ/jSY/xo4UNLMEFtMmVAroRmwpLsQVrdChPIsBaNabT8w==}
+    dev: false
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -1396,6 +1400,15 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       fill-range: 7.0.1
+
+  /bright@0.7.0(react@18.2.0):
+    resolution: {integrity: sha512-eLItPVH/tgyeOC9T24FsBQ57pSglOPoc1V7eG4XpIQzFNQ1aGYGvlQRAw6NUJk7mnd1EOiyXAVpbCgB400ERrA==}
+    peerDependencies:
+      react: ^18
+    dependencies:
+      '@code-hike/lighter': 0.4.1
+      react: 18.2.0
+    dev: false
 
   /browserslist@4.21.4:
     resolution: {integrity: sha512-CBHJJdDmgjl3daYjN5Cp5kbTf1mUhZoS+beLklHIvkOWscs83YAhLlF3Wsh/lciQYAcbBJgTOD44VtG31ZM4Hw==}
