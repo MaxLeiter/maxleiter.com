@@ -74,3 +74,5 @@ export const metadata = {
     },
   },
 }
+
+export const runtime = 'edge'

@@ -45,14 +45,14 @@ const Projects: Project[] = [
       "HackSC is Southern California's largest hackathon with over 800+ attendees.",
     href: 'https://hacksc.com',
     role: 'Organizer, Vice President',
-    years: ['2020', 'present'],
+    years: ['2020', '2022'],
   },
   {
     title: 'thelounge-bot',
     description: "A helper IRC bot for The Lounge's IRC channel.",
     href: 'https://github.com/thelounge/thelounge-bot',
     role: 'Creator',
-    years: ['2016', 'present'],
+    years: ['2016', '2021'],
   },
   {
     title: 'MSHW0184 driver for Linux kernel',
