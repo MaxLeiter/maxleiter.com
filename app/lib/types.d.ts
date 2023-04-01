@@ -6,7 +6,7 @@ export type Post = {
   description: string
   body: string
   lastModified?: number
-  // views: number
+  views?: number
 }
 
 export type Project = {
@@ -15,5 +15,5 @@ export type Project = {
   href: string
   role: string
   years: string[]
-  stars?: number | string
+  stars?: number
 }

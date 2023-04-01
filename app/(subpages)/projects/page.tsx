@@ -1,13 +1,16 @@
 import ProjectList from '@components/projects'
 import { getProjects } from '@lib/projects'
 
-const fetchProjects = () => {
-  const projects = getProjects()
-  return projects
+export const metadata = {
+  title: 'Projects',
+  description: 'Most of my projects',
+  alternates: {
+    canonical: 'https://maxleiter.com/projects',
+  },
 }
 
 const Projects = async () => {
-  const projects = fetchProjects()
+  const projects = await getProjects()
   return (
     <ProjectList showYears={true} count={projects.length} projects={projects} />
   )

@@ -2,8 +2,16 @@ import supabase from '@lib/supabase/private'
 import Link from '@components/link'
 import IeOrCss, { UselessButton } from '@components/ie-or-css'
 
+export const metadata = {
+  title: 'IE or CSS3?',
+  description: 'Test your knowledge on CSS3 and Internet Explorer.',
+  alternates: {
+    canonical: 'https://maxleiter.com/ie-or-css3',
+  },
+}
+
 const fetchQuestions = async () => {
-  let { data, error } = await supabase.from('Questions').select('id,question')
+  const { data, error } = await supabase.from('Questions').select('id,question')
 
   if (error || !data) {
     console.error(error)

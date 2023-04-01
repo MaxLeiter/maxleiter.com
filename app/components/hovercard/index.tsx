@@ -15,7 +15,7 @@ const Hovercard = ({
   }
 
   const handleMouseOut = () => {
-    setTimeout(function () {
+    setTimeout(() => {
       setIsHovering(false)
     }, 1000)
   }

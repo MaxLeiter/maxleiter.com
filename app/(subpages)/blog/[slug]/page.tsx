@@ -1,9 +1,5 @@
-import Post from 'app/(subpages)/blog/[slug]/post'
 import getPosts from '@lib/get-posts'
-import renderMarkdown from '@lib/render-markdown'
-
-export const dynamicParams = false
-export const dynamic = 'force-static'
+import { PostBody } from '@mdx/lib'
 
 export async function generateStaticParams() {
   const posts = await getPosts()
@@ -20,7 +16,7 @@ async function getData({ slug }: { slug: string }) {
     previous: posts[postIndex + 1] || null,
     next: posts[postIndex - 1] || null,
     ...rest,
-    html: renderMarkdown(body),
+    body,
   }
 }
 
@@ -32,7 +28,7 @@ const PostPage = async ({
   }
 }) => {
   const post = await getData(params)
-  return <Post {...post} />
+  return <PostBody body={post.body} />
 }
 
 export default PostPage

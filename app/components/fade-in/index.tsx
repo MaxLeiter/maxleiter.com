@@ -14,8 +14,8 @@ const FadeIn = ({ duration = 300, delay = 0, children, className }: Props) => {
   return (
     <div
       style={{
-        animationDuration: duration + 'ms',
-        animationDelay: delay + 'ms',
+        animationDuration: `${duration}ms`,
+        animationDelay: `${delay}ms`,
       }}
       className={`${className} ${styles.fadeIn}`}
     >

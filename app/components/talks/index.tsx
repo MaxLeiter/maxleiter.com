@@ -5,7 +5,7 @@ import type { Talk } from 'app/(subpages)/talks/page-backup'
 import VideoCard from './video-card'
 import styles from './talks.module.css'
 import Input from '@components/input'
-import PostFooter from 'app/(subpages)/blog/[slug]/post/post-footer'
+import PostFooter from '@(subpages)/blog/[slug]/post/post-footer'
 import Badge from '@components/badge'
 import tagStyles from './tags.module.css'
 
@@ -38,48 +38,40 @@ const Talks = ({ talks }: { talks: Array<Talk> }) => {
           return asc ? 1 : -1
         } else if (aDate < bDate) {
           return asc ? -1 : 1
-        } else {
-          return 0
         }
+        return 0
       } else if (sort === 'title') {
         if (asc) {
           return a.title.localeCompare(b.title)
-        } else {
-          return b.title.localeCompare(a.title)
         }
+        return b.title.localeCompare(a.title)
       } else if (sort === 'views') {
         if (!a.views) {
           return 1
         } else if (!b.views) {
           return -1
-        } else {
-          if (asc) {
-            return a.views - b.views
-          } else {
-            return b.views - a.views
-          }
         }
+        if (asc) {
+          return a.views - b.views
+        }
+        return b.views - a.views
       } else if (sort === 'likes') {
         if (!a.likes) {
           return 1
         } else if (!b.likes) {
           return -1
-        } else {
-          if (asc) {
-            return a.likes - b.likes
-          } else {
-            return b.likes - a.likes
-          }
         }
+        if (asc) {
+          return a.likes - b.likes
+        }
+        return b.likes - a.likes
       } else if (sort === 'length') {
         if (asc) {
           return a.lengthSeconds - b.lengthSeconds
-        } else {
-          return b.lengthSeconds - a.lengthSeconds
         }
-      } else {
-        return 0
+        return b.lengthSeconds - a.lengthSeconds
       }
+      return 0
     })
     return sorted
   }, [asc, search, selectedTags, sort, talks])
@@ -104,15 +96,13 @@ const Talks = ({ talks }: { talks: Array<Talk> }) => {
         return -1
       } else if (a[1] < b[1]) {
         return 1
-      } else {
-        if (a[0] > b[0]) {
-          return 1
-        } else if (a[0] < b[0]) {
-          return -1
-        } else {
-          return 0
-        }
       }
+      if (a[0] > b[0]) {
+        return 1
+      } else if (a[0] < b[0]) {
+        return -1
+      }
+      return 0
     })
   }, [filteredTalks])
 

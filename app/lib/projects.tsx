@@ -27,7 +27,7 @@ const Projects: Project[] = [
   {
     title: 'SortableJS-vue3',
     description: "A TypeScript wrapper for SortableJS that's built for Vue 3.",
-    href: 'https://sortablejs-vue3.maxleiter.com/',
+    href: 'https://github.com/maxleiter/sortablejs-vue3/',
     role: 'Creator',
     years: ['2022 - present'],
   },
@@ -119,48 +119,49 @@ const Projects: Project[] = [
   },
 ]
 
-export function getProjects() {
-  return Projects
+// export function getProjects() {
+//   return Projects
+// }
+
+export async function getProjects(): Promise<Project[]> {
+  if (!process.env.GITHUB_TOKEN) {
+    throw new Error(
+      'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
+    )
+  }
+
+  const withStars = await Promise.all(
+    Projects.map(async (proj) => {
+      const split = proj.href.split('/')
+      //[ 'https:', '', 'github.com', 'maxleiter', 'jsontree' ]
+      if (split[2] === 'github.com') {
+        const user = split[3]
+        const repo = split[4]
+        const fetchUrl =
+          process.env.NODE_ENV === 'production'
+            ? `https://api.github.com/repos/${user}/${repo}`
+            : 'http://localhost:3000/mock-stars-response.json'
+        const { stargazers_count, message } = await (
+          await fetch(fetchUrl, {
+            headers: {
+              Authorization: process.env.GITHUB_TOKEN ?? '',
+            },
+          })
+        ).json()
+        // rate limited
+        if (!stargazers_count && message) {
+          console.warn(`Rate limited or error: ${message}`)
+          return proj
+        }
+
+        return {
+          ...proj,
+          stars: stargazers_count,
+        }
+      }
+      return proj
+    })
+  )
+
+  return withStars
 }
-
-// export default async function getProjects(): Promise<Project[]> {
-// if (!process.env.GITHUB_TOKEN) {
-//   throw new Error(
-//     'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
-//   )
-// }
-
-//   const withStars = await Promise.all(
-//     Projects.map(async (proj) => {
-//       const split = proj.href.split('/')
-//       //[ 'https:', '', 'github.com', 'maxleiter', 'jsontree' ]
-//       if (split[2] === 'github.com') {
-//         const user = split[3]
-//         const repo = split[4]
-//         const { stargazers_count, message } = await (
-//           await fetch(`https://api.github.com/repos/${user}/${repo}`, {
-//             headers: {
-//               Authorization: process.env.GITHUB_TOKEN ?? '',
-//             },
-//           })
-//         ).json()
-//         // rate limited
-//         if (!stargazers_count && message) {
-//           return {
-//             ...proj,
-//             stars: 29,
-//           }
-//         }
-
-//         return {
-//           ...proj,
-//           stars: stargazers_count,
-//         }
-//       } else {
-//         return { ...proj, stars: -1 }
-//       }
-//     })
-//   )
-
-//   return withStars
-// }

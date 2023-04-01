@@ -43,16 +43,15 @@ const VideoCard = ({
           dangerouslySetInnerHTML={{ __html: embedCode }}
         />
       )
-    } else {
-      return (
-        <span className={styles.embed} onClick={handleClick}>
-          <span className={styles.playButton}>
-            <Play />
-          </span>
-          <Image src={thumbnail} alt={title} width={560} height={315} />
-        </span>
-      )
     }
+    return (
+      <span className={styles.embed} onClick={handleClick}>
+        <span className={styles.playButton}>
+          <Play />
+        </span>
+        <Image src={thumbnail} alt={title} width={560} height={315} />
+      </span>
+    )
   }
 
   const getTrimmedDescription = () => {
@@ -63,10 +62,9 @@ const VideoCard = ({
         0,
         Math.min(trimmedDescription.length, trimmedDescription.lastIndexOf(' '))
       )
-      return cleaned + '...'
-    } else {
-      return description
+      return `${cleaned}...`
     }
+    return description
   }
 
   return (

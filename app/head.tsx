@@ -1,8 +1,8 @@
-import { getHeadTags } from '@lib/get-head-tags'
+import { getMetadata } from '@lib/get-metadata'
 
 export default function Head() {
   const titleAsURLQuery = encodeURIComponent("Max Leiter's Website")
-  return getHeadTags({
+  return getMetadata({
     title: 'Max Leiter',
     description: "Max Leiter's website.",
     path: '/',

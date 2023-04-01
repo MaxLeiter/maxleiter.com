@@ -3,7 +3,11 @@
 }
 
 .badge {
-  margin-left: var(--gap-half);
+}
+
+.starBadge:hover {
+  background: var(--light-gray);
+  transition: background 0.2s ease-in;
 }
 
 .split {
@@ -11,4 +15,8 @@
   flex-direction: row;
   align-items: center;
   gap: var(--gap-half);
+}
+
+.title {
+  margin: var(--gap-quarter) 0;
 }

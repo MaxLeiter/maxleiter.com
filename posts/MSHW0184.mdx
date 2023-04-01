@@ -1,5 +1,5 @@
 ---
-title: 	Adding ambient light support to Linux and GNOME
+title: Adding ambient light support to Linux and GNOME
 description: A quick dive into Linux kernel drivers
 slug: MSHW0184
 date: Dec 15, 2020
@@ -23,10 +23,8 @@ static const struct i2c_device_id apds9960_id[] = {
 
 However, this didn't work and I realized the conventions seemed a little odd: no other i2c device ids in other drivers contained capitals or were ambient light sensing devices. Thankfully, someone on IRC helped me out:
 
-```
-00:53 &#60;djrscally&#62; That's an acpi ID 
-00:53 &#60;djrscally&#62; You probably need to add an ACPI match table
-```
+> 00:53 &#60;djrscally&#62; That's an acpi ID <br />
+> 00:53 &#60;djrscally&#62; You probably need to add an ACPI match table
 
 A few minutes later (well, probably closer to 30 minutes after compiling and testing the kernel on-device) I had the following, largely copied from other ACPI drivers:
 
@@ -89,7 +87,7 @@ TAG+="systemd", ENV{SYSTEMD_WANTS}+="iio-sensor-proxy.service"
 
 As you might be able to figure out, each TEST file is checked for existence and is used to determine whether or not the device should be used by iio-sensor-proxy.
 
-I hadn't seen any of the seemingly relevant files, in_illuminance_*, so I added my own line:
+I hadn't seen any of the seemingly relevant files, in*illuminance*\*, so I added my own line:
 
 ```yml
 SUBSYSTEM=="iio", TEST=="in_intensity_clear_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-als"
@@ -101,7 +99,8 @@ It kind of sucks though and isn't very consistent. As it turns out, intensity_cl
 
 If you've made it this far (or are here to get the code yourself), the modified driver (with basic proximity sensing support too) can be found here: https://github.com/maxleiter/MSHW0184.
 
-Major thanks to everyone that helped me in the ##linux-surface IRC channel. It was great to finally get a little low-level with Linux. 
+Major thanks to everyone that helped me in the ##linux-surface IRC channel. It was great to finally get a little low-level with Linux.
 
 ---
-*This post was originally written on the old maxleiter.com, and formatting has slightly adjusted
+
+\*This post was originally written on the old maxleiter.com, and formatting has slightly adjusted

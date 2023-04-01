@@ -1,33 +1,31 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .wrapper .date {
   font-weight: 500;
   font-size: 1rem;
 }
 
-.wrapper .modified {
+.wrapper .lastModified {
   color: var(--gray);
   font-size: 0.8rem;
   font-weight: 500;
-  margin-left: var(--gap-half);
 }
 
 .wrapper .title {
   margin-top: 1rem;
 }
 
-.wrapper {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.header {
+/*.header {
   height: var(--header-height);
   margin: 0 auto;
   display: flex;
   align-items: center;
   margin-bottom: var(--gap);
   gap: var(--gap-half);
-}
+} */
 
 .content {
   overflow: auto;
@@ -41,7 +39,7 @@
   padding: var(--gap-half) !important;
 }
 
-.scrolled {
+/* .scrolled {
   position: fixed;
   top: 0;
   display: none;
@@ -52,4 +50,4 @@
   background: var(--lightest-gray);
   opacity: 0.9;
   padding-top: var(--gap-half);
-}
+} */

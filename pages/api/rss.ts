@@ -101,9 +101,9 @@ async function rss(req: NextApiRequest, res: NextApiResponse) {
       const aDate = new Date(aPubDate)
       const bDate = new Date(bPubDate)
       return bDate.getTime() - aDate.getTime()
-    } else {
-      return 0
     }
+
+    return 0
   })
   items = items.splice(startIndex, stopIndex)
 
