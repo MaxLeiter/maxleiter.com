@@ -1,5 +1,5 @@
 import type { Project } from './types'
-
+import { cache } from 'react'
 const Projects: Project[] = [
   {
     title: 'X11 on iOS',
@@ -123,7 +123,7 @@ const Projects: Project[] = [
 //   return Projects
 // }
 
-export async function getProjects(): Promise<Project[]> {
+export const getProjects = cache(async (): Promise<Project[]> => {
   if (!process.env.GITHUB_TOKEN) {
     throw new Error(
       'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
@@ -164,4 +164,4 @@ export async function getProjects(): Promise<Project[]> {
   )
 
   return withStars
-}
+})

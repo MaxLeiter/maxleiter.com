@@ -11,7 +11,7 @@ import Posts from '@components/posts-list'
 
 const PROJECT_COUNT = 3
 
-const Index = async () => {
+export default async function HomePage() {
   const projects = await getProjects()
 
   return (
@@ -59,7 +59,5 @@ const Index = async () => {
     </>
   )
 }
-
-export default Index
 
 export const dynamic = 'force-static'

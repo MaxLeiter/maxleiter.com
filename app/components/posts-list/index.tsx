@@ -6,12 +6,14 @@ import BlockEntry from '@components/entry/block'
 import styles from './posts-list.module.css'
 import type { Post } from '@lib/types'
 
-type Props = {
-  posts: Post[]
-  paginate?: boolean
-} | {
-  skeleton: true
-}
+type Props =
+  | {
+      posts: Post[]
+      paginate?: boolean
+    }
+  | {
+      skeleton: true
+    }
 
 const Posts = (props: Props) => {
   const [showMore, setShowMore] = useState(4)

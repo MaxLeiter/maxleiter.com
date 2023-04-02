@@ -1,9 +1,0 @@
-User-agent: *
-Sitemap: https://maxleiter.com/sitemap-common.xml
-
-Allow: /*
-Allow: /blog/*
-Allow: /api/og
-
-Disallow: /_next/*
-Disallow: /js

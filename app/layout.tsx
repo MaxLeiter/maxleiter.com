@@ -1,8 +1,6 @@
-// import Header from '@components/header'
 import styles from './layout.module.css'
 import '@styles/global.css'
 import { Inter } from 'next/font/google'
-import ScrollUp from '@components/scroll-up'
 import { Analytics } from '@vercel/analytics/react'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -20,7 +18,6 @@ export default function RootLayout({
           <div className={styles.fade} />
         </div>
         <Analytics />
-        <ScrollUp />
       </body>
     </html>
   )
@@ -35,11 +32,15 @@ export const metadata = {
   description: 'Full-stack developer',
   keywords:
     'max leiter, full-stack developer, web developer, next.js, supabase',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#000' },
+  ],
   openGraph: {
     title: 'Max Leiter',
     description: 'Full-stack developer',
     url: 'https://maxleiter.com',
-    siteName: 'Max Leiter',
+    siteName: "Max Leiter's website",
     locale: 'en_US',
     type: 'website',
     images: [
@@ -62,11 +63,12 @@ export const metadata = {
     },
   },
   twitter: {
-    title: 'Lee Robinson',
+    title: 'Max Leiter',
     card: 'summary_large_image',
+    creator: '@max_leiter',
   },
   icons: {
-    shortcut: '/favicons/favicon.ico',
+    shortcut: 'https://maxleiter.com/favicons/favicon.ico',
   },
   alternates: {
     types: {

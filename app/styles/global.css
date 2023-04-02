@@ -215,8 +215,4 @@ th {
     --name: #333;
     --highlight: #eaeaea;
   }
-
-  * {
-    text-shadow: none !important;
-  }
 }

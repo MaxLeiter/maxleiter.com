@@ -23,27 +23,6 @@ export const generateMetadata = async ({
     alternates: {
       canonical: `https://maxleiter.com/blog/${params.slug}`,
     },
-    openGraph: {
-      title: post?.title,
-      description: post?.description,
-      url: `https://maxleiter.com/blog/${params.slug}`,
-      images: [
-        {
-          url: `https://maxleiter.com/api/og?title=${encodeURIComponent(
-            post?.title || post?.slug || ''
-          )}&date=${encodeURIComponent(
-            new Date(post?.date || new Date()).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })
-          )}`,
-          width: 1200,
-          height: 630,
-          alt: post?.title,
-        },
-      ],
-    },
   }
 }
 
