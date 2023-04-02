@@ -36,7 +36,6 @@ function Image({
 
   return <NextImage {...imageProps} />
 }
-
 // This file is required to use MDX in `app` directory.
 export const mdxComponents: MDXComponents = {
   a: ({ children, ...props }) => {
@@ -84,6 +83,8 @@ import remarkGfm from 'remark-gfm'
 import remarkFrontmatter from 'remark-frontmatter'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+// @ts-expect-error no types
+import remarkA11yEmoji from '@fec/remark-a11y-emoji'
 
 export function PostBody({ body }: { body: string }) {
   return (
@@ -92,7 +93,7 @@ export function PostBody({ body }: { body: string }) {
       source={body}
       options={{
         mdxOptions: {
-          remarkPlugins: [remarkGfm, remarkFrontmatter],
+          remarkPlugins: [remarkGfm, remarkFrontmatter, remarkA11yEmoji],
           rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
         },
       }}
