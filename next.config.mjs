@@ -16,7 +16,7 @@ const nextConfig = {
     // Change the default compilation output to ESModules compatible browsers
     legacyBrowsers: false,
     optimizeCss: true,
-    mdxRs: true
+    mdxRs: false,
   },
   async redirects() {
     return [
@@ -47,14 +47,15 @@ const nextConfig = {
 import nextMDX from '@next/mdx'
 import remarkGfm from 'remark-gfm'
 import remarkFrontmatter from 'remark-frontmatter'
+import remarkA11yEmoji from '@fec/remark-a11y-emoji'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 
 export default nextMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm, remarkFrontmatter],
-    rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
-    providerImportSource: "@mdx-js/react",
+    remarkPlugins: [remarkGfm, remarkFrontmatter, remarkA11yEmoji],
+    rehypePlugins: [rehypeSlug, [rehypeAutolinkHeadings, { behavior: 'wrap' }]],
+    providerImportSource: '@mdx-js/react',
   },
 })(nextConfig)

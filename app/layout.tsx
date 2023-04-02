@@ -25,6 +25,7 @@ export default function RootLayout({
 
 export const config = { runtime: 'edge' }
 export const metadata = {
+  metadataBase: new URL('https://maxleiter.com'),
   title: {
     template: '%s | Max Leiter',
     default: 'Max Leiter',
