@@ -1,5 +1,7 @@
 'use client'
 
+import Button from "@components/button"
+
 export default function ErrorPage({
   error,
   reset,
@@ -11,7 +13,7 @@ export default function ErrorPage({
     <article>
       <h1>Something went wrong</h1>
       <p>
-        <button onClick={reset}>Try again</button>
+        <Button onClick={reset}>Try again</Button>
       </p>
 
       <pre>{error.message}</pre>

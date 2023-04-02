@@ -177,7 +177,6 @@ code {
 }
 
 summary {
-  cursor: pointer;
   outline: none;
 }
 
@@ -186,6 +185,7 @@ details {
   background: var(--lightest-gray);
   padding: 1rem;
   border-radius: var(--radius);
+  cursor: pointer;
 }
 
 table {

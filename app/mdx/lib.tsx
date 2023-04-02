@@ -15,15 +15,28 @@ function Image({
   height: number
   width: number
 }) {
+  let widthFromSrc, heightFromSrc
+  const url = new URL(src, 'https://maxleiter.com')
+  const widthParam = url.searchParams.get('w') || url.searchParams.get('width')
+  const heightParam =
+    url.searchParams.get('h') || url.searchParams.get('height')
+  if (widthParam) {
+    widthFromSrc = parseInt(widthParam)
+  }
+  if (heightParam) {
+    heightFromSrc = parseInt(heightParam)
+  }
+
   const imageProps = {
     src,
     alt,
-    height,
-    width,
+    height: height || heightFromSrc || 300,
+    width: width || widthFromSrc || 400,
   }
 
   return <NextImage {...imageProps} />
 }
+
 // This file is required to use MDX in `app` directory.
 export const mdxComponents: MDXComponents = {
   a: ({ children, ...props }) => {
@@ -49,13 +62,28 @@ export const mdxComponents: MDXComponents = {
   pre: Code,
   // @ts-expect-error types
   img: Image,
+  Image: NextImage,
+  Details: ({
+    children,
+    summary,
+    ...props
+  }: React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLElement>,
+    HTMLDetailsElement
+  > & {
+    summary: string
+  }) => (
+    <details {...props}>
+      {summary && <summary>{summary}</summary>}
+      {children}
+    </details>
+  ),
 }
 
 import remarkGfm from 'remark-gfm'
 import remarkFrontmatter from 'remark-frontmatter'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
-import rehypeImgSize from 'rehype-img-size'
 
 export function PostBody({ body }: { body: string }) {
   return (
@@ -65,12 +93,7 @@ export function PostBody({ body }: { body: string }) {
       options={{
         mdxOptions: {
           remarkPlugins: [remarkGfm, remarkFrontmatter],
-          rehypePlugins: [
-            rehypeSlug,
-            rehypeAutolinkHeadings,
-            // @ts-expect-error tuple
-            [rehypeImgSize, { dir: 'public' }],
-          ],
+          rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
         },
       }}
       components={mdxComponents}

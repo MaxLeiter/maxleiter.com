@@ -124,6 +124,6 @@ article details {
 
 @media screen and (max-width: 760px) {
   .header-link::after {
-    opacity: .5;
+    opacity: 0.5;
   }
 }
