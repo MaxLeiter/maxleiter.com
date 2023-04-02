@@ -1,5 +1,5 @@
 import type { Project } from './types'
-
+import { cache } from 'react'
 const Projects: Project[] = [
   {
     title: 'X11 on iOS',
@@ -27,7 +27,7 @@ const Projects: Project[] = [
   {
     title: 'SortableJS-vue3',
     description: "A TypeScript wrapper for SortableJS that's built for Vue 3.",
-    href: 'https://sortablejs-vue3.maxleiter.com/',
+    href: 'https://github.com/maxleiter/sortablejs-vue3/',
     role: 'Creator',
     years: ['2022 - present'],
   },
@@ -45,14 +45,14 @@ const Projects: Project[] = [
       "HackSC is Southern California's largest hackathon with over 800+ attendees.",
     href: 'https://hacksc.com',
     role: 'Organizer, Vice President',
-    years: ['2020', 'present'],
+    years: ['2020', '2022'],
   },
   {
     title: 'thelounge-bot',
     description: "A helper IRC bot for The Lounge's IRC channel.",
     href: 'https://github.com/thelounge/thelounge-bot',
     role: 'Creator',
-    years: ['2016', 'present'],
+    years: ['2016', '2021'],
   },
   {
     title: 'MSHW0184 driver for Linux kernel',
@@ -119,48 +119,49 @@ const Projects: Project[] = [
   },
 ]
 
-export function getProjects() {
-  return Projects
-}
-
-// export default async function getProjects(): Promise<Project[]> {
-// if (!process.env.GITHUB_TOKEN) {
-//   throw new Error(
-//     'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
-//   )
+// export function getProjects() {
+//   return Projects
 // }
 
-//   const withStars = await Promise.all(
-//     Projects.map(async (proj) => {
-//       const split = proj.href.split('/')
-//       //[ 'https:', '', 'github.com', 'maxleiter', 'jsontree' ]
-//       if (split[2] === 'github.com') {
-//         const user = split[3]
-//         const repo = split[4]
-//         const { stargazers_count, message } = await (
-//           await fetch(`https://api.github.com/repos/${user}/${repo}`, {
-//             headers: {
-//               Authorization: process.env.GITHUB_TOKEN ?? '',
-//             },
-//           })
-//         ).json()
-//         // rate limited
-//         if (!stargazers_count && message) {
-//           return {
-//             ...proj,
-//             stars: 29,
-//           }
-//         }
+export const getProjects = cache(async (): Promise<Project[]> => {
+  if (!process.env.GITHUB_TOKEN) {
+    throw new Error(
+      'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
+    )
+  }
 
-//         return {
-//           ...proj,
-//           stars: stargazers_count,
-//         }
-//       } else {
-//         return { ...proj, stars: -1 }
-//       }
-//     })
-//   )
+  const withStars = await Promise.all(
+    Projects.map(async (proj) => {
+      const split = proj.href.split('/')
+      //[ 'https:', '', 'github.com', 'maxleiter', 'jsontree' ]
+      if (split[2] === 'github.com') {
+        const user = split[3]
+        const repo = split[4]
+        const fetchUrl =
+          process.env.NODE_ENV === 'production'
+            ? `https://api.github.com/repos/${user}/${repo}`
+            : 'http://localhost:3000/mock-stars-response.json'
+        const { stargazers_count, message } = await (
+          await fetch(fetchUrl, {
+            headers: {
+              Authorization: process.env.GITHUB_TOKEN ?? '',
+            },
+          })
+        ).json()
+        // rate limited
+        if (!stargazers_count && message) {
+          console.warn(`Rate limited or error: ${message}`)
+          return proj
+        }
 
-//   return withStars
-// }
+        return {
+          ...proj,
+          stars: stargazers_count,
+        }
+      }
+      return proj
+    })
+  )
+
+  return withStars
+})

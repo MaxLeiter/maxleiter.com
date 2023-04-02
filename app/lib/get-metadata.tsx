@@ -9,7 +9,7 @@ type Props = {
   path: `/${string}`
 }
 
-export function getHeadTags({
+export function getMetadata({
   title,
   description,
   image,

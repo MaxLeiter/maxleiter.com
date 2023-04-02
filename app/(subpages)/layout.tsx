@@ -9,5 +9,3 @@ export default function Layout({ children }: { children: ReactNode }) {
     </>
   )
 }
-
-export const config = { runtime: 'experimental-edge' }

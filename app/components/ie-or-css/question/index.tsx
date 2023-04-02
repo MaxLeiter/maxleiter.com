@@ -1,7 +1,7 @@
 'use client'
 
 import Button from '@components/button'
-import Highlight, { defaultProps } from 'prism-react-renderer'
+// import Highlight, { defaultProps } from 'prism-react-renderer'
 import { useEffect, useState } from 'react'
 import styles from './question.module.css'
 import { QuestionWithVotes } from '..'
@@ -10,7 +10,9 @@ import FadeIn from '@components/fade-in'
 const getLocalStorageKeyString = (id: string) => `question-${id}`
 
 const Question = ({ question }: { question: QuestionWithVotes }) => {
-  const { id, question: questionText, isCSS } = question
+  // const { id, question: questionText, isCSS } = question
+  const { id, isCSS } = question
+
   const [voted, setVoted] = useState(false)
   const [votedFor, setVotedFor] = useState('')
 
@@ -34,7 +36,7 @@ const Question = ({ question }: { question: QuestionWithVotes }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: id,
+        id,
         vote: 'css',
       }),
     })
@@ -54,7 +56,7 @@ const Question = ({ question }: { question: QuestionWithVotes }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: id,
+        id,
         vote: 'ie',
       }),
     })
@@ -68,7 +70,8 @@ const Question = ({ question }: { question: QuestionWithVotes }) => {
   return (
     <li className={styles.wrapper}>
       <pre className={styles.pre}>
-        <Highlight {...defaultProps} code={questionText} language={'css'}>
+        {/* TODO: convert to MDX */}
+        {/* <Highlight {...defaultProps} code={questionText} language={'css'}>
           {({ className, style, tokens, getLineProps, getTokenProps }) => (
             <code className={className} style={{ ...style }}>
               {tokens.map((line, i) => (
@@ -80,14 +83,14 @@ const Question = ({ question }: { question: QuestionWithVotes }) => {
               ))}
             </code>
           )}
-        </Highlight>
+        </Highlight> */}
       </pre>
       <div
         className={styles.buttons}
         style={{ display: 'flex', justifyContent: 'space-between' }}
       >
         <Button
-          data-voted-for={votedFor === 'css' ? true : false}
+          data-voted-for={votedFor === 'css'}
           data-correct={isCSS ? 'true' : 'false'}
           disabled={voted}
           width={100}
@@ -96,7 +99,7 @@ const Question = ({ question }: { question: QuestionWithVotes }) => {
           CSS3
         </Button>
         <Button
-          data-voted-for={votedFor === 'ie' ? true : false}
+          data-voted-for={votedFor === 'ie'}
           data-correct={isCSS ? 'false' : 'true'}
           disabled={voted}
           width={100}

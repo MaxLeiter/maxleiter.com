@@ -11,7 +11,7 @@
   padding-bottom: var(--gap-double);
   padding-left: var(--gap);
   padding-right: var(--gap);
-  transition: all 0.1s cubic-bezier(.01,.88,.93,.07);
+  transition: all 0.1s cubic-bezier(0.01, 0.88, 0.93, 0.07);
   border-radius: var(--radius);
   will-change: transform, opacity;
   cursor: pointer;
@@ -55,7 +55,7 @@
   line-height: 1.5;
 }
 
-.title {  
+.title {
   font-size: 1.15rem;
   font-weight: bold;
   transition: color var(--transition);
@@ -63,7 +63,7 @@
 
 .description {
   color: var(--gray);
-  margin-top: var(--gap-half);
+  margin-top: var(--gap-quarter);
 }
 
 @media (max-width: 600px) {
@@ -71,4 +71,14 @@
   .description {
     -webkit-line-clamp: 2;
   }
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  padding: var(--gap);
+  border-radius: var(--radius);
+  background: var(--lightest-gray);
+  margin-bottom: var(--gap);
+  height: 150px;
 }

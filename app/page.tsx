@@ -7,16 +7,12 @@ import styles from './page.module.css'
 import TimeOfDay from './timer'
 import { Suspense } from 'react'
 import { PostListRSC } from '@components/posts-list/rsc'
+import Posts from '@components/posts-list'
 
 const PROJECT_COUNT = 3
 
-const fetchProjects = () => {
-  const projects = getProjects()
-  return projects || []
-}
-
-const Index = async () => {
-  const projects = fetchProjects()
+export default async function HomePage() {
+  const projects = await getProjects()
 
   return (
     <>
@@ -36,7 +32,7 @@ const Index = async () => {
         projects={projects}
       />
       <h3>My posts</h3>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Posts skeleton />}>
         {/* @ts-expect-error async rsc support */}
         <PostListRSC paginate={false} />
       </Suspense>
@@ -63,7 +59,5 @@ const Index = async () => {
     </>
   )
 }
-
-export default Index
 
 export const dynamic = 'force-static'

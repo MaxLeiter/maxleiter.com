@@ -30,9 +30,9 @@ Coincidentally, Supabase [announced their Series B](https://techcrunch.com/2022/
 
 So far, I love everything about it except the dashboard: everything is *so slow*. Creating a new, unnamed SQL query can take 5 seconds:
 
-<video controls="true">
-    <source src="/blog/supabase/slow.webm" type="video/webm">
-    <source src="/blog/supabase/slow.mp4" type="video/mp4">
+<video controls={true}>
+    <source src="/blog/supabase/slow.webm" type="video/webm" />
+    <source src="/blog/supabase/slow.mp4" type="video/mp4" />
 </video>
 
 Dashboard slowness aside, this tutorial will walk you through using Supabase and Next.js middleware to have live-updating view counts and server-side analytics.
@@ -66,7 +66,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
 
 4. Now, we need to add a stored procedure (AKA a stored SQL function we can call from the Supabase API). Navigate to the `Database` tab in the left nav bar and select the `Functions` menu item inside:
 
-    <img alt="A screenshot showing the functions menu item location in the sidebar" src="/blog/supabase/sidebar-functions.png" height="450px" style="margin: var(--gap)" />
+    <img alt="A screenshot showing the functions menu item location in the sidebar" src="/blog/supabase/sidebar-functions.png" height="450px" style={{margin: "var(--gap)"}} />
 
     > Note that Supabase offers Database Functions and Edge Functions &mdash; we're using Database Functions!
 
@@ -107,7 +107,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
 
 1. First, we need to add the API keys and project URL to our environment, which will let us access them in our code. If you're hosting with [Vercel](https://vercel.com), I recommend using their CLI or dashboard to add the keys, which you can read about [here](https://vercel.com/docs/concepts/projects/environment-variables). Otherwise, create or modify your `.env` file to contain the following:
 
-    ```bash title=.env
+    ```bash
     NEXT_PUBLIC_SUPABASE_URL=<your URL>
     NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon_public_key>
     SUPABASE_SERVICE_KEY=<service_role_key>
@@ -130,7 +130,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
 
     They should each look something like this:
 
-    ```javascript collapsible title=public.js
+    ```javascript
     import { createClient } from '@supabase/supabase-js'
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -145,7 +145,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
     export default publicClient
     ```
 
-    ```js collapsible title=private.js
+    ```js
     import { createClient } from '@supabase/supabase-js'
 
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -165,7 +165,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
 
 4. Create an [API route](https://nextjs.org/docs/api-routes/introduction) for submitting views. You could do this directly from the middleware but adding it as a serverless function gives you more freedom to extend it in the future. Also note that anyone can trigger this function, so you may want to protect it by adding a new environment variable and sending that with the request from the middleware. Then, only your server requests will ever have that value and can be verified as legitimate.
 
-    ```typescript title=pages/api/view.ts
+    ```typescript
     import { NextApiRequest, NextApiResponse } from "next";
     import supabase from '@lib/supabase/private'
 
@@ -186,7 +186,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
 
 5. Create a `pages/_middleware.{jsx,tsx}` file. The middleware will run on the server before every page request; nothing inside it is ever exposed to the client so we can safely use our private Supabase lib. However, we'll actually just send a POST request to our API handler instead. 
 
-    ```typescript pages/_middleware.tsx
+    ```typescript
     import { NextMiddleware, NextResponse,  } from 'next/server'
     const PUBLIC_FILE = /\.(.*)$/
 
@@ -232,11 +232,11 @@ Note that this tutorial expects you to already have a Next.js project. If you do
 ### Next.js: Adding a live-updating view counter
 
 1. Now we can finally add our updating view count. In your React component, import your *public* Supabase client.
-    ```javascript title=components/something.js
+    ```javascript
     import supabase from '@lib/supabase/public'
     ```
 2. Make views a member of your state:
-    ```javascript title=components/something.js highlight=4,5,6
+    ```javascript
     import supabase from '@lib/supabase/public'
 
     const Component = () => {
@@ -248,7 +248,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
     ```
 3. Add a `useEffect` hook to subscribe and unsubscribe to changes on mount or unmount respectfully. This is *all it takes* to subscribe to recieve the changes made to the `analytics` table.
 
-    ```javascript title=component/something.js highlight=8-27,29
+    ```javascript
     import supabase from '@lib/supabase/public'
 
     const Component = () => {

@@ -1,16 +1,25 @@
 import Link from '@components/link'
 import styles from './block.module.css'
 
-type Props = {
-  title: string
-  description?: string
-  type?: string
-  href: string
-  date?: Date
-  // views?: number
-}
+type Props =
+  | {
+      title: string
+      description?: string
+      type?: string
+      href: string
+      date?: Date
+      views?: number
+    }
+  | {
+      skeleton: true
+    }
 
-const BlockEntry = ({ title, description, type, href, date }: Props) => {
+const BlockEntry = (props: Props) => {
+  if ('skeleton' in props) {
+    return <li className={styles.skeleton} />
+  }
+
+  const { title, description, type, href, date, views } = props
   return (
     <li className={styles.item}>
       <Link
@@ -32,11 +41,11 @@ const BlockEntry = ({ title, description, type, href, date }: Props) => {
                 })}
               </span>
             )}
-            {/* {views ? (
-            <span className={styles.views}>
-              {views.toLocaleString()} {views === 1 ? 'view' : 'views'}
-            </span>
-          ) : null} */}
+            {views ? (
+              <span className={styles.views}>
+                {views.toLocaleString()} {views === 1 ? 'view' : 'views'}
+              </span>
+            ) : null}
           </div>
         )}
 

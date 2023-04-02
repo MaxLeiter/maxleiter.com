@@ -17,7 +17,7 @@ Also, install [axios](https://axios-http.com/) (or change the below code to your
 ```
 Then, incorporate these two files:
 
-```typescript title=Client.ts collapsible
+```typescript
 import axios, { AxiosRequestConfig } from "axios";
 import { InitializationOptions, MetricResponse, RestartResponse } from "./types";
 
@@ -63,7 +63,7 @@ export default class Client {
 }
 ```
 
-```typescript title=types.d.ts collapsible
+```typescript
 export type MetricResponse = {
     status: 'success';
     free: number;

@@ -6,7 +6,9 @@ import matter from 'gray-matter'
 
 const posts = fs
   .readdirSync(path.resolve(__dirname, '../posts/'))
-  .filter((file) => path.extname(file) === '.md')
+  .filter(
+    (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx'
+  )
   .map((file) => {
     const postContent = fs.readFileSync(`./posts/${file}`, 'utf8')
     const { data, content }: { data: any; content: string } =
@@ -45,7 +47,7 @@ const main = () => {
     feed.item({
       title: post.title,
       description: renderPost(post.body),
-      date: new Date(post.date),
+      date: new Date(post?.date),
       author: 'Max Leiter',
       url,
       guid: url,

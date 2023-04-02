@@ -1,7 +1,6 @@
 article {
-  max-width: var(--main-content);
   margin: 0 auto;
-  line-height: 1.6em;
+  line-height: 1.7;
 }
 
 article > * + * {

@@ -17,8 +17,7 @@
     - `lint`: automatically lints files
     - `dev`: start a local instance with live reloading
     - `rss`: generate an RSS feed 
-    - `sitemap`: generate a sitemap
-    - `build`: generate an RSS feed, sitemap, and production site
+    - `build`: generate an RSS feed and production site
     - `analyze`: generate a bundle you can inspect via @next/bundle-analyzer
     - `start`: start a production instance built via `yarn build`
 

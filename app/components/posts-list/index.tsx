@@ -6,13 +6,29 @@ import BlockEntry from '@components/entry/block'
 import styles from './posts-list.module.css'
 import type { Post } from '@lib/types'
 
-type Props = {
-  posts: Post[]
-  paginate?: boolean
-}
+type Props =
+  | {
+      posts: Post[]
+      paginate?: boolean
+    }
+  | {
+      skeleton: true
+    }
 
-const Posts = ({ posts, paginate }: Props) => {
+const Posts = (props: Props) => {
   const [showMore, setShowMore] = useState(4)
+
+  if ('skeleton' in props) {
+    return (
+      <ul className={styles.container}>
+        {[...Array(4)].map((_, i) => (
+          <BlockEntry key={i} skeleton />
+        ))}
+      </ul>
+    )
+  }
+
+  const { posts, paginate } = props
 
   return (
     <ul className={styles.container}>
@@ -30,7 +46,7 @@ const Posts = ({ posts, paginate }: Props) => {
             title={post.title}
             date={new Date(date)}
             description={post.description}
-            // views={post.views}
+            views={post.views}
           />
         )
       })}

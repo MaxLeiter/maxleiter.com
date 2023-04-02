@@ -92,7 +92,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
-  line-height: 28px;
+  line-height: 1.55em;
 }
 
 body {
@@ -214,9 +214,5 @@ th {
     --keyword: #000;
     --name: #333;
     --highlight: #eaeaea;
-  }
-
-  * {
-    text-shadow: none !important;
   }
 }

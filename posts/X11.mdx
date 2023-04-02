@@ -4,9 +4,10 @@ description: A guide on how to compile the X Window System for iOS
 date: Dec 15, 2019
 slug: X11
 ---
+
 <details>
-    <summary>Please read</summary>
-    While the content below may be useful to some, the Cydia repository is no longer available due to the maintaince overhead and my loss of interest. If you still want X11 on iOS/iPadOS, check out the <a href="https://github.com/ProcursusTeam/Procursus" style="color: var(--link)">Procursus project</a>.
+{/* <summary>Please read</summary> */}
+    While the content below may be useful to some, the Cydia repository is no longer available due to the maintaince overhead and my loss of interest. If you still want X11 on iOS/iPadOS, check out the <a href="https://github.com/ProcursusTeam/Procursus">Procursus project</a>.
 </details>
 
 I'm excited to announce that X11 is coming soon to iOS. Most (see below) packages and dependencies for a fully functioning X11 desktop system have been compiled and are available on Cydia for iOS 11+. All packages have been compiled for arm64 and have been tested on iOS 12.4 and iOS 13.1. This requires a jailbroken device.
@@ -60,7 +61,6 @@ From MCApollo's repository:
  - ninja
  - libpng
  - gperf
-
 
  In general, you can follow the instructions from [Beyond LinuxFromScratch](http://www.linuxfromscratch.org/blfs/). This project is based on 9.0, with version differences or code modications marked with ⚠️ below. Applications and libs marked with ❗️ means unavailable on iOS or I was unable to build them. Empty notes means compiles and works as-is from BLFS. Additionally, all of the packages are available (generally as dylibs) on the Cydia repo linked above.
 
@@ -150,7 +150,7 @@ From MCApollo's repository:
 |xterm|351||
 |FLTK|1.3.5 ⚠️|Need to remove some -U__APPLE__ calls. Disable tests in Makefile.|
 |tigervnc|1.10.1 ⚠️|No vncviewer. Disable it via CMake. Remove the if(NOT APPLE) check above the add_subdirectory(unix). Also remove the find_package(FLTK) check and remove the line add_subdirectory(tests) (as some tests require FLTK). It's important to build tigervnc before building Xvnc.|
-|Xvnc|1.10.1 ⚠️|Add a fake Xplugin.h to fool /unix/xserver/miext/rootless. Modify rootlessWindow.c to check for "Xplugin.h" instead of <Xplugin.h>. Also, remove the -z, now characters from /unix/xserver/hw/vnc/Makefile.in, where it's assigning libvnc_la_LDFLAGS.|
+|Xvnc|1.10.1 ⚠️|Add a fake Xplugin.h to fool /unix/xserver/miext/rootless. Modify rootlessWindow.c to check for "Xplugin.h" instead of \<Xplugin.h\>. Also, remove the -z, now characters from /unix/xserver/hw/vnc/Makefile.in, where it's assigning libvnc_la_LDFLAGS.|
 |Glib|2.62.4 ⚠️|Disable cocoa and carbon support in build.meson. Had to fake crt_externs.h. Remove the if host_system == 'darwin' check in glib/meson.build.|
 |LuaJIT|2.1.0|https://github.com/rweichler/luajit-ios|
 |OpenJPG|2.3.1||

@@ -17,6 +17,7 @@ export default function useDocumentSize(): Size {
 
   useEffect(() => {
     // Handler to call on window resize
+    // eslint-disable-next-line prefer-const
     let resize
     function handleResize() {
       // Set window width/height to state

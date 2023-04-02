@@ -1,6 +1,6 @@
 import Link from '@components/link'
 import styles from './projects.module.css'
-import Entry from '@components/entry'
+import { Entry } from '@components/entry'
 
 import type { Project } from '@lib/types'
 // import { Star } from '@components/icons'
@@ -27,6 +27,7 @@ const Projects = ({ count = -1, projects = [], showYears = true }: Props) => {
             title={e.title}
             description={e.description}
             role={e.role}
+            stars={e.stars}
           />
         )
       })}

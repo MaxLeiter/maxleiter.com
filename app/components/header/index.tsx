@@ -4,8 +4,6 @@ import Link from 'next/link'
 import styles from './header.module.css'
 import Home from '@components/icons/home'
 import socialStyles from '../socials/socials.module.css'
-import Tooltip from '@components/tooltip'
-// import ThemeSwitcher from '@components/theme-switcher'
 
 type Props = {
   render: boolean
@@ -24,15 +22,14 @@ const Header = ({ render, title }: Props) => {
         </div>
       </nav>
     )
-  } else {
-    return (
-      <nav aria-hidden={true}>
-        <div className={styles.header}>
-          {title && <div className={styles.content}>{title}</div>}
-        </div>
-      </nav>
-    )
   }
+  return (
+    <nav aria-hidden={true}>
+      <div className={styles.header}>
+        {title && <div className={styles.content}>{title}</div>}
+      </div>
+    </nav>
+  )
 }
 
 export default memo(Header)

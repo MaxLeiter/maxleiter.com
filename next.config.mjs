@@ -2,20 +2,21 @@
 //   enabled: process.env.ANALYZE === 'true',
 // })
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
   swcMinify: true,
   images: {
     formats: ['image/avif', 'image/webp'],
     domains: ['i.ytimg.com'],
   },
   reactStrictMode: true,
-  pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js'],
+  pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],
   experimental: {
     // Required:
     appDir: true,
     // Change the default compilation output to ESModules compatible browsers
     legacyBrowsers: false,
     optimizeCss: true,
+    mdxRs: true
   },
   async redirects() {
     return [
@@ -42,3 +43,18 @@ module.exports = {
     ]
   },
 }
+
+import nextMDX from '@next/mdx'
+import remarkGfm from 'remark-gfm'
+import remarkFrontmatter from 'remark-frontmatter'
+import rehypeSlug from 'rehype-slug'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+
+export default nextMDX({
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [remarkGfm, remarkFrontmatter],
+    rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
+    providerImportSource: "@mdx-js/react",
+  },
+})(nextConfig)
