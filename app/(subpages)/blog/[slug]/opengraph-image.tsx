@@ -11,13 +11,7 @@ export const config = {
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default async function ({
-  params,
-}: {
-  params: {
-    slug: string
-  }
-}): Promise<ImageResponse> {
+export default async function (): Promise<ImageResponse> {
   // const post = (await getPosts()).find((p) => p?.slug === params.slug)
   // instead of getPosts, lets fetch VERCEL_URL/sitemap.xml and parse it with htmlparser2
   // then we can get the post data from there
@@ -38,7 +32,7 @@ export default async function ({
       },
       onclosetag(tagname) {
         if (tagname === 'loc') {
-          console.log('That\'s it?')
+          console.log("That's it?")
         }
       },
     },
