@@ -62,6 +62,7 @@ export default async function (): Promise<ImageResponse> {
             textAlign: 'center',
             height: 630 - 50 - 50,
             maxWidth: 1000,
+            fontSize: 100,
           }}
         >
           Max Leiter&apos;s Website
