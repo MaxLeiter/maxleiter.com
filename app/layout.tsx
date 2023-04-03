@@ -2,6 +2,7 @@ import styles from './layout.module.css'
 import '@styles/global.css'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
+import ThemeProvider from '@components/theme-provider'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -13,24 +14,26 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body>
-        <div className={styles.wrapper}>
-          <main className={styles.main}>{children}</main>
-          <div className={styles.fade} />
-        </div>
-        <Analytics />
+        <ThemeProvider>
+          <div className={styles.wrapper}>
+            <main className={styles.main}>{children}</main>
+            <div className={styles.fade} />
+          </div>
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )
 }
 
-export const config = { runtime: 'edge' }
+export const runtime = 'edge'
 export const metadata = {
   metadataBase: new URL('https://maxleiter.com'),
   title: {
     template: '%s | Max Leiter',
     default: 'Max Leiter',
   },
-  description: 'Full-stack developer',
+  description: 'Full-stack developer. My blog, projects, and more.',
   keywords:
     'max leiter, full-stack developer, web developer, next.js, supabase',
   themeColor: [
@@ -77,5 +80,3 @@ export const metadata = {
     },
   },
 }
-
-export const runtime = 'edge'

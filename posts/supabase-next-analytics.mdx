@@ -5,9 +5,10 @@ slug: supabase-next-analytics
 date: May 15, 2022
 ---
 
-<Details summary={"Please read"}>
-    This post was written for the (now stable) beta Next.js middleware. If you want your own analytics, I recommend looking 
-    at <a href="https://vercel.com/analytics">Vercel's solution.</a>
+<Details summary={'Please read'}>
+  This post was written for the (now stable) beta Next.js middleware. If you
+  want your own analytics, I recommend looking at{' '}
+  <a href="https://vercel.com/analytics">Vercel's solution.</a>
 </Details>
 
 This post starts with a brief introduction. If you want to jump down to the tutorial, click [here](/blog/supabase-next-analytics#how). You can also see the live updating views in action in the top right of this page! The analytics events themselves require no JavaScript and occur completely on the server thanks to the [new (in beta) Next.js middleware](https://nextjs.org/docs/advanced-features/middleware). If you have JavaScript enabled, the view count should live update thanks to Supabase Realtime. You can try it by opening the page in a new tab and eyeing the view count.
@@ -52,7 +53,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
    ![A screenshot of the Supabase new project page](/blog/supabase/create-project.png)
 
 3. Navigate to the `Table Editor` in the left nav bar and click new table. Fill it out to match below, and be sure to click the gear icon to deselect allowing null:
-  ![A screenshot of the new table field showing 4 columns: an int8 ID, a text slug, an int8 views with a default value of 1, and an updated_at date column with a default value of "now()".](/blog/supabase/create-table.png?width=600&height=495)
+   ![A screenshot of the new table field showing 4 columns: an int8 ID, a text slug, an int8 views with a default value of 1, and an updated_at date column with a default value of "now()".](/blog/supabase/create-table.png?width=600&height=495)
    Alternatively, if you're comfortable with SQL, you can write and save a SQL query that you can use again in the future. It may look something like this:
 
    ```sql

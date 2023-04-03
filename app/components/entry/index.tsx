@@ -40,7 +40,7 @@ export const Entry = ({
           <Link
             href={href}
             external
-            noLinkClass
+            underline
             style={{
               // TODO: why is this needed?
               textDecoration: 'none',

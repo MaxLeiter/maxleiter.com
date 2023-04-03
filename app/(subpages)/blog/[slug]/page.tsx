@@ -1,34 +1,20 @@
-import getPosts from '@lib/get-posts'
-import { PostBody } from '@mdx/lib'
+import getPosts, { getPost } from '@lib/get-posts'
+import { PostBody } from '@mdx/post-body'
+import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {
   const posts = await getPosts()
   return posts.map((post) => ({ slug: post.slug }))
 }
 
-async function getData({ slug }: { slug: string }) {
-  const posts = await getPosts()
-  const postIndex = posts.findIndex((p) => p?.slug === slug)
-  const post = posts[postIndex]
-  const { body, ...rest } = post
-
-  return {
-    previous: posts[postIndex + 1] || null,
-    next: posts[postIndex - 1] || null,
-    ...rest,
-    body,
-  }
-}
-
-const PostPage = async ({
+export default async function PostPage({
   params,
 }: {
   params: {
     slug: string
   }
-}) => {
-  const post = await getData(params)
-  return <PostBody body={post.body} />
+}) {
+  const post = await getPost(params.slug)
+  if (!post) return notFound()
+  return <PostBody>{post?.body}</PostBody>
 }
-
-export default PostPage
