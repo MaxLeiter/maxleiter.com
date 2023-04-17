@@ -90,7 +90,7 @@ article pre {
   border-radius: var(--inline-radius);
   line-height: 1.8;
   padding: 1rem;
-  font-size: 0.875rem;
+  font-size: 14px;
 }
 
 /* Linkable Headers */
