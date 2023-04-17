@@ -1,5 +1,4 @@
 import { ImageResponse } from '@vercel/og'
-import * as htmlparser2 from 'htmlparser2'
 
 export const size = { width: 1200, height: 600 }
 // TODO: update to support alt once nextjs has a solution for params
@@ -11,50 +10,33 @@ export const config = {
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default async function (): Promise<ImageResponse> {
-  // const post = (await getPosts()).find((p) => p?.slug === params.slug)
-  // instead of getPosts, lets fetch VERCEL_URL/sitemap.xml and parse it with htmlparser2
-  // then we can get the post data from there
-  const post = await fetch(
-    `https://${process.env.VERCEL_URL}/sitemap.xml`
-  ).then((res) => res.text())
+export default async function ({
+  params,
+}: {
+  params: { slug: string }
+}): Promise<ImageResponse> {
+  // fetch https://raw.githubusercontent.com/MaxLeiter/maxleiter.com/master/posts/{slug}.mdx
+  // and parse the frontmatter to get the title and date
 
-  // extract the /blog/{post} data from the sitemap
-  const parser = new htmlparser2.Parser(
-    {
-      onopentag(name, attribs) {
-        if (name === 'loc' && attribs.href.includes('/blog/')) {
-          console.log(attribs.href)
-        }
-      },
-      ontext(text) {
-        console.log('-->', text)
-      },
-      onclosetag(tagname) {
-        if (tagname === 'loc') {
-          console.log("That's it?")
-        }
-      },
-    },
-    { decodeEntities: true }
+  const res = await fetch(
+    `https://raw.githubusercontent.com/MaxLeiter/maxleiter.com/master/posts/${params.slug}.mdx`
   )
-  parser.write(post)
-  parser.end()
 
-  if (!post) {
+  if (res.ok) {
     return new Response('Not found', { status: 404 })
+  }
+
+  const text = await res.text()
+  const title = text.match(/title: "(.*)"/)?.[1]
+  const date = text.match(/date: "(.*)"/)?.[1]
+
+  if (!title) {
+    return new Response('Missing title', { status: 400 })
   }
 
   const fontData = await fetch(
     new URL('../../../fonts/Inter-Medium.ttf', import.meta.url)
   ).then((res) => res.arrayBuffer())
-
-  const title = ''
-  const date = ''
-
-  if (!title) {
-    return new Response('Missing title', { status: 400 })
-  }
 
   return new ImageResponse(
     (

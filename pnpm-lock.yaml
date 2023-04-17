@@ -18,7 +18,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': 5.36.2
   '@typescript-eslint/parser': 5.36.2
   '@vercel/analytics': ^0.1.11
-  '@vercel/og': ^0.5.0
+  '@vercel/og': ^0.5.3
   bright: ^0.7.1
   clsx: ^1.2.1
   concurrently: 7.4.0
@@ -74,7 +74,7 @@ dependencies:
   '@next/mdx': 13.3.1-canary.8_msthxdjvrhmdkfpqqalumiidgq
   '@supabase/supabase-js': 1.35.6
   '@vercel/analytics': 0.1.11_react@18.2.0
-  '@vercel/og': 0.5.0
+  '@vercel/og': 0.5.3
   bright: 0.7.1_react@18.2.0
   globby: 11.1.0
   htmlparser2: 8.0.2
@@ -974,12 +974,12 @@ packages:
       react: 18.2.0
     dev: false
 
-  /@vercel/og/0.5.0:
-    resolution: {integrity: sha512-NrHyWFj7fLixXPjgCXlyX90VdbiIfP6IBcyimiFGgwpnmyRgLiYTvrnPIKI/JP49VF9bnYHFfVqzMupeyCamuQ==}
+  /@vercel/og/0.5.3:
+    resolution: {integrity: sha512-7hKSUEzhUhK62Naaf1jD8d+AVLnLU6LGdakTTqucD1AP/CHqmsm5dvdE1z9QJNPyiCAyyihhXIoUdhCqKHZWBQ==}
     engines: {node: '>=16'}
     dependencies:
       '@resvg/resvg-wasm': 2.4.1
-      satori: 0.4.4
+      satori: 0.4.9
       yoga-wasm-web: 0.3.3
     dev: false
 
@@ -5325,8 +5325,8 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
-  /satori/0.4.4:
-    resolution: {integrity: sha512-UCgoY7CXibFQmgI4ay4QSWUOca07nI9pY56w8NKrBq+bkGgiMbcPXZWj9bxukyJkEl/cgAICGjjxvwlDF2NYRw==}
+  /satori/0.4.9:
+    resolution: {integrity: sha512-vV1h8GNCqMGD4Z/cbmCNLsUUkmfMVIV5TWwkxdSCocssz3cU2qiATHZqtZkUfEazGeSB2frvTC4xQ/+fQ4topg==}
     engines: {node: '>=16'}
     dependencies:
       '@shuding/opentype.js': 1.4.0-beta.0
