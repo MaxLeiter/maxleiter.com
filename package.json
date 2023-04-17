@@ -56,7 +56,7 @@
     "@typescript-eslint/eslint-plugin": "5.36.2",
     "@typescript-eslint/parser": "5.36.2",
     "clsx": "^1.2.1",
-    "concurrently": "7.4.0",
+    "concurrently": "8.0.1",
     "critters": "0.0.16",
     "dotenv": "16.0.2",
     "eslint": "8.23.0",
