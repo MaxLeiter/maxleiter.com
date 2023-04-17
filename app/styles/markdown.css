@@ -101,6 +101,14 @@ article pre {
   text-decoration: none;
 }
 
+article a  {
+  text-decoration: none;
+}
+
+article a:hover {
+  text-decoration: underline;
+}
+
 sup {
   font-size: 0.8em;
   vertical-align: super;

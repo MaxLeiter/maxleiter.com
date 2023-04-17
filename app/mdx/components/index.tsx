@@ -10,25 +10,26 @@ import Home from '@components/icons/home'
 import { Tweet } from 'react-tweet'
 
 export const mdxComponents: MDXComponents = {
-  a: ({ children, ...props }) => {
-    // check if external
-    let isExternal = false
-    if (props.href?.startsWith('http')) {
-      isExternal = true
-    }
+  // TODO: re-enable once anchor tags are fixed in the app router
+  // a: ({ children, ...props }) => {
+  //   // check if external
+  //   let isExternal = false
+  //   if (props.href?.startsWith('http')) {
+  //     isExternal = true
+  //   }
 
-    return (
-      // @ts-expect-error legacy refs
-      <Link
-        {...props}
-        href={props.href || ''}
-        target={isExternal ? '_blank' : undefined}
-        rel={isExternal ? 'noopener noreferrer' : undefined}
-      >
-        {children}
-      </Link>
-    )
-  },
+  //   return (
+  //     // @ts-expect-error legacy refs
+  //     <Link
+  //       {...props}
+  //       href={props.href || ''}
+  //       target={isExternal ? '_blank' : undefined}
+  //       rel={isExternal ? 'noopener noreferrer' : undefined}
+  //     >
+  //       {children}
+  //     </Link>
+  //   )
+  // },
   pre: ({
     children,
     ...props
@@ -39,9 +40,7 @@ export const mdxComponents: MDXComponents = {
     // TODO: extract title from children
     return (
       // @ts-expect-error RSC
-      <Code {...props} theme="material-default">
-        {children as any}
-      </Code>
+      <Code {...props} theme="material-default">{children as any}</Code>
     )
   },
   // @ts-expect-error types
@@ -74,13 +73,7 @@ export const mdxComponents: MDXComponents = {
   Folder,
 
   Tweet: (props) => (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <Tweet {...props} />
     </div>
   ),
