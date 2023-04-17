@@ -146,6 +146,10 @@ export const getProjects = cache(async (): Promise<Project[]> => {
             headers: {
               Authorization: process.env.GITHUB_TOKEN ?? '',
             },
+            next: {
+              // every 24 hours
+              revalidate: 60 * 60 * 24,
+            }
           })
         ).json()
         // rate limited
