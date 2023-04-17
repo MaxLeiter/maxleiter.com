@@ -23,7 +23,7 @@
     "@vercel/analytics": "^0.1.11",
     "@vercel/og": "^0.5.3",
     "bright": "^0.7.1",
-    "globby": "^11.0.0",
+    "globby": "^13.0.0",
     "htmlparser2": "^8.0.2",
     "lodash.debounce": "4.0.8",
     "next": "13.3.1-canary.8",
