@@ -20,10 +20,13 @@ export function PostBody({ children }: { children: string }) {
             remarkGfm,
             remarkFrontmatter,
             remarkA11yEmoji,
-            [remarkToc, {
-              tight: true,
-              maxDepth: 5,
-            }],
+            [
+              remarkToc,
+              {
+                tight: true,
+                maxDepth: 5,
+              },
+            ],
           ],
           rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
         },

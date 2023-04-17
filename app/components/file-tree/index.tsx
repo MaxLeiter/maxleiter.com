@@ -101,6 +101,18 @@ const Folder: React.FC<FolderProps> = ({ name, children, open, note }) => {
 }
 
 const File: React.FC<FileProps> = ({ type, name, note, url: link }) => {
+  const [isFocused, setIsFocused] = useState(false)
+
+  const handleFocus = (event: React.FocusEvent<HTMLLIElement>) => {
+    event.currentTarget.classList.add(styles.focused)
+    setIsFocused(true)
+  }
+
+  const handleBlur = (event: React.FocusEvent<HTMLLIElement>) => {
+    event.currentTarget.classList.remove(styles.focused)
+    setIsFocused(false)
+  }
+
   const Wrapper = ({ children }: PropsWithChildren) =>
     link ? (
       <Link underline={false} href={link} external>
@@ -124,8 +136,13 @@ const File: React.FC<FileProps> = ({ type, name, note, url: link }) => {
     }
   }
   return (
-    <li role="treeitem">
-      <div className={styles.file}>
+    <li
+      role="treeitem"
+      aria-selected={isFocused}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    >
+      <div className={styles.file} tabIndex={0}>
         {getIcon()}
         <Wrapper>
           <span className={styles['file-name']}>

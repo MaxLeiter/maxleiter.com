@@ -1,5 +1,10 @@
 const withIcon = (icon: string) => {
-  const Icon = ({ size = 24, color = 'currentColor', fill = '', strokeWidth = 1 }) => {
+  const Icon = ({
+    size = 24,
+    color = 'currentColor',
+    fill = '',
+    strokeWidth = 1,
+  }) => {
     return (
       <svg
         viewBox="0 0 24 24"

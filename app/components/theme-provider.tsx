@@ -7,7 +7,7 @@ export default function ThemeProvider({
   children: React.ReactNode
 }) {
   return (
-    <NextThemesProvider enableSystem enableColorScheme defaultTheme='dark'>
+    <NextThemesProvider enableSystem enableColorScheme defaultTheme="dark">
       {children}
     </NextThemesProvider>
   )
