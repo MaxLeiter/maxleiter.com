@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import styles from './header.module.css'
 import Home from '@components/icons/home'
-import socialStyles from '../socials/socials.module.css'
+import socialStyles from '@components/socials/socials.module.css'
 import ThemeSwitcher from '@components/theme-switcher'
 
 type Props = {

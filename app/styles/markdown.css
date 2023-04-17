@@ -11,6 +11,10 @@ article p {
   color: var(--article-color);
 }
 
+article aside p {
+  margin: var(--gap-half) 0;
+}
+
 article video,
 article img {
   max-width: 100%;

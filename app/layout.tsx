@@ -17,7 +17,6 @@ export default function RootLayout({
         <ThemeProvider>
           <div className={styles.wrapper}>
             <main className={styles.main}>{children}</main>
-            <div className={styles.fade} />
           </div>
           <Analytics />
         </ThemeProvider>

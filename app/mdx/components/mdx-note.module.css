@@ -17,4 +17,9 @@
 
 .note .content {
   padding-left: var(--gap);
+
+  p {
+    margin: 0;
+  }
 }
+

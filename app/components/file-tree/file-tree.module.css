@@ -27,6 +27,7 @@
   gap: var(--gap-half);
   height: 2.5rem;
   padding: var(--gap-half);
+  font-family: monospace;
 }
 
 .folder {
@@ -42,7 +43,6 @@
 }
 
 .file-name {
-  font-family: monospace;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -57,4 +57,8 @@
 .note {
   color: var(--gray);
   margin-left: var(--gap-half);
+}
+
+.focused {
+  background-color: var(--lighter-gray);
 }

@@ -8,6 +8,7 @@ import Layout from '@components/icons/layout'
 import React, { PropsWithChildren, useState } from 'react'
 import styles from './file-tree.module.css'
 import Link from '@components/link'
+
 type FileProps = {
   type: string
   name: string
@@ -28,28 +29,64 @@ type FileTreeProps = {
 
 const Folder: React.FC<FolderProps> = ({ name, children, open, note }) => {
   const [isOpen, setIsOpen] = useState(open)
+  const [isFocused, setIsFocused] = useState(false)
 
   const handleClick = () => {
     setIsOpen(!isOpen)
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      setIsOpen(!isOpen)
+    }
+  }
+
+  const handleFocus = (event: React.FocusEvent<HTMLAnchorElement>) => {
+    event.currentTarget.classList.add(styles.focused)
+    setIsFocused(true)
+  }
+
+  const handleBlur = (event: React.FocusEvent<HTMLAnchorElement>) => {
+    event.currentTarget.classList.remove(styles.focused)
+    setIsFocused(false)
+  }
+
   return (
-    <div>
-      <a onClick={handleClick}>
+    <li
+      role="treeitem"
+      aria-expanded={isOpen}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      aria-selected={isFocused}
+    >
+      <a
+        onClick={handleClick}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        role="button"
+        tabIndex={-1}
+        aria-label={
+          isOpen ? `Collapse ${name} folder` : `Expand ${name} folder`
+        }
+      >
         <div className={styles.folder}>
           {isOpen ? (
-            <FolderMinus color="var(--fg)" fill="none" />
+            <FolderMinus color="var(--fg)" fill="none" aria-hidden />
           ) : (
-            <FolderPlus color="var(--fg)" fill="none" />
+            <FolderPlus color="var(--fg)" fill="none" aria-hidden />
           )}
           <span>
             {name}
+            <span className="sr-only">
+              , {isOpen ? 'open' : 'closed'} folder
+            </span>
             <span className={styles.note}>{note}</span>
           </span>
         </div>
       </a>
       {isOpen && (
-        <ul className={styles['folder-children']}>
+        <ul className={styles['folder-children']} role="group">
           {Array.isArray(children) ? (
             children.map((child, index) => (
               <React.Fragment key={index}>{child}</React.Fragment>
@@ -59,13 +96,20 @@ const Folder: React.FC<FolderProps> = ({ name, children, open, note }) => {
           )}
         </ul>
       )}
-    </div>
+    </li>
   )
 }
 
 const File: React.FC<FileProps> = ({ type, name, note, url: link }) => {
-  const Wrapper = ({ children }: PropsWithChildren) => link ? <Link underline={false} href={link} external>{children}</Link> : <>{children}</>
-  const withWrapper = (children: React.ReactNode) => <Wrapper>{children}</Wrapper>
+  const Wrapper = ({ children }: PropsWithChildren) =>
+    link ? (
+      <Link underline={false} href={link} external>
+        <span className="sr-only">{type} file:</span>
+        {children}
+      </Link>
+    ) : (
+      <>{children}</>
+    )
 
   function getIcon() {
     switch (type) {
@@ -80,13 +124,15 @@ const File: React.FC<FileProps> = ({ type, name, note, url: link }) => {
     }
   }
   return (
-    <li>
+    <li role="treeitem">
       <div className={styles.file}>
         {getIcon()}
-        {withWrapper(<span className={styles['file-name']}>
-          {name}
-          <span className={styles.note}>{note}</span>
-        </span>)}
+        <Wrapper>
+          <span className={styles['file-name']}>
+            {name}
+            <span className={styles.note}>{note}</span>
+          </span>
+        </Wrapper>
       </div>
     </li>
   )
@@ -95,7 +141,7 @@ const File: React.FC<FileProps> = ({ type, name, note, url: link }) => {
 const FileTree: React.FC<FileTreeProps> = ({ children }) => {
   return (
     <div className={styles.wrapper}>
-      <ul className={styles.fileTree}>
+      <ul className={styles.fileTree} role="tree">
         {Array.isArray(children)
           ? children.map((child, index) => (
               <React.Fragment key={index}>{child}</React.Fragment>

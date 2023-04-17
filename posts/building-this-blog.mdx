@@ -5,32 +5,36 @@ slug: build-a-blog-with-nextjs-13
 date: Apr 2, 2023
 ---
 
-There's been a lot of excitement in the community since [the Next.js 13 App Router](https://beta.nextjs.org) was announced, enabling using [React Server Components](https://react.dev/blog/2020/12/21/data-fetching-with-react-server-components). At the same time, I've noticed some disparagement from hobbyists about using the `app/` directory in production.
-This blog has been on the App Router for a while now, so I thought I'd share how I use it and how it's working out for me.
+I've been tinkering with this website and the [Next.js 13 App Router](https://beta.nextjs.org) for a while now,
+and it's been a great experience, especially in the last few months. But I've seen some confusion around
+how to use the new features and React Server Components, so I thought I'd share an outline on how I built this website,
+which makes use of many new features.
 
 To address the React-sized elephant in the room:
-You do not need this fancy setup to build a blog. You might just want HTML and CSS.
-But there's no fun in that, and I'm a strong believer in having a website to play with.
+you do not need this fancy setup to build a blog.
+HTML and CSS may be a better choice for you, but I'd find little fun in that, and I'm a strong believer in having a website to experiment with.
 
-To set a few expecations, here's what this post **won't** do:
+To set a few expectations, here's what this post **won't** do:
 
 - Act as documentation for Next.js or React
 - Be a 100% code-complete tutorial. You'll need to fill in some gaps yourself.
   - You can always reference [this website's source code](https://github.com/maxleiter/maxleiter.com).
+  - There are file trees included with links to the source code.
 
-And here's what I hope for it to do:
+And here's what it **will** do:
 
-- Guide you in spinning up your own 'static-first' blog with Next.js 13 and React Server Components with great SEO and performance.
-  - I say static first because while you can opt into dynamic rendering everything presented here can result in a fully static no-JS site.
+- Show you real-world examples involving React Server Components and the App Router.
+- Guide you in spinning up your own blog with Next.js 13 and React Server Components with great SEO and performance.
+  - I say static first because while you can opt into [dynamic rendering](https://beta.nextjs.org/docs/rendering/static-and-dynamic-rendering) everything presented here can result in a fully static no-JavaScript site.
 - Demonstrate how to enable writing in markdown with [MDX](https://mdxjs.com/) and [next-mdx-remote/rsc](https://github.com/hashicorp/next-mdx-remote#react-server-components-rsc--nextjs-app-directory-support)
   - We'll use [Bright](https://github.com/code-hike/bright) for server-side syntax highlighting.
 - Act as a launching point for your own experimentation and exploration.
 
-Now that that's out of the way, let's get started!
+Now that that's out of the way:
 
 ### Table of Contents
 
-## Setting up the project
+## Set up the project
 
 First, we'll need to create a new Next.js project. You can launch the setup wizard with `npx create-next-app`:
 
@@ -45,16 +49,15 @@ npx create-next-app --experimental-app
 
 Hit `y` (or `n`, I'm not your boss) a few times to complete the wizard.
 
-Now we can start constructing our website.
-
 ## File structure
 
 The easiest way I've found to thinking about structuring App Router applications is from a top-down approach.
-Start with your highest level 'scope' (layout) and work your way down.
+Think of your general path structure, then start with your highest level 'scope' (layout) and work your way down.
 
 In our case, we'll have a [home page](/). Let's also add a [projects page](/projects) and an [about page](/about).
+We'll cover the blog in the next section.
 
-In general, a Page will look like this:
+In general, a page will look like this:
 
 ```tsx
 // page.tsx
@@ -80,12 +83,14 @@ export default function Layout({ children }: PropsWithChildren) {
 }
 ```
 
-So it seems like we need to create an `app/layout.tsx` file for the pages to share, and then an `app/page.tsx`, `app/projects/page.tsx`, and `app/about/page.tsx` for the content.
-There's one problem though. You might have noticed this blog post has a header containing the <span style={{ position: 'relative', top: 4 }}><HomeIcon /></span> Home Icon.
-It doesn't make much sense to include that in the home page, but all the other pages should have it,
-so we'll keep it out of the root layout and create a _Route Group_ with it's own nested layout layout to only apply to the other pages.
+Knowing all of this, I chose to create four files: `app/layout.tsx`, `app/page.tsx`, `app/projects/page.tsx`, and `app/about/page.tsx`.
+The layout will apply to all pages, and each page file will contain it's own content.
 
-First, lets create our `app/(subpages)/components` directory and create a quick header:
+I ran into one small issue with this approach: the home page doesn't need a <span style={{ position: 'relative', top: 4 }}><HomeIcon /></span> icon, but the other pages do.
+It doesn't make much sense to include that in the home page, but all the other pages should have it,
+so we'll keep it out of the root layout and create a [Route Group](https://beta.nextjs.org/docs/routing/defining-routes#route-groups) with it's own nested layout layout to only apply to the other pages.
+
+First, lets create our `app/(subpages)/components` directory and create a quick header only for the subpages:
 
 ```tsx
 // app/(subpages)components/header.tsx
@@ -99,7 +104,7 @@ export default function Header() {
         <HomeIcon />
       </Link>
       // If you want to add a Client Component here like a theme switcher, mark that
-      // component with "use client" and leave the majority of the heade as an RSC
+      // component with "use client" and leave the majority of the header as an RSC
     </header>
   )
 }
@@ -132,7 +137,12 @@ Let's go ahead and create our files and directories:
 
 <FileTree>
   <Folder name="app" open>
-    <Folder name="components" open />
+    <Folder 
+      name="components" 
+      open 
+      note="contains our general components" 
+    >
+    </Folder>
     <File
       name="layout.tsx"
       type="layout"
@@ -149,7 +159,18 @@ Let's go ahead and create our files and directories:
       name="(subpages)"
       open
       note="route groups aren't included in the URL"
-    >
+    >    
+      <Folder 
+        name="components" 
+        open
+      >
+        <File 
+          name="header.tsx" 
+          type="component" 
+          url="https://github.com/MaxLeiter/maxleiter.com/blob/master/app/(subpages)/components/header.tsx"
+          note="<Header />"
+        />
+      </Folder>
       <File 
         name="layout.tsx" 
         type="layout" 
@@ -169,16 +190,17 @@ Let's go ahead and create our files and directories:
           type="page"
           url="https://github.com/MaxLeiter/maxleiter.com/blob/master/app/(subpages)/projects/page.tsx" />
       </Folder>
-      <Folder name="blog" open />
     </Folder>
 
   </Folder>
 </FileTree>
 
-### Blog post routing with dynamic segments
+## A blog needs posts
+
+### Routing with dynamic segments
 
 For our blog posts like this one, we'll want `/blog/[slug]` to be a page that displays a single blog post, and we want it to have it's own footer to link to other posts.
-It sure seems like the footer should live inside the `/blog/[slug]` layout.
+It sure seems like the footer should live inside the `/blog/[slug]` layout. The `[slug]` in the URL is referred to as a [Dynamic Segment](https://beta.nextjs.org/docs/routing/defining-routes#dynamic-segments).
 
 <FileTree>
   <Folder name="blog" open>
@@ -208,7 +230,7 @@ It sure seems like the footer should live inside the `/blog/[slug]` layout.
 
 But how do we render markdown files in our blog posts?
 
-## Fetching and rendering markdown
+### Fetching and rendering markdown
 
 The official Next.js documentation has a [great guide](https://beta.nextjs.org/docs/guides/mdx#mdx) for using MDX with all your pages.
 Sometimes you want to render content from a remote source though, like a <abbr title="Content Management System">CMS</abbr>.
@@ -216,7 +238,7 @@ In my case, for niche specific reasons, I want to keep my markdown separate from
 
 A lot of the code is the same if you want to apply it to your own project, so just follow along with the code snippets.
 
-### Fetching your posts
+#### Fetching your posts
 
 You need to fetch your posts from somewhere before you can render them.
 There's a lot of ways to do this. Here's a simplified but functional version of mine loading them from the file system:
@@ -257,9 +279,15 @@ export async function getPost(slug: string) {
 }
 
 export default getPosts
+
+// Usage:
+const posts = await getPosts()
+const post = await getPost('my-post')
 ```
 
-### Rendering your posts
+Because `getPosts` is cached, you can call `getPost` multiple times in your layout tree without worrying about a network waterfall.
+
+#### Rendering your posts
 
 Now that we have our posts, we can render them.
 
@@ -284,6 +312,7 @@ export function PostBody({ children }: { children: string }) {
       options={{
         mdxOptions: {
           remarkPlugins: [
+            // Adds support for GitHub Flavored Markdown
             remarkGfm,
             // Makes emojis more accessible
             remarkA11yEmoji,
@@ -409,45 +438,44 @@ import { PostBody } from '@mdx/post-body'
 Now we just... render the component.
 
 ```tsx
-export default function PostPage() {
-  const post = getPost()
-```
-
-Hm. Which post do we want to render?
-You may be thinking that we can get it from the URL, and you'd be right.
-Now that I think about it, we also know all of our slugs ahead of time,
-so we can use `generateStaticParams` to generate all of the possible slugs at build time.
-
-```tsx
 import getPosts, { getPost } from '@lib/get-posts'
 import { PostBody } from '@mdx/post-body'
 import { notFound } from 'next/navigation'
 
-export async function generateStaticParams() {
-  const posts = await getPosts()
-  // the params to pre-render the page with
-  // without this, the page will be rendered at runtime
-  return posts.map((post) => ({ params: { slug: post.slug } }))
-}
-
 export default async function PostPage({
-  params: { slug },
+  params,
 }: {
-  params: { slug: string }
+  params: {
+    slug: string
+  }
 }) {
   const post = await getPost(params.slug)
+  // notFound is a Next.js utility
   if (!post) return notFound()
-
   // Pass the post contents to MDX
   return <PostBody>{post?.body}</PostBody>
 }
 ```
 
+We can now render a post; that's pretty cool. 
+
+We can optionally choose to build all of our posts at build time, 
+by adding `generateStaticParams` to the page:
+
+```tsx
+export async function generateStaticParams() {
+  const posts = await getPosts()
+  // The params to pre-render the page with.
+  // Without this, the page will be rendered at runtime
+  return posts.map((post) => ({ params: { slug: post.slug } }))
+}
+```
+
 <Note>
-  If you're thinking it's bad that we're calling `getPost` _and_ `getPosts()`,
-  remember back to the beginning when we wrapped `getPosts` in `cache`.
-  `getPost` just calls `getPosts`, so we're not making any unnecessary requests
-  to the filesystem (or wherever you're getting your posts from).
+  If you think it's bad that we call `getPost` _and_ `getPosts()`, remember the
+  we wrapped `getPosts` in `cache`. `getPost` just calls
+  `getPosts`, so we're not making any unnecessary requests to the filesystem (or
+  wherever you're getting your posts from).
 </Note>
 
 ## SEO
@@ -492,14 +520,6 @@ export const metadata = {
         alt: '',
       },
     ],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-    },
   },
   twitter: {
     title: 'Max Leiter',
@@ -625,12 +645,13 @@ const main = () => {
 main()
 ```
 
-## Analytics
-
-I use the [@vercel/analytics](https://vercel.com/analytics) and included the `<Analytics />` component in my root directory.
-If you use a different provider, you probably want to do similar.
-
 ## Deployment
 
-I use Vercel for deployments (I may be bias...), but you can use any static site provider you want with a setup
-like this because it supports [static export](https://beta.nextjs.org/docs/configuring/static-export).
+I use Vercel for deployments (I may be bias), but you can use any static site provider you want with a setup
+like this because it supports [static export](https://beta.nextjs.org/docs/configuring/static-export). 
+
+## Wrapping up
+
+I hope this post was helpful to you. 
+As a reminder, you can find the source code for this site [here](https://github.com/maxleiter/maxleiter.com).
+Please try to not think negatively of me for anything you find (but feel free to offer praise for anything you like).

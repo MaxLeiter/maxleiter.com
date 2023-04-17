@@ -2,6 +2,7 @@
   "plugins": [
     "postcss-flexbugs-fixes",
     "postcss-hover-media-feature",
+    "postcss-nested",
     [
       "postcss-preset-env",
       {
