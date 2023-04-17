@@ -4,9 +4,9 @@ specifiers:
   '@fec/remark-a11y-emoji': ^3.1.0
   '@mdx-js/loader': ^2.3.0
   '@mdx-js/react': ^2.3.0
-  '@next/bundle-analyzer': 13.1.5-canary.2
-  '@next/eslint-plugin-next': 13.2.5-canary.26
-  '@next/mdx': 13.2.5-canary.24
+  '@next/bundle-analyzer': 13.3.1-canary.8
+  '@next/eslint-plugin-next': 13.3.1-canary.8
+  '@next/mdx': 13.3.1-canary.8
   '@supabase/supabase-js': 1.35.6
   '@types/marked': 4.0.7
   '@types/mdx': ^2.0.3
@@ -69,9 +69,9 @@ dependencies:
   '@fec/remark-a11y-emoji': 3.1.0
   '@mdx-js/loader': 2.3.0
   '@mdx-js/react': 2.3.0_react@18.2.0
-  '@next/bundle-analyzer': 13.1.5-canary.2
-  '@next/eslint-plugin-next': 13.2.5-canary.26
-  '@next/mdx': 13.2.5-canary.24_msthxdjvrhmdkfpqqalumiidgq
+  '@next/bundle-analyzer': 13.3.1-canary.8
+  '@next/eslint-plugin-next': 13.3.1-canary.8
+  '@next/mdx': 13.3.1-canary.8_msthxdjvrhmdkfpqqalumiidgq
   '@supabase/supabase-js': 1.35.6
   '@vercel/analytics': 0.1.11_react@18.2.0
   '@vercel/og': 0.5.0
@@ -438,8 +438,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /@next/bundle-analyzer/13.1.5-canary.2:
-    resolution: {integrity: sha512-qlmzr7ucFGqoK8jEaHCnI50EOXXaZ7Lz087HnzXcM18/v1aXGfxs3/LYTosx7Qiyjh9cpIPlpcP/kCidX1XCiw==}
+  /@next/bundle-analyzer/13.3.1-canary.8:
+    resolution: {integrity: sha512-OD8Q7fl0ghAIQTLmyorzCv0qt0wAD7S5j42w/C6PVRo8hJWE+X+HQyd3ymma6ZYrvT3/pSM0S59iQw1ImhSqPQ==}
     dependencies:
       webpack-bundle-analyzer: 4.7.0
     transitivePeerDependencies:
@@ -451,20 +451,13 @@ packages:
     resolution: {integrity: sha512-xZfNu7yq3OfiC4rkGuGMcqb25se+ZHRqajSdny8dp+nZzkNSK1SHuNT3W8faI+KGk6dqzO/zAdHR9YrqnQlCAg==}
     dev: false
 
-  /@next/eslint-plugin-next/13.2.5-canary.26:
-    resolution: {integrity: sha512-xN9Vi/Jy/iVeuobwENM+ikcErE9QwLxApPAkgsFFz+tFDhFWfVYh/cnypXxa2qAzrz3iSIDduJ7NWVXmRJaPEw==}
-    dependencies:
-      glob: 7.1.7
-    dev: false
-
   /@next/eslint-plugin-next/13.3.1-canary.8:
     resolution: {integrity: sha512-PXJG6o++ztR4UWTXPiEOPbbqR3rCiERt4M+8oSkDH/gwHYZZyGTg5J5abjsUzgNA+792QIKqq3NtJ9HX0h9xgA==}
     dependencies:
       glob: 7.1.7
-    dev: true
 
-  /@next/mdx/13.2.5-canary.24_msthxdjvrhmdkfpqqalumiidgq:
-    resolution: {integrity: sha512-JnxwUX8sc6dBE7/S1510FrrB/dCff37V5Vl347tzOHqXBHgsd06ZgiGJA+ZD4jJ/Nqer2THXCYliibQhr8NtbQ==}
+  /@next/mdx/13.3.1-canary.8_msthxdjvrhmdkfpqqalumiidgq:
+    resolution: {integrity: sha512-aHNJ+3Q687gXh0ZeJmAG/gXTmOJ1911E2OMjL5/DaEaxx+7WQ3LrKoGhrXkilr9XrpZcm9n87YKEU37FJbnujA==}
     peerDependencies:
       '@mdx-js/loader': '>=0.15.0'
       '@mdx-js/react': '>=0.15.0'
