@@ -11,6 +11,10 @@ article p {
   color: var(--article-color);
 }
 
+article aside p {
+  margin: var(--gap-half) 0;
+}
+
 article video,
 article img {
   max-width: 100%;
@@ -24,15 +28,17 @@ article img {
 /* Lists */
 
 article ul {
-  padding: 0;
   list-style-position: inside;
   list-style-type: disc;
+  padding-left: var(--gap);
 }
 
 article ul ul {
-  margin-left: var(--gap-double);
-  list-style-position: inside;
   list-style-type: circle;
+}
+
+article ul ul ul {
+  list-style-type: square;
 }
 
 article ol {
@@ -53,9 +59,9 @@ article ol > li > ul {
 
 article aside,
 article blockquote {
-  border: 2px solid var(--light-gray);
+  border: 1px solid var(--lighter-gray);
   background: var(--lightest-gray);
-  padding: var(--gap-half) var(--gap);
+  padding: var(--gap-half);
   color: var(--article-color);
   margin: var(--gap-half) 0;
 }
@@ -93,6 +99,14 @@ article pre {
   /* padding-top: var(--header-height); */
   color: inherit;
   text-decoration: none;
+}
+
+article a  {
+  text-decoration: none;
+}
+
+article a:hover {
+  text-decoration: underline;
 }
 
 sup {

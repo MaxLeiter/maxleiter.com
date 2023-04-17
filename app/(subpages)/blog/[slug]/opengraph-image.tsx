@@ -49,8 +49,8 @@ export default async function (): Promise<ImageResponse> {
     new URL('../../../fonts/Inter-Medium.ttf', import.meta.url)
   ).then((res) => res.arrayBuffer())
 
-  const title = ""
-  const date = ""
+  const title = ''
+  const date = ''
 
   if (!title) {
     return new Response('Missing title', { status: 400 })

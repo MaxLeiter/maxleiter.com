@@ -3,7 +3,8 @@ import Link from 'next/link'
 
 import styles from './header.module.css'
 import Home from '@components/icons/home'
-import socialStyles from '../socials/socials.module.css'
+import socialStyles from '@components/socials/socials.module.css'
+import ThemeSwitcher from '@components/theme-switcher'
 
 type Props = {
   render: boolean
@@ -18,6 +19,7 @@ const Header = ({ render, title }: Props) => {
           <Link href="/" className={`${socialStyles.icon} ${styles.icon}`}>
             <Home size={28} />
           </Link>
+          <ThemeSwitcher hideTooltip />
           {title && <div className={styles.content}>{title}</div>}
         </div>
       </nav>

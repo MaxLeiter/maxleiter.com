@@ -1,3 +1,10 @@
+/**
+ * CSS Variables:
+ *
+ * --info-stroke-circle-color
+ *
+ * --info-stroke-line-color
+ */
 const Info = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -11,9 +18,26 @@ const Info = () => (
     strokeLinejoin="round"
     className="feather feather-info"
   >
-    <circle cx="12" cy="12" r="10"></circle>
-    <line x1="12" y1="16" x2="12" y2="12"></line>
-    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    <circle
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="var(--info-stroke-circle-color, currentColor)"
+    ></circle>
+    <line
+      x1="12"
+      y1="16"
+      x2="12"
+      y2="12"
+      stroke="var(--info-stroke-line-color, currentColor)"
+    ></line>
+    <line
+      x1="12"
+      y1="8"
+      x2="12.01"
+      y2="8"
+      stroke="var(--info-stroke-line-color, currentColor)"
+    ></line>
   </svg>
 )
 

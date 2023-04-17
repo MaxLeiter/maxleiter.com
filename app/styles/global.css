@@ -15,8 +15,8 @@
   --header-height: 48px;
 
   /* Typography */
-   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue',
-    sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Roboto',
+    'Helvetica Neue', sans-serif;
   --font-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo',
     monospace;
 
@@ -49,27 +49,25 @@
   --fade-in: var(--timing) ease-in-out;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #fff;
-    --bg-alpha: hsla(0, 0%, 100%, 0.9);
-    --fg: #444;
-    --gray: rgb(100, 100, 100);
-    --light-gray: rgb(222, 222, 222);
-    --lighter-gray: rgb(240, 240, 240);
-    --lightest-gray: rgb(245, 245, 245);
-    --article-color: #212121;
-    --header-bg: rgba(255, 255, 255, 0.8);
-    --gray-alpha: rgba(19, 20, 21, 0.5);
-    --selection: rgba(0, 0, 0, 0.99);
-    --link: #6669FF;
+[data-theme='light'] {
+  --bg: #fff;
+  --bg-alpha: hsla(0, 0%, 100%, 0.9);
+  --fg: #444;
+  --gray: rgb(100, 100, 100);
+  --light-gray: rgb(222, 222, 222);
+  --lighter-gray: rgb(240, 240, 240);
+  --lightest-gray: rgb(245, 245, 245);
+  --article-color: #212121;
+  --header-bg: rgba(255, 255, 255, 0.8);
+  --gray-alpha: rgba(19, 20, 21, 0.5);
+  --selection: rgba(0, 0, 0, 0.99);
+  --link: #6669ff;
 
-    --token: #666;
-    --comment: #999;
-    --keyword: #000;
-    --name: #333;
-    --highlight: #eaeaea;
-  }
+  --token: #666;
+  --comment: #999;
+  --keyword: #000;
+  --name: #333;
+  --highlight: #eaeaea;
 }
 
 * {
@@ -133,7 +131,7 @@ h3 {
 }
 
 h4 {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 hr {
@@ -215,4 +213,16 @@ th {
     --name: #333;
     --highlight: #eaeaea;
   }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
