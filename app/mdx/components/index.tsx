@@ -1,6 +1,6 @@
 import { MDXComponents } from 'mdx/types'
 import NextImage from 'next/image'
-import Link from '@components/link'
+// import Link from '@components/link'
 import { MDXNote } from './mdx-note'
 import { Code } from 'bright'
 import { MDXImage } from './mdx-image'
@@ -13,7 +13,7 @@ export const mdxComponents: MDXComponents = {
   // TODO: re-enable once anchor tags are fixed in the app router
   // a: ({ children, ...props }) => {
   //   // check if external
-  //   let isExternal = false
+  //   let te = false
   //   if (props.href?.startsWith('http')) {
   //     isExternal = true
   //   }
