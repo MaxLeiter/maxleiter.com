@@ -70,7 +70,7 @@
     "postcss-flexbugs-fixes": "5.0.2",
     "postcss-hover-media-feature": "1.0.2",
     "postcss-nested": "^6.0.1",
-    "postcss-preset-env": "7.8.1",
+    "postcss-preset-env": "8.3.2",
     "rehype-autolink-headings": "^6.1.1",
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
