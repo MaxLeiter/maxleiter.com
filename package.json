@@ -19,7 +19,7 @@
     "@next/bundle-analyzer": "13.3.1-canary.8",
     "@next/eslint-plugin-next": "13.3.1-canary.8",
     "@next/mdx": "13.3.1-canary.8",
-    "@supabase/supabase-js": "1.35.6",
+    "@supabase/supabase-js": "2.21.0",
     "@vercel/analytics": "^0.1.11",
     "@vercel/og": "^0.5.3",
     "bright": "^0.7.1",
