@@ -23,7 +23,7 @@ export type IEQuizProps = {
 
 export const UselessButton = ({ text }: { text: string }) => (
   <Button
-    style={{ display: 'inline-block', width: '100px', height: 36, margin: 2 }}
+    style={{ display: 'inline-block' }}
     onClick={() => alert("That's the idea!")}
   >
     {text}
@@ -94,7 +94,9 @@ const IeOrCss = ({ questions }: IEQuizProps) => {
       <p>Good luck!</p>
       <ul className={styles.list}>
         {questionsWithVotes.map((question, index) => (
-          <Question question={question} key={index} />
+          <Question question={question} key={index}>
+            {question.question}
+          </Question>
         ))}
       </ul>
     </>

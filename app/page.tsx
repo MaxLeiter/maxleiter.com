@@ -11,6 +11,8 @@ import Posts from '@components/posts-list'
 
 const PROJECT_COUNT = 3
 
+export const revalidate = 10800
+
 export default async function HomePage() {
   const projects = await getProjects()
 
@@ -59,5 +61,3 @@ export default async function HomePage() {
     </>
   )
 }
-
-export const dynamic = 'force-static'

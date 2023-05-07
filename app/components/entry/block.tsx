@@ -26,7 +26,7 @@ const BlockEntry = (props: Props) => {
         href={href}
         title={description || title}
         className={styles.link}
-        underline
+        underline={false}
         scroll={true}
       >
         {type && <div className={styles.type}>{type}</div>}

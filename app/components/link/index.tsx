@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import NextLink from 'next/link'
 
 import styles from './link.module.css'
@@ -18,27 +19,31 @@ const Link = ({
   external,
   href,
   children,
-  className = 'link',
+  className: classNameProp = '',
   title,
-  underline = false,
+  underline = true,
   tabIndex = 0,
   ...props
 }: Props) => {
-  const style = underline ? className : `${styles.link} ${className}`
+  const className = clsx(
+    styles.link,
+    underline && styles.underline,
+    classNameProp
+  )
 
   if (external) {
     return (
-      <NextLink
+      <a
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className={style}
+        className={className}
         title={title}
         tabIndex={tabIndex}
         {...props}
       >
         {children}
-      </NextLink>
+      </a>
     )
   }
 
@@ -46,7 +51,7 @@ const Link = ({
     <NextLink
       href={href}
       title={title}
-      className={style}
+      className={className}
       {...props}
       tabIndex={tabIndex}
     >

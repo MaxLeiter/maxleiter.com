@@ -4,10 +4,8 @@ export const size = { width: 1200, height: 600 }
 // TODO: update to support alt once nextjs has a solution for params
 export const alt = ''
 export const contentType = 'image/png'
+export const runtime = 'edge'
 
-export const config = {
-  runtime: 'edge',
-}
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async function ({

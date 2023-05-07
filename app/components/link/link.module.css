@@ -10,8 +10,8 @@
 .link {
   text-decoration: none;
   color: var(--link);
-}
 
-.link:hover {
-  text-decoration: underline;
+  &.underline:hover {
+    text-decoration: underline;
+  }
 }

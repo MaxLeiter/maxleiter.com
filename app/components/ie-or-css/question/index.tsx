@@ -9,7 +9,13 @@ import FadeIn from '@components/fade-in'
 
 const getLocalStorageKeyString = (id: string) => `question-${id}`
 
-const Question = ({ question }: { question: QuestionWithVotes }) => {
+const Question = ({
+  question,
+  children,
+}: {
+  question: QuestionWithVotes
+  children: string
+}) => {
   // const { id, question: questionText, isCSS } = question
   const { id, isCSS } = question
 
@@ -70,20 +76,7 @@ const Question = ({ question }: { question: QuestionWithVotes }) => {
   return (
     <li className={styles.wrapper}>
       <pre className={styles.pre}>
-        {/* TODO: convert to MDX */}
-        {/* <Highlight {...defaultProps} code={questionText} language={'css'}>
-          {({ className, style, tokens, getLineProps, getTokenProps }) => (
-            <code className={className} style={{ ...style }}>
-              {tokens.map((line, i) => (
-                <div key={i} {...getLineProps({ line, key: i })}>
-                  {line.map((token, key) => (
-                    <span key={key} {...getTokenProps({ token, key })} />
-                  ))}
-                </div>
-              ))}
-            </code>
-          )}
-        </Highlight> */}
+        <code>{children}</code>
       </pre>
       <div
         className={styles.buttons}
@@ -110,7 +103,6 @@ const Question = ({ question }: { question: QuestionWithVotes }) => {
       </div>
       {voted && (
         <FadeIn>
-          {/* line showing vote margins */}
           <div className={styles.line}>
             <div
               className={styles.left}

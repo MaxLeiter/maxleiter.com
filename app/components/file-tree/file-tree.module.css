@@ -32,6 +32,8 @@
 
 .folder {
   cursor: pointer;
+  /* To avoid highlighting on double clicking */
+  user-select: none;
 }
 
 .folder-children {

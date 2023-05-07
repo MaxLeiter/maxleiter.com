@@ -19,5 +19,3 @@ export default function BlogLayout({
     </Outline>
   )
 }
-
-export const config = { runtime: 'experimental-edge' }

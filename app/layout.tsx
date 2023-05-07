@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body>
         <ThemeProvider>
           <div className={styles.wrapper}>
@@ -25,7 +25,6 @@ export default function RootLayout({
   )
 }
 
-export const runtime = 'edge'
 export const metadata = {
   metadataBase: new URL('https://maxleiter.com'),
   title: {
