@@ -40,7 +40,9 @@ export const mdxComponents: MDXComponents = {
     // TODO: extract title from children
     return (
       // @ts-expect-error RSC
-      <Code {...props} theme="material-default">{children as any}</Code>
+      <Code {...props} theme="material-default">
+        {children as any}
+      </Code>
     )
   },
   // @ts-expect-error types
@@ -73,7 +75,13 @@ export const mdxComponents: MDXComponents = {
   Folder,
 
   Tweet: (props) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <Tweet {...props} />
     </div>
   ),

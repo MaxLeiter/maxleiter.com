@@ -1,4 +1,4 @@
-import { getPosts } from './lib/get-posts'
+import getPosts from './lib/get-posts'
 
 export default async function sitemap() {
   const posts = await getPosts()

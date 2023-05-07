@@ -1,4 +1,3 @@
-import supabase from '@lib/supabase/private'
 import Link from '@components/link'
 import { UselessButton } from '@components/ie-or-css'
 import { Metadata } from 'next'
@@ -11,26 +10,26 @@ export const metadata: Metadata = {
   },
 }
 
-const fetchQuestions = async () => {
-  const { data, error } = await supabase
-    .from('Questions')
-    .select('id,question,isCSS')
+// const fetchQuestions = async () => {
+//   const { data, error } = await supabase
+//     .from('Questions')
+//     .select('id,question,isCSS')
 
-  if (error || !data) {
-    console.error(error)
-    return []
-  }
+//   if (error || !data) {
+//     console.error(error)
+//     return []
+//   }
 
-  const randomized = data.sort(() => Math.random() - 0.5)
-  return randomized
-}
+//   const randomized = data.sort(() => Math.random() - 0.5)
+//   return randomized
+// }
 
 const IeQuiz = async () => {
-  const questions = (await fetchQuestions()) as {
-    id: string
-    question: string
-    isCSS: boolean
-  }[]
+  // const questions = (await fetchQuestions()) as {
+  //   id: string
+  //   question: string
+  //   isCSS: boolean
+  // }[]
 
   return (
     <>

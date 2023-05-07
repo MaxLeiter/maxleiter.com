@@ -11,7 +11,10 @@ type Props = React.DetailedHTMLProps<
 
 const Badge = ({ children, className, width }: Props) => {
   return (
-    <div className={`${styles.badge} ${className ? className : ''}`} style={{ width }}>
+    <div
+      className={`${styles.badge} ${className ? className : ''}`}
+      style={{ width }}
+    >
       {children}
     </div>
   )

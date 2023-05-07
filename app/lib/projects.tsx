@@ -149,7 +149,7 @@ export const getProjects = cache(async (): Promise<Project[]> => {
             next: {
               // every 24 hours
               revalidate: 60 * 60 * 24,
-            }
+            },
           })
         ).json()
         // rate limited

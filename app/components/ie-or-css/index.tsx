@@ -31,31 +31,28 @@ export const UselessButton = ({ text }: { text: string }) => (
 )
 
 const IeOrCss = ({ questions }: IEQuizProps) => {
-  const [questionsWithVotes, setQuestionsWithVotes] = useState<
-    QuestionWithVotes[]
-  >([])
+  const [questionsWithVotes] = useState<QuestionWithVotes[]>([])
 
   console.log('questions', questions)
 
-  // update questionsWithVotes on changes
   useEffect(() => {
-    supabase.channel('votes').on('*', (payload) => {
-        const newObj = payload.new
-        setQuestionsWithVotes((questionsWithVotes) => {
-          const newQuestions = questionsWithVotes.map((q) => {
-            if (q.id === newObj.id) {
-              return {
-                ...q,
-                ...newObj,
-              }
-            }
-            return q
-          })
+    // supabase.channel('votes').on('*', (payload) => {
+    //     const newObj = payload.new
+    //     setQuestionsWithVotes((questionsWithVotes) => {
+    //       const newQuestions = questionsWithVotes.map((q) => {
+    //         if (q.id === newObj.id) {
+    //           return {
+    //             ...q,
+    //             ...newObj,
+    //           }
+    //         }
+    //         return q
+    //       })
 
-          return newQuestions
-        })
-      })
-      .subscribe()
+    //       return newQuestions
+    //     })
+    //   })
+    //   .subscribe()
 
     return () => {
       supabase.removeAllChannels()
@@ -69,21 +66,20 @@ const IeOrCss = ({ questions }: IEQuizProps) => {
 
       if (error || !data) {
         console.error(error)
-        return
       }
 
-      const newQuestions = questions.map((q) => {
-        const vote = data.find((v) => v.id === q.id)
-        if (vote) {
-          return {
-            ...q,
-            ...vote,
-          }
-        }
-        return q
-      })
+      // const newQuestions = questions.map((q) => {
+      //   const vote = data.find((v) => v.id === q.id)
+      //   if (vote) {
+      //     return {
+      //       ...q,
+      //       ...vote,
+      //     }
+      //   }
+      //   return q
+      // })
 
-      setQuestionsWithVotes(newQuestions)
+      // setQuestionsWithVotes(newQuestions)
     }
 
     fetchVotes()
