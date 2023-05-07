@@ -35,11 +35,11 @@ const IeOrCss = ({ questions }: IEQuizProps) => {
     QuestionWithVotes[]
   >([])
 
+  console.log('questions', questions)
+
   // update questionsWithVotes on changes
   useEffect(() => {
-    supabase
-      .from('Votes')
-      .on('*', (payload) => {
+    supabase.channel('votes').on('*', (payload) => {
         const newObj = payload.new
         setQuestionsWithVotes((questionsWithVotes) => {
           const newQuestions = questionsWithVotes.map((q) => {
@@ -58,7 +58,7 @@ const IeOrCss = ({ questions }: IEQuizProps) => {
       .subscribe()
 
     return () => {
-      supabase.removeAllSubscriptions()
+      supabase.removeAllChannels()
     }
   }, [])
 

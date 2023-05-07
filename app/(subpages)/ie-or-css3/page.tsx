@@ -1,8 +1,9 @@
 import supabase from '@lib/supabase/private'
 import Link from '@components/link'
-import IeOrCss, { UselessButton } from '@components/ie-or-css'
+import { UselessButton } from '@components/ie-or-css'
+import { Metadata } from 'next'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'IE or CSS3?',
   description: 'Test your knowledge on CSS3 and Internet Explorer.',
   alternates: {
@@ -11,7 +12,9 @@ export const metadata = {
 }
 
 const fetchQuestions = async () => {
-  const { data, error } = await supabase.from('Questions').select('id,question')
+  const { data, error } = await supabase
+    .from('Questions')
+    .select('id,question,isCSS')
 
   if (error || !data) {
     console.error(error)
@@ -23,10 +26,14 @@ const fetchQuestions = async () => {
 }
 
 const IeQuiz = async () => {
-  const questions = await fetchQuestions()
+  const questions = (await fetchQuestions()) as {
+    id: string
+    question: string
+    isCSS: boolean
+  }[]
+
   return (
     <>
-      {' '}
       <p>
         Welcome! This quiz is inspired by the{' '}
         <Link href="https://youtu.be/Ck-e3hd3pKw?t=22032" external>
@@ -49,7 +56,10 @@ const IeQuiz = async () => {
         If you think the feature is Internet Explorer specific or was used to
         target IE, click <UselessButton text={'IE'} />
       </p>
-      <IeOrCss questions={questions} />
+      <h3>
+        This page is currently on pause until I migrate to the latest supabase
+        Supabase.
+      </h3>
     </>
   )
 }
