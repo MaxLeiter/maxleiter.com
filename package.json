@@ -22,7 +22,6 @@
     "@octokit/rest": "^19.0.7",
     "@supabase/supabase-js": "2.21.0",
     "@vercel/analytics": "^1.0.1",
-    "@vercel/og": "^0.5.4",
     "bright": "^0.8.2",
     "globby": "^13.1.4",
     "htmlparser2": "^8.0.2",

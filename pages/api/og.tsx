@@ -1,4 +1,4 @@
-import { ImageResponse } from '@vercel/og'
+import { ImageResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 export const runtime = 'edge'
 
