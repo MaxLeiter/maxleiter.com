@@ -17,3 +17,11 @@ export type Project = {
   years: string[]
   stars?: number
 }
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      octokit: Octokit
+    }
+  }
+}
