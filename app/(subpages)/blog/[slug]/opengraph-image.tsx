@@ -12,27 +12,24 @@ export default async function ({
 }: {
   params: { slug: string }
 }): Promise<ImageResponse> {
-  // fetch https://raw.githubusercontent.com/MaxLeiter/maxleiter.com/master/posts/{slug}.mdx
-  // and parse the frontmatter to get the title and date
-
   const res = await fetch(
     `https://raw.githubusercontent.com/MaxLeiter/maxleiter.com/master/posts/${params.slug}.mdx`
   )
 
-  if (res.ok) {
+  if (!res.ok) {
     return new Response('Not found', { status: 404 })
   }
 
   const text = await res.text()
-  const title = text.match(/title: "(.*)"/)?.[1]
-  const date = text.match(/date: "(.*)"/)?.[1]
+  const title = text.match(/title: (.*)/)?.[1]
+  const date = text.match(/date: (.*)/)?.[1]
 
   if (!title) {
     return new Response('Missing title', { status: 400 })
   }
 
   const fontData = await fetch(
-    new URL('../../../fonts/Inter-Medium.ttf', import.meta.url)
+  new URL('../../../fonts/Inter-Medium.ttf', import.meta.url)
   ).then((res) => res.arrayBuffer())
 
   return new ImageResponse(
