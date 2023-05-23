@@ -40,7 +40,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Max Leiter',
-    description: 'Full-stack developer',
+    description: 'My personal website',
     url: 'https://maxleiter.com',
     siteName: "Max Leiter's website",
     locale: 'en_US',
