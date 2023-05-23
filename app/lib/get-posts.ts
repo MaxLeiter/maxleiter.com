@@ -2,25 +2,22 @@ import matter from 'gray-matter'
 import { Octokit } from '@octokit/rest'
 import type { Post } from './types'
 import { cache } from 'react'
-// import supabase from '@lib/supabase/private'
 import { promises as fs } from 'fs'
 
-// const octokit = new Octokit({
-//   auth: process.env.GITHUB_TOKEN,
-//   request: {
-//     fetch,
-//   },
-// })
-
 // save octokit to global if exists, otherwise create new instance and save to global
-const octokit = global.octokit ?? new Octokit({
-  auth: process.env.GITHUB_TOKEN,
-  request: {
-    fetch,
-  },
-})
+const octokit =
+  // @ts-ignore - octokit is not defined
+  global.octokit ??
+  new Octokit({
+    auth: process.env.GITHUB_TOKEN,
+    request: {
+      fetch,
+    },
+  })
 
+// @ts-ignore - octokit is not defined
 if (!global.octokit) {
+  // @ts-ignore - octokit is not defined
   global.octokit = octokit
 }
 
@@ -43,22 +40,23 @@ const getPosts = cache(async () => {
   const repoName = 'maxleiter.com'
   const postsDir = 'posts'
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     const posts = await Promise.all(
-      (await fs.readdir(`${process.cwd()}/posts`)).map(async (file) => {
+      (
+        await fs.readdir(`${process.cwd()}/posts`)
+      ).map(async (file) => {
         const postContent = await fs.readFile(
           `${process.cwd()}/posts/${file}`,
           'utf8'
         )
         const { data, content } = matter(postContent)
         return { ...data, body: content } as Post
-      }
-    ))
+      })
+    )
 
     return posts.sort((a, b) =>
       a && b ? new Date(b.date).getTime() - new Date(a.date).getTime() : 0
     ) as Post[]
-
   }
 
   const { data: files } = (await octokit.repos.getContent({
