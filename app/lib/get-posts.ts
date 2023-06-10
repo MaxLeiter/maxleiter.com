@@ -1,122 +1,37 @@
 import matter from 'gray-matter'
-import { Octokit } from '@octokit/rest'
+import path from 'path'
 import type { Post } from './types'
+import fs from 'fs/promises'
 import { cache } from 'react'
-import { promises as fs } from 'fs'
+// import supabase from '@lib/supabase/private'
 
-export function avoidRateLimit(delay = 500) {
-  if (process.env.VERCEL_ENV !== 'production') {
-    return
-  }
+export const getPosts = cache(async () => {
+  const posts = await fs.readdir('./posts/')
 
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay)
-  })
-}
-
-// save octokit to global if exists, otherwise create new instance and save to global
-const octokit =
-  // @ts-ignore - octokit is not defined
-  global.octokit ??
-  new Octokit({
-    auth: process.env.GITHUB_TOKEN,
-    request: {
-      fetch,
-    },
-  })
-
-// @ts-ignore - octokit is not defined
-if (!global.octokit) {
-  // @ts-ignore - octokit is not defined
-  global.octokit = octokit
-}
-
-type GithubFile = {
-  type: 'file' | 'dir' | 'submodule' | 'symlink'
-  size: number
-  name: string
-  path: string
-  content?: string | undefined
-  sha: string
-  url: string
-  git_url: string | null
-  html_url: string | null
-  download_url: string | null
-  _links: any
-}
-
-const getPosts = cache(async () => {
-  const repoOwner = 'maxleiter'
-  const repoName = 'maxleiter.com'
-  const postsDir = 'posts'
-
-  if (process.env.NODE_ENV === 'development') {
-    const posts = await Promise.all(
-      (
-        await fs.readdir(`${process.cwd()}/posts`)
-      ).map(async (file) => {
-        const postContent = await fs.readFile(
-          `${process.cwd()}/posts/${file}`,
-          'utf8'
-        )
-        const { data, content } = matter(postContent)
-        return { ...data, body: content } as Post
-      })
-    )
-
-    return posts.sort((a, b) =>
-      a && b ? new Date(b.date).getTime() - new Date(a.date).getTime() : 0
-    ) as Post[]
-  }
-
-  const { data: files } = (await octokit.repos.getContent({
-    owner: repoOwner,
-    repo: repoName,
-    path: postsDir,
-  })) as { data: GithubFile[] }
-  avoidRateLimit()
   const postsWithMetadata = await Promise.all(
-    files
+    posts
       .filter(
-        (file) =>
-          file.type === 'file' &&
-          (file.path.endsWith('.md') || file.path.endsWith('.mdx'))
+        (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx'
       )
       .map(async (file) => {
-        avoidRateLimit()
-        const { data: fileContent } = (await octokit.repos.getContent({
-          owner: repoOwner,
-          repo: repoName,
-          path: file.path,
-          cache: 'force-cache',
-        })) as { data: GithubFile }
-
-        if (!fileContent.content) {
-          return null
-        }
-
-        const postContent = Buffer.from(fileContent.content, 'base64').toString(
-          'utf8'
-        )
+        const filePath = `./posts/${file}`
+        const postContent = await fs.readFile(filePath, 'utf8')
         const { data, content } = matter(postContent)
 
         if (data.published === false) {
           return null
         }
-
-        const withoutLeadingChars = file.path.replace('.mdx', '.md')
+        const withoutLeadingChars = filePath.substring(2).replace('.mdx', '.md')
 
         const fetchUrl =
           process.env.NODE_ENV === 'production'
-            ? `https://api.github.com/repos/${repoOwner}/${repoName}/commits?path=${withoutLeadingChars}&page=1&per_page=1`
+            ? `https://api.github.com/repos/maxleiter/maxleiter.com/commits?path=${withoutLeadingChars}&page=1&per_page=1`
             : `http://localhost:3000/mock-commit-response.json`
 
-        avoidRateLimit();
         const commitInfoResponse = await fetch(fetchUrl, {
           headers: {
             Authorization: process.env.GITHUB_TOKEN ?? '',
           },
-          cache: 'force-cache',
         })
         const commitInfo = await commitInfoResponse.json()
         let lastModified = 0
@@ -153,7 +68,7 @@ const getPosts = cache(async () => {
   return filtered
 })
 
-export const getPost = async (slug: string) => {
+export async function getPost(slug: string) {
   const posts = await getPosts()
   return posts.find((post) => post.slug === slug)
 }

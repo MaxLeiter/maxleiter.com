@@ -1,6 +1,6 @@
 ---
-title: Why your website's fonts might be larger than you want on mobile
-description: A well-meaning iOS feature can be problematic
+title: Why your website's fonts might be larger than intended
+description: A well-meaning mobile browser feature can be problematic
 slug: mobile-browsers-resizing-font
 date: Jun 9, 2023
 ---
@@ -17,7 +17,7 @@ I was able to reproduce the issue and found that it only happened on iOS devices
   height={500}
 />
 
-After adventuring down a small rabbit hole, I can share that mobile devices (mostly tablets/phones) support the [text-size-adjust](https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust) CSS property that automatically adjusts the font size of text to make it more readable. 
+After adventuring down a small rabbit hole, I can share that mobile devices (mostly tablets/phones) support the [text-size-adjust](https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust) CSS property that automatically adjusts the font size of text to make it more readable.
 This is a great feature for most websites, but it can be problematic for code blocks. It's worth noting that all browsers support this feature (although WebKit requires a prefix), but it seems like they use different heuristics to determine when to apply it.
 
 Here's a solution:
