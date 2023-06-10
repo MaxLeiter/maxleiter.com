@@ -45,7 +45,6 @@ const Posts = (props: Props) => {
             href={`/blog/${post.slug}`}
             title={post.title}
             date={new Date(date)}
-            description={post.description}
             views={post.views}
           />
         )

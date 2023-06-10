@@ -5,7 +5,7 @@
 .link {
   display: block;
   text-decoration: none;
-  color: var(--fg);
+  color: var(--fg) !important;
   outline: none;
   padding-top: var(--gap);
   padding-bottom: var(--gap-double);
