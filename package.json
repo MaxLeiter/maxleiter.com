@@ -24,7 +24,7 @@
     "@vercel/analytics": "^1.0.1",
     "bright": "^0.8.2",
     "globby": "^13.1.4",
-    "htmlparser2": "^8.0.2",
+    "htmlparser2": "^9.0.0",
     "lodash.debounce": "4.0.8",
     "next": "13.4.5-canary.9",
     "next-mdx-remote": "^4.4.1",
