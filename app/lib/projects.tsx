@@ -119,10 +119,6 @@ const Projects: Project[] = [
   },
 ]
 
-// export function getProjects() {
-//   return Projects
-// }
-
 export const getProjects = cache(async (): Promise<Project[]> => {
   if (!process.env.GITHUB_TOKEN) {
     throw new Error(
@@ -146,12 +142,10 @@ export const getProjects = cache(async (): Promise<Project[]> => {
             headers: {
               Authorization: process.env.GITHUB_TOKEN ?? '',
             },
-            next: {
-              // every 24 hours
-              revalidate: 60 * 60 * 24,
-            },
+            cache: 'force-cache'
           })
         ).json()
+
         // rate limited
         if (!stargazers_count && message) {
           console.warn(`Rate limited or error: ${message}`)

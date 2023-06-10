@@ -73,6 +73,7 @@ const getPosts = cache(async () => {
           (file.path.endsWith('.md') || file.path.endsWith('.mdx'))
       )
       .map(async (file) => {
+        await new Promise((resolve) => setTimeout(resolve, 1000))
         const { data: fileContent } = (await octokit.repos.getContent({
           owner: repoOwner,
           repo: repoName,
@@ -93,6 +94,8 @@ const getPosts = cache(async () => {
         }
 
         const withoutLeadingChars = file.path.replace('.mdx', '.md')
+
+        await new Promise((resolve) => setTimeout(resolve, 2000))
 
         const fetchUrl =
           process.env.NODE_ENV === 'production'
