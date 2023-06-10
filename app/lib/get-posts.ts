@@ -83,7 +83,10 @@ const getPosts = cache(async () => {
           return null
         }
 
-        const { data, content } = matter(fileContent.content)
+        const postContent = Buffer.from(fileContent.content, 'base64').toString(
+          'utf8'
+        )
+        const { data, content } = matter(postContent)
 
         if (data.published === false) {
           return null
@@ -100,7 +103,7 @@ const getPosts = cache(async () => {
           headers: {
             Authorization: process.env.GITHUB_TOKEN ?? '',
           },
-          cache: 'force-cache',
+          cache: 'force-cache'
         })
         const commitInfo = await commitInfoResponse.json()
         let lastModified = 0
