@@ -4,6 +4,16 @@ import type { Post } from './types'
 import { cache } from 'react'
 import { promises as fs } from 'fs'
 
+export function avoidRateLimit(delay = 500) {
+  if (process.env.VERCEL_ENV !== 'production') {
+    return
+  }
+
+  return new Promise((resolve) => {
+    setTimeout(resolve, delay)
+  })
+}
+
 // save octokit to global if exists, otherwise create new instance and save to global
 const octokit =
   // @ts-ignore - octokit is not defined
@@ -64,7 +74,7 @@ const getPosts = cache(async () => {
     repo: repoName,
     path: postsDir,
   })) as { data: GithubFile[] }
-
+  avoidRateLimit()
   const postsWithMetadata = await Promise.all(
     files
       .filter(
@@ -73,10 +83,12 @@ const getPosts = cache(async () => {
           (file.path.endsWith('.md') || file.path.endsWith('.mdx'))
       )
       .map(async (file) => {
+        avoidRateLimit()
         const { data: fileContent } = (await octokit.repos.getContent({
           owner: repoOwner,
           repo: repoName,
           path: file.path,
+          cache: 'force-cache',
         })) as { data: GithubFile }
 
         if (!fileContent.content) {
@@ -99,11 +111,12 @@ const getPosts = cache(async () => {
             ? `https://api.github.com/repos/${repoOwner}/${repoName}/commits?path=${withoutLeadingChars}&page=1&per_page=1`
             : `http://localhost:3000/mock-commit-response.json`
 
+        avoidRateLimit();
         const commitInfoResponse = await fetch(fetchUrl, {
           headers: {
             Authorization: process.env.GITHUB_TOKEN ?? '',
           },
-          cache: 'force-cache'
+          cache: 'force-cache',
         })
         const commitInfo = await commitInfoResponse.json()
         let lastModified = 0
