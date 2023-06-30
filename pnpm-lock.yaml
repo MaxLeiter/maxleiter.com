@@ -48,7 +48,7 @@ specifiers:
   prettier: ^2.8.8
   react: 18.3.0-canary-16d053d59-20230506
   react-dom: 18.3.0-canary-16d053d59-20230506
-  react-tweet: ^2.0.1
+  react-tweet: ^3.0.0
   rehype-autolink-headings: ^6.1.1
   rehype-highlight: ^6.0.0
   rehype-img-size: ^1.0.1
@@ -88,7 +88,7 @@ dependencies:
   prettier: 2.8.8
   react: 18.3.0-canary-16d053d59-20230506
   react-dom: 18.3.0-canary-16d053d59-20230506_u56pbgjbkowncv6nprcr2weanu
-  react-tweet: 2.0.1_gtqat2wn5bqm6ott5tfyc3i7ca
+  react-tweet: 3.0.0_gtqat2wn5bqm6ott5tfyc3i7ca
   rehype-highlight: 6.0.0
   rehype-img-size: 1.0.1
   remark-frontmatter: 4.0.1
@@ -953,12 +953,6 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
-    dev: false
-
-  /@swc/helpers/0.4.14:
-    resolution: {integrity: sha512-4C7nX/dvpzB7za4Ql9K81xK3HPxCpHMgwTZVyf+9JQ6VUbn9jjZVN7/Nkdz/Ugzs2CSjqnL/UPXroiVBVHUWUw==}
-    dependencies:
-      tslib: 2.5.0
     dev: false
 
   /@swc/helpers/0.5.1:
@@ -5184,18 +5178,18 @@ packages:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: true
 
-  /react-tweet/2.0.1_gtqat2wn5bqm6ott5tfyc3i7ca:
-    resolution: {integrity: sha512-r8Yrv+cW8ajpCcT2AJCIji9crbbVxiaYSagqU4IW4Btsm3b3Ui65pFOV9gZmnt2xorn8L98kqj8REEuGxwnaeA==}
+  /react-tweet/3.0.0_gtqat2wn5bqm6ott5tfyc3i7ca:
+    resolution: {integrity: sha512-oLtr5AsBmoYFlZeSm1zWFn1P1oS4Vja/wGAcw1BEtCSJAENcsLlUNnsJdExZ8QTuxv2w3ETjvNeHTv68+xhciA==}
     peerDependencies:
       react: '>= 18.0.0'
       react-dom: '>= 18.0.0'
     dependencies:
-      '@swc/helpers': 0.4.14
+      '@swc/helpers': 0.5.1
       clsx: 1.2.1
       date-fns: 2.30.0
       react: 18.3.0-canary-16d053d59-20230506
       react-dom: 18.3.0-canary-16d053d59-20230506_u56pbgjbkowncv6nprcr2weanu
-      swr: 2.1.5_u56pbgjbkowncv6nprcr2weanu
+      swr: 2.2.0_u56pbgjbkowncv6nprcr2weanu
     dev: false
 
   /react/18.3.0-canary-16d053d59-20230506:
@@ -5559,6 +5553,7 @@ packages:
   /source-map/0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -5733,6 +5728,15 @@ packages:
 
   /swr/2.1.5_u56pbgjbkowncv6nprcr2weanu:
     resolution: {integrity: sha512-/OhfZMcEpuz77KavXST5q6XE9nrOBOVcBLWjMT+oAE/kQHyE3PASrevXCtQDZ8aamntOfFkbVJp7Il9tNBQWrw==}
+    peerDependencies:
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.3.0-canary-16d053d59-20230506
+      use-sync-external-store: 1.2.0_u56pbgjbkowncv6nprcr2weanu
+    dev: false
+
+  /swr/2.2.0_u56pbgjbkowncv6nprcr2weanu:
+    resolution: {integrity: sha512-AjqHOv2lAhkuUdIiBu9xbuettzAzWXmCEcLONNKJRba87WAefz8Ca9d6ds/SzrPc235n1IxWYdhJ2zF3MNUaoQ==}
     peerDependencies:
       react: ^16.11.0 || ^17.0.0 || ^18.0.0
     dependencies:

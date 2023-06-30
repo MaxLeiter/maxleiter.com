@@ -35,7 +35,7 @@
     "prettier": "^2.8.8",
     "react": "18.3.0-canary-16d053d59-20230506",
     "react-dom": "18.3.0-canary-16d053d59-20230506",
-    "react-tweet": "^2.0.1",
+    "react-tweet": "^3.0.0",
     "rehype-highlight": "^6.0.0",
     "rehype-img-size": "^1.0.1",
     "remark-frontmatter": "^4.0.1",
