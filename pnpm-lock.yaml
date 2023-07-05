@@ -45,7 +45,7 @@ specifiers:
   postcss-hover-media-feature: 1.0.2
   postcss-nested: ^6.0.1
   postcss-preset-env: 8.3.2
-  prettier: ^2.8.8
+  prettier: ^3.0.0
   react: 18.3.0-canary-16d053d59-20230506
   react-dom: 18.3.0-canary-16d053d59-20230506
   react-tweet: ^2.0.1
@@ -85,7 +85,7 @@ dependencies:
   next-themes: 0.2.1_ilkamvfzxpreaom6o3obvheyiy
   patch-package: 7.0.0
   postcss: 8.4.23
-  prettier: 2.8.8
+  prettier: 3.0.0
   react: 18.3.0-canary-16d053d59-20230506
   react-dom: 18.3.0-canary-16d053d59-20230506_u56pbgjbkowncv6nprcr2weanu
   react-tweet: 2.0.1_gtqat2wn5bqm6ott5tfyc3i7ca
@@ -5098,9 +5098,9 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier/2.8.8:
-    resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
-    engines: {node: '>=10.13.0'}
+  /prettier/3.0.0:
+    resolution: {integrity: sha512-zBf5eHpwHOGPC47h0zrPyNn+eAEIdEzfywMoYn2XPi0P44Zp0tSq64rq0xAREh4auw2cJZHo9QUob+NqCQky4g==}
+    engines: {node: '>=14'}
     hasBin: true
     dev: false
 
@@ -5559,6 +5559,7 @@ packages:
   /source-map/0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dev: true
     optional: true
 
