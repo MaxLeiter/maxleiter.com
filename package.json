@@ -43,7 +43,7 @@
     "rss-parser": "3.13.0",
     "swr": "2.2.0",
     "tiny-glob": "^0.2.9",
-    "youtubei": "0.0.1-rc.36"
+    "youtubei": "1.1.2"
   },
   "devDependencies": {
     "@types/marked": "5.0.1",
