@@ -70,8 +70,11 @@ export const mdxComponents: MDXComponents = {
   HomeIcon: Home,
 
   // file tree
+  // @ts-expect-error types
   FileTree,
+  // @ts-expect-error types
   File,
+  // @ts-expect-error types
   Folder,
 
   Tweet: (props) => (
