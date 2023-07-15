@@ -34,7 +34,7 @@ type Options = {
   value: string | number
 }
 
-const _useMediaQuery = ({ feature, value }: Options) => {
+const useMediaQuery = ({ feature, value }: Options) => {
   const [matches, setMatches] = useState(false)
 
   const query = `(${feature}: ${value})`
@@ -55,9 +55,9 @@ const _useMediaQuery = ({ feature, value }: Options) => {
 }
 
 const useReducedMotion = () => {
-  return _useMediaQuery({ feature: 'prefers-reduced-motion', value: 'reduce' })
+  return useMediaQuery({ feature: 'prefers-reduced-motion', value: 'reduce' })
 }
 
 export { useReducedMotion }
 
-export default _useMediaQuery
+export default useMediaQuery
