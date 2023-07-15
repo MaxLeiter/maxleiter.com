@@ -20,3 +20,6 @@ yalc.lock
 **/supabase/.temp
 
 .vscode
+
+# next bundle analyzer
+analyze/
