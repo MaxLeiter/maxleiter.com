@@ -9,6 +9,7 @@ type Props =
       href: string
       date?: Date
       views?: number
+      isThirdParty?: boolean
     }
   | {
       skeleton: true
@@ -19,7 +20,7 @@ const BlockEntry = (props: Props) => {
     return <li className={styles.skeleton} />
   }
 
-  const { title, description, type, href, date, views } = props
+  const { title, description, type, href, date, views, isThirdParty } = props
   return (
     <li className={styles.item}>
       <Link
@@ -48,9 +49,11 @@ const BlockEntry = (props: Props) => {
             ) : null}
           </div>
         )}
-
         <h4 className={`${styles.title}`}>{title}</h4>
         {description && <p className={styles.description}>{description}</p>}
+        {isThirdParty && (
+            <span className={styles.thirdParty}>{new URL(href).hostname}</span>
+        )}
       </Link>
     </li>
   )

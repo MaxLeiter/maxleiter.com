@@ -5,7 +5,32 @@ import fs from 'fs/promises'
 import { cache } from 'react'
 // import supabase from '@lib/supabase/private'
 
-export const getPosts = cache(async () => {
+const thirdPartyPosts: Post[] = [
+  {
+    title: 'Introducing the Vercel AI SDK',
+    description: "An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.",
+    body: '',
+    date: '2023-06-15T13:00:00.000Z',
+    slug: '',
+    tags: [],
+    lastModified: 0,
+    isThirdParty: true,
+    href: 'https://vercel.com/blog/introducing-the-vercel-ai-sdk'
+  },
+  {
+    title: 'Improving the accessibility of our Next.js site',
+    description: "We've made some improvements to the accessibility of our Next.js site. Here's how we did it.",
+    body: '',
+    date: '2022-09-30T13:00:00.000Z',
+    slug: '',
+    tags: [],
+    lastModified: 0,
+    isThirdParty: true,
+    href: 'https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site'
+  }
+]
+
+export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
   const posts = await fs.readdir('./posts/')
 
   const postsWithMetadata = await Promise.all(
@@ -60,11 +85,18 @@ export const getPosts = cache(async () => {
         return { ...data, body: content, lastModified } as Post
       })
   )
-  const filtered = postsWithMetadata
+
+  const postsWithMetadataAndThirdPartyPosts = [
+    ...postsWithMetadata,
+    ...(includeThirdPartyPosts ? thirdPartyPosts : [])
+  ]
+
+  const filtered = postsWithMetadataAndThirdPartyPosts
     .filter((post) => post !== null)
     .sort((a, b) =>
       a && b ? new Date(b.date).getTime() - new Date(a.date).getTime() : 0
     ) as Post[]
+
   return filtered
 })
 

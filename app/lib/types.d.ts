@@ -7,6 +7,9 @@ export type Post = {
   body: string
   lastModified?: number
   views?: number
+  // Third party only
+  isThirdParty?: boolean
+  href?: string
 }
 
 export type Project = {

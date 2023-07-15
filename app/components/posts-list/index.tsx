@@ -42,10 +42,11 @@ const Posts = (props: Props) => {
         return (
           <BlockEntry
             key={`post-item-${post.slug}`}
-            href={`/blog/${post.slug}`}
+            href={post.isThirdParty ? post.href! : `/blog/${post.slug}`}
             title={post.title}
             date={new Date(date)}
             views={post.views}
+            isThirdParty={post.isThirdParty}
           />
         )
       })}

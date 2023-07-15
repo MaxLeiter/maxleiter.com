@@ -35,7 +35,6 @@ export default async function HomePage() {
       />
       <h3>My posts</h3>
       <Suspense fallback={<Posts skeleton />}>
-        {/* @ts-expect-error async rsc support */}
         <PostListRSC paginate={false} />
       </Suspense>
       <footer className={styles.footer}>

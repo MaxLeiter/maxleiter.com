@@ -11,7 +11,6 @@ import { mdxComponents } from './components'
 
 export function PostBody({ children }: { children: string }) {
   return (
-    // @ts-expect-error RSC
     <MDXRemote
       source={children}
       options={{

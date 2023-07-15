@@ -39,7 +39,6 @@ export const mdxComponents: MDXComponents = {
   >) => {
     // TODO: extract title from children
     return (
-      // @ts-expect-error RSC
       <Code {...props} theme="material-default">
         {children as any}
       </Code>
@@ -47,6 +46,7 @@ export const mdxComponents: MDXComponents = {
   },
   // @ts-expect-error types
   img: MDXImage,
+  // @ts-expect-error types
   Image: NextImage,
   Details: ({
     children,

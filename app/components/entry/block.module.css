@@ -82,3 +82,17 @@
   margin-bottom: var(--gap);
   height: 150px;
 }
+
+.thirdParty {
+ color: var(--gray);
+ font-size: 0.9rem;
+}
+
+.thirdParty:after {
+  content: '↗';
+  margin-left: 0.25rem;
+  font-size: 0.7rem;
+  /* position up a little */
+  position: relative;
+  top: -0.03rem;
+}
