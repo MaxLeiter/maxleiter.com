@@ -29,6 +29,7 @@ const BlockEntry = (props: Props) => {
         className={styles.link}
         underline={false}
         scroll={true}
+        external={isThirdParty}
       >
         {type && <div className={styles.type}>{type}</div>}
         {date && (
