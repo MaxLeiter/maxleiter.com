@@ -20,7 +20,7 @@ specifiers:
   '@typescript-eslint/parser': 6.0.0
   '@vercel/analytics': ^1.0.1
   bright: ^0.8.2
-  clsx: ^1.2.1
+  clsx: ^2.0.0
   concurrently: 8.2.0
   critters: 0.0.19
   dotenv: 16.3.1
@@ -108,7 +108,7 @@ devDependencies:
   '@types/rss': 0.0.30
   '@typescript-eslint/eslint-plugin': 6.0.0_67z5obcwh3vgkftcfgt7udy35y
   '@typescript-eslint/parser': 6.0.0_ko3fmmbeyij36muomfgt2u76xu
-  clsx: 1.2.1
+  clsx: 2.0.0
   concurrently: 8.2.0
   critters: 0.0.19
   dotenv: 16.3.1
@@ -1803,6 +1803,12 @@ packages:
   /clsx/1.2.1:
     resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
     engines: {node: '>=6'}
+    dev: false
+
+  /clsx/2.0.0:
+    resolution: {integrity: sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==}
+    engines: {node: '>=6'}
+    dev: true
 
   /color-convert/1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
@@ -6175,6 +6181,7 @@ packages:
   /source-map/0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dev: true
     optional: true
 
