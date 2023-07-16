@@ -55,7 +55,7 @@
     "@types/rss": "0.0.30",
     "@typescript-eslint/eslint-plugin": "6.0.0",
     "@typescript-eslint/parser": "6.0.0",
-    "clsx": "^1.2.1",
+    "clsx": "^2.0.0",
     "concurrently": "8.2.0",
     "critters": "0.0.19",
     "dotenv": "16.3.1",
