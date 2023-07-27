@@ -39,7 +39,7 @@ specifiers:
   next-mdx-remote: ^4.4.1
   next-remote-watch: 2.0.0
   next-themes: ^0.2.1
-  patch-package: ^7.0.2
+  patch-package: ^8.0.0
   postcss: 8.4.26
   postcss-flexbugs-fixes: 5.0.2
   postcss-hover-media-feature: 1.0.2
@@ -83,7 +83,7 @@ dependencies:
   next-mdx-remote: 4.4.1_gtqat2wn5bqm6ott5tfyc3i7ca
   next-remote-watch: 2.0.0_next@13.4.10
   next-themes: 0.2.1_wxjnjbslxnl7gjpcupiy62t5ey
-  patch-package: 7.0.2
+  patch-package: 8.0.0
   postcss: 8.4.26
   prettier: 3.0.0
   react: 18.3.0-canary-16d053d59-20230506
@@ -3723,6 +3723,12 @@ packages:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
     dev: true
 
+  /json-stable-stringify/1.0.2:
+    resolution: {integrity: sha512-eunSSaEnxV12z+Z73y/j5N37/In40GK4GmsSy+tEHJMxknvqnA7/djeYtAgW0GsWHUfg+847WJjKaEylk2y09g==}
+    dependencies:
+      jsonify: 0.0.1
+    dev: false
+
   /json5/1.0.2:
     resolution: {integrity: sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==}
     hasBin: true
@@ -3742,6 +3748,10 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.11
+    dev: false
+
+  /jsonify/0.0.1:
+    resolution: {integrity: sha512-2/Ki0GcmuqSrgFyelQq9M05y7PS0mEwuIzrf3f1fPqkVDVRvZrPZtVSMHxdgo8Aq0sxAOb/cr2aqqA3LeWHVPg==}
     dev: false
 
   /jsx-ast-utils/3.3.3:
@@ -5119,8 +5129,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: false
 
-  /patch-package/7.0.2:
-    resolution: {integrity: sha512-PMYfL8LXxGIRmxXLqlEaBxzKPu7/SdP13ld6GSfAUJUZRmBDPp8chZs0dpzaAFn9TSPnFiMwkC6PJt6pBiAl8Q==}
+  /patch-package/8.0.0:
+    resolution: {integrity: sha512-da8BVIhzjtgScwDJ2TtKsfT5JFWz1hYoBl9rUQ1f38MC2HwnEIkK8VN3dKMKcP7P7bvvgzNDbfNHtx3MsQb5vA==}
     engines: {node: '>=14', npm: '>5'}
     hasBin: true
     dependencies:
@@ -5130,6 +5140,7 @@ packages:
       cross-spawn: 7.0.3
       find-yarn-workspace-root: 2.0.0
       fs-extra: 9.1.0
+      json-stable-stringify: 1.0.2
       klaw-sync: 6.0.0
       minimist: 1.2.8
       open: 7.4.2
@@ -6175,6 +6186,7 @@ packages:
   /source-map/0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dev: true
     optional: true
 
