@@ -30,7 +30,7 @@
     "next-mdx-remote": "^4.4.1",
     "next-remote-watch": "2.0.0",
     "next-themes": "^0.2.1",
-    "patch-package": "^7.0.2",
+    "patch-package": "^8.0.0",
     "postcss": "8.4.26",
     "prettier": "^3.0.0",
     "react": "18.3.0-canary-16d053d59-20230506",
