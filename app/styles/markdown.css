@@ -18,11 +18,9 @@ article aside p {
 article video,
 article img {
   max-width: 100%;
-  /* width: var(--main-content); */
-  width: auto;
-  margin: var(--gap-half) auto;
+  height: auto;
   display: block;
-  border-radius: var(--radius);
+  margin: var(--gap) auto;
 }
 
 /* Lists */
