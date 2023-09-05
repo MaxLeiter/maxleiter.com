@@ -44,10 +44,8 @@ export const mdxComponents: MDXComponents = {
       </Code>
     )
   },
-  // @ts-expect-error types
-  img: MDXImage,
-  // @ts-expect-error types
-  Image: NextImage,
+  img: MDXImage as any,
+  Image: NextImage as any,
   Details: ({
     children,
     summary,
@@ -70,12 +68,9 @@ export const mdxComponents: MDXComponents = {
   HomeIcon: Home,
 
   // file tree
-  // @ts-expect-error types
-  FileTree,
-  // @ts-expect-error types
-  File,
-  // @ts-expect-error types
-  Folder,
+  FileTree: FileTree as any,
+  File: File as any,
+  Folder: Folder as any,
 
   Tweet: (props) => (
     <div
