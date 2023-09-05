@@ -60,7 +60,7 @@
     "critters": "0.0.19",
     "dotenv": "16.3.1",
     "eslint": "8.45.0",
-    "eslint-config-next": "13.4.10",
+    "eslint-config-next": "13.4.19",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-mdx": "^2.1.0",
     "eslint-plugin-react": "7.32.2",
