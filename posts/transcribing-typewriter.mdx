@@ -1,0 +1,185 @@
+---
+title: Transcribing with AWS Textract
+description: rransc;rib:ing an old Tpi ewritcr _ocument with AN S
+slug: typewriter-transcription
+date: Sep 10, 2023
+---
+
+My family has (in my opinion) a very cool written history of our family tree on my father's side.
+Recently, my grandfather found a renewed interest in the book and decided to digitize and update it.
+He took it to a local print shop and had them scan it to a PDF (it's 60+ pages), which resulted in scans like this:
+
+![typewriter scan](/blog/typewriter/typewriter-scan.png?width=350)
+
+It seems like something for <abbr title="optical character recognition">OCR</abbr>, but no tool I tried could handle the font and the scan quality very well.
+I tried to perform some post-processing on the text to fix the errors, but I couldn't put together the right incantation of imagemagick parameters to do much. 
+Sharpening sometimes made it easier for me to read it, but it didn't help the OCR tools.
+
+Here's the first paragraph transcribed my be:
+
+```
+On or about 1788 in a small town of Streliska Galitsia a
+family by the name of Wolf sin Mordecai was living with his
+Wife and three sons ;- Berl, Lippe, and Mordecai.
+```
+
+First, I tried my favorite OCR tool: Preview on macOS. It works well for printed text, but it didn't work well with the typewriter's font and scan quality.
+Here's a copy pasted excerpt from the first three lines of image above:
+
+<Diff>
+  On or about 1788 la a san22 tom of Strollaka Calissim
+  <br />
+  wife and saree sons z-Barl, • Mappo, sad Losdeena.
+</Diff>
+
+It completely skips the second line and jumbles the rest into nonsense.
+
+After that I did some googling and found [`ocrmypdf`](https://ocrmypdf.readthedocs.io/en/latest/), which is a command-line wrapper around the [Tesseract](https://github.com/tesseract-ocr/tesseract) OCR engine.
+From what I can tell, most open-source OCR tools are wrappers around Tesseract, so I chose the most popular wrapper I could find.
+ocrmypdf did an impressively better job than Preview, but it still wasn't great:
+
+<Diff>
+  On of about 1768 in © omehl town of Strelisks Galitsia
+  family by the mame of Wolf sin Moerdessi was living with his
+  Wife snd three sons ;~- Berl, Lippe, and Mordecad,
+</Diff>
+
+Finally, I decided to try [AWS Textract](https://aws.amazon.com/textract/) after seeing a Google ad for it.
+AWS might seem a little overkill, and it probably is, but their free tier is very generous with 1,000 pages per month and I figured there was a low chance of me going over that.
+Not being an AWS user I found it unnecessarily complicated getting started, but once I got it working it was the best solution by far (although still not as great as I expected).
+
+I first had to create a bucket and upload the PDF to it. I tried to use the AWS CLI for this, but gave up and used the console <code>¯\_(ツ)\_/¯</code>.
+
+Then with the I could run the following command to process the file:
+
+```bash
+aws textract analyze-document \
+    --document '{"S3Object":{"Bucket":"bucketname","Name":"filename"}}' \
+    --region us-west-1  \
+    --feature-types '["TABLES","FORMS","SIGNATURES"]'
+```
+
+...or so I thought:
+
+```
+An error occurred (DocumentTooLargeException) when calling the AnalyzeDocument operation: S3 object size 31251609 is more than the maximum limit 10485760
+```
+
+I guess I should have read the docs more closely. The maximum file size for _synchronously_ OCRing is 10MB. I could have split the file into smaller chunks,
+but instead I fired off a job to process the file async:
+
+```bash
+aws textract start-document-analysis \
+     --document '{"S3Object":{"Bucket":"bucketname","Name":"filename"}}' \
+     --feature-types '["TABLES","FORMS","SIGNA
+TURES"]' \
+     -region us-west-1
+```
+
+This returned a response:
+
+```json
+{
+  "JobId": "somerandomstring"
+}
+```
+
+I could then use the job ID to check the status of the job:
+
+```bash
+aws textract get-document-analysis \
+                  --job-id somerandomstring \
+                  --region us-west-1
+{
+    "JobStatus": "IN_PROGRESS",
+    "AnalyzeDocumentModelVersion": "1.0"
+}
+```
+
+Once it was done I got back a scary JSON object:
+
+```json
+{
+  "DocumentMetadata": {
+    "Pages": 70
+  },
+  "JobStatus": "SUCCEEDED",
+  "NextToken": "lqcceE45FaQ/PZn9Vh3lEx2gqQuNgqJvcy2HG4g2BClYNBKxaTVRukM41e5+MN7dcASSArbPT1KFXhNRcKa9aGdwut1Yrae234pofBDcFNT6jh9PiogjrsdIaIAnKKNReID8RCk=",
+  "Blocks": [
+    {
+      "BlockType": "PAGE",
+      "Geometry": {
+        "BoundingBox": {
+          "Width": 0.9691011905670166,
+          "Height": 0.9765985012054443,
+          "Left": 0.0308988057076931,
+          "Top": 0.0
+        },
+        "Polygon": [
+          {
+            "X": 0.03162039443850517,
+            "Y": 0.0
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+~~I~~ Copilot threw together this script to extract the text from the JSON:
+
+<details>
+<summary>Click to expand</summary>
+
+```js
+const AWS = require('aws-sdk')
+const fs = require('fs/promises')
+
+AWS.config.update({ region: 'us-west-1' })
+
+const textract = new AWS.Textract()
+
+const params = {
+  JobId: 'somerandomstring',
+}
+
+async function getText(params) {
+  const data = await textract.getDocumentAnalysis(params).promise()
+  let finalText = ''
+  const blocks = data.Blocks
+  blocks.forEach((block) => {
+    if (block.BlockType === 'LINE') {
+      finalText += block.Text + '\n'
+    }
+  })
+  const nextToken = data.NextToken
+  if (nextToken) {
+    params.NextToken = nextToken
+    console.log('Getting next page of results...')
+    return finalText + (await getText(params))
+  } else {
+    return finalText
+  }
+}
+
+getText(params).then((text) => {
+  fs.writeFile('text_output.txt', text, 'utf8')
+  console.log('Done')
+})
+```
+
+</details>
+
+Which gave me the best results of all the solutions I tried:
+
+
+<Diff>
+  On oz about 1788 in a small town of Stroliska Calitais a
+  family by the name of Welf sin Mordaoas was living with his
+  Wife and three sons :- Barl, Lippe, and Mordecai.
+</Diff>
+
+
+Still not perfect, but it's enough for me to be able to fix the errors and get the text into a format I can use.
+If you have any suggestions for improving the results, please let me know &mdash; it will save me lots of time!

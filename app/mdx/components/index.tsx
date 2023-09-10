@@ -8,6 +8,21 @@ import Info from '@components/icons/info'
 import { FileTree, File, Folder } from '@components/file-tree'
 import Home from '@components/icons/home'
 import { Tweet } from 'react-tweet'
+// import Diff from './mdx-diff'
+import dynamic from 'next/dynamic'
+const Diff = dynamic(() => import('./mdx-diff'), {
+  ssr: false,
+  loading: () => (
+    <div
+      style={{
+        height: 400,
+        width: '100%',
+        display: 'flex',
+        backgroundColor: 'var(--light-gray)',
+      }}
+    />
+  ),
+})
 
 export const mdxComponents: MDXComponents = {
   // TODO: re-enable once anchor tags are fixed in the app router
@@ -66,7 +81,7 @@ export const mdxComponents: MDXComponents = {
   //   icons
   InfoIcon: Info,
   HomeIcon: Home,
-
+  Diff: Diff as any,
   // file tree
   FileTree: FileTree as any,
   File: File as any,

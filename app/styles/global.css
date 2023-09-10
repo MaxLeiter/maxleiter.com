@@ -36,6 +36,8 @@
   --gray-alpha: rgba(255, 255, 255, 0.5);
   --selection: rgba(255, 255, 255, 0.88);
   --link: #579dff;
+  --green: #2ecc71;
+  --red: #e74c3c;
 
   /* Syntax Highlighting */
   --token: #999;
