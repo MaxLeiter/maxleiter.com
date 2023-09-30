@@ -465,7 +465,7 @@ export async function generateStaticParams() {
   const posts = await getPosts()
   // The params to pre-render the page with.
   // Without this, the page will be rendered at runtime
-  return posts.map((post) => ({ params: { slug: post.slug } }))
+  return posts.map((post) => ({ slug: post.slug }))
 }
 ```
 
