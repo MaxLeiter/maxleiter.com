@@ -25,7 +25,6 @@ export default async function HomePage() {
         </span>
         <Socials />
       </div>
-      <h3 className={styles.secondHeading}>About me</h3>
       <AboutMe />
       <h3>My projects</h3>
       <ProjectList

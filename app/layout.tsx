@@ -3,6 +3,7 @@ import '@styles/global.css'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import ThemeProvider from '@components/theme-provider'
+import { VercelToolbar } from '@vercel/toolbar/next';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -20,6 +21,7 @@ export default function RootLayout({
           </div>
           <Analytics />
         </ThemeProvider>
+        {process.env.NODE_ENV === 'development' ? <VercelToolbar /> : null}
       </body>
     </html>
   )
@@ -31,16 +33,13 @@ export const metadata = {
     template: '%s | Max Leiter',
     default: 'Max Leiter',
   },
-  description: 'Full-stack developer. My blog, projects, and more.',
-  keywords:
-    'max leiter, full-stack developer, web developer, next.js, supabase',
+  description: 'A website by Max Leiter.',
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
     { media: '(prefers-color-scheme: dark)', color: '#000' },
   ],
   openGraph: {
     title: 'Max Leiter',
-    description: 'My personal website',
     url: 'https://maxleiter.com',
     siteName: "Max Leiter's website",
     locale: 'en_US',

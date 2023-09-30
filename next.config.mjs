@@ -10,10 +10,6 @@ const nextConfig = {
   reactStrictMode: true,
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],
   experimental: {
-    // Required:
-    appDir: true,
-    // Change the default compilation output to ESModules compatible browsers
-    legacyBrowsers: false,
     optimizeCss: true,
     mdxRs: false,
   },

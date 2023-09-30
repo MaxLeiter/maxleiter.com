@@ -3,11 +3,7 @@ import Link from '@components/link'
 const AboutMe = () => (
   <>
     <p>
-      I&apos;ve previously worked at{' '}
-      <Link href="https://www.blend.com" external>
-        Blend
-      </Link>{' '}
-      and am currently building at{' '}
+      I'm currently building at{' '}
       <Link href="https://vercel.com" external>
         Vercel
       </Link>
