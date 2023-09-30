@@ -21,18 +21,17 @@ export default async function HomePage() {
       <div className={styles.heading}>
         <span className={styles.headingText}>
           <h1>Max Leiter</h1>
-          <h2>Full-stack developer</h2>
         </span>
         <Socials />
       </div>
       <AboutMe />
-      <h3>My projects</h3>
+      <h2>My projects</h2>
       <ProjectList
         showYears={false}
         count={PROJECT_COUNT}
         projects={projects}
       />
-      <h3>My posts</h3>
+      <h2>My posts</h2>
       <Suspense fallback={<Posts skeleton />}>
         <PostListRSC paginate={false} />
       </Suspense>

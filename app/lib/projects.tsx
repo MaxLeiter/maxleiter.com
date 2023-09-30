@@ -94,14 +94,6 @@ const Projects: Project[] = [
     years: ['2019'],
   },
   {
-    title: 'EO-tracker',
-    description:
-      "A quick tool for viewing recent President's executive orders.",
-    href: 'https://eo-tracker.vercel.app/',
-    role: 'Creator',
-    years: ['2020'],
-  },
-  {
     title: 'easyarty.com',
     description:
       'A web app for calculating artillery distances in the video game Hell Let Loose.',
@@ -113,14 +105,6 @@ const Projects: Project[] = [
     title: 'Vercel Raycast',
     description: 'A Raycast extension for managing Vercel via its REST API.',
     href: 'https://github.com/MaxLeiter/vercel-raycast',
-    role: 'Creator',
-    years: ['2022'],
-  },
-  {
-    title: 'GitHub Activity Visualizer',
-    description:
-      "A React and d3.js tool for visualizing a user's GitHub activity.",
-    href: 'https://git-visualizer.maxleiter.com',
     role: 'Creator',
     years: ['2022'],
   },

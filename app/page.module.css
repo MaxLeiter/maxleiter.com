@@ -3,6 +3,7 @@
   justify-content: space-between;
   margin-top: var(--header-height);
   margin-bottom: 24px;
+  align-items: center;
 }
 
 @media screen and (max-width: 768px) {
@@ -11,12 +12,10 @@
   }
 }
 
-.headingText > * {
-  margin: 0;
-}
-
 .headingText h1 {
-  color: var(--link);
+  margin: 0;
+  /* Same as global h2 */
+  font-size: 1.6rem;
 }
 
 @media (max-width: 768px) {
