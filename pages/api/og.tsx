@@ -1,5 +1,5 @@
-import { ImageResponse } from 'next/server'
-import { NextRequest } from 'next/server'
+import { ImageResponse } from 'next/og'
+import type { NextRequest } from 'next/server'
 export const runtime = 'edge'
 
 const font = fetch(new URL('./fonts/Inter-Medium.ttf', import.meta.url)).then(

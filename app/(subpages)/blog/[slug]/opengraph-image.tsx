@@ -1,4 +1,4 @@
-import { ImageResponse } from 'next/server'
+import { ImageResponse } from 'next/og'
 
 export const size = { width: 1200, height: 600 }
 // TODO: update to support alt once nextjs has a solution for params
@@ -29,7 +29,7 @@ export default async function ({
   }
 
   const fontData = await fetch(
-  new URL('../../../fonts/Inter-Medium.ttf', import.meta.url)
+    new URL('../../../fonts/Inter-Medium.ttf', import.meta.url)
   ).then((res) => res.arrayBuffer())
 
   return new ImageResponse(
