@@ -29,7 +29,13 @@ export const generateMetadata = async ({
 async function getData({ slug }: { slug: string }) {
   const posts = await getPosts()
   const postIndex = posts.findIndex((p) => p?.slug === slug)
+
+  if (postIndex === -1) {
+    throw new Error(`${slug} not found in posts. Did you forget to rename the file?`)
+  }
+
   const post = posts[postIndex]
+
   const { ...rest } = post
 
   return {
@@ -52,10 +58,10 @@ export default async function PostLayout({
 
   const lastModifiedDate = lastModified
     ? new Date(lastModified).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
     : null
 
   return (

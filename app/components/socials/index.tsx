@@ -24,7 +24,6 @@ const SocialButton = ({ tooltip, href, icon }: SocialButtonProps) => {
 const Socials = () => {
   return (
     <div className={styles.socials}>
-      <ThemeSwitcher />
       <SocialButton
         href="https://github.com/maxleiter"
         icon={<GitHub strokeWidth={2} />}
@@ -45,6 +44,7 @@ const Socials = () => {
         icon={<RSS strokeWidth={2} />}
         tooltip="RSS"
       />
+      <ThemeSwitcher />
     </div>
   )
 }

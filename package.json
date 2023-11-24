@@ -50,7 +50,7 @@
   "devDependencies": {
     "@types/diff": "5.0.3",
     "@types/marked": "5.0.1",
-    "@types/mdx": "2.0.8",
+    "@types/mdx": "2.0.10",
     "@types/node": "20.7.2",
     "@types/prettier": "2.7.3",
     "@types/react": "18.2.23",

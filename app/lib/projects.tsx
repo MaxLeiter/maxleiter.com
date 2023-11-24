@@ -17,13 +17,6 @@ const Projects: Project[] = [
     years: ['2022', 'present'],
   },
   {
-    title: "Vercel AI SDK",
-    description: "Build AI-powered applications with React, Svelte, and Vue",
-    href: "https://github.com/vercel-labs/ai",
-    role: "Maintainer",
-    years: ["2023", "present"],
-  },
-  {
     title: 'The Lounge',
     description:
       'Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.',

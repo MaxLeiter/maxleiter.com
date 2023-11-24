@@ -1,6 +1,6 @@
 ---
-title: Building a blog with Next.js 13 and React Server Components
-description: Use MDX, RSC, and Bright to build a blog with Next.js 13.
+title: Building a blog with Next.js 14 and React Server Components
+description: Use MDX, RSC, and Bright to build a blog with Next.js 14.
 slug: build-a-blog-with-nextjs-13
 date: Apr 16, 2023
 ---
@@ -8,6 +8,8 @@ date: Apr 16, 2023
 I've been tinkering with this website and the [Next.js 13 App Router](https://beta.nextjs.org) for a while now,
 and it's been a great experience, especially in the last few months. But I've seen some confusion around
 how to use the new features and React Server Components, so I wrote up an outline on building this website.
+
+<Note> This post has been updated for [Next.js 14.](https://nextjs.org/blog/next-14) </Note>
 
 To address the React-sized elephant in the room:
 you do not need this fancy setup to build a blog.
@@ -495,10 +497,6 @@ export const metadata = {
     default: 'Max Leiter',
   },
   description: 'Full-stack developer.',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
-    { media: '(prefers-color-scheme: dark)', color: '#000' },
-  ],
   openGraph: {
     title: 'Max Leiter',
     description: 'Full-stack developer.',
@@ -533,6 +531,13 @@ export const metadata = {
       'application/rss+xml': 'https://maxleiter.com/feed.xml',
     },
   },
+}
+
+export const viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#000' },
+  ],
 }
 ```
 

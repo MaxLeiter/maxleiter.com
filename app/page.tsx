@@ -19,9 +19,7 @@ export default async function HomePage() {
   return (
     <>
       <div className={styles.heading}>
-        <span className={styles.headingText}>
-          <h1>Max Leiter</h1>
-        </span>
+        <h1>Max Leiter</h1>
         <Socials />
       </div>
       <AboutMe />

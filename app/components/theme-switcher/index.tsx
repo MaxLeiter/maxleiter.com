@@ -36,21 +36,19 @@ const ThemeSwitcher = ({
 
   return (
     <Wrapper>
-      {mounted && (
-        <FadeIn duration={200}>
-          <button
-            onClick={() => setTheme(activeTheme === 'light' ? 'dark' : 'light')}
-            aria-label="Change the theme"
-            className={`${socialStyles.icon} ${className}`}
-          >
-            {activeTheme === 'light' ? (
-              <Moon size={iconSize} strokeWidth={strokeWidth || 2} />
-            ) : (
-              <Sun size={iconSize} strokeWidth={strokeWidth || 1} />
-            )}
-          </button>
-        </FadeIn>
-      )}
+      <button
+        onClick={() => setTheme(activeTheme === 'light' ? 'dark' : 'light')}
+        aria-label="Change the theme"
+        className={`${socialStyles.icon} ${className}`}
+      >
+        {mounted ? <FadeIn>{
+          activeTheme === 'light' ? (
+            <Moon size={iconSize} strokeWidth={strokeWidth || 2} />
+          ) : (
+            <Sun size={iconSize} strokeWidth={strokeWidth || 1} />
+          )
+        } </FadeIn> : <span style={{ opacity: 0 }} aria-hidden><Moon size={iconSize} /></span>}
+      </button>
     </Wrapper>
   )
 }

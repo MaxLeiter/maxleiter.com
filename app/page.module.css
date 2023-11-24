@@ -12,12 +12,6 @@
   }
 }
 
-.headingText h1 {
-  margin: 0;
-  /* Same as global h2 */
-  font-size: 1.6rem;
-}
-
 @media (max-width: 768px) {
   .heading {
     flex-direction: column;

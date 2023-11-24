@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import ThemeProvider from '@components/theme-provider'
 import { VercelToolbar } from '@vercel/toolbar/next';
+import { Viewport } from 'next'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -34,10 +35,6 @@ export const metadata = {
     default: 'Max Leiter',
   },
   description: 'A website by Max Leiter.',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
-    { media: '(prefers-color-scheme: dark)', color: '#000' },
-  ],
   openGraph: {
     title: 'Max Leiter',
     url: 'https://maxleiter.com',
@@ -76,4 +73,11 @@ export const metadata = {
       'application/rss+xml': 'https://maxleiter.com/feed.xml',
     },
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#000' },
+  ],
 }
