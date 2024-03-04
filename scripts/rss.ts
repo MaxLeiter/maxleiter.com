@@ -25,11 +25,12 @@ renderer.link = (href, _, text) =>
 marked.setOptions({
   gfm: true,
   breaks: true,
-  headerIds: true,
   renderer,
 })
 
-const renderPost = (md: string) => marked.parse(md)
+const renderPost = (md: string) => marked.parse(md, {
+  async: false,
+}) as string
 
 const main = () => {
   const feed = new RSS({

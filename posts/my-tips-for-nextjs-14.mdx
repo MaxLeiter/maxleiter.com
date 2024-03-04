@@ -1,0 +1,259 @@
+---
+title: Some tips for working with Next.js 14
+description: RSCs, Server Actions, and the App Router
+slug: how-i-work-with-nextjs-14
+date: Feb 19, 2024
+toc: true
+published: false
+---
+
+I've been working with the Next.js App Router for a while now, and wanted to share some of the patterns and snippets I've found useful and keep referring to.
+My goal is for this post to be a living document, but I haven't been great about writing much so we'll see about that 🤷‍♂️. 
+
+<Note>
+I'm assuming you have some familiarity with the App Router. If you don't, I recommend you check out my older post: [Build a blog with Next.js 13](/blog/build-a-blog-with-nextjs-13).
+</Note>
+
+### Table of Contents
+
+### SWR for state management
+
+Scenario: You have state you want to share between components, but your components share an RSC parent (or *boundary*) between them so the parent component can't contain the `useState` call:
+
+```server-component.tsx
+export function MyServerComponent() {
+  return <>
+      <Sidebar />
+      <Body />
+      <OtherSidebar />
+      <Footer />
+    <>
+}
+```
+
+You can use SWR to manage that state and subscribe to it in your client components:
+
+```sidebar.tsx
+"use client";
+
+import useSWR from 'swr';
+
+export function useAppState() {
+  // Second param is a fetcher; we have none.
+  const { data, mutate } = useSWR("state:app", null, {
+    // Providing fallbackData is optional,
+    // but provides type inference and an SSR fallback.
+    fallbackData: { currentPostIndex: 0 }
+  })
+
+  return { 
+    appState: data,
+    setAppState: mutate
+  }
+}
+
+export function Sidebar() {
+  const { appState, setAppState } = useAppState();
+
+  return <div>Currently on post {appState.currentPostIndex}</div>
+}
+```
+
+You can also use the global `mutate` function provided by SWR to update the state from anywhere in your app. See the [SWR docs](https://swr.vercel.app/docs/mutation#mutate) for more info and caveats.
+
+Note that this could also be accomplished with React Context, but I prefer SWR.
+
+#### For Modals and Dialogs
+
+I love using this trick for managing modal state. 
+You export a `useModal` hook from the modal file and use it to control the modals state. 
+Then you can use the same hook to control the modal from anywhere in your app. I generally include the modal / dialog in the highest shared `layout.tsx` that I know it will be used in.
+
+```warning-dialog.tsx
+"use client";
+
+import useSWR, { mutate } from 'swr'
+
+export function useWarningDialog(defaultOpen = false) {
+  const { data: showWarningDialog, mutate: setShowWarningDialog } = useSWR(
+    'showWarningDialog',
+    null,
+    { fallbackData: defaultOpen }
+  )
+
+  return { showWarningDialog, setShowWarningDialog }
+}
+
+export function mutateWarningDialog(showWarningDialog: boolean) {
+  return mutate('showWarningDialog', showWarningDialog)
+}
+
+export function WarningDialog() {
+  const { setShowWarningDialog, showWarningDialog } = useWarningDialog()
+
+  return <Dialog open={showWarningDialog} onClose={() => setShowWarningDialog(false)}>
+    ...
+  </Dialog>
+}
+```
+
+```layout.tsx
+
+// You can also use next/dynamic to lazy load the dialog,
+// but then you will have to wait the first time it's used on the client.
+import { WarningDialog } from './warning-dialog'
+export default function Layout({ children }: PropsWithChildren) {
+  return <>
+    {children}
+    <Suspense>
+      <WarningDialog />
+    </Suspense>
+  </>
+}
+```
+
+### Server Actions
+
+Server Actions are my favorite feature in Next.js. They can return JSX, promises, or anything else that React can serialize. With great power comes great responsibility.
+
+#### Validation 
+
+A misconception I've seen with Server Actions is people conflating type inference with validation. Just because you have a type during development doesn't mean you can trust it at runtime.
+Your consumer might not have TypeScript, or a [cosmic ray](https://blog.mozilla.org/data/2022/04/13/this-week-in-glean-what-flips-your-bit/) might have flipped a bit in the payload.
+
+My coworker [Gaspar](https://twitter.com/gaspargarcia_/) sent me this tiny higher order function to validate server actions with zod and I've been using it ever since:
+
+```make-action.ts
+// this ensures that this utility is only imported on the server
+import 'server-only';
+
+export function makeAction<T extends z.ZodTypeAny, R>(
+  schema: T,
+  fn: (params: z.infer<T>) => R,
+): (params: z.infer<T>) => R {
+  return (params: z.infer<T>) => {
+    const parsedParams = schema.safeParse(params);
+    if (!parsedParams.success) {
+      // Go to the next section to see why this is probably NOT what you want to do.
+      throw new Error(...);
+    }
+    return fn(parsedParams);
+  };
+}
+```
+
+Usage:
+```my-action.ts
+"use server";
+import { makeAction } from './make-action';
+import * as z from 'zod';
+
+const myActionSchema = z.object({
+  name: z.string(),
+  age: z.number(),
+});
+
+async function myAction(params: z.infer<typeof myActionSchema>) {
+  // ...
+}
+
+export default makeAction(myActionSchema, myAction);
+```
+
+#### Error handling
+
+One common mistake with server actions is expecting Errors to be thrown and caught in the client. If that were the case,
+server-only information could be leaked to the client. Instead, you need to return an error object from your server action and handle it in the client.
+
+```action-errors.ts 
+export enum MyError {
+  InvalidName = 1,
+  InvalidAge = 2,
+}
+
+export type MyErrorObject = {
+  code: MyError;
+  message: string;
+};
+
+export function makeError(code: MyError): MyErrorObject {
+  return { code };
+}
+```
+
+```my-action.ts
+"use server";
+
+async function myAction(params: z.infer<typeof myActionSchema>) {
+  const data = await fetch(...)
+
+  if (!data) {
+    return makeError(MyError.InvalidName);
+  }
+}
+```
+
+Then on the client, I recommend having a `handleActionError` function or similar to use around your app:
+
+```handle-action-error.ts
+export function handleActionError(error: MyErrorObject) {
+  switch (error.code) {
+    case MyError.InvalidName:
+      return toast.error('Name is invalid');
+    case MyError.InvalidAge:
+      return toast.error('Age is invalid');
+    default:
+      return toast.error('An error occurred');
+  }
+}
+```
+
+And then use it in your components:
+
+```ts
+const onClickHandler = async () => {
+  try {
+   const result = await myAction({ name: 'John', age: 30 });
+   if (result && "error" in result) {
+     return handleActionError(result);
+   }
+
+    // ...
+  } catch (e) {
+    // ...
+  }
+}
+```
+
+Abstracting the above is left as an exercise to the reader (I haven't found a way I'm very happy with yet).
+
+### Gotcha: Stable references with React.cache
+
+The `cache()` function from React allows you to cache a function during a render.
+This is useful if you want multiple RSCs to call the same function without a separate request every time.
+However, there's a pretty easy gotcha: React.cache uses reference equality to determine if the function should be re-invoked or not. 
+This means that 
+
+```tsx
+import 'server-only'
+import { cache } from 'react'
+
+function _getResultWithData(resultId: string, fields: string[]) {
+  return kv.get(resultId, fields);
+}
+
+export const getResultWithData = cache(_getResultWithData);
+
+await getResultWithData('123', ['name', 'age']);
+await getResultWithData('123', ['name', 'age']);
+```
+
+This will make two requests, because `[name, age] !== [name, age]`.
+
+### You don't need `router.refresh`
+
+`router.refresh` forces a re-render (and re-fetch/validation) of the current page. It's too convienent and easy to reach for.
+
+If your state is changing due to a Server Action, use [`revalidatePath`](https://nextjs.org/docs/app/api-reference/functions/revalidatePath) or [`revalidateTag`](https://nextjs.org/docs/app/api-reference/functions/revalidateTag) to revalidate the page
+instead of `router.refresh()`. The new page payload will be included in the server action response, saving you 
+a round trip to the server (this also works with `redirect()`). If you aren't using Server Actions for mutations, consider it. 

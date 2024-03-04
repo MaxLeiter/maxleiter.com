@@ -24,6 +24,12 @@ const Diff = dynamic(() => import('./mdx-diff'), {
   ),
 })
 
+Code.theme = {
+  dark: "solarized-dark",
+  light: "material-palenight",
+  lightSelector: '[data-theme="light"]',
+}
+
 export const mdxComponents: MDXComponents = {
   // TODO: re-enable once anchor tags are fixed in the app router
   // a: ({ children, ...props }) => {
@@ -52,9 +58,8 @@ export const mdxComponents: MDXComponents = {
     React.HTMLAttributes<HTMLElement>,
     HTMLPreElement
   >) => {
-    // TODO: extract title from children
     return (
-      <Code {...props} theme="material-default">
+      <Code {...props}>
         {children as any}
       </Code>
     )
