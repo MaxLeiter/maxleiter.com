@@ -71,17 +71,6 @@ export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
           }
         }
 
-        // let views = 0
-
-        // const { data: viewCount } = await supabase
-        //   .from('analytics')
-        //   .select('view_count')
-        //   .filter('slug', 'eq', `/blog/${data.slug}`)
-
-        // if (viewCount?.length) {
-        //   views = viewCount[0].view_count
-        // }
-
         return { ...data, body: content, lastModified } as Post
       })
   )

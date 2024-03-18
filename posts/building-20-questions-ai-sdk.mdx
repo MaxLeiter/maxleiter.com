@@ -1,0 +1,437 @@
+---
+title: AI-first UI with the AI SDK and React Server Components
+description: A tutorial building a not-chatbot AI app using the AI SDK
+slug: ai-first-ui
+date: Mar 4, 2024
+# published: false
+---
+
+The [3.0 release of the AI SDK](https://vercel.com/blog/ai-sdk-3-generative-ui), which includes
+new APIs for rendering React components from LLM responses. There's a ton of [really]() [cool]() [stuff]() in the release,
+but I'm most excited for **how easily you can now build non-chatbot AI apps.**
+
+Until now, it's been easist to model your interface the same as your GPT conversations.
+You send a list of messages (we'll call this **AI state**) to the LLM,
+and you render the list of messages plus a response back on the client. This is great for chatbots,
+but the AI SDK introduces **UI state** to provide more flexibility in how and what you render.
+
+Here's an example [Server Action]() for streaming a text node to the client:
+
+```jsx
+const openai = new OpenAI()
+async function renderResponse(input: string) {
+  'use server'
+
+  const aiState = getMutableAIState()
+
+  aiState.update([
+    ...aiState.get(),
+    {
+      role: 'user',
+      content: input,
+    },
+  ])
+
+  return render({
+    model: 'gpt-3.5-turbo',
+    text: async ({ content, done }) => {
+      if (done) {
+        aiState.done([
+          ...aiState.get(),
+          {
+            role: 'assistant',
+            content,
+          },
+        ])
+      }
+      return content
+    },
+    initial: <p>Loading...</p>
+    messages: aiState.get().map((message) => ({
+        role: message.role,
+        content: message.content,
+    })),
+    provider: openai,
+  })
+}
+```
+
+And then on the client:
+
+```jsx
+"use client";
+
+import { useUIState } from 'ai/rsc'
+
+export default function MyComponent() {
+  const [response, setResponse] = useUIState()
+
+  async function sendInput(input: string) {
+    const nextResponse = await renderResponse(input)
+    setResponse(nextResponse)
+  }
+
+  return (
+    <div>
+      {response}
+      <form onSubmit={(e) => {
+        e.preventDefault()
+        sendInput(e.target[0].value)
+      }}>
+        <input type="text" />
+        <button>Send</button>
+      </form>
+    </div>
+  )
+}
+```
+
+To help people get started, the end of this post contains a full guide for building
+a [20 questions game](https://en.wikipedia.org/wiki/Twenty_questions) with OpenAI's gpt-3.5-turbo model.
+
+If you aren't familiar with 20 questions, it's a game where someone asks yes or no questions to guess an object someone else is thinking of.
+In our case, the AI will be guessing what you're thinking.
+
+## ToC
+
+## Key Concepts
+
+Before we get started, I want to clarify a few concepts that are important to understand when working with the new APIs.
+
+### Server Actions
+
+[Server Actions]() are a Next.js and React feature that allow you to expose async functions to the client. At build time,
+your action calls are replaced with a fetch call to the server. This means you can replace `fetch('/api/...')` with `callServerAction(...)`,
+and you get type safety and autocompletion. They're at the heart of the AI SDK's new APIs, as they allow sending streams and React components from the server
+to the client. You make a function a Server Action by adding the `'use server'` to the top of its file or its definition.
+
+<Note>
+  Be careful with `"use server"`: anything exported from a file with that
+  annotation will be exported as an endpoint that can be called from any client.
+  Be sure to perform any necessary validation and authentication checks before.
+</Note>
+
+### AI and UI State
+
+One of the most powerful features of the SDK is its ability to keep your state in sync with the server and AI model.
+To accomplish this, you maintain two distinct states: **AI state**, which you can also think of as "server state", is an object
+passed between the client and server. **UI state**, on the other hand, exists only on the client and is used to render the UI.
+
+In practice, UI state typically contains your React nodes, and AI state contains something like a history of the users actions to the LLM.
+
+<details>
+<summary>{"Why do we need two states?"}</summary>
+
+The reason for the distinction is primarily **serialization**, or the process of converting an object into a format that can be
+sent over the wire. The AI state is serialized and accessible on the server.
+The response is then sent back to the client, and you update the UI state.
+
+Your UI state can contain React Nodes and
+other complex objects. The AI state needs to contain only objects that React can serialize. You can see a list of support types [here](https://react.dev/reference/react/use-client#serializable-types).
+
+</details>
+
+## Getting Started
+
+To get started, you'll need to setup a new Next.js project with the necessary dependencies: `ai` for the SDK, `zod` for parameter validation, and `openai` for making a call to the OpenAI API.
+
+```bash
+pnpm create next-app my-app
+cd my-app
+pnpm add ai zod openai
+```
+
+## Create your AI Provider
+
+The first step in using the new APIs is to create an `<AI>` provider you wrap your application with. All components rendered under the provider will share
+the same AI and UI state, and you'll have access to the `useAIState` and `useUIState` hooks.
+
+Let's make an `app/action.tsx` file and create a new `AI` provider.
+
+```tsx
+import { createAI } from 'ai/rsc'
+
+export const AI = createAI({
+  actions: {},
+  // If you add types to your UI and AI states here,
+  // you can get autocompletion and type safety in your components.
+  initialUIState: [],
+  initialAIState: [],
+})
+```
+
+Now, you can wrap your app with the `AI` provider in your root layout (`app/layout.tsx`), or wherever in your tree you want to use the AI SDK:
+
+```tsx
+import { AI } from './action'
+
+export default function Layout({ children }: PropsWithChildren) {
+  return (
+    <html lang="en">
+      <body>
+        <AI>{children}</AI>
+      </body>
+    </html>
+  )
+}
+```
+
+## Writing the Server Code
+
+To figure out exactly how to structure our game, we need to think big picture for a moment: The user sees a question, clicks a Yes or No button, and then the AI responds with a new question.
+
+This means the AI needs the history of its questions and responses, so it seems like that's what should go in the AI state.
+The user, meanwhile, will only ever see one question at a time, so the UI state will contain the current question.
+
+Let's ago ahead and define a new Server Action in our `app/action.tsx` file that will handle the user's response to a question.
+We also need to create an OpenAI instance to make calls to the OpenAI API.
+
+```tsx
+import { getMutableAIState, createAI } from 'ai/rsc'
+import OpenAI from 'openai'
+
+// Create a new OpenAI instance with your API key
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
+});
+
+// This action will be called when the user clicks a Yes or No button.
+async function answerQuestion(yes: boolean) {
+  'use server' // this makes the function a Server Action
+
+```
+
+The first thing we need to do is add a message to the chat history. We'll do this by updating the AI state.
+
+```tsx
+const aiState = getMutableAIState()
+const questionNumber = aiState.get().length / 2 + 1 // we'll need this later,
+// just trust me
+
+// Add the user's answer to the AI state for subsequent questions.
+aiState.update([
+  ...aiState.get(),
+  { role: 'user', content: yes ? 'yes' : 'no' },
+])
+```
+
+Next, we'll use the **[createStreamableUI](https://sdk.vercel.ai/docs/api-reference/generative-ui/create-streamable-ui)**
+API from the AI SDK to create a UI node that we can update and stream to the client. We'll also make an OpenAI call to get the question.
+You need to be careful here to not block returning the node while waiting for OpenAI. In order for the initial response
+to be sent to the client, we'll call an async function but _not_ await it.
+
+```tsx
+// update your import
+import { createStreamableUI } from 'ai/rsc'
+
+export async function answerQuestion(yes: boolean) {
+  // ... code from above
+
+  // It takes in an initial node
+  const nextQuestionNode = createStreamableUI(<p>Loading...</p>)
+
+  async function updateQuestionNode() {
+    const nextQuestion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: `
+You are playing 20 questions with the user.
+They have though of an object.
+You have to guess what it is by asking yes or no questions.`,
+        },
+        // Use the AI state to construct the message history
+        ...aiState.get().map((message) => ({
+          role: message.role,
+          content: message.content,
+        })),
+      ],
+    })
+
+    // We use .done() to close the stream; we aren't updating the node anymore.
+    nextQuestionNode.done(<h2>{nextQuestion}</h2>)
+  }
+
+  updateQuestionNode()
+
+  return nextQuestionNode
+}
+```
+
+We also need to add the question to the message history, so we need to update it in the AI state (right before the `nextQuestionNode.done`).
+
+```tsx
+aiState.done([
+  ...aiState.get(),
+  {
+    role: 'assistant',
+    content: nextQuestion,
+  },
+])
+```
+
+```tsx
+  return render({
+    model: 'gpt-3.5-turbo',
+    // text is called whenever the LLM returns text. It's called as it streams in,
+    // so you can use `done` to know when the response is complete.
+    text: async ({ content, done }) => {
+      if (done) {
+        aiState.done([
+          ...aiState.get(),
+          {
+            role: 'assistant',
+            content,
+          },
+        ])
+      }
+
+      return content
+    },
+    // The initial element rendered while the LLM response is loading.
+    initial: <p>Loading...</p>
+    // Whatever message history to send to the LLM. We construct this
+    // from our AI State. We don't include our system prompt in the AI state
+    // so its not leaked to the client.
+    messages: [
+      {
+        role: 'system',
+        content: `You are playing 20 questions with the user.
+They have though of an object.
+You have to guess what it is by asking yes or no questions.`
+      },
+      ...aiState.get().map((message) => ({
+        role: message.role,
+        content: message.content,
+      })),
+    ],
+    temperature: 1,
+    provider: openai,
+  })
+}
+
+// Because UI state is just going to be a node, we update this to be null.
+const initialUIState: ReactNode | null = null
+const initialAIState: { role: 'user' | 'assistant'; content: string }[] = []
+
+export const AI = createAI({
+  actions: {},
+  initialUIState,
+  initialAIState,
+})
+```
+
+## Creating the Question Component
+
+Now that you have your AI provider and action set up, you can create a component that will render the question and handle the user's response.
+
+I started with v0 (see my result [here](https://v0.dev/t/NuNKn1LwqBB)) and got a component that looks something like this:
+
+```tsx
+'use client'
+
+import { useAIState, useActions, useUIState } from 'ai/rsc'
+import { AI } from '@/app/action'
+import { ReactNode, useEffect, useState } from 'react'
+
+export default function Question() {
+  return (
+    // I've removed the shadcn components for brevity
+    <form>
+      <h1>Question 1</h1>
+      <h2>Is your object a living thing?</h2>
+      <button>Yes</button>
+      <button>No</button>
+    </form>
+  )
+}
+```
+
+Let's augment it with the client hooks that the AI SDK provides: `useAIState`, `useActions`, and `useUIState`.
+
+```diff
+"use client"
+
++ import { useAIState, useActions, useUIState } from 'ai/rsc'
+import { AI } from '@/app/action'
+import { ReactNode, useEffect, useState } from 'react'
+
+export default function Question() {
++  const { answerQuestion } = useActions<typeof AI>()
++  const [question, setQuestion] = useUIState<typeof AI>()
++  const [aiState, setAIState] = useAIState<typeof AI>()
+
++  async function sendAnswer(yes: boolean) {
++    const nextQuestionNode = await answerQuestion(yes)
++    setQuestion(nextQuestionNode)
++  }
+
+  return (
+    <form>
++      <h1>Question {aiState.get().length / 2 + 1}</h1>
+-      <h2>Is your object a living thing?</h2>
++      {question}
++      <button onClick={() => sendAnswer(true)}>
+        Yes
+       </button>
++      <button onClick={() => sendAnswer(false)}>
+        No
+       </button>
+    </form>
+  )
+}
+```
+
+Go ahead and throw this `<Question />` component into a page and you should be good to go!
+At least until you load the page and see nothing 🤔. We need to special case the first
+question, since we don't have any AI state yet.
+
+In our component:
+
+```diff
+export default function Question() {
+// ...
++  useEffect(() => {
++    if (!questions.length) {
++      answerQuestion().then((firstQuestion: ReactNode) => {
++        setQuestions[firstQuestion)
++      })
++    }
++  }, [questions.length])
+// ...
+```
+
+In our action:
+
+```diff
+
+// Define necessary types and create the AI. `null` on the first call.
+- async function answerQuestion(yes: boolean) {
++ async function answerQuestion(yes: boolean | null) {
+  'use server';
+  const aiState = getMutableAIState();
++  if (yes !== null) {
++    // Add the user's answer to the AI state for subsequent questions
++    aiState.update([...aiState.get(), { role: 'user', content: yes ? 'yes' : 'no' }]);
++  }
+
+- const questionNumber = aiState.get().length / 2 + 1;
++ const questionNumber = yes === null ? 1 : aiState.get().length / 2 + 1;
+```
+
+Now we're talking:
+
+<Image
+  src="/blog/20-questions/question-1.png"
+  alt="Screenshot of Question 1: Is it a man made object? With 'Yes' and 'No' buttons."
+  width={400}
+  height={300}
+/>
+
+## Ending the Game with Function Calls
+
+If you start playing, you'll find that there's no way to win. Well, the AI may realize you've won, but you can still
+click "Yes" or "No" after that and get responses back. We need a way to end the game when the AI successfully guesses the object.
+
+Thankfully,
