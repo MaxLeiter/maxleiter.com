@@ -22,7 +22,7 @@ export default function RootLayout({
           </div>
           <Analytics />
         </ThemeProvider>
-        {/* {process.env.NODE_ENV === 'development' ? <VercelToolbar /> : null} */}
+        {process.env.NODE_ENV === 'development' ? <VercelToolbar /> : null}
       </body>
     </html>
   )
