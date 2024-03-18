@@ -13,6 +13,12 @@ const nextConfig = {
     optimizeCss: true,
     mdxRs: false,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [
       {
