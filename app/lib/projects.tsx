@@ -2,13 +2,6 @@ import type { Project } from './types'
 import { cache } from 'react'
 const Projects: Project[] = [
   {
-    title: 'gitkv',
-    description: 'A simple key-value store using Git as the backend.',
-    href: 'https://github.com/maxleiter/gitkv',
-    role: 'Creator',
-    years: ['2024'],
-  },
-  {
     title: 'X11 on iOS',
     description: 'Patched, compiled, and packaged X11 for iOS devices.',
     href: '/blog/X11',
@@ -108,6 +101,13 @@ const Projects: Project[] = [
     role: 'Creator',
     years: ['2022'],
   },
+  {
+    title: 'gitkv',
+    description: 'A simple key-value store using Git as the backend.',
+    href: 'https://github.com/maxleiter/gitkv',
+    role: 'Creator',
+    years: ['2024'],
+  }
 ]
 
 export const getProjects = cache(async (): Promise<Project[]> => {
