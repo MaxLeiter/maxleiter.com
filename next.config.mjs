@@ -11,7 +11,7 @@ const nextConfig = {
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],
   experimental: {
     optimizeCss: true,
-    mdxRs: false,
+    mdxRs: true,
   },
   async redirects() {
     return [

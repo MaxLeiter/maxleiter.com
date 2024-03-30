@@ -7,6 +7,17 @@ import { cache } from 'react'
 
 const thirdPartyPosts: Post[] = [
   {
+    title: 'Introducing AI SDK 3.0 with Generative UI support',
+    description: "Stream React Components from LLMs to deliver richer user experiences.",
+    body: '',
+    date: '2024-03-01T10:00:00.000Z',
+    slug: '',
+    tags: [],
+    lastModified: 0,
+    isThirdParty: true,
+    href: 'https://vercel.com/blog/ai-sdk-3-generative-ui'
+  },
+  {
     title: 'Introducing the Vercel AI SDK',
     description: "An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.",
     body: '',

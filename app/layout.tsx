@@ -2,8 +2,7 @@ import styles from './layout.module.css'
 import '@styles/global.css'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
-import ThemeProvider from '@components/theme-provider'
-import { VercelToolbar } from '@vercel/toolbar/next';
+import { ThemeProvider } from 'next-themes'
 import { Viewport } from 'next'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })

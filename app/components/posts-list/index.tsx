@@ -8,12 +8,12 @@ import type { Post } from '@lib/types'
 
 type Props =
   | {
-      posts: Post[]
-      paginate?: boolean
-    }
+    posts: Post[]
+    paginate?: boolean
+  }
   | {
-      skeleton: true
-    }
+    skeleton: true
+  }
 
 const Posts = (props: Props) => {
   const [showMore, setShowMore] = useState(4)
@@ -41,7 +41,8 @@ const Posts = (props: Props) => {
 
         return (
           <BlockEntry
-            key={`post-item-${post.slug}`}
+            // TODO: Math.random is a bad hack.
+            key={`post-item-${post.slug || Math.random()}`}
             href={post.isThirdParty ? post.href! : `/blog/${post.slug}`}
             title={post.title}
             date={new Date(date)}
