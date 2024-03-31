@@ -5,8 +5,8 @@ import styles from './terminal.module.css';
 
 export function TerminalWindow({ children }: { children: React.ReactNode }) {
     const editableRef = React.useRef<HTMLDivElement>(null);
-    const [mode, setMode] = React.useState<'normal' | 'insert'>('normal');
-    const [cursorPosition, setCursorPosition] = React.useState<number>(0);
+    const [mode, setMode] = React.useState<'normal' | 'insert' | 'command'>('normal');
+    const [command, setCommand] = React.useState('');
 
     // autofocus the editor on desktops
     React.useEffect(() => {
@@ -16,95 +16,92 @@ export function TerminalWindow({ children }: { children: React.ReactNode }) {
     }, []);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-        const { key } = event;
-
         if (mode === 'normal') {
-            event.preventDefault(); // Prevent default behavior of keys in normal mode
+            switch (event.key) {
+                case 'ArrowUp':
+                    console.log('ArrowUp');
+                    break;
+                case 'k':
+                    // Move cursor up
+                    event.preventDefault();
+                    // fire an ArrowUp event
+                    break;
+                case 'ArrowDown':
+                case 'j':
+                    // Move cursor down
+                    event.preventDefault();
+                    break;
+                case 'ArrowLeft':
+                case 'h':
+                    // Move cursor left
+                    event.preventDefault();
+                    break;
+                case 'ArrowRight':
+                case 'l':
+                    // Move cursor right
+                    event.preventDefault();
+                    break;
 
-            if (key === 'i') {
-                setMode('insert');
-            } else if (key === 'h' || key === 'ArrowLeft') {
-                // Move cursor left
-                moveCursor(-1);
-            } else if (key === 'l' || key === 'ArrowRight') {
-                // Move cursor right
-                moveCursor(1);
+                case 'Escape':
+                    // Do nothing
+                    break;
+                case 'i':
+                    // Enter insert mode
+                    event.preventDefault();
+                    setMode('insert');
+                    break;
+                case ':':
+                    // Enter command mode
+                    event.preventDefault();
+                    setMode('command');
+                    break;
+                default:
+                    // Prevent default behavior in normal mode
+                    event.preventDefault();
+                    event.stopPropagation();
+                    break;
             }
         } else if (mode === 'insert') {
-            if (key === 'Escape') {
-                event.preventDefault(); // Prevent default behavior of Escape key
+            if (event.key === 'Escape') {
+                // Exit insert mode
+                event.preventDefault();
                 setMode('normal');
             }
-        }
-    };
-
-    const moveCursor = (delta: number) => {
-        const newPosition = cursorPosition + delta;
-        setCursorPosition(newPosition);
-        setPosition(newPosition);
-    };
-
-    const getCursorPosition = () => {
-        if (editableRef.current) {
-            const selection = window.getSelection();
-            const range = selection?.getRangeAt(0);
-            const clonedRange = range?.cloneRange();
-            clonedRange?.selectNodeContents(editableRef.current);
-            clonedRange?.setEnd(range?.endContainer || editableRef.current, range?.endOffset || 0);
-            return clonedRange?.toString().length || 0;
-        }
-        return 0;
-    };
-
-    const createRange = (node: Node, targetPosition: number) => {
-        const range = document.createRange();
-        range.selectNode(node);
-        range.setStart(node, 0);
-
-        let pos = 0;
-        const stack = [node];
-        while (stack.length > 0) {
-            const current = stack.pop();
-
-            if (current?.nodeType === Node.TEXT_NODE) {
-                const len = current.textContent?.length || 0;
-                if (pos + len >= targetPosition) {
-                    range.setEnd(current, targetPosition - pos);
-                    return range;
-                }
-                pos += len;
-            } else if (current?.childNodes && current.childNodes.length > 0) {
-                for (let i = current.childNodes.length - 1; i >= 0; i--) {
-                    stack.push(current.childNodes[i]);
-                }
+        } else if (mode === 'command') {
+            if (event.key === 'Enter') {
+                // Execute command
+                event.preventDefault();
+                executeCommand(command);
+                setCommand('');
+                setMode('normal');
+            } else if (event.key === 'Escape') {
+                // Cancel command
+                event.preventDefault();
+                setCommand('');
+                setMode('normal');
+            } else {
+                // Update command
+                setCommand(command + event.key);
             }
         }
-
-        range.setEnd(node, node.childNodes.length);
-        return range;
     };
 
-    const setPosition = (targetPosition: number) => {
-        if (editableRef.current) {
-            const range = createRange(editableRef.current, targetPosition);
-            const selection = window.getSelection();
-            selection?.removeAllRanges();
-            selection?.addRange(range);
+    const executeCommand = (command: string) => {
+        switch (command) {
+            case 'q':
+                // Quit the editor
+                console.log('Quitting the editor...');
+                break;
+            case 'w':
+                // Save the content
+                console.log('Saving the content...');
+                break;
+            default:
+                console.log('Unknown command:', command);
+                break;
         }
     };
 
-    React.useEffect(() => {
-        const handleSelectionChange = () => {
-            const position = getCursorPosition();
-            setCursorPosition(position);
-        };
-
-        document.addEventListener('selectionchange', handleSelectionChange);
-
-        return () => {
-            document.removeEventListener('selectionchange', handleSelectionChange);
-        };
-    }, []);
     return (
         <div className={styles.terminalWindow}>
             <div className={styles.terminalHeader}>
@@ -121,18 +118,13 @@ export function TerminalWindow({ children }: { children: React.ReactNode }) {
                 suppressContentEditableWarning
                 ref={editableRef}
                 onKeyDown={handleKeyDown}
+                style={{ cursor: mode === 'normal' ? 'default' : 'text' }}
             >
                 {children}
-                <div
-                    className={`${styles.cursor} ${mode === 'normal' ? styles.normalCursor : styles.insertCursor}`}
-                    style={{
-                        left: `calc(1ch * ${cursorPosition})`,
-                        position: 'relative'
-                    }}
-                ></div>
             </div>
             <div className={styles.statusBar}>
-                {mode === 'normal' ? '-- NORMAL --' : '-- INSERT --'}
+                {mode === 'normal' ? '-- NORMAL --' : mode === 'insert' ? '-- INSERT --' : `:`}
+                {mode === 'command' && <span>{command}</span>}
             </div>
         </div>
     );

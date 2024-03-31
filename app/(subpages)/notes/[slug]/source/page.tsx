@@ -28,9 +28,10 @@ type: ${post.type}
 ---
 ${post.body.trim()}
 `
+
   return <TerminalWindow>
     <Code lang="mdx" style={{ margin: 0, padding: 0 }}>
       {src.trim()}
-
-    </Code></TerminalWindow>
+    </Code>
+  </TerminalWindow>
 }

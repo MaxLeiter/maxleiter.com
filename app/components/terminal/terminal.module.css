@@ -44,6 +44,11 @@
     font-size: 0.875rem;
 }
 
+.terminalContent {
+    max-height: 20rem;
+    overflow-y: auto;
+}
+
 .terminalEditor {
     position: relative;
 
@@ -57,18 +62,6 @@
     width: 0.5em;
     height: 1.2em;
     pointer-events: none;
-    /* blink */
-    animation: blink 1.2s infinite;
-    animation-timing-function: step-start;
-}
-
-@keyframes blink {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: .7;
-    }
 }
 
 .normalCursor {
