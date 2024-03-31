@@ -23,5 +23,16 @@
   margin-top: var(--small-gap);
   display: flex;
   justify-content: space-between;
-}
+  color: var(--gray);
 
+  .gitSha {
+    /* before, add an mdash */
+    &:before {
+      content: ' — ';
+    }
+
+    @media (max-width: 600px) {
+      display: none;
+    }
+  }
+}

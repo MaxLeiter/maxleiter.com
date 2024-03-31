@@ -90,7 +90,7 @@ const TimeOfDay = () => {
       type="button"
       aria-label="Time of day"
     >
-      San Francisco: <MemoTimeDisplay format={format} />
+      <MemoTimeDisplay format={format} />
     </button>
   )
 }
