@@ -87,7 +87,7 @@ const FilterableList = <T extends Base>({
                 />
             </div> : null}
             {enableTags && (
-                <div style={{ marginBottom: 'var(--gap)', display: 'flex', gap: 'var(--gap-half)' }}>
+                <div style={{ paddingTop: 2, marginBottom: 'var(--gap)', display: 'flex', gap: 'var(--gap-half)' }}>
                     <Badge
                         key="all"
                         style={selectedTag ? {} : selectedBadgeStyles}

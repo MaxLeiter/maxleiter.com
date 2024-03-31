@@ -19,7 +19,7 @@ export default async function HomePage() {
       <AboutMe />
       <p>You can find me around the internet here:</p>
       <Socials />
-      <h2>My projects</h2>
+      <h2 style={{ padding: 'var(--gap-quarter) 0' }}>My projects</h2>
       <ProjectList
         showYears={false}
         projects={projects.slice(0, PROJECT_COUNT)}
@@ -32,6 +32,7 @@ export default async function HomePage() {
           <NotesListRSC />
         </Suspense>} */}
       {/* /> */}
+      <h2 style={{ padding: 'var(--gap-quarter) 0' }}> Posts and other half-baked thoughts</h2>
       <ContentListRSC />
       <footer className={styles.footer}>
         <span>

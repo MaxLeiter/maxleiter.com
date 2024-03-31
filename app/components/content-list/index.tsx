@@ -16,7 +16,6 @@ export async function ContentListRSC() {
     })
 
     return <>
-        <h2>Posts and other half-baked thoughts</h2>
         {/* Suspense for useSearchParams */}
         <Suspense fallback={null}>
             <FilterableList
