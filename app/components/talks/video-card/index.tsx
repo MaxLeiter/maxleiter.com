@@ -6,11 +6,13 @@ import Info from '@components/icons/info'
 import Play from '@components/icons/play'
 import Link from '@components/link'
 import Image from 'next/image'
-import type { Talk } from 'app/(subpages)/talks/page-backup'
+// import type { Talk } from 'app/(subpages)/talks/page-backup'
 import { useState } from 'react'
 import styles from './video-card.module.css'
 import tagStyles from '../tags.module.css'
 import secondsToTime from '@lib/seconds-to-time'
+type Talk = any
+
 const VideoCard = ({
   talk: {
     title,
@@ -97,7 +99,7 @@ const VideoCard = ({
           <p>{getTrimmedDescription()}</p>
           <div className={tagStyles.tags}>
             <b>Tags:</b>
-            {tags?.map((tag) => (
+            {tags?.map((tag: any) => (
               <Badge className={tagStyles.tag} key={`${id}-${tag}`}>
                 {tag}
               </Badge>

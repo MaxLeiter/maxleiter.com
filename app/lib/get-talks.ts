@@ -1,7 +1,7 @@
-import { Talk } from 'app/(subpages)/talks/page-backup'
+// import { Talk } from 'app/(subpages)/talks/page-backup'
 import { Client, Video } from 'youtubei'
 import Talks from '@data/talks.json'
-
+type Talk = any
 const youtube = new Client()
 
 const getTalks = async (): Promise<Array<Talk>> => {

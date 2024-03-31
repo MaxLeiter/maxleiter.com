@@ -1,10 +1,10 @@
-import { PostListRSC } from '@components/posts-list/rsc'
+import { NotesListRSC } from '@components/notes-list/rsc'
 import { Suspense } from 'react'
 
 const Blog = async () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <PostListRSC paginate={true} />
+      <NotesListRSC paginate={true} />
     </Suspense>
   )
 }

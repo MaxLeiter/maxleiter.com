@@ -1,7 +1,8 @@
+// @ts-nocheck
 'use client'
 
 import React from 'react'
-import type { Talk } from 'app/(subpages)/talks/page-backup'
+// import type { Talk } from 'app/(subpages)/talks/page-backup'
 import VideoCard from './video-card'
 import styles from './talks.module.css'
 import Input from '@components/input'
@@ -10,6 +11,7 @@ import Badge from '@components/badge'
 import tagStyles from './tags.module.css'
 
 type SortOption = 'date' | 'title' | 'views' | 'likes' | 'length'
+type Talk = any
 
 const Talks = ({ talks }: { talks: Array<Talk> }) => {
   const [search, setSearch] = React.useState('')

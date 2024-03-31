@@ -119,7 +119,11 @@ export const getProjects = cache(async (): Promise<Project[]> => {
 
   const withStars = await Promise.all(
     Projects.map(async (proj) => {
-      const split = proj.href.split('/')
+      const split = proj.href?.split('/')
+      if (!split) {
+        return proj
+      }
+
       //[ 'https:', '', 'github.com', 'maxleiter', 'jsontree' ]
       if (split[2] === 'github.com') {
         const user = split[3]
