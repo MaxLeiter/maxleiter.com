@@ -30,8 +30,10 @@ export default function BreadcrumbPage() {
     }, [pathname])
 
     return (
-        <ol className={styles.list}>
-            {breadcrumbs}
-        </ol>
+        <nav>
+            <ol className={styles.list}>
+                {breadcrumbs}
+            </ol>
+        </nav>
     )
 }

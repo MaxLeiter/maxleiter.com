@@ -11,22 +11,22 @@ type Props = {
 const Header = ({ render, title }: Props) => {
   if (render) {
     return (
-      <nav className={styles.nav}>
+      <div className={styles.nav}>
         <div className={styles.header}>
           {title ? title : null}
         </div>
         <div>
           <ThemeSwitcher hideTooltip />
         </div>
-      </nav>
+      </div>
     )
   }
   return (
-    <nav aria-hidden={true}>
+    <div aria-hidden={true}>
       <div className={styles.header}>
         {title ? title : null}
       </div>
-    </nav>
+    </div>
   )
 }
 

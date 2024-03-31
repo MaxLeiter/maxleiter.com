@@ -5,7 +5,7 @@ import styles from './navigation.module.css'
 
 const Navigation = ({ previous, next }: { previous?: Note | Post; next?: Note | Post }) => {
   return (
-    <div className={styles.navigation}>
+    <nav className={styles.navigation}>
       <div className={styles.previous}>
         {previous && (
           <Link href={`./${previous.slug}`}>
@@ -23,7 +23,7 @@ const Navigation = ({ previous, next }: { previous?: Note | Post; next?: Note | 
           </Link>
         )}
       </div>
-    </div>
+    </nav>
   )
 }
 
