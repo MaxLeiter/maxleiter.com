@@ -22,6 +22,6 @@
 }
 
 .tabsTrigger[aria-selected='true'] {
-  color: var(--foreground);
-  border-bottom-color: var(--foreground);
+  color: var(--fg);
+  border-bottom-color: var(--fg);
 }

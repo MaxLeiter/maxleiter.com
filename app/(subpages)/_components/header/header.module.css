@@ -11,23 +11,17 @@
 }
 
 .nav {
+  display: flex;
+  justify-content: space-between;
   margin: var(--small-gap) auto var(--small-gap) auto;
 }
 
 .header {
   height: var(--header-height);
-  margin: 0 auto;
   /* padding: 0 var(--gap); */
   max-width: var(--main-content);
   display: flex;
   align-items: center;
-}
-
-.content {
-  overflow: auto;
-  color: var(--gray-alpha);
-  font-weight: 500;
-  margin-left: var(--gap-double);
 }
 
 @media (max-width: 960px) {

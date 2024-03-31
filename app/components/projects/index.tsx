@@ -23,7 +23,7 @@ const Projects = ({ count = -1, projects = [], showYears = true }: Props) => {
             showYears={showYears}
             years={e.years}
             key={e.title}
-            href={e.href}
+            href={e.href || ""}
             title={e.title}
             description={e.description}
             role={e.role}

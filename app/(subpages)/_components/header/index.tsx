@@ -1,14 +1,11 @@
 import { memo } from 'react'
-import Link from 'next/link'
 
 import styles from './header.module.css'
-import Home from '@components/icons/home'
-import socialStyles from '@components/socials/socials.module.css'
 import ThemeSwitcher from '@components/theme-switcher'
 
 type Props = {
   render: boolean
-  title: string
+  title: string | React.ReactNode
 }
 
 const Header = ({ render, title }: Props) => {
@@ -16,11 +13,10 @@ const Header = ({ render, title }: Props) => {
     return (
       <nav className={styles.nav}>
         <div className={styles.header}>
-          <Link href="/" className={`${socialStyles.icon} ${styles.icon}`}>
-            <Home size={28} />
-          </Link>
+          {title ? title : null}
+        </div>
+        <div>
           <ThemeSwitcher hideTooltip />
-          {title && <div className={styles.content}>{title}</div>}
         </div>
       </nav>
     )
@@ -28,7 +24,7 @@ const Header = ({ render, title }: Props) => {
   return (
     <nav aria-hidden={true}>
       <div className={styles.header}>
-        {title && <div className={styles.content}>{title}</div>}
+        {title ? title : null}
       </div>
     </nav>
   )

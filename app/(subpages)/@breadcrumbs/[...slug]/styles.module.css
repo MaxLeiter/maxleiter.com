@@ -1,0 +1,16 @@
+.list {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  color: var(--gray);
+  
+  a {
+    color: var(--gray);
+    font-size: 0.8rem;
+
+    &:hover {
+      color: var(--fg);
+    }
+  }
+}
