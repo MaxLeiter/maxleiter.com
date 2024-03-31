@@ -1,0 +1,86 @@
+.terminalWindow {
+    background-color: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--light-gray);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    font-family: monospace;
+}
+
+.terminalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.trafficLights {
+    display: flex;
+    gap: 0.5rem;
+    color: red;
+}
+
+.redLight,
+.yellowLight,
+.greenLight {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+}
+
+.redLight {
+    background-color: red;
+}
+
+.yellowLight {
+    background-color: yellow;
+}
+
+.greenLight {
+    background-color: green;
+}
+
+.terminalTitle {
+    font-size: 0.875rem;
+}
+
+.terminalEditor {
+    position: relative;
+
+    &[contenteditable] {
+        outline: none;
+    }
+}
+
+.cursor {
+    position: absolute;
+    width: 0.5em;
+    height: 1.2em;
+    pointer-events: none;
+    /* blink */
+    animation: blink 1.2s infinite;
+    animation-timing-function: step-start;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .7;
+    }
+}
+
+.normalCursor {
+    background-color: var(--fg);
+}
+
+.insertCursor {
+    border-left: 1px solid var(--fg);
+}
+
+.statusBar {
+    background-color: var(--bg);
+    color: var(--fg);
+    padding: 0.5rem;
+}

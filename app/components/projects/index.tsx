@@ -6,18 +6,17 @@ import type { Project } from '@lib/types'
 // import { Star } from '@components/icons'
 
 type Props = {
-  count: number
   projects: Project[]
   showYears: boolean
+  seeMore: boolean;
 }
 
-const Projects = ({ count = -1, projects = [], showYears = true }: Props) => {
-  const sliced = projects.slice(0, count > 0 ? count : projects.length)
-  sliced.sort((a, b) => parseInt(b.years[0]) - parseInt(a.years[0]))
+const Projects = ({ projects = [], seeMore = false, showYears = true }: Props) => {
+  projects.sort((a, b) => parseInt(b.years[0]) - parseInt(a.years[0]))
 
   return (
     <ul className={styles.container}>
-      {sliced.map((e) => {
+      {projects.map((e) => {
         return (
           <Entry
             showYears={showYears}
@@ -31,7 +30,7 @@ const Projects = ({ count = -1, projects = [], showYears = true }: Props) => {
           />
         )
       })}
-      {count > 0 && count < projects.length && (
+      {seeMore && (
         <li>
           See some more on <Link href="/projects"> this page</Link>
         </li>

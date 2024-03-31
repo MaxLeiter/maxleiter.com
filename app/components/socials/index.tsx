@@ -3,7 +3,7 @@ import Link from '@components/link'
 import styles from './socials.module.css'
 import { GitHub, Twitter, Mail, RSS } from '@components/icons'
 import Tooltip from '@components/tooltip'
-import ThemeSwitcher from '@components/theme-switcher'
+// import ThemeSwitcher from '@components/theme-switcher'
 
 type SocialButtonProps = {
   href: string
@@ -13,7 +13,7 @@ type SocialButtonProps = {
 
 const SocialButton = ({ tooltip, href, icon }: SocialButtonProps) => {
   return (
-    <Tooltip text={tooltip}>
+    <Tooltip text={tooltip} direction='top'>
       <Link href={href} className={styles.icon}>
         {icon}
       </Link>
@@ -21,9 +21,9 @@ const SocialButton = ({ tooltip, href, icon }: SocialButtonProps) => {
   )
 }
 
-const Socials = () => {
+const Socials = (props: Omit<React.HTMLProps<HTMLDivElement>, 'className'>) => {
   return (
-    <div className={styles.socials}>
+    <div className={styles.socials} {...props}>
       <SocialButton
         href="https://github.com/maxleiter"
         icon={<GitHub strokeWidth={2} />}
@@ -44,7 +44,7 @@ const Socials = () => {
         icon={<RSS strokeWidth={2} />}
         tooltip="RSS"
       />
-      <ThemeSwitcher />
+      {/* <ThemeSwitcher /> */}
     </div>
   )
 }

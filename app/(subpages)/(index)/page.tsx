@@ -4,7 +4,7 @@ import Link from '@components/link'
 import AboutMe from '@components/aboutme'
 import { getProjects } from '@lib/projects'
 import styles from './page.module.css'
-import TimeOfDay from './timer'
+import TimeOfDay from '../../timer'
 import { ContentListRSC } from '@components/content-list'
 
 const PROJECT_COUNT = 3
@@ -16,16 +16,14 @@ export default async function HomePage() {
 
   return (
     <>
-      <div className={styles.heading}>
-        <h1>Max Leiter</h1>
-        <Socials />
-      </div>
       <AboutMe />
+      <p>You can find me around the internet here:</p>
+      <Socials />
       <h2>My projects</h2>
       <ProjectList
         showYears={false}
-        count={PROJECT_COUNT}
-        projects={projects}
+        projects={projects.slice(0, PROJECT_COUNT)}
+        seeMore={true}
       />
       {/* <PostsAndDevNotes PostList={<Suspense>
         <PostListRSC paginate={false} />

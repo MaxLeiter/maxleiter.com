@@ -17,7 +17,6 @@
 }
 
 .header {
-  height: var(--header-height);
   /* padding: 0 var(--gap); */
   max-width: var(--main-content);
   display: flex;

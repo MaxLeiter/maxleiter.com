@@ -25,6 +25,31 @@
     pointer-events: all;
 }
 
+/* directions */
+.tooltip[data-direction='left']::after {
+    top: 50%;
+    left: 0;
+    transform: translate(calc(-100% - 10px), -50%);
+}
+
+.tooltip[data-direction='bottom']::after {
+    top: 50%;
+    left: 0;
+    transform: translate(calc(-100% - 10px), 50%);
+}
+
+.tooltip[data-direction='top']::after {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, calc(-100% - 10px));
+}
+
+.tooltip[data-direction='right']::after {
+    top: 0;
+    left: 50%;
+    transform: translate(50%, calc(-100% - 10px));
+}
+
 /* disable on screenreader */
 @media reader, speech, aural {
     .tooltip::after {

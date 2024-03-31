@@ -12,7 +12,7 @@ export const metadata = {
 const Projects = async () => {
   const projects = await getProjects()
   return (
-    <ProjectList showYears={true} count={projects.length} projects={projects} />
+    <ProjectList showYears={true} projects={projects} seeMore={false} />
   )
 }
 

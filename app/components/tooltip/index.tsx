@@ -7,13 +7,15 @@ import styles from './tooltip.module.css'
 const Tooltip = ({
   children,
   text,
+  direction = 'top',
   ...otherProps
 }: {
   text: string
   children: ReactNode | ReactNode[]
+  direction?: 'top' | 'right' | 'bottom' | 'left'
 }) => {
   return (
-    <span className={styles.tooltip} data-label={text} {...otherProps}>
+    <span className={styles.tooltip} data-label={text} data-direction={direction}{...otherProps}>
       {React.Children.map(
         children,
         (child) =>

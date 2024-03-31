@@ -1,4 +1,4 @@
-import { PropsWithChildren, memo } from 'react'
+import { PropsWithChildren } from 'react'
 
 import styles from './header.module.css'
 import ThemeSwitcher from '@components/theme-switcher'
@@ -16,4 +16,4 @@ const Header = ({ children }: PropsWithChildren) => {
   )
 }
 
-export default memo(Header)
+export default (Header)

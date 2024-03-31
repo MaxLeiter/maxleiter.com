@@ -108,7 +108,7 @@ const FilterableList = <T extends Base>({
                     ))}
                 </div>
             )}
-            <ul className={styles.items}>
+            <ul className={styles.items} aria-live="polite" aria-relevant="additions removals">
                 {filteredItems.map((item) => renderItem(item))}
             </ul>
         </>

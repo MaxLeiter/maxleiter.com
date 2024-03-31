@@ -1,23 +1,10 @@
-.heading {
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--header-height);
-  margin-bottom: 24px;
-  align-items: center;
-}
-
 @media screen and (max-width: 768px) {
   .secondHeading {
     margin-top: var(--gap-half);
   }
 }
 
-@media (max-width: 768px) {
-  .heading {
-    flex-direction: column;
-    margin-bottom: var(--gap);
-  }
-}
+
 
 .footer {
   margin-top: var(--small-gap);
