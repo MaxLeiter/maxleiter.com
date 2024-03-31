@@ -1,0 +1,28 @@
+---
+title: Sending a Slack message with fetch
+slug: slack-message-with-fetch
+date: Mar 30, 2024
+---
+
+I like making Slack bots for things like alerts and notifications. I've been bit by
+a few gotchas enough times to save it here.
+
+I use [slack-block-builder](https://github.com/raycharius/slack-block-builder) to
+build the message; writing raw slack blocks is a pain.
+
+```tsx
+const res = await fetch('https://slack.com/api/chat.postMessage', {
+  method: 'POST',
+  headers: {
+    // IMPORTANT! You need to set the charset to utf-8
+    'Content-Type': 'application/json; charset=utf-8',
+    // Create an app: https://api.slack.com/apps
+    Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+  },
+  body: Message()
+    // Get this from Slack or the channel URL
+    .channel('C1234567890')
+    .blocks(Blocks.Section().text('*Error:* ' + error), Blocks.Divider())
+    .buildToJSON(),
+})
+```
