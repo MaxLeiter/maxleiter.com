@@ -4,10 +4,12 @@ import path from 'path'
 import { marked } from 'marked'
 import matter from 'gray-matter'
 
+const paths = ['../posts', '../notes']
 const posts = fs
-  .readdirSync(path.resolve(__dirname, '../posts/'))
+  .readdirSync(path.resolve(__dirname, paths[0]))
+  .concat(fs.readdirSync(path.resolve(__dirname, paths[1])))
   .filter(
-    (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx'
+    (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx',
   )
   .map((file) => {
     const postContent = fs.readFileSync(`./posts/${file}`, 'utf8')
@@ -28,9 +30,10 @@ marked.setOptions({
   renderer,
 })
 
-const renderPost = (md: string) => marked.parse(md, {
-  async: false,
-}) as string
+const renderPost = (md: string) =>
+  marked.parse(md, {
+    async: false,
+  }) as string
 
 const main = () => {
   const feed = new RSS({
