@@ -13,7 +13,7 @@
 .nav {
   display: flex;
   justify-content: space-between;
-  margin: var(--small-gap) auto var(--small-gap) auto;
+  margin: 1rem 0;
 }
 
 .header {

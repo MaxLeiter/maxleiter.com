@@ -6,6 +6,7 @@
 .wrapper .date {
   font-weight: 500;
   font-size: 1rem;
+  color: var(--gray);
 }
 
 .wrapper .lastModified {

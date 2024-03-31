@@ -1,7 +1,7 @@
 import getPosts from '@lib/get-posts'
 import Navigation from '@components/content-footer/navigation'
 import PostFooter from '@components/content-footer/post-footer'
-import styles from './layout.module.css'
+import styles from '../../blog/[slug]/layout.module.css'
 import { Metadata } from 'next'
 import getNotes from '@lib/get-notes'
 
