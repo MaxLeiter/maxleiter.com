@@ -44,6 +44,9 @@ dependencies:
   diff:
     specifier: 5.2.0
     version: 5.2.0
+  geist:
+    specifier: ^1.3.0
+    version: 1.3.0(next@14.2.0-canary.49)
   globby:
     specifier: 14.0.1
     version: 14.0.1
@@ -3948,6 +3951,14 @@ packages:
   /functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
+
+  /geist@1.3.0(next@14.2.0-canary.49):
+    resolution: {integrity: sha512-IoGBfcqVEYB4bEwsfHd35jF4+X9LHRPYZymHL4YOltHSs9LJa24DYs1Z7rEMQ/lsEvaAIc61Y9aUxgcJaQ8lrg==}
+    peerDependencies:
+      next: '>=13.2.0 <15.0.0-0'
+    dependencies:
+      next: 14.2.0-canary.49(react-dom@18.3.0-canary-d900fadbf-20230929)(react@18.3.0-canary-d900fadbf-20230929)
+    dev: false
 
   /gemoji@6.1.0:
     resolution: {integrity: sha512-MOlX3doQ1fsfzxQX8Y+u6bC5Ssc1pBUBIPVyrS69EzKt+5LIZAOm0G5XGVNhwXFgkBF3r+Yk88ONyrFHo8iNFA==}

@@ -15,9 +15,9 @@
   --header-height: 48px;
 
   /* Typography */
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Roboto',
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Roboto',
     'Helvetica Neue', sans-serif;
-  --font-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo',
+  --font-mono: var(--font-geist-mono), 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo',
     monospace;
 
   /* Transitions */

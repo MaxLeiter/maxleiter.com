@@ -18,7 +18,7 @@ export default function BreadcrumbPage() {
             const href = `/${parts.slice(0, index + 1).join("/")}`
             return (
                 <>
-                    <span key={part} aria-hidden style={{ color: "var(--gray)" }}> / </span>
+                    <span key={`${part}-span`} aria-hidden style={{ color: "var(--gray)" }}> / </span>
                     <li style={{ listStyle: "none" }} key={part}>
                         <Link key={part} href={href}>
                             {part}

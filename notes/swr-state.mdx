@@ -7,19 +7,14 @@ date: Mar 30, 2024
 
 [SWR](https://swr.vercel.app/) is a great library for data fetching in React. It looks like this:
 
-```jsx
+```tsx
 import useSWR from 'swr'
 
 export function MyComponent() {
-  const { data, error } =
-    useSWR <
-    string >
-    ('/api/data',
-    fetcher,
-    {
-      refreshInterval: 1000,
-      fallbackData: { name: 'swr' },
-    })
+  const { data, error } = useSWR<string>('/api/data', fetcher, {
+    refreshInterval: 1000,
+    fallbackData: { name: 'swr' },
+  })
 }
 ```
 

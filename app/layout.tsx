@@ -1,11 +1,10 @@
 import styles from './layout.module.css'
 import '@styles/global.css'
-import { Inter } from 'next/font/google'
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from 'next-themes'
 import { Viewport } from 'next'
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export default function RootLayout({
   children,
@@ -13,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body>
         <ThemeProvider>
           <div className={styles.wrapper}>
