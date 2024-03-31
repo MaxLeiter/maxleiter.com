@@ -1,10 +1,9 @@
-import Header from './_components/header'
 import type { ReactNode } from 'react'
 
-export default function Layout({ children, breadcrumbs }: { children: ReactNode, breadcrumbs: ReactNode }) {
+export default function Layout({ children, header }: { children: ReactNode, header: ReactNode }) {
   return (
     <>
-      <Header render={true} title={breadcrumbs} />
+      {header}
       {children}
     </>
   )

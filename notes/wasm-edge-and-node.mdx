@@ -2,13 +2,15 @@
 title: Loading wasm files on Vercel Edge and Node.js runtimes
 slug: wasm-edge-and-node
 date: Mar 30, 2024
+type: snippet
 ---
 
-Loading wasm on [Vercel Edge runtime](https://vercel.com/docs/functions/wasm) is easy. You need to do a little more work
+Loading wasm on the [Vercel Edge runtime](https://vercel.com/docs/functions/wasm) is easy. You need to do a little more work
 to do the same on Node.js.
 
 ```tsx
 async function getWasmNextJSEdge() {
+  // Webpack and Turbopack can tree-shake this.
   if (process.env.NEXT_RUNTIME === 'edge') {
     return (await import('./file.wasm?module')).default
   }

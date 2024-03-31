@@ -7,37 +7,43 @@ import { cache } from 'react'
 const thirdPartyPosts: Post[] = [
   {
     title: 'Introducing AI SDK 3.0 with Generative UI support',
-    description: "Stream React Components from LLMs to deliver richer user experiences.",
+    description:
+      'Stream React Components from LLMs to deliver richer user experiences.',
     body: '',
     date: '2024-03-01T10:00:00.000Z',
     slug: '',
     tags: [],
     lastModified: 0,
     isThirdParty: true,
-    href: 'https://vercel.com/blog/ai-sdk-3-generative-ui'
+    href: 'https://vercel.com/blog/ai-sdk-3-generative-ui',
+    type: 'post',
   },
   {
     title: 'Introducing the Vercel AI SDK',
-    description: "An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.",
+    description:
+      'An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.',
     body: '',
     date: '2023-06-15T13:00:00.000Z',
     slug: '',
     tags: [],
     lastModified: 0,
     isThirdParty: true,
-    href: 'https://vercel.com/blog/introducing-the-vercel-ai-sdk'
+    href: 'https://vercel.com/blog/introducing-the-vercel-ai-sdk',
+    type: 'post',
   },
   {
     title: 'Improving the accessibility of our Next.js site',
-    description: "We've made some improvements to the accessibility of our Next.js site. Here's how we did it.",
+    description:
+      "We've made some improvements to the accessibility of our Next.js site. Here's how we did it.",
     body: '',
     date: '2022-09-30T13:00:00.000Z',
     slug: '',
     tags: [],
     lastModified: 0,
     isThirdParty: true,
-    href: 'https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site'
-  }
+    href: 'https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site',
+    type: 'post',
+  },
 ]
 
 export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
@@ -46,7 +52,7 @@ export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
   const postsWithMetadata = await Promise.all(
     posts
       .filter(
-        (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx'
+        (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx',
       )
       .map(async (file) => {
         const filePath = `./posts/${file}`
@@ -81,19 +87,19 @@ export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
           }
         }
 
-        return { ...data, body: content, lastModified } as Post
-      })
+        return { ...data, body: content, lastModified, type: 'post' } as Post
+      }),
   )
 
   const postsWithMetadataAndThirdPartyPosts = [
     ...postsWithMetadata,
-    ...(includeThirdPartyPosts ? thirdPartyPosts : [])
+    ...(includeThirdPartyPosts ? thirdPartyPosts : []),
   ]
 
   const filtered = postsWithMetadataAndThirdPartyPosts
     .filter((post) => post !== null)
     .sort((a, b) =>
-      a && b ? new Date(b.date).getTime() - new Date(a.date).getTime() : 0
+      a && b ? new Date(b.date).getTime() - new Date(a.date).getTime() : 0,
     ) as Post[]
 
   return filtered

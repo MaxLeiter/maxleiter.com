@@ -9,6 +9,7 @@ import { PostsAndDevNotes } from '@components/posts-and-devnotes'
 import { Suspense } from 'react'
 import { PostListRSC } from '@components/posts-list/rsc'
 import { NotesListRSC } from '@components/notes-list/rsc'
+import { ContentListRSC } from '@components/content-list'
 
 const PROJECT_COUNT = 3
 
@@ -30,13 +31,14 @@ export default async function HomePage() {
         count={PROJECT_COUNT}
         projects={projects}
       />
-      <PostsAndDevNotes PostList={<Suspense>
+      {/* <PostsAndDevNotes PostList={<Suspense>
         <PostListRSC paginate={false} />
       </Suspense>}
         NoteList={<Suspense>
           <NotesListRSC />
-        </Suspense>}
-      />
+        </Suspense>} */}
+      {/* /> */}
+      <ContentListRSC />
       <footer className={styles.footer}>
         <span>
           <Link href="/about">About this site</Link>

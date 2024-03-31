@@ -10,7 +10,7 @@ export default function BreadcrumbPage() {
     const breadcrumbs = useMemo(() => {
         if (!pathname) return
 
-        const homeLink = <li style={{ listStyle: "none" }} key="first"><Link href="/">home</Link></li>
+        const homeLink = <li style={{ listStyle: "none" }} key="first"><Link href="/" title="home">~</Link></li>
         const parts = pathname?.split("/").filter(Boolean)
         if (parts?.length === 0) return
 
