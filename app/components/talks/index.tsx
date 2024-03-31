@@ -5,7 +5,7 @@ import type { Talk } from 'app/(subpages)/talks/page-backup'
 import VideoCard from './video-card'
 import styles from './talks.module.css'
 import Input from '@components/input'
-import PostFooter from '@(subpages)/blog/[slug]/post/post-footer'
+import PostFooter from '@components/content-footer/post-footer'
 import Badge from '@components/badge'
 import tagStyles from './tags.module.css'
 

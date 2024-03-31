@@ -1,0 +1,27 @@
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+   
+  h2 {
+    margin-bottom: 0;
+  }
+}
+
+.tabsList {
+  display: flex;
+  gap: 1rem;
+}
+
+.tabsTrigger {
+  cursor: pointer;
+  background-color: transparent;
+  cursor: pointer;
+  color: var(--gray);
+  border-bottom: 2px solid transparent;
+}
+
+.tabsTrigger[aria-selected='true'] {
+  color: var(--foreground);
+  border-bottom-color: var(--foreground);
+}

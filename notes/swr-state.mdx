@@ -1,0 +1,53 @@
+---
+title: SWR for more than fetching
+description: SWR for state management
+slug: swr-state
+date: Mar 30, 2024
+---
+
+[SWR](https://swr.vercel.app/) is a great library for data fetching in React. It looks like this:
+
+```jsx
+import useSWR from 'swr'
+
+export function MyComponent() {
+  const { data, error } =
+    useSWR <
+    string >
+    ('/api/data',
+    fetcher,
+    {
+      refreshInterval: 1000,
+      fallbackData: { name: 'swr' },
+    })
+}
+```
+
+But to me the best part of it is not the data fetching but for it's caching and revalidation features. It's a great tool for state management.
+
+Here's how I manage modals and dialogs:
+
+```tsx
+import useSWR, { mutate } from 'swr'
+
+export function useModal() {
+  const { data: isVisible, mutate: setVisible } = useSWR<boolean>(
+    'state:modal',
+    {
+      fallbackData: false,
+    },
+  )
+
+  return {
+    isVisible,
+    setVisible,
+  }
+}
+
+// For when you can't use hooks
+export const mutateModal = (isVisible) => {
+  mutate('state:modal', isVisible)
+}
+```
+
+Any hook call with that same `state:modal` key will receive the same data and re-render when it changes.

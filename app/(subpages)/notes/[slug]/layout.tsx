@@ -3,6 +3,7 @@ import Navigation from '@components/content-footer/navigation'
 import PostFooter from '@components/content-footer/post-footer'
 import styles from './layout.module.css'
 import { Metadata } from 'next'
+import getNotes from '@lib/get-notes'
 
 export async function generateStaticParams() {
   const posts = await getPosts()
@@ -16,32 +17,30 @@ export const generateMetadata = async ({
     slug: string
   }
 }): Promise<Metadata> => {
-  const post = (await getPosts()).find((p) => p?.slug === params.slug)
+  const note = (await getNotes()).find((p) => p?.slug === params.slug)
   return {
-    title: post?.title,
-    description: post?.description,
+    title: note?.title,
+    description: note?.description,
     alternates: {
-      canonical: `https://maxleiter.com/blog/${params.slug}`,
+      canonical: `https://maxleiter.com/notes/${params.slug}`,
     },
   }
 }
 
 async function getData({ slug }: { slug: string }) {
-  const posts = await getPosts()
-  const postIndex = posts.findIndex((p) => p?.slug === slug)
+  const notes = await getNotes()
+  const noteIndex = notes.findIndex((p) => p?.slug === slug)
 
-  if (postIndex === -1) {
-    throw new Error(`${slug} not found in posts. Did you forget to rename the file?`)
+  if (noteIndex === -1) {
+    throw new Error(`${slug} not found in notes. Did you forget to rename the file?`)
   }
 
-  const post = posts[postIndex]
-
-  const { ...rest } = post
+  const note = notes[noteIndex]
 
   return {
-    previous: posts[postIndex + 1] || null,
-    next: posts[postIndex - 1] || null,
-    ...rest,
+    previous: notes[noteIndex + 1] || null,
+    next: notes[noteIndex - 1] || null,
+    ...note,
   }
 }
 
@@ -54,26 +53,12 @@ export default async function PostLayout({
     slug: string
   }
 }) {
-  const { previous, next, title, date, lastModified } = await getData(params)
-
-  const lastModifiedDate = lastModified
-    ? new Date(lastModified).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    })
-    : null
+  const { previous, next, title, date } = await getData(params)
 
   return (
     <>
       <div className={styles.wrapper}>
         <span className={styles.date}>{date}</span>
-        {lastModified ? (
-          <span className={styles.lastModified}>
-            Last modified {lastModifiedDate}
-          </span>
-        ) : null}
-        {/* {updatedViews && <FadeIn>{updatedViews} views</FadeIn>} */}
       </div>
       <article>
         <h1 className={styles.title}>{title}</h1>

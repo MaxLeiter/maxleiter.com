@@ -20,6 +20,7 @@
     "@next/eslint-plugin-next": "14.2.0-canary.49",
     "@next/mdx": "14.2.0-canary.49",
     "@octokit/rest": "20.0.2",
+    "@radix-ui/react-tabs": "^1.0.4",
     "@supabase/supabase-js": "2.39.7",
     "@vercel/analytics": "1.2.2",
     "@vercel/toolbar": "0.1.13",

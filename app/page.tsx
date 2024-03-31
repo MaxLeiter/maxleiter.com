@@ -5,9 +5,10 @@ import AboutMe from '@components/aboutme'
 import { getProjects } from '@lib/projects'
 import styles from './page.module.css'
 import TimeOfDay from './timer'
+import { PostsAndDevNotes } from '@components/posts-and-devnotes'
 import { Suspense } from 'react'
 import { PostListRSC } from '@components/posts-list/rsc'
-import Posts from '@components/posts-list'
+import { NotesListRSC } from '@components/notes-list/rsc'
 
 const PROJECT_COUNT = 3
 
@@ -29,10 +30,13 @@ export default async function HomePage() {
         count={PROJECT_COUNT}
         projects={projects}
       />
-      <h2>My posts</h2>
-      <Suspense fallback={<Posts skeleton />}>
+      <PostsAndDevNotes PostList={<Suspense>
         <PostListRSC paginate={false} />
-      </Suspense>
+      </Suspense>}
+        NoteList={<Suspense>
+          <NotesListRSC />
+        </Suspense>}
+      />
       <footer className={styles.footer}>
         <span>
           <Link href="/about">About this site</Link>

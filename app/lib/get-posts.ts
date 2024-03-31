@@ -3,7 +3,6 @@ import path from 'path'
 import type { Post } from './types'
 import fs from 'fs/promises'
 import { cache } from 'react'
-// import supabase from '@lib/supabase/private'
 
 const thirdPartyPosts: Post[] = [
   {
@@ -81,17 +80,6 @@ export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
             lastModified = 0
           }
         }
-
-        // let views = 0
-
-        // const { data: viewCount } = await supabase
-        //   .from('analytics')
-        //   .select('view_count')
-        //   .filter('slug', 'eq', `/blog/${data.slug}`)
-
-        // if (viewCount?.length) {
-        //   views = viewCount[0].view_count
-        // }
 
         return { ...data, body: content, lastModified } as Post
       })
