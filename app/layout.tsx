@@ -6,6 +6,8 @@ import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from 'next-themes'
 import { Viewport } from 'next'
 
+export const dynamic = 'force-static'
+
 export default function RootLayout({
   children,
 }: {
