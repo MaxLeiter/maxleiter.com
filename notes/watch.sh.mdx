@@ -1,0 +1,36 @@
+---
+title: watch.sh
+description: A simple bash script for macOS that runs a command and displays a notification when the output of the command changes.
+slug: watch.sh
+date: Mar 30, 2024
+---
+
+A simple bash script for macOS that runs a command and displays a notification when the output of the command changes.
+
+```bash
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <command> [sleep_time]"
+  exit 1
+fi
+
+COMMAND="$1"
+SLEEP_TIME="${2:-3}"
+PREV_OUTPUT=$($COMMAND)
+
+while true; do
+  CURRENT_OUTPUT=$($COMMAND)
+  if [ "$CURRENT_OUTPUT" != "$PREV_OUTPUT" ]; then
+    osascript -e 'display notification "Command output has changed"'
+    PREV_OUTPUT=$CURRENT_OUTPUT
+  fi
+  sleep $SLEEP_TIME
+done
+```
+
+To use it:
+
+1. Save the script to a file (e.g., `watch` in `/usr/local/bin`)
+2. make it executable (`chmod +x watch.sh`)
+3. Run it with the command you want to watch as the argument. You can optionally specify a sleep time in seconds as the second argument (defaults to 3).

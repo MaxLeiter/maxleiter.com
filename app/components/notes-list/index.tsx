@@ -46,6 +46,7 @@ const NotesList = (props: Props) => {
             href={`/notes/${note.slug}`}
             title={note.title}
             date={new Date(date)}
+            description={note.description}
           />
         )
       })}
