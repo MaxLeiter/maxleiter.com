@@ -3,6 +3,7 @@ import Link from '@components/link'
 import styles from './socials.module.css'
 import { GitHub, Twitter, Mail, RSS } from '@components/icons'
 import Tooltip from '@components/tooltip'
+import { track } from '@vercel/analytics/react'
 // import ThemeSwitcher from '@components/theme-switcher'
 
 type SocialButtonProps = {
@@ -14,7 +15,11 @@ type SocialButtonProps = {
 const SocialButton = ({ tooltip, href, icon }: SocialButtonProps) => {
   return (
     <Tooltip text={tooltip} direction='top'>
-      <Link href={href} className={styles.icon}>
+      <Link href={href} className={styles.icon} external onClick={() =>
+        track('clicked social link', {
+          type: tooltip.toLowerCase(),
+        })
+      }>
         {icon}
       </Link>
     </Tooltip>
