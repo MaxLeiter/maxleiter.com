@@ -7,5 +7,5 @@
     border-radius: var(--radius);
     color: var(--gray);
     padding: 0 var(--gap-half);
-    font-weight: 500;
+    font-weight: 450;
 }
