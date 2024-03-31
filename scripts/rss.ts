@@ -3,21 +3,33 @@ import RSS from 'rss'
 import path from 'path'
 import { marked } from 'marked'
 import matter from 'gray-matter'
+import { Note, Post } from '@lib/types'
 
 const paths = ['../posts', '../notes']
+
 const posts = fs
   .readdirSync(path.resolve(__dirname, paths[0]))
-  .concat(fs.readdirSync(path.resolve(__dirname, paths[1])))
   .filter(
     (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx',
   )
   .map((file) => {
-    const postContent = fs.readFileSync(`./posts/${file}`, 'utf8')
-    const { data, content }: { data: any; content: string } =
-      matter(postContent)
+    const { data, content }: { data: any; content: string } = matter(file)
     return { ...data, body: content }
   })
-  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+const notes = fs
+  .readdirSync(path.resolve(__dirname, paths[1]))
+  .filter(
+    (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx',
+  )
+  .map((file) => {
+    const { data, content }: { data: any; content: string } = matter(file)
+    return { ...data, body: content }
+  })
+
+const combined: (Note | Post)[] = [...posts, ...notes].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+)
 
 const renderer = new marked.Renderer()
 
@@ -45,7 +57,7 @@ const main = () => {
     description: "Max Leiter's blog",
   })
 
-  posts.forEach((post) => {
+  combined.forEach((post) => {
     const url = `https://maxleiter.com/blog/${post.slug}`
 
     feed.item({
@@ -54,6 +66,7 @@ const main = () => {
       date: new Date(post?.date),
       author: 'Max Leiter',
       url,
+      categories: [post.type],
       guid: url,
     })
   })

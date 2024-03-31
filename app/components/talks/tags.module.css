@@ -6,32 +6,18 @@
   gap: var(--gap-half);
 }
 
-.tag {
-  background-color: var(--lightest-gray);
-  border: 1px solid var(--lightest-gray);
-  border-radius: var(--radius);
-  color: var(--gray);
-  font-size: 14px;
-  padding: 0 var(--gap-half);
-}
-
-
 .tag a {
   text-decoration: none;
-  cursor: pointer;
 }
 
 .tag a:hover {
   color: var(--link);
 }
 
+.selected a:hover {
+  color: var(--fg);
+}
+
 .selected {
   background-color: var(--link);
-  border-color: var(--link);
-  color: var(--bg);
 }
-
-.selected a:hover {
-  color:  var(--fg);
-}
-

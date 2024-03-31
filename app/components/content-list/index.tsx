@@ -2,6 +2,7 @@ import FilterableList from "@components/filterable-list"
 import getNotes from "@lib/get-notes"
 import getPosts from "@lib/get-posts"
 import { getTag, renderItem } from "./render-item"
+import { Suspense } from "react"
 
 
 export async function ContentListRSC() {
@@ -10,22 +11,21 @@ export async function ContentListRSC() {
         getNotes(),
     ])
 
-    const content = [...posts, ...notes]
+    const content = [...posts, ...notes].sort((a, b) => {
+        return new Date(b.date).getTime() - new Date(a.date).getTime()
+    })
 
     return <>
-    <h2>Posts and other half-baked thoughts</h2>
-    <FilterableList
-        items={content}
-        renderItem={renderItem}
-        filterProperties={['type']}
-        sortOptions={[
-            { label: 'Sort by date', value: 'date' },
-            { label: 'Sort by title', value: 'title' },
-        ]}
-        tags={getTag}
-        enableSearch={false}
-        enableSort={false}
-        enableTags={false}
-    />
+        <h2>Posts and other half-baked thoughts</h2>
+        {/* Suspense for useSearchParams */}
+        <Suspense fallback={null}>
+            <FilterableList
+                items={content}
+                renderItem={renderItem}
+                tags={getTag}
+                enableSearch={false}
+                enableTags={true}
+            />
+        </Suspense>
     </>
 }

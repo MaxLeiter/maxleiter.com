@@ -5,7 +5,8 @@ export type Base = {
 }
 
 export type Post = Base & {
-  slug: string
+  // Not defined for third party posts
+  slug: string | undefined
   date: string
   tags: string[]
   body: string

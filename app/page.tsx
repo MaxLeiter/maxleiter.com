@@ -5,10 +5,6 @@ import AboutMe from '@components/aboutme'
 import { getProjects } from '@lib/projects'
 import styles from './page.module.css'
 import TimeOfDay from './timer'
-import { PostsAndDevNotes } from '@components/posts-and-devnotes'
-import { Suspense } from 'react'
-import { PostListRSC } from '@components/posts-list/rsc'
-import { NotesListRSC } from '@components/notes-list/rsc'
 import { ContentListRSC } from '@components/content-list'
 
 const PROJECT_COUNT = 3

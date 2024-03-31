@@ -6,9 +6,9 @@ import { Note, Post } from "@lib/types"
 export const renderItem = (item: Post | Note) => item.type === 'post' ? renderPost(item) : renderNote(item)
 export const getTag = (post: Post | Note) => [post.type]
 
-function renderPost(post: any) {
+function renderPost(post: Post) {
     return <BlockEntry
-        key={post.slug}
+        key={post.slug || post.href}
         href={post.isThirdParty ? post.href! : `/blog/${post.slug}`}
         title={post.title}
         date={new Date(post.date)}
@@ -18,7 +18,7 @@ function renderPost(post: any) {
     />
 }
 
-function renderNote(note: any) {
+function renderNote(note: Note) {
     return <BlockEntry
         key={note.slug}
         href={`/notes/${note.slug}`}
