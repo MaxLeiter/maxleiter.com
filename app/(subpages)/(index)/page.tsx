@@ -9,8 +9,6 @@ import { ContentListRSC } from '@components/content-list'
 
 const PROJECT_COUNT = 3
 
-export const revalidate = 10800
-
 export default async function HomePage() {
   const projects = await getProjects()
 
