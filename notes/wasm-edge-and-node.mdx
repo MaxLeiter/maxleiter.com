@@ -1,0 +1,25 @@
+---
+title: Loading wasm files on Vercel Edge and Node functions
+slug: wasm-edge-and-node
+date: Mar 30, 2024
+---
+
+Loading wasm on [Vercel Edge runtime](https://vercel.com/docs/functions/wasm) is easy. You need to do a little more work
+to do the same on Node.js.
+
+```tsx
+async function getWasmNextJSEdge() {
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    return (await import('./file.wasm?module')).default
+  }
+}
+
+async function getWasmNode() {
+  if (!process.env.NEXT_RUNTIME || process.env.NEXT_RUNTIME === 'nodejs') {
+    const { readFileSync } = await import('fs')
+    const { join } = await import('path')
+    const wasm = readFileSync(join(process.cwd(), './file.wasm'))
+    return await WebAssembly.compile(wasm)
+  }
+}
+```
