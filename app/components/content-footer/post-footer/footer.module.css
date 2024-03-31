@@ -1,8 +1,12 @@
-.footer a {
+.footer {
+  color: var(--article-color);
+
+  a {
     color: var(--link);
     transition: color 0.1s ease-in-out;
-}
+  }
 
-.footer {
-    color: var(--article-color);
+  p {
+    color: var(--gray);
+  }
 }
