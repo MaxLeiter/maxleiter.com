@@ -8,7 +8,7 @@ const Navigation = ({ previous, next }: { previous?: Note | Post; next?: Note | 
     <div className={styles.navigation}>
       <div className={styles.previous}>
         {previous && (
-          <Link href={`/blog/${previous.slug}`}>
+          <Link href={`./${previous.slug}`}>
             <div className={styles.title}>← Older</div>
             {previous.title}
           </Link>
@@ -17,7 +17,7 @@ const Navigation = ({ previous, next }: { previous?: Note | Post; next?: Note | 
 
       <div className={styles.next}>
         {next && (
-          <Link href={`/blog/${next.slug}`}>
+          <Link href={`./${next.slug}`}>
             <div className={styles.title}>Newer →</div>
             {next.title}
           </Link>
