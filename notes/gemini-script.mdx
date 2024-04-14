@@ -12,6 +12,7 @@ for grabbing entire repos. It ignores most binary files and concatenates the res
 You'll need to have `parallel` installed for this to work (`brew install parallel` on macOS).
 
 ```bash
+
 #!/bin/bash
 # written by Claude 3 Opus and Gemini-1.5-pro.
 
@@ -54,6 +55,10 @@ is_ignored() {
     fi
 
     if [[ $file == *.wasm ]]; then
+        return 0
+    fi
+
+    if [[ $mimetype == application/octet-stream ]]; then
         return 0
     fi
 
