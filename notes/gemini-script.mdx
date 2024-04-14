@@ -1,0 +1,78 @@
+---
+title: gemini.sh script
+description: A script for concatenating files in a directory for copying to an LLM
+slug: gemini-script
+date: Apr 14, 2024
+type: snippet
+---
+
+I've been messing with gemini-1.5-pro with the 1 million token context window for a while now and found this script very useful
+for grabbing entire repos. It ignores most binary files and concatenates the rest into a single file. 
+
+You'll need to have `parallel` installed for this to work (`brew install parallel` on macOS).
+
+```bash
+#!/bin/bash
+# written by Claude 3 Opus and Gemini-1.5-pro.
+
+set -e
+
+# Check for correct number of arguments
+if [ "$#" -ne 2 ]; then
+    echo "Usage: gemini.sh <directory> <output file>"
+    exit 1
+fi
+
+# Check if directory exists
+if [ ! -d "$1" ]; then
+    echo "Directory $1 does not exist"
+    exit 1
+fi
+
+# Check if can replace output file
+if [ -f "$2" ]; then
+    read -p "File $2 already exists. Overwrite? [y/n] " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+
+    rm "$2"
+fi
+
+# Function to check if a file should be ignored
+is_ignored() {
+    local file="$1"
+    local gitignore=$(git rev-parse --show-toplevel)/.gitignore 2>/dev/null
+    if [[ -f "$gitignore" ]]; then
+        git check-ignore -q "$file" && return 0
+    fi
+
+    local mimetype=$(file --mime-type -b "$file")
+    if [[ $mimetype == image/* || $mimetype == *binary* || $mimetype == video/* || $mimetype == audio/* ]]; then
+        return 0
+    fi
+
+    if [[ $file == *.wasm ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
+# Export the function so it can be used by parallel
+export -f is_ignored
+
+find "$1" -type f -print0 | parallel -0 -k '
+    if is_ignored {}; then
+        exit
+    fi
+    echo "/** {} **/"
+    cat {}
+    echo ""
+' >>"$2"
+
+
+echo "Gemini complete"
+exit 0
+```
