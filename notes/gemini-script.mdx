@@ -12,7 +12,6 @@ for grabbing entire repos. It ignores most binary files and concatenates the res
 You'll need to have `parallel` installed for this to work (`brew install parallel` on macOS).
 
 ```bash
-
 #!/bin/bash
 # written by Claude 3 Opus and Gemini-1.5-pro.
 
@@ -49,6 +48,28 @@ is_ignored() {
         git check-ignore -q "$file" && return 0
     fi
 
+    if [[ $file == *.git* ]]; then
+        return 0
+    fi
+
+    # ignore run folder
+    if [[ $file == run/* ]]; then
+        return 0
+    fi
+
+    if [[ $file == *.bin/* || $file == *build/* || $file == *dist/* ]]; then
+        return 0
+    fi
+
+    if [[ $file == *.gradle/* || $file == *.idea/* || $file == *.vscode/* ]]; then
+        return 0
+    fi
+
+    # ignore .bin files
+    if [[ $file == *.bin ]]; then
+        return 0
+    fi
+    
     local mimetype=$(file --mime-type -b "$file")
     if [[ $mimetype == image/* || $mimetype == *binary* || $mimetype == video/* || $mimetype == audio/* ]]; then
         return 0
@@ -58,16 +79,18 @@ is_ignored() {
         return 0
     fi
 
-    if [[ $mimetype == application/octet-stream ]]; then
+    if [[ $file == .DS_Store ]]; then
         return 0
     fi
 
+    if [[ $mimetype == application/zip* ]]; then
+        return 0
+    fi
     return 1
 }
 
 # Export the function so it can be used by parallel
 export -f is_ignored
-
 find "$1" -type f -print0 | parallel -0 -k '
     if is_ignored {}; then
         exit
