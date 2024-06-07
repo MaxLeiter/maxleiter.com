@@ -1,5 +1,7 @@
 import type { Project } from './types'
 import { cache } from 'react'
+import { unstable_cache } from 'next/cache';
+
 const Projects: Project[] = [
   {
     title: 'X11 on iOS',
@@ -114,7 +116,7 @@ export const getProjects = cache(async (): Promise<Project[]> => {
     )
   }
 
-  const withStars = await Promise.all(
+  const withStars = await unstable_cache(() => Promise.all(
     Projects.map(async (proj) => {
       const split = proj.href?.split('/')
       if (!split) {
@@ -151,6 +153,11 @@ export const getProjects = cache(async (): Promise<Project[]> => {
       }
       return proj
     })
+  ),
+    ['projects'],
+    {
+      revalidate: 60 * 60 * 24 // 24 hours
+    }
   )
 
   return withStars

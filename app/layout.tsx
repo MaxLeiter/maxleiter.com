@@ -43,9 +43,7 @@ export const metadata = {
     type: 'website',
     images: [
       {
-        url: `https://maxleiter.com/api/og?title=${encodeURIComponent(
-          "Max Leiter's site"
-        )}`,
+        url: `https://maxleiter.com/opengraph-image`,
         width: 1200,
         height: 630,
         alt: "Max Leiter's site",
