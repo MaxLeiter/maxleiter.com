@@ -5,6 +5,8 @@ export const size = { width: 1200, height: 600 }
 export const alt = ''
 export const contentType = 'image/png'
 
+export const runtime = 'edge'
+
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async function (): Promise<ImageResponse> {
   const fontData = await fetch(
