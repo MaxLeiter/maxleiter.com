@@ -5,25 +5,30 @@ import { marked } from 'marked'
 import matter from 'gray-matter'
 import { Note, Post } from '@lib/types'
 
-const paths = ['../posts', '../notes']
-
 const posts = fs
-  .readdirSync(path.resolve(__dirname, paths[0]))
+  .readdirSync(path.resolve(__dirname, '../posts'))
   .filter(
     (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx',
   )
   .map((file) => {
-    const { data, content }: { data: any; content: string } = matter(file)
+    const markdown = fs.readFileSync(
+      path.resolve(__dirname, '../posts', file),
+      'utf-8',
+    )
+    const { data, content }: { data: any; content: string } = matter(markdown)
     return { ...data, body: content }
   })
-
 const notes = fs
-  .readdirSync(path.resolve(__dirname, paths[1]))
+  .readdirSync(path.resolve(__dirname, '../notes'))
   .filter(
     (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx',
   )
   .map((file) => {
-    const { data, content }: { data: any; content: string } = matter(file)
+    const markdown = fs.readFileSync(
+      path.resolve(__dirname, '../notes', file),
+      'utf-8',
+    )
+    const { data, content }: { data: any; content: string } = matter(markdown)
     return { ...data, body: content }
   })
 
@@ -59,7 +64,7 @@ const main = () => {
 
   combined.forEach((post) => {
     const url = `https://maxleiter.com/blog/${post.slug}`
-
+    console.log(post)
     feed.item({
       title: post.title,
       description: renderPost(post.body),
