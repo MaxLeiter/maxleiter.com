@@ -116,7 +116,7 @@ export const getProjects = cache(async (): Promise<Project[]> => {
     )
   }
 
-  const withStars = await unstable_cache(() => Promise.all(
+  const withStars = unstable_cache(async () => await Promise.all(
     Projects.map(async (proj) => {
       const split = proj.href?.split('/')
       if (!split) {
@@ -160,5 +160,5 @@ export const getProjects = cache(async (): Promise<Project[]> => {
     }
   )
 
-  return withStars
+  return await withStars()
 })
