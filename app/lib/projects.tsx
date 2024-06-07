@@ -108,7 +108,7 @@ const Projects: Project[] = [
 ]
 
 export const getProjects = cache(async (): Promise<Project[]> => {
-  if (!process.env.GITHUB_TOKEN) {
+  if (process.env.NODE_ENV === 'production' && !process.env.GITHUB_TOKEN) {
     throw new Error(
       'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.'
     )

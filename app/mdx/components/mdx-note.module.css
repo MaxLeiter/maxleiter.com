@@ -1,5 +1,10 @@
 .note {
   position: relative;
+  border: 1px solid var(--lighter-gray);
+  background: var(--lightest-gray);
+  padding: var(--gap-half);
+  color: var(--article-color);
+  margin: var(--gap-half) 0;
 }
 
 .note .icon {
@@ -22,4 +27,3 @@
     margin: 0;
   }
 }
-

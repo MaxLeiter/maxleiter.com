@@ -15,7 +15,6 @@ export default async function HomePage() {
   return (
     <>
       <AboutMe />
-      <p>You can find me around the internet here:</p>
       <Socials />
       <h2 style={{ padding: 'var(--gap-quarter) 0' }}>My projects</h2>
       <ProjectList
