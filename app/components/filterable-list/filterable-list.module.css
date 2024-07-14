@@ -24,6 +24,10 @@
   margin-bottom: var(--gap);
 }
 
+.count {
+  display: inline;
+}
+
 @media (max-width: 768px) {
   .filterSettings {
     flex-direction: column;
@@ -36,6 +40,10 @@
   .selects {
     flex-direction: column;
     margin-top: var(--gap);
+  }
+
+  .count {
+    display: none;
   }
 }
 

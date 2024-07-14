@@ -102,7 +102,9 @@ const FilterableList = <T extends Base>({
                             style={selectedTag === tag ? selectedBadgeStyles : {}}
                         >
                             <Link href={tagHref(tag)} scroll={false} style={linkStyles}>
-                                {tag} ({count})
+                                {tag} <span className={styles.count}>
+                                    ({count})
+                                </span>
                             </Link>
                         </Badge>
                     ))}
