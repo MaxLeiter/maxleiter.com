@@ -63,35 +63,8 @@ export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
         if (data.published === false) {
           return null
         }
-        const withoutLeadingChars = filePath.substring(2).replace('.mdx', '.md')
 
-        const fetchUrl =
-          process.env.NODE_ENV === 'production'
-            ? `https://api.github.com/repos/maxleiter/maxleiter.com/commits?path=${withoutLeadingChars}&page=1&per_page=1`
-            : `http://localhost:3000/mock-commit-response.json`
-
-        const commitInfoResponse = await unstable_cache(async () => await fetch(fetchUrl, {
-          headers: {
-            Authorization: process.env.GITHUB_TOKEN ?? '',
-          },
-        }), ['github-posts', filePath], {
-          revalidate: 24 * 60 * 60,
-        })()
-
-        const commitInfo = await commitInfoResponse.json()
-        let lastModified = 0
-        if (commitInfo?.length) {
-          lastModified = new Date(commitInfo[0].commit.committer.date).getTime()
-
-          if (
-            lastModified - new Date(data.date).getTime() <
-            24 * 60 * 60 * 1000
-          ) {
-            lastModified = 0
-          }
-        }
-
-        return { ...data, body: content, lastModified, type: 'post' } as Post
+        return { ...data, body: content, type: 'post' } as Post
       }),
   )
 
