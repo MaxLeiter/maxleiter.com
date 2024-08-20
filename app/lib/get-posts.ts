@@ -70,13 +70,13 @@ export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
             ? `https://api.github.com/repos/maxleiter/maxleiter.com/commits?path=${withoutLeadingChars}&page=1&per_page=1`
             : `http://localhost:3000/mock-commit-response.json`
 
-        const commitInfoResponse = unstable_cache(async () => await fetch(fetchUrl, {
+        const commitInfoResponse = await unstable_cache(async () => await fetch(fetchUrl, {
           headers: {
             Authorization: process.env.GITHUB_TOKEN ?? '',
           },
         }), ['github-posts', filePath], {
           revalidate: 24 * 60 * 60,
-        })
+        })()
 
         const commitInfo = await commitInfoResponse.json()
         let lastModified = 0

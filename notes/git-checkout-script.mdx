@@ -1,7 +1,7 @@
 ---
 title: Never think about branch names again
 description: a bash script for generating branch names
-slug: gcb-script
+slug: git-checkout-script
 type: snippet
 date: Aug 19, 2024
 ---
@@ -10,17 +10,17 @@ This script lets you run `gcb branch-name` and it will create a branch with the 
 I recommend swapping out `max` to basically anything else.
 
 ```bash
-#!/bin/bash
+  #!/bin/bash
 
-# Get the current month and day
-month=$(date +%m)
-day=$(date +%d)
+  # Get the current month and day
+  month=$(date +%m)
+  day=$(date +%d)
 
-# Prefix the branch name with max/{month}-{day}
-branch_name="max/$month-$day-$1"
+  # Prefix the branch name with max/{month}-{day}
+  branch_name="max/$month-$day-$1"
 
-# Checkout the branch
-git checkout -b "$branch_name"
+  # Checkout the branch
+  git checkout -b "$branch_name"
 ```
 
 To use on macOS/linux, you can paste the above into a file in `/usr/local/bin` and make it executable with `chmod +x /usr/local/bin/gcb`.
