@@ -4,7 +4,7 @@ import BlockEntry from "@components/entry/block"
 import { Note, Post } from "@lib/types"
 
 export const renderItem = (item: Post | Note) => item.type === 'post' ? renderPost(item) : renderNote(item)
-export const getTag = (post: Post | Note) => [post.type]
+export const getTag = (post: Post | Note) => [post.type === 'post' ? 'post' : 'note']
 
 function renderPost(post: Post) {
     return <BlockEntry

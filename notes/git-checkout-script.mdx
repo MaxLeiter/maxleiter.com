@@ -1,0 +1,34 @@
+---
+title: Never think about branch names again
+description: a bash script for generating branch names
+slug: gcb-script
+type: snippet
+date: Aug 19, 2024
+---
+
+This script lets you run `gcb branch-name` and it will create a branch with the name `max/{month}-{day}-branch-name`.
+I recommend swapping out `max` to basically anything else.
+
+```bash
+#!/bin/bash
+
+# Get the current month and day
+month=$(date +%m)
+day=$(date +%d)
+
+# Prefix the branch name with max/{month}-{day}
+branch_name="max/$month-$day-$1"
+
+# Checkout the branch
+git checkout -b "$branch_name"
+```
+
+To use on macOS/linux, you can paste the above into a file in `/usr/local/bin` and make it executable with `chmod +x /usr/local/bin/gcb`.
+
+I also recommend setting your git settings to sort branches by `committerdate` so that you can easily find the branch you worked on most recently:
+
+```bash
+git config --global branch.sort committerdate
+```
+
+This does work with the default alphabetical sorting, but this works better if you work on features over long periods of time.
