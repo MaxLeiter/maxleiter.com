@@ -63,7 +63,7 @@ const main = () => {
   })
 
   combined.forEach((post) => {
-    const url = `https://maxleiter.com/blog/${post.slug}`
+    const url = `https://maxleiter.com/${post.type === 'post' ? 'blog' : 'notes'}/${post.slug}`
     feed.item({
       title: post.title,
       description: renderPost(post.body),
