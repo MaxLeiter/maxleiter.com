@@ -1,0 +1,57 @@
+---
+title: Reduce Cognitive Load
+description: My new motto
+slug: reduce-cognitive-load
+date: Aug 28, 2024
+published: false
+---
+
+The AI team at Vercel has been growing; what was five people a year ago is almost 15.
+In most ways, this has been fantastic. But it's been a challenge, too. More people are reading my code, and I'm reading
+theirs. **A lot** of time can be spent just trying to understand what's going on, even if it's a code base you're familiar with, to no fault of the author.
+
+I've been thinking a lot about how to make this easier,
+and it really comes down to focusing on <strong>reducing [cognitive load](https://en.wikipedia.org/wiki/Cognitive_load)</strong>.
+
+Obviously, this comes into play all over the place, like when designing APIs and user experiences.
+But I've been thinking about it in terms of code. How can I make my code easier to read and understand?
+
+Here are a few things I've been trying, from the big to the small.
+
+## 1. Incremental PRs
+
+When I work on a large feature, I'll often break it up into multiple PRs.
+Sometimes, this happens naturally while I'm working and the branches practically create themselves.
+Other times, I write the entire feature in one go, but then do my own personal PR review and group the changes into logical chunks.
+
+If there are no logical chunks, I try to split them into PRs based on impact. I ask myself, _can some of this code ship without any risk to production?_
+This has its risks regarding issues like stale code if the rest doesn't ship soon after, but I think it's worth it for the reviewer.
+
+Even if the PR they're reviewing is only a portion of the big picture, your PR description and chunking needs to be enough for them to go off of.
+
+## 2. Coding style
+
+I've adjusted a lot of my coding style in the past few years. Any big numbers in JS? Each set of three digits gets an underscore.
+
+Which would you rather read in a codebase, even if for a second?
+
+This:
+
+```js
+export const TIMEOUT_TIME = 1000000
+```
+
+or this?
+
+```js
+export const TIMEOUT_TIME = 100_000
+```
+
+Could you tell there was a missing zero in the second example?
+
+## 3. Comments
+
+Your code can be the most beautiful thing in the world. I still don't want to have to read it all
+character by character to understand what it does or _why_ it does it.
+
+I like to leave comments at the top of my files (which are often named after the feature they're implementing) explaining the high-level overview of the file.
