@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { useEffect, useState } from 'react'
 
 const timeStringOptions: Intl.DateTimeFormatOptions[] = [
@@ -100,7 +100,10 @@ const TimeOfDay = () => {
 export default TimeOfDay
 
 const TimeDisplay = ({ format }: { format: Intl.DateTimeFormatOptions }) => {
-  const [time, setTime] = useState(new Date())
+  const [time, setTime] = useState<Date>()
+  useLayoutEffect(() => {
+    setTime(new Date())
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000)
@@ -108,8 +111,8 @@ const TimeDisplay = ({ format }: { format: Intl.DateTimeFormatOptions }) => {
   }, [])
 
   return (
-    <span suppressHydrationWarning>
-      {time.toLocaleTimeString('en-US', {
+    <span>
+      {time?.toLocaleTimeString('en-US', {
         timeZone: 'America/Los_Angeles',
         ...format,
       })}

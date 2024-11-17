@@ -22,6 +22,7 @@ export type Project = Base & {
   years: string[]
   stars?: number
   type: 'project'
+  imageUrl?: string
 }
 
 export type Note = Base & {

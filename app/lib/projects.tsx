@@ -1,6 +1,7 @@
 import type { Project } from './types'
 import { cache } from 'react'
 import { unstable_cache } from 'next/cache';
+import { cacheLife } from 'next/dist/server/use-cache/cache-life';
 
 const Projects: Project[] = [
   {
@@ -18,7 +19,8 @@ const Projects: Project[] = [
     href: 'https://github.com/maxleiter/drift',
     role: 'Creator',
     years: ['2022', 'present'],
-    type: 'project'
+    type: 'project',
+    imageUrl: '/blog/drift/view-post.png'
   },
   {
     title: 'The Lounge',
@@ -116,7 +118,7 @@ export const getProjects = cache(async (): Promise<Project[]> => {
     )
   }
 
-  const withStars = unstable_cache(async () => await Promise.all(
+  const withStars = await Promise.all(
     Projects.map(async (proj) => {
       const split = proj.href?.split('/')
       if (!split) {
@@ -153,12 +155,7 @@ export const getProjects = cache(async (): Promise<Project[]> => {
       }
       return proj
     })
-  ),
-    ['projects'],
-    {
-      revalidate: 60 * 60 * 24 // 24 hours
-    }
   )
 
-  return await withStars()
+  return withStars
 })

@@ -7,8 +7,6 @@ import { ContentListRSC } from '@components/content-list'
 
 const PROJECT_COUNT = 3
 
-export const dynamic = 'force-static'
-
 export default async function HomePage() {
   const projects = await getProjects()
 

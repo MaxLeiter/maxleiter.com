@@ -14,7 +14,7 @@ export default function BreadcrumbPage() {
         const homeLink = <li style={{ listStyle: "none" }} key="first"><Link href="/" title="home">~</Link></li>
         const parts = pathname?.split("/").filter(Boolean)
         if (parts?.length === 0) return
-        console.log("parts", parts)
+
         return [homeLink, ...parts.map((part, index) => {
             const href = `/${parts.slice(0, index + 1).join("/")}`
             return (

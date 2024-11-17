@@ -6,9 +6,7 @@ import { ThemeProvider } from 'next-themes'
 import { Viewport } from 'next'
 
 export const dynamic = 'force-static'
-
-// every 6 hours
-export const revalidate = 21_600
+export const revalidate = 21_600 // 6 hours
 
 export default function RootLayout({
   children,

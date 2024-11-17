@@ -19,7 +19,6 @@ export function TerminalWindow({ children }: { children: React.ReactNode }) {
         if (mode === 'normal') {
             switch (event.key) {
                 case 'ArrowUp':
-                    console.log('ArrowUp');
                     break;
                 case 'k':
                     // Move cursor up
