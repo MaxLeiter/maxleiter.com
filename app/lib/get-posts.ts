@@ -7,6 +7,32 @@ import { unstable_cache } from 'next/cache'
 
 const thirdPartyPosts: Post[] = [
   {
+    title: 'Gemini Chatbot with Gen UI support',
+    description:
+      "The Gemini AI Chatbot template is a streaming-enabled, Generative UI application. It's built with the AI SDK, App Router, Server Components, and Server Actions.",
+    body: '',
+    date: '2024-04-10T10:00:00.000Z',
+    slug: '',
+    tags: [],
+    lastModified: 0,
+    isThirdParty: true,
+    href: 'https://vercel.com/changelog/gemini-ai-chatbot-with-generative-ui-support',
+    type: 'post',
+  },
+  {
+    title: 'Our new Edge and Dev infrastructure',
+    description:
+      'Introducing major end-to-end enhancements from a better development experience to serving pages even faster.',
+    body: '',
+    date: '2020-07-21T13:00:00.000Z',
+    slug: '',
+    tags: [],
+    lastModified: 0,
+    isThirdParty: true,
+    href: 'https://vercel.com/blog/new-edge-dev-infrastructure',
+    type: 'post',
+  },
+  {
     title: 'Introducing AI SDK 3.0 with Generative UI support',
     description:
       'Stream React Components from LLMs to deliver richer user experiences.',

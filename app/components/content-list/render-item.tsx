@@ -20,7 +20,7 @@ export function RenderItem({ postOrNote, index }: { postOrNote: Post | Note, ind
     })
 
     const shouldAnimate = isInView || index === 0
-    const href = postOrNote.type === 'post' ? `/posts/${postOrNote.slug}` : ("isThirdParty" in postOrNote && postOrNote.isThirdParty) ? postOrNote.href : `/notes/${postOrNote.slug}` || ""
+    const href = ("isThirdParty" in postOrNote && postOrNote.isThirdParty) ? postOrNote.href : postOrNote.type === 'post' ? `/blog/${postOrNote.slug}` : `/notes/${postOrNote.slug}` || ""
     const isThirdParty = "isThirdParty" in postOrNote ? postOrNote.isThirdParty : false
     const readingTime = `${(postOrNote.body.length / 238).toFixed(0)} min read`
 

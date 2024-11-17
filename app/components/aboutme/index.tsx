@@ -38,7 +38,9 @@ export default function AboutMe() {
       . I'm interested in politics, tech, and building a fast, accessible web.
     </p>
     <div className="flex space-x-3">
-      <ThemeSwitcher />
+      <Button asChild variant="outline" size="icon" >
+        <ThemeSwitcher className="transition-all hover:bg-muted bg-card border !border-border" />
+      </Button>
       {socialLinks.map((social) => (
         <Button
           key={social.label}
