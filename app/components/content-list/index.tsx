@@ -1,9 +1,9 @@
 import FilterableList from "@components/filterable-list"
 import getNotes from "@lib/get-notes"
 import getPosts from "@lib/get-posts"
-import { getTag, renderItem } from "./render-item"
+import { getTag } from "./render-item"
 import { Suspense } from "react"
-
+import { ContentList } from "./client"
 
 export async function ContentListRSC() {
     const [posts, notes] = await Promise.all([
@@ -15,16 +15,14 @@ export async function ContentListRSC() {
         return new Date(b.date).getTime() - new Date(a.date).getTime()
     })
 
-    return <>
-        {/* Suspense for useSearchParams */}
-        <Suspense fallback={null}>
+    return <ContentList>
+        <Suspense>
             <FilterableList
                 items={content}
-                renderItem={renderItem}
                 tags={getTag}
                 enableSearch={false}
                 enableTags={true}
             />
         </Suspense>
-    </>
+    </ContentList>
 }

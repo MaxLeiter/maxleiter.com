@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useEffect, useState } from 'react'
-import styles from './timer.module.css'
+
 const timeStringOptions: Intl.DateTimeFormatOptions[] = [
   {
     hour: 'numeric',
@@ -85,11 +85,13 @@ const TimeOfDay = () => {
 
   return (
     <button
-      className={styles.button}
+      className='flex items-center justify-center gap-1'
       onClick={onClick}
       type="button"
       aria-label="Time of day"
     >
+      <span className='sm:hidden'>SF</span>
+      <span className='hidden sm:block'>San Francisco</span>
       <MemoTimeDisplay format={format} />
     </button>
   )

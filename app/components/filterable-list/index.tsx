@@ -2,21 +2,45 @@
 import Badge from "@components/badge"
 import Input from "@components/input"
 import React from "react"
-import styles from './filterable-list.module.css'
 import { Base } from "@lib/types"
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { RenderItem } from "@components/content-list/render-item";
+import { motion } from "framer-motion";
+
+const linkStyles: React.CSSProperties = {
+    textDecoration: 'none',
+    color: 'inherit'
+}
+
+const selectedBadgeStyles: React.CSSProperties = {
+    backgroundColor: 'var(--fg)',
+    color: 'var(--bg)'
+}
+
+
+// uses router.replace so next.js doesn't refetch in RSC (we have the data already)
+function FakeLink({ href, children }: { href: string, children: React.ReactNode }) {
+    return (
+        <a
+            href={href}
+            onClick={(e) => {
+                e.preventDefault()
+                window.history.replaceState({}, '', href)
+            }}
+            style={linkStyles}
+        >
+            {children}
+        </a>
+    )
+}
 
 const FilterableList = <T extends Base>({
     items,
-    renderItem,
     tags,
     enableSearch = true,
     enableTags = true
 }: {
     items: Array<T>
-    // eslint-disable-next-line no-unused-vars
-    renderItem: (item: T) => React.ReactNode
     // eslint-disable-next-line no-unused-vars
     tags?: (item: T) => Array<string>
     enableSearch?: boolean
@@ -66,19 +90,9 @@ const FilterableList = <T extends Base>({
         return Object.entries(tagCounts).sort((a, b) => b[1] - a[1])
     }, [items, tags])
 
-    const selectedBadgeStyles: React.CSSProperties = {
-        backgroundColor: 'var(--fg)',
-        color: 'var(--bg)'
-    }
-
-    const linkStyles: React.CSSProperties = {
-        textDecoration: 'none',
-        color: 'inherit'
-    }
-
     return (
         <>
-            {enableSearch ? <div className={styles.filterSettings}>
+            {enableSearch ? <div className="flex flex-row items-center justify-between">
                 <Input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -87,31 +101,40 @@ const FilterableList = <T extends Base>({
                 />
             </div> : null}
             {enableTags && (
-                <div style={{ paddingTop: 2, marginBottom: 'var(--gap)', display: 'flex', gap: 'var(--gap-half)' }}>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.1 }}
+                    className="flex gap-1 mb-8 text-muted-foreground"
+                >
                     <Badge
                         key="all"
                         style={selectedTag ? {} : selectedBadgeStyles}
                     >
-                        <Link href={tagHref('')} scroll={false} style={linkStyles}>
+                        <FakeLink href={'?'} >
                             All
-                        </Link>
+                        </FakeLink>
                     </Badge>
                     {allTags.map(([tag, count]) => (
                         <Badge
                             key={tag}
                             style={selectedTag === tag ? selectedBadgeStyles : {}}
                         >
-                            <Link href={tagHref(tag)} scroll={false} style={linkStyles}>
-                                {tag} <span className={styles.count}>
+                            <FakeLink href={tagHref(tag)} >
+                                {tag} <span>
                                     ({count})
                                 </span>
-                            </Link>
+                            </FakeLink>
                         </Badge>
                     ))}
-                </div>
+                </motion.div>
             )}
-            <ul className={styles.items} aria-live="polite" aria-relevant="additions removals">
-                {filteredItems.map((item) => renderItem(item))}
+            <ul aria-live="polite" aria-relevant="additions removals">
+                {filteredItems.map((item, i) => (
+                    <li key={item.title} className='mb-4'>
+                        <RenderItem postOrNote={item as any} index={i} />
+                    </li>
+                ))}
             </ul>
         </>
     )

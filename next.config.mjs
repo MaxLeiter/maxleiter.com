@@ -12,6 +12,7 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
     mdxRs: true,
+    reactCompiler: true,
   },
   typescript: {
     ignoreBuildErrors: true,

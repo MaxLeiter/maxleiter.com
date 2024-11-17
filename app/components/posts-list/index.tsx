@@ -31,37 +31,42 @@ const Posts = (props: Props) => {
   const { posts, paginate } = props
 
   return (
-    <ul className={styles.container}>
-      {posts.slice(0, paginate ? showMore : undefined).map((post) => {
-        const date = new Date(post.date).toLocaleDateString('en-US', {
-          month: 'numeric',
-          day: 'numeric',
-          year: 'numeric',
-        })
+    <div className="mt-32 space-y-16 md:mt-48">
+      <h2 className="text-2xl font-semibold tracking-tight">Posts and other half-baked thoughts</h2>
+      <ul className="space-y-16">
 
-        return (
-          <BlockEntry
-            // TODO: Math.random is a bad hack.
-            key={`post-item-${post.slug || Math.random()}`}
-            href={post.isThirdParty ? post.href! : `/blog/${post.slug}`}
-            title={post.title}
-            date={new Date(date)}
-            views={post.views}
-            isThirdParty={post.isThirdParty}
-          />
-        )
-      })}
-      {paginate && showMore < posts.length && (
-        <button
-          onClick={() => {
-            setShowMore(showMore + 4)
-          }}
-          className={styles.button}
-        >
-          Show More
-        </button>
-      )}
-    </ul>
+        {posts.slice(0, paginate ? showMore : undefined).map((post, i) => {
+          const date = new Date(post.date).toLocaleDateString('en-US', {
+            month: 'numeric',
+            day: 'numeric',
+            year: 'numeric',
+          })
+
+          return (
+            <BlockEntry
+              // TODO: Math.random is a bad hack.
+              key={`post-item-${post.slug || Math.random()}`}
+              href={post.isThirdParty ? post.href! : `/blog/${post.slug}`}
+              title={post.title}
+              date={new Date(date)}
+              views={post.views}
+              index={i}
+              isThirdParty={post.isThirdParty}
+            />
+          )
+        })}
+        {paginate && showMore < posts.length && (
+          <button
+            onClick={() => {
+              setShowMore(showMore + 4)
+            }}
+            className={styles.button}
+          >
+            Show More
+          </button>
+        )}
+      </ul>
+    </div>
   )
 }
 
