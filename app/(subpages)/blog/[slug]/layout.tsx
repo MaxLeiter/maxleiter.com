@@ -9,13 +9,14 @@ export async function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }))
 }
 
-export const generateMetadata = async ({
-  params,
-}: {
-  params: {
-    slug: string
+export const generateMetadata = async (
+  props: {
+    params: Promise<{
+      slug: string
+    }>
   }
-}): Promise<Metadata> => {
+): Promise<Metadata> => {
+  const params = await props.params;
   const post = (await getPosts()).find((p) => p?.slug === params.slug)
   return {
     title: post?.title,
@@ -45,15 +46,20 @@ async function getData({ slug }: { slug: string }) {
   }
 }
 
-export default async function PostLayout({
-  children,
-  params,
-}: {
-  children: JSX.Element
-  params: {
-    slug: string
+export default async function PostLayout(
+  props: {
+    children: JSX.Element
+    params: Promise<{
+      slug: string
+    }>
   }
-}) {
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const { previous, next, title, date, lastModified } = await getData(params)
 
   const lastModifiedDate = lastModified

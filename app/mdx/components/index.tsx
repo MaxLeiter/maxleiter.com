@@ -11,7 +11,6 @@ import { Tweet } from 'react-tweet'
 // import Diff from './mdx-diff'
 import dynamic from 'next/dynamic'
 const Diff = dynamic(() => import('./mdx-diff'), {
-  ssr: false,
   loading: () => (
     <div
       style={{

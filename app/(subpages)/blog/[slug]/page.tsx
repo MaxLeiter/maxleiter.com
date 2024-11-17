@@ -7,13 +7,14 @@ export async function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }))
 }
 
-export default async function PostPage({
-  params,
-}: {
-  params: {
-    slug: string
+export default async function PostPage(
+  props: {
+    params: Promise<{
+      slug: string
+    }>
   }
-}) {
+) {
+  const params = await props.params;
   const post = await getPost(params.slug)
   if (!post) return notFound()
   return <PostBody>{post?.body}</PostBody>
