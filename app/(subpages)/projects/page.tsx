@@ -13,7 +13,7 @@ const Projects = async () => {
   const projects = await getProjects()
   return (
     <span className='block max-w-3xl'>
-      <ProjectList showYears={true} projects={projects} seeMore={false} />
+      <ProjectList showYears={true} projects={projects} seeMore={false} animated={false} />
     </span>
   )
 }

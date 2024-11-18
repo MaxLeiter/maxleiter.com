@@ -19,6 +19,7 @@ type Props = {
   showYears: boolean
   seeMore: boolean
   cardClassName?: string
+  animated?: boolean
 }
 
 const Projects = ({
@@ -26,7 +27,7 @@ const Projects = ({
   seeMore = false,
   showYears = true,
   cardClassName,
-  hoverCardSide = 'right',
+  animated = true,
 }: Props) => {
   projects.sort((a, b) => {
     if (a.years[0] === b.years[0]) {
@@ -39,8 +40,8 @@ const Projects = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={animated ? { opacity: 0, y: 20 } : undefined}
+      animate={animated ? { opacity: 1, y: 0 } : undefined}
       transition={{ delay: 0.2 }}
       className="flex flex-col gap-4"
     >
