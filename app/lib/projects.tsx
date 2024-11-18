@@ -10,7 +10,8 @@ const Projects: Project[] = [
     href: '/blog/X11',
     role: 'Creator',
     years: ['2020'],
-    type: 'project'
+    type: 'project',
+    imageUrl: '/projects/x11.png'
   },
   {
     title: 'Drift',
@@ -20,7 +21,7 @@ const Projects: Project[] = [
     role: 'Creator',
     years: ['2022', 'present'],
     type: 'project',
-    imageUrl: '/blog/drift/view-post.png'
+    imageUrl: '/projects/drift.png'
   },
   {
     title: 'The Lounge',
@@ -29,8 +30,8 @@ const Projects: Project[] = [
     href: 'https://github.com/thelounge/thelounge',
     role: 'Maintainer',
     years: ['2016', 'present'],
-    type: 'project'
-
+    type: 'project',
+    imageUrl: '/projects/thelounge.png'
   },
   {
     title: 'SortableJS-vue3',
@@ -46,8 +47,8 @@ const Projects: Project[] = [
       'Open-source unix-like operating system for z80-based calculators written entirely in z80 asm.',
     href: 'https://github.com/knightos/knightos',
     role: 'Maintainer',
-    years: ['2017', 'present'], type: 'project'
-
+    years: ['2017', 'present'], type: 'project',
+    imageUrl: "/projects/knightos.png"
   },
   {
     title: 'thelounge-bot',
@@ -55,7 +56,6 @@ const Projects: Project[] = [
     href: 'https://github.com/thelounge/thelounge-bot',
     role: 'Creator',
     years: ['2016', '2021'], type: 'project'
-
   },
   {
     title: 'MSHW0184 driver for Linux kernel',
@@ -64,7 +64,6 @@ const Projects: Project[] = [
     href: 'blog/MSHW0184',
     role: 'Creator',
     years: ['2021'], type: 'project'
-
   },
   {
     title: 'jsonTree',
@@ -73,7 +72,6 @@ const Projects: Project[] = [
     href: 'https://github.com/maxleiter/jsontree',
     role: 'Creator',
     years: ['2015'], type: 'project'
-
   },
   {
     title: 'Annie',
@@ -81,8 +79,10 @@ const Projects: Project[] = [
       "Annie is the official app for the University of Southern California's Annenberg Media Center. Annie placed second place in the AEJMC Best of Digital Competition in August 2020.",
     href: 'https://www.uscannenbergmedia.com',
     role: 'Past developer',
-    years: ['2019', '2020'], type: 'project'
-
+    years: ['2019', '2020'], type: 'project',
+    imageUrl: '/projects/annie.png',
+    imageWidth: 300,
+    imageHeight: 800
   },
   {
     title: 'easyarty.com',
@@ -90,16 +90,16 @@ const Projects: Project[] = [
       'A web app for calculating artillery distances in the video game Hell Let Loose.',
     href: 'https://easyarty.com',
     role: 'Creator',
-    years: ['2021'], type: 'project'
-
+    years: ['2021'], type: 'project',
+    imageUrl: '/projects/easyarty.png',
   },
   {
     title: 'Vercel Raycast',
     description: 'A Raycast extension for managing Vercel via its REST API.',
     href: 'https://github.com/MaxLeiter/vercel-raycast',
     role: 'Creator',
-    years: ['2022'], type: 'project'
-
+    years: ['2022'], type: 'project',
+    imageUrl: '/projects/raycast.png'
   },
   {
     title: 'gitkv',

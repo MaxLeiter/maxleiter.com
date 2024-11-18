@@ -23,6 +23,8 @@ export type Project = Base & {
   stars?: number
   type: 'project'
   imageUrl?: string
+  imageHeight?: number
+  imageWidth?: number
 }
 
 export type Note = Base & {

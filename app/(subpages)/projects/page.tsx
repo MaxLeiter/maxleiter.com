@@ -12,7 +12,9 @@ export const metadata = {
 const Projects = async () => {
   const projects = await getProjects()
   return (
-    <ProjectList showYears={true} projects={projects} seeMore={false} />
+    <span className='block max-w-3xl'>
+      <ProjectList showYears={true} projects={projects} seeMore={false} />
+    </span>
   )
 }
 

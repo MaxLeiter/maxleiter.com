@@ -11,7 +11,7 @@ import {
   HoverCardTrigger,
   HoverCardContent,
 } from '@components/ui/hover-card'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 
 type Props = {
@@ -26,6 +26,7 @@ const Projects = ({
   seeMore = false,
   showYears = true,
   cardClassName,
+  hoverCardSide = 'right',
 }: Props) => {
   projects.sort((a, b) => {
     if (a.years[0] === b.years[0]) {
@@ -51,6 +52,7 @@ const Projects = ({
             closeDelay={100}
             key={project.title}
             onOpenChange={(open) => setAnyHovercardShown(open)}
+            open={project.imageUrl ? undefined : false}
           >
             <HoverCardTrigger asChild>
               <Link
@@ -87,14 +89,13 @@ const Projects = ({
                 </Card>
               </Link>
             </HoverCardTrigger>
-            <HoverCardContent side="right">
+            <HoverCardContent side="right" className="h-64 rounded-lg w-96">
               {project.imageUrl ? <Image
                 src={project.imageUrl || ""}
                 alt={""}
-                width={400}
-                height={300}
-                layout="responsive"
-                className="rounded-lg"
+                fill={project.imageHeight && project.imageWidth ? false : true}
+                height={project.imageHeight || undefined}
+                width={project.imageWidth || undefined}
               /> : null}
             </HoverCardContent>
           </HoverCard>
