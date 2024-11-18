@@ -13,6 +13,7 @@ import {
 } from '@components/ui/hover-card'
 import { useState } from 'react'
 import Image from 'next/image'
+import { Star } from 'lucide-react'
 
 type Props = {
   projects: Project[]
@@ -72,6 +73,11 @@ const Projects = ({
                     >
                       <span className="text-lg">{project.title}</span>
                       <div className="flex gap-2">
+                        {project.stars && (
+                          <Badge variant='secondary'>
+                            <Star size={14} /> <span style={{ marginLeft: 4 }}>{project.stars}</span>
+                          </Badge>
+                        )}
                         <Badge>{project.role}</Badge>
                         {showYears && (
                           <Badge>
@@ -79,6 +85,7 @@ const Projects = ({
                             {project.years[1]}
                           </Badge>
                         )}
+
                       </div>
                     </CardTitle>
                   </CardHeader>
