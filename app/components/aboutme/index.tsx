@@ -4,7 +4,6 @@ import { GitHub, Mail, RSS, Twitter } from '@components/icons'
 import Link from '@components/link'
 import ThemeSwitcher from '@components/theme-switcher'
 import { Button } from '@components/ui/button'
-import { motion } from 'framer-motion'
 
 const socialLinks = [
   { icon: GitHub, href: "https://github.com/maxleiter", label: "GitHub" },
@@ -14,9 +13,7 @@ const socialLinks = [
 ]
 
 export default function AboutMe() {
-  return <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
+  return <div
     className="space-y-6"
   >
     <div className="pt-8 lg:pt-0">
@@ -56,5 +53,5 @@ export default function AboutMe() {
         </Button>
       ))}
     </div>
-  </motion.div>
+  </div>
 }

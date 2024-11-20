@@ -1,7 +1,6 @@
 'use client'
 
 import type { Project } from '@lib/types'
-import { motion } from 'framer-motion'
 import { Badge } from '@components/ui/badge'
 import { Card, CardHeader, CardTitle, CardContent } from '@components/ui/card'
 import Link from 'next/link'
@@ -40,10 +39,7 @@ const Projects = ({
   const [anyHovercardShown, setAnyHovercardShown] = useState(false)
 
   return (
-    <motion.div
-      initial={animated ? { opacity: 0, y: 20 } : undefined}
-      animate={animated ? { opacity: 1, y: 0 } : undefined}
-      transition={{ delay: 0.2 }}
+    <div
       className="flex flex-col gap-4"
     >
       <h2 className="text-2xl font-semibold tracking-tight">Projects</h2>
@@ -114,7 +110,7 @@ const Projects = ({
           </p>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }
 

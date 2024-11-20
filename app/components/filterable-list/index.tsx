@@ -5,7 +5,6 @@ import React from "react"
 import { Base } from "@lib/types"
 import { useSearchParams } from "next/navigation";
 import { RenderItem } from "@components/content-list/render-item";
-import { motion } from "framer-motion";
 
 const linkStyles: React.CSSProperties = {
     textDecoration: 'none',
@@ -101,10 +100,7 @@ const FilterableList = <T extends Base>({
                 />
             </div> : null}
             {enableTags && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.1 }}
+                <div
                     className="flex gap-1 mb-8 text-muted-foreground"
                 >
                     <Badge
@@ -127,12 +123,12 @@ const FilterableList = <T extends Base>({
                             </FakeLink>
                         </Badge>
                     ))}
-                </motion.div>
+                </div>
             )}
             <ul aria-live="polite" aria-relevant="additions removals">
-                {filteredItems.map((item, i) => (
+                {filteredItems.map((item) => (
                     <li key={item.title} className='mb-4'>
-                        <RenderItem postOrNote={item as any} index={i} />
+                        <RenderItem postOrNote={item as any} />
                     </li>
                 ))}
             </ul>

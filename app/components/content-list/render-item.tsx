@@ -2,7 +2,6 @@
 
 import { Button } from '@components/ui/button'
 import { Note, Post } from '@lib/types'
-import { motion, useInView } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useRef } from 'react'
@@ -13,21 +12,11 @@ export const getTag = (post: Post | Note) => [
 
 export function RenderItem({
     postOrNote,
-    index,
 }: {
     postOrNote: Post | Note
-    index: number
 }) {
     const ref = useRef<HTMLDivElement>(null)
-    // @ts-expect-error null?
-    const isInView = useInView(ref, {
-        // Only trigger once
-        once: true,
-        // Amount of element that needs to be visible to trigger animation (0-1)
-        amount: 0.1,
-    })
 
-    const shouldAnimate = isInView || index === 0
     const href =
         'isThirdParty' in postOrNote && postOrNote.isThirdParty
             ? postOrNote.href
@@ -38,11 +27,7 @@ export function RenderItem({
         'isThirdParty' in postOrNote ? postOrNote.isThirdParty : false
 
     return (
-        <motion.div
-            key={postOrNote.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ delay: 0.1 }}
+        <div
             className="relative group"
             ref={ref}
         >
@@ -78,6 +63,6 @@ export function RenderItem({
                     <ArrowUpRight className="w-3 h-3 transform translate-y-[0.05rem]" />
                 </Button>
             </Link>
-        </motion.div>
+        </div>
     )
 }
