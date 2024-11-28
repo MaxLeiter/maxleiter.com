@@ -63,12 +63,13 @@ const Projects = ({
                   <CardHeader className="p-5">
                     <CardTitle
                       className={cn(
-                        'flex items-center gap-3 text-base',
+                        'flex flex-col text-base',
+                        'md:flex-row md:items-center md:gap-3',
                         cardClassName,
                       )}
                     >
                       <span className="text-lg">{project.title}</span>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 mt-2 md:mt-0">
                         {project.stars && (
                           <Badge variant='secondary'>
                             <Star size={14} /> <span style={{ marginLeft: 4 }}>{project.stars}</span>

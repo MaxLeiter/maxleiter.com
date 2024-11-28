@@ -12,7 +12,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <div className="grid gap-24 lg:gap-32 top-0 space-y-6 lg:mt-12 lg:grid-cols-[.618fr,1fr] h-full">
+      <div className="grid gap-24 lg:gap-32 top-0 lg:mt-12 md:grid-cols-[.618fr,1fr] h-full">
         <main className="space-y-6 lg:min-h-screen">
           <AboutMe />
           <ProjectList

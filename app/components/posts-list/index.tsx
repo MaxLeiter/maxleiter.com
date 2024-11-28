@@ -31,7 +31,7 @@ const Posts = (props: Props) => {
   const { posts, paginate } = props
 
   return (
-    <div className="mt-32 space-y-16 md:mt-48">
+    <div className="space-y-16">
       <h2 className="text-2xl font-semibold tracking-tight">Posts and other half-baked thoughts</h2>
       <ul className="space-y-16">
 

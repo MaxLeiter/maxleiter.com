@@ -13,7 +13,7 @@ export default function BlogLayout({
   children: React.ReactNode
 }) {
   return (
-    <article className='max-w-[min(720px,100vw)]'>
+    <article className=''>
       {children}
     </article>
   )
