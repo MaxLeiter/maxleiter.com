@@ -1,6 +1,6 @@
 article {
   margin: 0 auto;
-  line-height: 1.7;
+  line-height: 1.4;
 }
 
 article h2,
@@ -114,7 +114,7 @@ article div + pre {
   text-decoration: none;
 }
 
-article a  {
+article a {
   text-decoration: none;
 }
 
