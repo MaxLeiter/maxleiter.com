@@ -4,7 +4,6 @@ import PostFooter from '@components/content-footer/post-footer'
 import styles from '../../blog/[slug]/layout.module.css'
 import { Metadata } from 'next'
 import getNotes from '@lib/get-notes'
-import { JSX } from 'react'
 
 export async function generateStaticParams() {
   const posts = await getPosts()

@@ -1,0 +1,17 @@
+.transition {
+  transition: box-shadow 80ms cubic-bezier(0.01, 0.88, 0.93, 0.07) 0s;
+  will-change: box-shadow;
+}
+
+.transition:hover {
+  /* box-shadow: 0px 2px 0px var(--link); */
+}
+
+.link {
+  text-decoration: none;
+  color: var(--link);
+
+  &.underline:hover {
+    text-decoration: underline;
+  }
+}

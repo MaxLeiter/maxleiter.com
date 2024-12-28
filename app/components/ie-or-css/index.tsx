@@ -33,6 +33,7 @@ export const UselessButton = ({ text }: { text: string }) => (
 const IeOrCss = ({ questions }: IEQuizProps) => {
   const [questionsWithVotes] = useState<QuestionWithVotes[]>([])
 
+  console.log('questions', questions)
 
   useEffect(() => {
     // supabase.channel('votes').on('*', (payload) => {

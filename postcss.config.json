@@ -1,7 +1,5 @@
 {
   "plugins": [
-    "tailwindcss",
-    "autoprefixer",
     "postcss-flexbugs-fixes",
     "postcss-hover-media-feature",
     "postcss-nested",

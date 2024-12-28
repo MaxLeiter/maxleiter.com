@@ -1,11 +1,14 @@
 import { PropsWithChildren } from 'react'
 
+import styles from './header.module.css'
 import ThemeSwitcher from '@components/theme-switcher'
 
 const Header = ({ children }: PropsWithChildren) => {
   return (
-    <div className='flex items-center justify-between my-4'>
-      {children}
+    <div className={styles.nav}>
+      <div className={styles.header}>
+        {children}
+      </div>
       <div>
         <ThemeSwitcher hideTooltip />
       </div>

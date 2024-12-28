@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useLayoutEffect } from 'react'
+import React from 'react'
 import { useEffect, useState } from 'react'
-
+import styles from './timer.module.css'
 const timeStringOptions: Intl.DateTimeFormatOptions[] = [
   {
     hour: 'numeric',
@@ -85,13 +85,11 @@ const TimeOfDay = () => {
 
   return (
     <button
-      className='flex items-center justify-center gap-1'
+      className={styles.button}
       onClick={onClick}
       type="button"
       aria-label="Time of day"
     >
-      <span className='sm:hidden'>SF</span>
-      <span className='hidden sm:block'>San Francisco</span>
       <MemoTimeDisplay format={format} />
     </button>
   )
@@ -100,10 +98,7 @@ const TimeOfDay = () => {
 export default TimeOfDay
 
 const TimeDisplay = ({ format }: { format: Intl.DateTimeFormatOptions }) => {
-  const [time, setTime] = useState<Date>()
-  useLayoutEffect(() => {
-    setTime(new Date())
-  }, [])
+  const [time, setTime] = useState(new Date())
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000)
@@ -111,8 +106,8 @@ const TimeDisplay = ({ format }: { format: Intl.DateTimeFormatOptions }) => {
   }, [])
 
   return (
-    <span>
-      {time?.toLocaleTimeString('en-US', {
+    <span suppressHydrationWarning>
+      {time.toLocaleTimeString('en-US', {
         timeZone: 'America/Los_Angeles',
         ...format,
       })}

@@ -5,7 +5,7 @@ import styles from './footer.module.css'
 const PostFooter = () => {
   return (
     <>
-      <hr style={{ margin: 0, paddingTop: 'var(--gap)' }} />
+      <hr style={{ margin: 0, marginTop: 'var(--gap-double)' }}/>
       <footer className={styles.footer}>
         <p>
           Thanks for reading! If you want to see future content, you can follow me{' '}

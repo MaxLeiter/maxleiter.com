@@ -1,0 +1,30 @@
+.icon {
+  color: var(--gray) !important;
+  padding: var(--gap-half) !important;
+}
+
+.icon:active,
+.icon:hover,
+.icon:focus-within {
+  outline: none;
+  color: var(--fg) !important;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0;
+}
+
+.header {
+  /* padding: 0 var(--gap); */
+  max-width: var(--main-content);
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 960px) {
+  .nav {
+    margin: var(--gap-double) 0;
+  }
+}

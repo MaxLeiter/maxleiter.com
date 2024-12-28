@@ -31,7 +31,7 @@ const NotesList = (props: Props) => {
   const { notes, paginate } = props
 
   return (
-    <ul className="w-full">
+    <ul className={styles.container}>
       {notes.slice(0, paginate ? showMore : undefined).map((note) => {
         const date = new Date(note.date).toLocaleDateString('en-US', {
           month: 'numeric',

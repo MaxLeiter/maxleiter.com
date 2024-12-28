@@ -2,44 +2,21 @@
 import Badge from "@components/badge"
 import Input from "@components/input"
 import React from "react"
+import styles from './filterable-list.module.css'
 import { Base } from "@lib/types"
 import { useSearchParams } from "next/navigation";
-import { RenderItem } from "@components/content-list/render-item";
-
-const linkStyles: React.CSSProperties = {
-    textDecoration: 'none',
-    color: 'inherit'
-}
-
-const selectedBadgeStyles: React.CSSProperties = {
-    backgroundColor: 'var(--fg)',
-    color: 'var(--bg)'
-}
-
-
-// uses router.replace so next.js doesn't refetch in RSC (we have the data already)
-function FakeLink({ href, children }: { href: string, children: React.ReactNode }) {
-    return (
-        <a
-            href={href}
-            onClick={(e) => {
-                e.preventDefault()
-                window.history.replaceState({}, '', href)
-            }}
-            style={linkStyles}
-        >
-            {children}
-        </a>
-    )
-}
+import Link from "next/link";
 
 const FilterableList = <T extends Base>({
     items,
+    renderItem,
     tags,
     enableSearch = true,
     enableTags = true
 }: {
     items: Array<T>
+    // eslint-disable-next-line no-unused-vars
+    renderItem: (item: T) => React.ReactNode
     // eslint-disable-next-line no-unused-vars
     tags?: (item: T) => Array<string>
     enableSearch?: boolean
@@ -89,9 +66,19 @@ const FilterableList = <T extends Base>({
         return Object.entries(tagCounts).sort((a, b) => b[1] - a[1])
     }, [items, tags])
 
+    const selectedBadgeStyles: React.CSSProperties = {
+        backgroundColor: 'var(--fg)',
+        color: 'var(--bg)'
+    }
+
+    const linkStyles: React.CSSProperties = {
+        textDecoration: 'none',
+        color: 'inherit'
+    }
+
     return (
         <>
-            {enableSearch ? <div className="flex flex-row items-center justify-between">
+            {enableSearch ? <div className={styles.filterSettings}>
                 <Input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -100,37 +87,31 @@ const FilterableList = <T extends Base>({
                 />
             </div> : null}
             {enableTags && (
-                <div
-                    className="flex gap-1 mb-8 text-muted-foreground"
-                >
+                <div style={{ paddingTop: 2, marginBottom: 'var(--gap)', display: 'flex', gap: 'var(--gap-half)' }}>
                     <Badge
                         key="all"
                         style={selectedTag ? {} : selectedBadgeStyles}
                     >
-                        <FakeLink href={'?'} >
+                        <Link href={tagHref('')} scroll={false} style={linkStyles}>
                             All
-                        </FakeLink>
+                        </Link>
                     </Badge>
                     {allTags.map(([tag, count]) => (
                         <Badge
                             key={tag}
                             style={selectedTag === tag ? selectedBadgeStyles : {}}
                         >
-                            <FakeLink href={tagHref(tag)} >
-                                {tag} <span>
+                            <Link href={tagHref(tag)} scroll={false} style={linkStyles}>
+                                {tag} <span className={styles.count}>
                                     ({count})
                                 </span>
-                            </FakeLink>
+                            </Link>
                         </Badge>
                     ))}
                 </div>
             )}
-            <ul aria-live="polite" aria-relevant="additions removals">
-                {filteredItems.map((item) => (
-                    <li key={item.title} className='mb-4'>
-                        <RenderItem postOrNote={item as any} />
-                    </li>
-                ))}
+            <ul className={styles.items} aria-live="polite" aria-relevant="additions removals">
+                {filteredItems.map((item) => renderItem(item))}
             </ul>
         </>
     )

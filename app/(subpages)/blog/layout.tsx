@@ -1,4 +1,5 @@
-import '../../styles/markdown.css'
+import Outline from '@components/layout-outline'
+
 export const metadata = {
   title: 'Blog',
   description: 'Posts and tips, mostly about software.',
@@ -13,8 +14,8 @@ export default function BlogLayout({
   children: React.ReactNode
 }) {
   return (
-    <article className=''>
-      {children}
-    </article>
+    <Outline type="layout" name="Blog">
+      <article>{children}</article>
+    </Outline>
   )
 }

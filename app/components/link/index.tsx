@@ -1,6 +1,7 @@
+import clsx from 'clsx'
 import NextLink from 'next/link'
 
-import { cn } from '@lib/utils'
+import styles from './link.module.css'
 
 // Inherit default link props from NextLink or <a>
 type LinkProps = React.ComponentProps<typeof NextLink>
@@ -24,9 +25,9 @@ const Link = ({
   tabIndex = 0,
   ...props
 }: Props) => {
-  const className = cn(
-    "text-blue-500 ",
-    underline && "underline decoration-current",
+  const className = clsx(
+    styles.link,
+    underline && styles.underline,
     classNameProp
   )
 
