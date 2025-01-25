@@ -37,7 +37,7 @@ Now that that's out of the way:
 
 ## Set up the project
 
-First, we'll need to create a new Next.js project. You can launch the setup wizard with `npx create-next-app`:
+First, we'll need to create a new Next.js project. You can launch the setup wizard with \`npx create-next-app\`:
 
 ```bash
 npx create-next-app --experimental-app
@@ -48,7 +48,7 @@ npx create-next-app --experimental-app
   documentation](https://beta.nextjs.org/docs/installation).
 </Note>
 
-Hit `y` (or `n`, I'm not your boss) a few times to complete the wizard.
+Hit \`y\` (or \`n\`, I'm not your boss) a few times to complete the wizard.
 
 ## File structure
 
@@ -84,14 +84,14 @@ export default function Layout({ children }: PropsWithChildren) {
 }
 ```
 
-Knowing all of this, I chose to create four files: `app/layout.tsx`, `app/page.tsx`, `app/projects/page.tsx`, and `app/about/page.tsx`.
+Knowing all of this, I chose to create four files: \`app/layout.tsx\`, \`app/page.tsx\`, \`app/projects/page.tsx\`, and \`app/about/page.tsx\`.
 The layout will apply to all pages, and each page file will contain it's own content.
 
 I ran into one small issue with this approach: the home page doesn't need a <span style={{ position: 'relative', top: 4 }}><HomeIcon /></span> icon, but the other pages do.
 It doesn't make much sense to include that in the home page, but all the other pages should have it,
 so we'll keep it out of the root layout and create a [Route Group](https://beta.nextjs.org/docs/routing/defining-routes#route-groups) with it's own nested layout layout to only apply to the other pages.
 
-First, lets create our `app/(subpages)/components` directory and create a quick header only for the subpages:
+First, lets create our \`app/(subpages)/components\` directory and create a quick header only for the subpages:
 
 ```tsx
 // app/(subpages)components/header.tsx
@@ -111,7 +111,7 @@ export default function Header() {
 }
 ```
 
-And use it in our `app/(subpages)/layout.tsx`:
+And use it in our \`app/(subpages)/layout.tsx\`:
 
 ```tsx
 // app/(subpages)/layout.tsx
@@ -200,8 +200,8 @@ Let's go ahead and create our files and directories:
 
 ### Routing with dynamic segments
 
-For our blog posts like this one, we'll want `/blog/[slug]` to be a page that displays a single blog post, and we want it to have it's own footer to link to other posts.
-It sure seems like the footer should live inside the `/blog/[slug]` layout. The `[slug]` in the URL is referred to as a [Dynamic Segment](https://beta.nextjs.org/docs/routing/defining-routes#dynamic-segments).
+For our blog posts like this one, we'll want \`/blog/[slug]\` to be a page that displays a single blog post, and we want it to have it's own footer to link to other posts.
+It sure seems like the footer should live inside the \`/blog/[slug]\` layout. The \`[slug]\` in the URL is referred to as a [Dynamic Segment](https://beta.nextjs.org/docs/routing/defining-routes#dynamic-segments).
 
 <FileTree>
   <Folder name="blog" open>
@@ -235,7 +235,7 @@ But how do we render markdown files in our blog posts?
 
 The official Next.js documentation has a [great guide](https://beta.nextjs.org/docs/guides/mdx#mdx) for using MDX with all your pages.
 Sometimes you want to render content from a remote source though, like a <abbr title="Content Management System">CMS</abbr>.
-In my case, for niche specific reasons, I want to keep my markdown separate from the Next.js project, so I'll be using `next-mdx-remote` and it's experimental React Server Components support.
+In my case, for niche specific reasons, I want to keep my markdown separate from the Next.js project, so I'll be using \`next-mdx-remote\` and it's experimental React Server Components support.
 
 A lot of the code is the same if you want to apply it to your own project, so just follow along with the code snippets.
 
@@ -251,7 +251,7 @@ import type { Post } from './types'
 import fs from 'fs/promises'
 import { cache } from 'react'
 
-// `cache` is a React 18 feature that allows you to cache a function for the lifetime of a request.
+// \`cache\` is a React 18 feature that allows you to cache a function for the lifetime of a request.
 // this means getPosts() will only be called once per page build, even though we may call it multiple times
 // when rendering the page.
 export const getPosts = cache(async () => {
@@ -261,7 +261,7 @@ export const getPosts = cache(async () => {
     posts
       .filter((file) => path.extname(file) === '.mdx')
       .map(async (file) => {
-        const filePath = `./posts/${file}`
+        const filePath = \`./posts/${file}\`
         const postContent = await fs.readFile(filePath, 'utf8')
         const { data, content } = matter(postContent)
 
@@ -286,7 +286,7 @@ const posts = await getPosts()
 const post = await getPost('my-post')
 ```
 
-Because `getPosts` is cached, you can call `getPost` multiple times in your layout tree without worrying about a network waterfall.
+Because \`getPosts\` is cached, you can call \`getPost\` multiple times in your layout tree without worrying about a network waterfall.
 
 #### Rendering your posts
 
@@ -329,8 +329,8 @@ export function PostBody({ children }: { children: string }) {
 }
 ```
 
-You may notice the `components={mdxComponents}` prop. This is where we pass in our custom components that we want to use in our markdown files.
-For using with Next.js, we probably want to use the official `next/link` and `next/image` components to opt into client side routing and image optimization.
+You may notice the \`components=\{mdxComponents\}\` prop. This is where we pass in our custom components that we want to use in our markdown files.
+For using with Next.js, we probably want to use the official \`next/link\` and \`next/image\` components to opt into client side routing and image optimization.
 This is also where I've defined the components like the file trees in this post.
 
 ```tsx
@@ -358,7 +358,7 @@ export const mdxComponents: MDXComponents = {
 <details>
 <summary>{"How I get the width and height of an image"}</summary>
 
-There's probably a better way to accomplish this (that makes use of the `sizes` prop of next/image),
+There's probably a better way to accomplish this (that makes use of the \`sizes\` prop of next/image),
 but I add the intended image width and height to the image URL as query parameters.
 This allows me to get the width and height from the URL and pass it to next/image.
 
@@ -413,12 +413,12 @@ Bright is a new RSC-first syntax highlighter by [code-hike](https://codehike.org
 It performs the highlighting on the server, so only the necessary styles and markup are sent to the client.
 It also has first-class support for extensions like line numbers, highlighting, or whatever you decide to build.
 
-Install the `bright` package and use it in your MDX components like so:
+Install the \`bright\` package and use it in your MDX components like so:
 
 ```tsx
 import { Code } from 'bright'
 export const mdxComponents: MDXComponents = {
-  // the `a` and `img` tags from before should remain
+  // the \`a\` and \`img\` tags from before should remain
   pre: Code,
 }
 ```
@@ -427,7 +427,7 @@ And that's all you need for great syntax highlighting.
 
 Now that we have MDX setup and equipped with our components, we can render a post.
 
-First, let's import the `getPost` function and the `PostBody` component we created earlier.
+First, let's import the \`getPost\` function and the \`PostBody\` component we created earlier.
 
 ```tsx
 // app/(subpages)/blog/[slug]/page.tsx
@@ -460,7 +460,7 @@ export default async function PostPage({
 We can now render a post; that's pretty cool. 
 
 We can optionally choose to build all of our posts at build time, 
-by adding `generateStaticParams` to the page:
+by adding \`generateStaticParams\` to the page:
 
 ```tsx
 export async function generateStaticParams() {
@@ -472,9 +472,9 @@ export async function generateStaticParams() {
 ```
 
 <Note>
-  If you think it's bad that we call `getPost` _and_ `getPosts()`, remember the
-  we wrapped `getPosts` in `cache`. `getPost` just calls
-  `getPosts`, so we're not making any unnecessary requests to the filesystem (or
+  If you think it's bad that we call \`getPost\` _and_ \`getPosts()\`, remember the
+  we wrapped \`getPosts\` in \`cache\`. \`getPost\` just calls
+  \`getPosts\`, so we're not making any unnecessary requests to the filesystem (or
   wherever you're getting your posts from).
 </Note>
 
@@ -505,12 +505,12 @@ export const metadata = {
     locale: 'en_US',
     type: 'website',
     // To use your own endpoint, refer to https://vercel.com/docs/concepts/functions/edge-functions/og-image-generation
-    // Note that an official `app/` solution is coming soon.
+    // Note that an official \`app/\` solution is coming soon.
     images: [
       {
-        url: `https://maxleiter.com/api/og?title=${encodeURIComponent(
+        url: \`https://maxleiter.com/api/og?title=${encodeURIComponent(
           "Max Leiter's site"
-        )}`,
+        )}\`,
         width: 1200,
         height: 630,
         alt: '',
@@ -553,7 +553,7 @@ export const metadata = {
 }
 ```
 
-### Sitemap support (`sitemap.js`)
+### Sitemap support (\`sitemap.js\`)
 
 See @leeerob's [announcement tweet](https://twitter.com/leeerob/status/1639639575843729409) for more details.
 
@@ -564,12 +564,12 @@ import { getPosts } from './lib/get-posts'
 export default async function sitemap() {
   const posts = await getPosts()
   const blogs = posts.map((post) => ({
-    url: `https://maxleiter.com/blog/${post.slug}`,
+    url: \`https://maxleiter.com/blog/${post.slug}\`,
     lastModified: new Date(post.lastModified).toISOString().split('T')[0],
   }))
 
   const routes = ['', '/about', '/blog', '/projects'].map((route) => ({
-    url: `https://maxleiter.com${route}`,
+    url: \`https://maxleiter.com${route}\`,
     lastModified: new Date().toISOString().split('T')[0],
   }))
 
@@ -580,7 +580,7 @@ export default async function sitemap() {
 ### Generating an RSS Feed
 
 While waiting for of an official solution for RSS feeds, I've created a custom solution that works well for me.
-I use the `marked` library to parse the markdown files and then use the `rss` library to generate the RSS feed.
+I use the \`marked\` library to parse the markdown files and then use the \`rss\` library to generate the RSS feed.
 This means the JSX components for MDX are passed through to the RSS feed,
 so I just try and ensure the components are legible even when not renderd.
 
@@ -598,7 +598,7 @@ const posts = fs
     (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx'
   )
   .map((file) => {
-    const postContent = fs.readFileSync(`./posts/${file}`, 'utf8')
+    const postContent = fs.readFileSync(\`./posts/${file}\`, 'utf8')
     const { data, content }: { data: any; content: string } =
       matter(postContent)
     return { ...data, body: content }
@@ -608,7 +608,7 @@ const posts = fs
 const renderer = new marked.Renderer()
 
 renderer.link = (href, _, text) =>
-  `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`
+  \`<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>\`
 
 marked.setOptions({
   gfm: true,
@@ -629,7 +629,7 @@ const main = () => {
   })
 
   posts.forEach((post) => {
-    const url = `https://maxleiter.com/blog/${post.slug}`
+    const url = \`https://maxleiter.com/blog/${post.slug}\`
 
     feed.item({
       title: post.title,
