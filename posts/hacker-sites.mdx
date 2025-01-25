@@ -13,7 +13,7 @@ It got far more replies than I expected (over 1000 at the time of writing) so I 
 
 I wrote a quick-and-dirty typescript script (at the bottom of page) for scraping, pinging, and sorting the comments. I could've used a pre-existing library or service for determining tech used on the sites, but where's the fun in that? I’d have loved to add features like checking for git repository links and doing some API calls for a more in-depth analysis, but I’ll leave the complicated parts as exercises for the reader.
 
-If I were to do this all again, I would absolutely not choose JavaScript. Just 0 real benefits; I spent more time than I care to admit bashing my head before remembering `Promise.allSettled` exists. I should've just used Python.
+If I were to do this all again, I would absolutely not choose JavaScript. Just 0 real benefits; I spent more time than I care to admit bashing my head before remembering \`Promise.allSettled\` exists. I should've just used Python.
 
 ## The stats:
 
@@ -21,10 +21,10 @@ Of the 721 top level comments, 692 contained links and were analyzed at the time
 
 #### Some fun ones:
 
-- 4 sites offer the `onion-location` response header
-- One `"x-nananana": "Batcache",` response header
-- One site is behind `Apache/2.4.7`, which was released in 2013 and has [multiple CVEs](https://www.cvedetails.com/vulnerability-list/vendor_id-45/product_id-66/version_id-524064/Apache-Http-Server-2.4.7.html)
-  - This is also the only site to advertise `mod_perl`, so do with that what you may.
+- 4 sites offer the \`onion-location\` response header
+- One \`"x-nananana": "Batcache",\` response header
+- One site is behind \`Apache/2.4.7\`, which was released in 2013 and has [multiple CVEs](https://www.cvedetails.com/vulnerability-list/vendor_id-45/product_id-66/version_id-524064/Apache-Http-Server-2.4.7.html)
+  - This is also the only site to advertise \`mod_perl\`, so do with that what you may.
 
 #### The scraped stuff:
 

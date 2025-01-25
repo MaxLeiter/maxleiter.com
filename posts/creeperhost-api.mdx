@@ -8,7 +8,7 @@ type: snippet
 
 I've had a server on [Creeper Host](https://creeper.host) for around eight years now, and have used it for small side projects and hackathons. Lately, I've been trying to  automate more of my life and discovered that the API their in-house control panel uses is [available for general use](https://creeperhost.docs.apiary.io/). I'm making this post in case someone else ever wants to interact with their API via JavaScript. Maybe someday I'll create a proper repository, but for now my wrapper is incomplete and it's easier to just include here. It was also a good chance to write some TypeScript from scratch, something I haven't had the opportunty to do very much of.
 
-To get started, you'll need to generate a Developer Token on the [control panel](https://creeperpanel.com). Navigate to the `Sub-accounts` page and generate a new API key at the bottom of the page:
+To get started, you'll need to generate a Developer Token on the [control panel](https://creeperpanel.com). Navigate to the \`Sub-accounts\` page and generate a new API key at the bottom of the page:
 
 ![Screenshot of the Creeper Host control panel with a blue 'Generate Key' button](/blog/creeperhost/apiKey.png)
 
@@ -83,7 +83,7 @@ export type RestartResponse = {
 }
 ```
 
-Finally, create an instance via `new Client({ apiKey, apiSecret, instanceId });`
+Finally, create an instance via \`new Client(\{ apiKey, apiSecret, instanceId \});\`
 You can use it by finding what you want to call on the Creeper Host docs and accessing that on the client; I purposefully used the same naming scheme. For example,
 ```typescript
 Client.os.getram(): Promise<MetricResponse>

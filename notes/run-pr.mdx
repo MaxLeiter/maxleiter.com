@@ -6,7 +6,7 @@ date: Nov 18, 2021
 type: snippet
 ---
 
-Today I found myself once again trying to run a pull request that was created in a different GitHub repository. If it was in the same repo, it would be a simple `git checkout`, however because GitHub insisted on the creation of "forks" I now need to go through the extra steps of fetching that specific ref. Here's what I do:
+Today I found myself once again trying to run a pull request that was created in a different GitHub repository. If it was in the same repo, it would be a simple \`git checkout\`, however because GitHub insisted on the creation of "forks" I now need to go through the extra steps of fetching that specific ref. Here's what I do:
 
 ```bash
 git fetch https://github.com/${team}/${respository}.git refs/pull/${prId}/head
@@ -14,7 +14,7 @@ git checkout FETCH_HEAD
 git rebase master # or main
 ```
 
-Just replace `team`, `repository` and `prId` and you're all set. 
+Just replace \`team\`, \`repository\` and \`prId\` and you're all set. 
 
-I picked this script up from The Lounge: https://github.com/thelounge/thelounge/blob/master/scripts/run-pr.sh. It's a more complete example if you want to start using a script like this. Notice the [`shift`](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html) and bash substitution ([`$@`](https://stackoverflow.com/a/3898681)) at the end of it —  these allow you to pass in command-line arguments to `yarn start` (or whatever your run script is).
+I picked this script up from The Lounge: https://github.com/thelounge/thelounge/blob/master/scripts/run-pr.sh. It's a more complete example if you want to start using a script like this. Notice the [\`shift\`](https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_07.html) and bash substitution ([\`$@\`](https://stackoverflow.com/a/3898681)) at the end of it —  these allow you to pass in command-line arguments to \`yarn start\` (or whatever your run script is).
 

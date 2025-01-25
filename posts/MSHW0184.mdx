@@ -48,7 +48,7 @@ A few minutes later (well, probably closer to 30 minutes after compiling and tes
 
 ```
 
-I recompiled the kernel module, rebooted, and verified the driver was matched with lsmod and ensured the driver paired with the device by navigating to the IIO device (finding the path to the device took a lot more work than I'd like to admit) and reading in the `in_intensity_clear_raw` file:
+I recompiled the kernel module, rebooted, and verified the driver was matched with lsmod and ensured the driver paired with the device by navigating to the IIO device (finding the path to the device took a lot more work than I'd like to admit) and reading in the \`in_intensity_clear_raw\` file:
 
 ```sh
  max@surface ~> cat sys/bus/iio/devices/iio:device0/in_intensity_clear_raw
@@ -59,7 +59,7 @@ The joy I felt seeing that file exist and the output was monumental. I had somet
 
 I wasn't done yet though — GNOME still didn't show me an option to automatically adjust the screen brightness. After someone else verified they also had the device loaded with the modified driver but not in GNOME I determined the problem was somewhere in iio-sensor-proxy. I cloned the iio-sensor-proxy repository and started digging.
 
-The first thing I always do when I clone a new repo is expand and quickly look over every folder (assuming the repo is a reasonable size) and that served me well here. I found the following file `80-iio-sensor-proxy.rules`:
+The first thing I always do when I clone a new repo is expand and quickly look over every folder (assuming the repo is a reasonable size) and that served me well here. I found the following file \`80-iio-sensor-proxy.rules\`:
 
 ```yml
 # iio-sensor-proxy

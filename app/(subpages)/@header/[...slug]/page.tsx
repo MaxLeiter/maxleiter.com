@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useMemo } from "react"
@@ -12,21 +13,21 @@ export default function BreadcrumbPage() {
 
         const homeLink = <li style={{ listStyle: "none" }} key="first"><Link href="/" title="home">~</Link></li>
         const parts = pathname?.split("/").filter(Boolean)
-        if (parts?.length === 0) return
-
-        return [homeLink, ...parts.map((part, index) => {
+        if (parts?.length === 0) return 
+        
+        return [homeLink, ...(parts.map((part, index) => {
             const href = `/${parts.slice(0, index + 1).join("/")}`
             return (
-                <>
+                <React.Fragment key={part}>
                     <span key={`${part}-span`} aria-hidden style={{ color: "var(--gray)" }}> / </span>
                     <li style={{ listStyle: "none" }} key={part}>
                         <Link key={part} href={href}>
                             {part}
                         </Link>
                     </li>
-                </>
+                </React.Fragment>
             )
-        })]
+        }))]
     }, [pathname])
 
     return (

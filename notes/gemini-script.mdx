@@ -6,10 +6,14 @@ date: Apr 14, 2024
 type: snippet
 ---
 
+<Note>
+As of late 2024/early 2025, I recommend using the great repomix tool: https://github.com/yamadashy/repomix
+</Note>
+
 I've been messing with gemini-1.5-pro with the 1 million token context window for a while now and found this script very useful
 for grabbing entire repos. It ignores most binary files and concatenates the rest into a single file. 
 
-You'll need to have `parallel` installed for this to work (`brew install parallel` on macOS).
+You'll need to have \`parallel\` installed for this to work (\`brew install parallel\` on macOS).
 
 ```bash
 #!/bin/bash

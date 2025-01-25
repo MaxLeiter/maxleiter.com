@@ -22,19 +22,19 @@ My recommendation is to **pin your dependencies**. If you're unfamiliar with wha
 }
 ```
 
-To automatically accomplish this in your projects, you can add `save-exact=true` to a `.npmrc` file, or use `--save-exact` when adding the dependency via npm (or `--exact` via yarn).
+To automatically accomplish this in your projects, you can add \`save-exact=true\` to a \`.npmrc\` file, or use \`--save-exact\` when adding the dependency via npm (or \`--exact\` via yarn).
 
 If you do this, I also recommend some sort of dependency management so you stay up-to-date. I personally use the [renovate](https://github.com/renovatebot/renovate) bot for my GitHub projects.
 
 ### What about lockfiles?
 
-You may have noticed npm and yarn generate `package-lock.json` and `yarn.lock` when you run `npm i` and `yarn`, respectively. The lockfiles allow every version of every sub-dependency to be pinned, while modifying the package.json only guarantees we pin the immediate dependency (which may not pin its own dependencies).
+You may have noticed npm and yarn generate \`package-lock.json\` and \`yarn.lock\` when you run \`npm i\` and \`yarn\`, respectively. The lockfiles allow every version of every sub-dependency to be pinned, while modifying the package.json only guarantees we pin the immediate dependency (which may not pin its own dependencies).
 
-One problem with relying on lockfiles is that they and their semantics are confusing. In my experience, many new-to-npm users expect `npm i` to function like `npm ci`, and are unaware of the differences. `npm i` can update `package-lock.json`, whereas `npm ci` will only read from it.
+One problem with relying on lockfiles is that they and their semantics are confusing. In my experience, many new-to-npm users expect \`npm i\` to function like \`npm ci\`, and are unaware of the differences. \`npm i\` can update \`package-lock.json\`, whereas \`npm ci\` will only read from it.
 
-> Tip: You almost always want to use `npm ci`
+> Tip: You almost always want to use \`npm ci\`
 
-Meanwhile, with yarn, `yarn install` will install the version in the yarn.lock, regardless of the version in the package.json. Good for security? Sure. Good for the developer experience? Not so much. You need to use `yarn upgrade <package>` in order to fetch the version in the package.json if it's more recent than specified in the yarn.lock. It's now far more difficult to determine _when_ something is updated. If you've ever found yourself staring at a yarn.lock diff you'll know what I mean.
+Meanwhile, with yarn, \`yarn install\` will install the version in the yarn.lock, regardless of the version in the package.json. Good for security? Sure. Good for the developer experience? Not so much. You need to use \`yarn upgrade \<package\>\` in order to fetch the version in the package.json if it's more recent than specified in the yarn.lock. It's now far more difficult to determine _when_ something is updated. If you've ever found yourself staring at a yarn.lock diff you'll know what I mean.
 
 Lockfiles are good tools, but can be difficult and unintuitive to work with.
 

@@ -6,8 +6,7 @@ type: snippet
 date: Aug 19, 2024
 ---
 
-This script lets you run `gcb branch-name` and it will create a branch with the name `max/{month}-{day}-branch-name`.
-I recommend swapping out `max` to basically anything else.
+I recommend swapping out \`max\` to basically anything else.
 
 ```bash
   #!/bin/bash
@@ -23,9 +22,9 @@ I recommend swapping out `max` to basically anything else.
   git checkout -b "$branch_name"
 ```
 
-To use on macOS/linux, you can paste the above into a file in `/usr/local/bin` and make it executable with `chmod +x /usr/local/bin/gcb`.
+To use on macOS/linux, you can paste the above into a file in \`/usr/local/bin\` and make it executable with \`chmod +x /usr/local/bin/gcb\`.
 
-I also recommend setting your git settings to sort branches by `committerdate` so that you can easily find the branch you worked on most recently:
+I also recommend setting your git settings to sort branches by \`committerdate\` so that you can easily find the branch you worked on most recently:
 
 ```bash
 git config --global branch.sort committerdate

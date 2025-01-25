@@ -33,7 +33,7 @@ Largely just because I can. Also, I want to turn my iPad into a proper developme
  - Loads of other libraries, tools, and applications.
 
 ## Building instructions
-Before you start, be sure to have an iOS SDK located at `/usr/share/iPhoneOS.sdk` for sbingner's llvm-10 to function. You can get the SDKs from theos.
+Before you start, be sure to have an iOS SDK located at \`/usr/share/iPhoneOS.sdk\` for sbingner's llvm-10 to function. You can get the SDKs from theos.
 
 The following tools/libraries are required to build the packages (unless you choose to build these yourself): 
 
@@ -63,103 +63,492 @@ From MCApollo's repository:
 
  In general, you can follow the instructions from [Beyond LinuxFromScratch](http://www.linuxfromscratch.org/blfs/). This project is based on 9.0, with version differences or code modications marked with ⚠️ below. Applications and libs marked with ❗️ means unavailable on iOS or I was unable to build them. Empty notes means compiles and works as-is from BLFS. Additionally, all of the packages are available (generally as dylibs) on the Cydia repo linked above.
 
-|Name|Version|Notes|
-|--- |--- |--- |
-|util-macros|1.19.2||
-|xorgproto|2019.2||
-|libXau|1.0.9||
-|libXdmcp|1.1.3||
-|xcb-proto|1.13||
-|libxcb|1.13.1||
-|Freetype|2.10.1||
-|Fontconfig|2.13.1 ⚠️|Requires modifying stdlib.h in SDK to allow system calls. Bug with patch available here.|
-|xtrans|1.4.0||
-|libX11|1.6.9||
-|libFS|1.0.8 ⚠️|Need to remove some code from the libtool file. The enviroment variables aren't populated on iOS so a generated bash command is wrong. Check the output of ./configure to pinpoint the line number.|
-|libICE|1.0.1||
-|libSM|1.2.3||
-|libXScrnSaver|1.2.3||
-|libXt|1.2.0||
-|libXmu|1.1.3||
-|libXpm|3.5.13||
-|libXaw|1.0.13||
-|libXfixes|5.0.3||
-|libXcomposite|0.4.5||
-|libXrender|0.9.10||
-|libXcursor|1.2.0||
-|libXdamage|1.1.5||
-|libfontenc|1.1.4||
-|libXfont2|2.0.4||
-|libXft|2.3.3||
-|libXi|1.7.10||
-|libXinerama|1.1.4||
-|libXrandr|1.5.2||
-|libXres|1.2.0||
-|libXtst|1.2.3||
-|libXv|1.0.11||
-|libXvMC|1.0.12||
-|libXxf86dga|1.1.5||
-|libXxf86vm|1.1.4||
-|libpciaccess|1.0.12 ❗️|Unsupported OS|
-|libdmx|1.1.4||
-|libxkbfile|1.1.0||
-|xcb-util|0.4.0||
-|xcb-util-image|0.4.0||
-|xcb-util-keysyms|0.4.0||
-|xcb-util-keysyms|0.4.0||
-|xcb-util-renderutil|0.3.9||
-|xcb-util-wm|0.4.1||
-|xcb-util-cursor|0.1.3||
-|Mako|1.1.0|If you can't build yourself, try using pip|
-|Mesa|0.52.1 ⚠️|Set DRI drivers to swrast and set gallium drivers to empty. I manually modifed meson_options.txt. Also symlink m4 to /opt/local/bin/gm4. I had to remove an __APPLE__ check in /src/mesa/main/texcompress_s3tc_tmp.h so it used the GL library instead of the macOS OpenGL one. Also, be sure to specify a minimum iOS version so thread-local support works with something like -miphoneos-version-min=11.2.|
-|xbitmaps|1.1.2||
-|iceauth|1.0.8||
-|luit|1.1.1|Run sed -i -e "/D_XOPEN/s/5/6/" configure|
-|mkfontdir|1.0.7||
-|mkfontscale|1.2.1||
-|sessreg|1.1.2||
-|setxkbmap|1.3.2||
-|smproxy|1.0.6||
-|x11perf|1.6.1||
-|xcursorgen|1.0.7||
-|xdpyinfo|1.3.2||
-|xev|1.2.3||
-|xhost|1.0.8||
-|xinput|1.6.3||
-|xkbcomp|1.4.2||
-|xkbevd|1.1.4||
-|xkbutils|1.0.4||
-|xkill|1.0.5||
-|xlsatoms|1.1.3||
-|xlsclients|1.1.4||
-|xmessage|1.0.5||
-|xmodmap|1.0.10||
-|xpr|1.0.5||
-|xprop|1.2.4||
-|xrandr|1.5.1||
-|xrdb|1.2.0||
-|xrefresh|1.0.6||
-|xset|1.2.4||
-|xsetroot|1.1.2||
-|xvinfo|1.1.4||
-|xwd|1.0.7||
-|xwininfo|1.1.5||
-|xwud|1.0.5||
-|startup-notifcation|.12||
-|xterm|351||
-|FLTK|1.3.5 ⚠️|Need to remove some -U__APPLE__ calls. Disable tests in Makefile.|
-|tigervnc|1.10.1 ⚠️|No vncviewer. Disable it via CMake. Remove the if(NOT APPLE) check above the add_subdirectory(unix). Also remove the find_package(FLTK) check and remove the line add_subdirectory(tests) (as some tests require FLTK). It's important to build tigervnc before building Xvnc.|
-|Xvnc|1.10.1 ⚠️|Add a fake Xplugin.h to fool /unix/xserver/miext/rootless. Modify rootlessWindow.c to check for "Xplugin.h" instead of \<Xplugin.h\>. Also, remove the -z, now characters from /unix/xserver/hw/vnc/Makefile.in, where it's assigning libvnc_la_LDFLAGS.|
-|Glib|2.62.4 ⚠️|Disable cocoa and carbon support in build.meson. Had to fake crt_externs.h. Remove the if host_system == 'darwin' check in glib/meson.build.|
-|LuaJIT|2.1.0|https://github.com/rweichler/luajit-ios|
-|OpenJPG|2.3.1||
-|poppler|0.84.0||
-|check|0.11.0||
-|pango||working on it|
-|EFL|1.23.3|working on it|
-|compton|git v0.1 beta g316eac0||
-|FOX toolkit|1.7.67|Contains Adie (text editor), a calculator, and Shutterbug (screenshots)|
-|azpainter|4bf18c8||
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Version</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>util-macros</td>
+            <td>1.19.2</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xorgproto</td>
+            <td>2019.2</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXau</td>
+            <td>1.0.9</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXdmcp</td>
+            <td>1.1.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xcb-proto</td>
+            <td>1.13</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libxcb</td>
+            <td>1.13.1</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Freetype</td>
+            <td>2.10.1</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Fontconfig</td>
+            <td>2.13.1 <span className="warning">⚠️</span></td>
+            <td>Requires modifying stdlib.h in SDK to allow system calls. Bug with patch available here.</td>
+        </tr>
+        <tr>
+            <td>xtrans</td>
+            <td>1.4.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libX11</td>
+            <td>1.6.9</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libFS</td>
+            <td>1.0.8 <span className="warning">⚠️</span></td>
+            <td>Need to remove some code from the libtool file. The enviroment variables aren't populated on iOS so a generated bash command is wrong. Check the output of ./configure to pinpoint the line number.</td>
+        </tr>
+        <tr>
+            <td>libICE</td>
+            <td>1.0.1</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libSM</td>
+            <td>1.2.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXScrnSaver</td>
+            <td>1.2.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXt</td>
+            <td>1.2.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXmu</td>
+            <td>1.1.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXpm</td>
+            <td>3.5.13</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXaw</td>
+            <td>1.0.13</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXfixes</td>
+            <td>5.0.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXcomposite</td>
+            <td>0.4.5</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXrender</td>
+            <td>0.9.10</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXcursor</td>
+            <td>1.2.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXdamage</td>
+            <td>1.1.5</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libfontenc</td>
+            <td>1.1.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXfont2</td>
+            <td>2.0.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXft</td>
+            <td>2.3.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXi</td>
+            <td>1.7.10</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXinerama</td>
+            <td>1.1.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXrandr</td>
+            <td>1.5.2</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXres</td>
+            <td>1.2.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXtst</td>
+            <td>1.2.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXv</td>
+            <td>1.0.11</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXvMC</td>
+            <td>1.0.12</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXxf86dga</td>
+            <td>1.1.5</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libXxf86vm</td>
+            <td>1.1.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libpciaccess</td>
+            <td>1.0.12 <span className="error">❗️</span></td>
+            <td>Unsupported OS</td>
+        </tr>
+        <tr>
+            <td>libdmx</td>
+            <td>1.1.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>libxkbfile</td>
+            <td>1.1.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xcb-util</td>
+            <td>0.4.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xcb-util-image</td>
+            <td>0.4.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xcb-util-keysyms</td>
+            <td>0.4.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xcb-util-keysyms</td>
+            <td>0.4.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xcb-util-renderutil</td>
+            <td>0.3.9</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xcb-util-wm</td>
+            <td>0.4.1</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xcb-util-cursor</td>
+            <td>0.1.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Mako</td>
+            <td>1.1.0</td>
+            <td>If you can't build yourself, try using pip</td>
+        </tr>
+        <tr>
+            <td>Mesa</td>
+            <td>0.52.1 <span className="warning">⚠️</span></td>
+            <td>Set DRI drivers to swrast and set gallium drivers to empty. I manually modifed meson_options.txt. Also symlink m4 to /opt/local/bin/gm4. I had to remove an __APPLE__ check in /src/mesa/main/texcompress_s3tc_tmp.h so it used the GL library instead of the macOS OpenGL one. Also, be sure to specify a minimum iOS version so thread-local support works with something like -miphoneos-version-min=11.2.</td>
+        </tr>
+        <tr>
+            <td>xbitmaps</td>
+            <td>1.1.2</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>iceauth</td>
+            <td>1.0.8</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>luit</td>
+            <td>1.1.1</td>
+            <td>Run sed -i -e "/D_XOPEN/s/5/6/" configure</td>
+        </tr>
+        <tr>
+            <td>mkfontdir</td>
+            <td>1.0.7</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>mkfontscale</td>
+            <td>1.2.1</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>sessreg</td>
+            <td>1.1.2</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>setxkbmap</td>
+            <td>1.3.2</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>smproxy</td>
+            <td>1.0.6</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>x11perf</td>
+            <td>1.6.1</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xcursorgen</td>
+            <td>1.0.7</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xdpyinfo</td>
+            <td>1.3.2</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xev</td>
+            <td>1.2.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xhost</td>
+            <td>1.0.8</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xinput</td>
+            <td>1.6.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xkbcomp</td>
+            <td>1.4.2</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xkbevd</td>
+            <td>1.1.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xkbutils</td>
+            <td>1.0.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xkill</td>
+            <td>1.0.5</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xlsatoms</td>
+            <td>1.1.3</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xlsclients</td>
+            <td>1.1.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xmessage</td>
+            <td>1.0.5</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xmodmap</td>
+            <td>1.0.10</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xpr</td>
+            <td>1.0.5</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xprop</td>
+            <td>1.2.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xrandr</td>
+            <td>1.5.1</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xrdb</td>
+            <td>1.2.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xrefresh</td>
+            <td>1.0.6</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xset</td>
+            <td>1.2.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xsetroot</td>
+            <td>1.1.2</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xvinfo</td>
+            <td>1.1.4</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xwd</td>
+            <td>1.0.7</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xwininfo</td>
+            <td>1.1.5</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xwud</td>
+            <td>1.0.5</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>startup-notifcation</td>
+            <td>.12</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>xterm</td>
+            <td>351</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>FLTK</td>
+            <td>1.3.5 <span className="warning">⚠️</span></td>
+            <td>Need to remove some -U__APPLE__ calls. Disable tests in Makefile.</td>
+        </tr>
+        <tr>
+            <td>tigervnc</td>
+            <td>1.10.1 <span className="warning">⚠️</span></td>
+            <td>No vncviewer. Disable it via CMake. Remove the if(NOT APPLE) check above the add_subdirectory(unix). Also remove the find_package(FLTK) check and remove the line add_subdirectory(tests) (as some tests require FLTK). It's important to build tigervnc before building Xvnc.</td>
+        </tr>
+        <tr>
+            <td>Xvnc</td>
+            <td>1.10.1 <span className="warning">⚠️</span></td>
+            <td>Add a fake Xplugin.h to fool /unix/xserver/miext/rootless. Modify rootlessWindow.c to check for "Xplugin.h" instead of \<Xplugin.h\>. Also, remove the -z, now characters from /unix/xserver/hw/vnc/Makefile.in, where it's assigning libvnc_la_LDFLAGS.</td>
+        </tr>
+        <tr>
+            <td>Glib</td>
+            <td>2.62.4 <span className="warning">⚠️</span></td>
+            <td>Disable cocoa and carbon support in build.meson. Had to fake crt_externs.h. Remove the if host_system == 'darwin' check in glib/meson.build.</td>
+        </tr>
+        <tr>
+            <td>LuaJIT</td>
+            <td>2.1.0</td>
+            <td>https://github.com/rweichler/luajit-ios</td>
+        </tr>
+        <tr>
+            <td>OpenJPG</td>
+            <td>2.3.1</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>poppler</td>
+            <td>0.84.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>check</td>
+            <td>0.11.0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>pango</td>
+            <td></td>
+            <td>working on it</td>
+        </tr>
+        <tr>
+            <td>EFL</td>
+            <td>1.23.3</td>
+            <td>working on it</td>
+        </tr>
+        <tr>
+            <td>compton</td>
+            <td>git v0.1 beta g316eac0</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>FOX toolkit</td>
+            <td>1.7.67</td>
+            <td>Contains Adie (text editor), a calculator, and Shutterbug (screenshots)</td>
+        </tr>
+        <tr>
+            <td>azpainter</td>
+            <td>4bf18c8</td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
 
 ---
 *This post was originally written on the old maxleiter.com, and formatting has slightly adjusted
