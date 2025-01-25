@@ -1,6 +1,6 @@
 ---
-title: Building a blog with Next.js 14 and React Server Components
-description: Use MDX, RSC, and Bright to build a blog with Next.js 14.
+title: Building a blog with Next.js 15 and React Server Components
+description: Use MDX, RSC, and Bright to build a blog with Next.js 15.
 slug: build-a-blog-with-nextjs-13
 date: Apr 16, 2023
 ---
@@ -9,7 +9,7 @@ I've been tinkering with this website and the [Next.js 13 App Router](https://be
 and it's been a great experience, especially in the last few months. But I've seen some confusion around
 how to use the new features and React Server Components, so I wrote up an outline on building this website.
 
-<Note> This post has been updated for [Next.js 14.](https://nextjs.org/blog/next-14) </Note>
+<Note> This post has been updated for [Next.js 15.](https://nextjs.org/blog/next-15) </Note>
 
 To address the React-sized elephant in the room:
 you do not need this fancy setup to build a blog.
@@ -40,7 +40,7 @@ Now that that's out of the way:
 First, we'll need to create a new Next.js project. You can launch the setup wizard with \`npx create-next-app\`:
 
 ```bash
-npx create-next-app --experimental-app
+npx create-next-app
 ```
 
 <Note>
@@ -443,12 +443,13 @@ import { PostBody } from '@mdx/post-body'
 import { notFound } from 'next/navigation'
 
 export default async function PostPage({
-  params,
+  params: _params,
 }: {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }) {
+  const params = await _params;
   const post = await getPost(params.slug)
   // notFound is a Next.js utility
   if (!post) return notFound()
