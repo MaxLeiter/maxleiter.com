@@ -1,0 +1,132 @@
+/* reset */
+.container {
+  outline: 1px solid var(--light-gray);
+  border-radius: 0.5rem;
+  max-width: 450px;
+
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    /* reset */
+    margin: 0;
+    font-weight: 600;
+    padding: 0;
+  }
+}
+
+.card {
+  width: 100%;
+  background-color: var(--lighter-gray);
+  overflow: hidden;
+}
+
+.content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.profileImgContainer {
+  position: relative;
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-weight: 600;
+}
+
+.userPosition {
+  font-size: 0.875rem;
+}
+
+.userMeta {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.separator {
+  margin: 0 0.25rem;
+}
+
+.linkedinIcon {
+  height: 2rem;
+  width: 2rem;
+}
+
+.contentText p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.highlight {
+}
+
+.videoThumbnail {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.videoImage {
+  object-fit: cover;
+  border-radius: 0.25rem;
+}
+
+.videoOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.engagement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.buttonGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
