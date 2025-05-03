@@ -24,3 +24,4 @@ yalc.lock
 # next bundle analyzer
 analyze/
 .env*.local
+codex.md
