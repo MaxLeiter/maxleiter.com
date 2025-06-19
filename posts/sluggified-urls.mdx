@@ -38,7 +38,7 @@ This post will be focused on Next.js, but the concepts are universal. Here are s
 - Be mindful of your previous URLs and ensure they don't conflict with the logic for adding/parsing the slug
 
 
-First, we need two functions: one to generate the URL, and one to parse it.
+To get started, we need two functions: one to generate the URL, and one to parse it.
 
 It's important we support URLs both with and without the title, and I recommend using a library to handle 
 the slugification so you don't need to worry about things like special characters.
@@ -76,10 +76,10 @@ function getSluggifiedId(id: string, title: string | undefined) {
 (In practice, I had to add support for passing in a minimum ID length for each case, because v0 used to generate IDs with dashes.
 )
 
-Now, integrating these utilities into our pages:
+Now, integrating these utilities into our pages requires:
 
-- Update the canonical URL
-- Implement a way to redirect users to the updated URL. 
+- Updating the canonical URL
+- Implementing a way to redirect users to the updated URL. 
   - If you do this on the server, you can serve a 301 redirect
 
 Using the Next.js [Metadata API](https://nextjs.org/docs/app/getting-started/metadata-and-og-images):
