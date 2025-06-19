@@ -1,0 +1,133 @@
+---
+title: Implementing Notion style URLs 
+description: Create /some-title-here-{id} URLs for recognizable links in Next.js
+slug: sluggified-urls
+date: Jun 19, 2025
+---
+
+I hate unrecognizable URLs. If I want to go back to a specific document or page, I should be able
+to type the name of it in the address bar and find it in my browser history. Notion is particularly good at this,
+and v0 was particularly bad at it (for a while), so this is what I did to fix v0. 
+
+Here's what a notion URL looks like:
+<span
+  style={{
+    fontFamily: 'monospace',
+    fontSize: '1.2em',
+  }}
+>
+```
+https://notion.so/org/Team-Roadmap-159f06b059c491d9abb8
+```
+</span>
+
+It's recognizable, visually appealing, and easy to find in your browser history:
+
+<Image src="/blog/notion-urls/suggestion.png" alt="Screenshot of Firefox Suggestion matching the URL when I typed Team Roadmap" width={600} height={100} />
+
+I'm a fan. 
+
+
+<hr />
+
+At first I thought implementing it would be straight forward, but there are a few easy-to-hit gotcha's involved. 
+This post will be focused on Next.js, but the concepts are universal. Here are some of the things to keep in mind:
+
+- You need to ensure the [canonical URL](https://developers.google.com/search/docs/crawling-indexing/canonicalization) is up-to-date
+- The client needs to wind up on the most recent URL, otherwise crawlers like Google can index "fake" paths
+- Be mindful of your previous URLs and ensure they don't conflict with the logic for adding/parsing the slug
+
+
+First, we need two functions: one to generate the URL, and one to parse it.
+
+It's important we support URLs both with and without the title, and I recommend using a library to handle 
+the slugification so you don't need to worry about things like special characters.
+
+```ts
+function extractIdFromSlug(slug: string): {
+  id: string
+  title?: string
+} {
+  const lastHyphenIndex = slug.lastIndexOf('-')
+
+  // If no hyphen found, its just the ID
+  if (lastHyphenIndex === -1) {
+    return { id: slug, title: undefined }
+  }
+
+  const id = slug.substring(lastHyphenIndex + 1)
+  const title = slug.substring(0, lastHyphenIndex)
+
+  return { id, title: title || undefined }
+}
+```
+
+```ts
+function getSluggifiedId(id: string, title: string | undefined) {
+  if (title) {
+    /* you can use slugify or some other library */
+    return `${slugify(title.slice(0, 50))}-${id}`
+  }
+
+  return id
+}
+```
+
+(In practice, I had to add support for passing in a minimum ID length for each case, because v0 used to generate IDs with dashes.
+)
+
+Now, integrating these utilities into our pages:
+
+- Update the canonical URL
+- Implement a way to redirect users to the updated URL. 
+  - If you do this on the server, you can serve a 301 redirect
+
+Using the Next.js [Metadata API](https://nextjs.org/docs/app/getting-started/metadata-and-og-images):
+```tsx
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    // ...other fields here...
+    alternates: {
+      canonical: `/chat/${getSluggifiedId(chatId, title)}`,
+    },
+  }
+}
+```
+
+This ensures the pages Metadata is correct for SSR (be sure to revalidate the path if you update the title),
+but the client can still be on the wrong page if they visit an old URL.
+
+To solve that, we can introduce a client component that we'll include in our root layout (or wherever you need it):
+
+```tsx
+"use client"
+
+// throw this in your layout/page
+export function KeepClientOnUpToDateSlugPath({
+  id,
+  title,
+}: {
+  id: string
+  title?: string
+}) {
+   useLayoutEffect(() => {
+    const slug = getSluggifiedId(id, title)
+
+    const url = new URL(window.location.href)
+    const pathParts = url.pathname.split('/')
+    const lastPart = pathParts[pathParts.length - 1]
+
+    if (lastPart && lastPart !== slug) {
+      // Replace last path segment 
+      pathParts[pathParts.length - 1] = slug
+      url.pathname = pathParts.join('/')
+
+      window.history.replaceState(null, '', url.toString())
+    }
+  }, [id, title])
+  
+  return null
+}
+```
+
+Fin! Now I have great URLs like https://v0.dev/chat/autoplay-slideshow-for-v0-Z7canzuZ4b9
