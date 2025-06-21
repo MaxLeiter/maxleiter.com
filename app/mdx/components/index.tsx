@@ -10,6 +10,7 @@ import Home from '@components/icons/home'
 import { Tweet } from 'react-tweet'
 // import Diff from './mdx-diff'
 import dynamic from 'next/dynamic'
+import { MinecraftInventoryFromDir } from '@components/mc'
 const Diff = dynamic(() => import('./mdx-diff'), {
   loading: () => (
     <div
@@ -95,4 +96,5 @@ export const mdxComponents: MDXComponents = {
       <Tweet {...props} />
     </div>
   ),
+  MinecraftInventory: MinecraftInventoryFromDir,
 }

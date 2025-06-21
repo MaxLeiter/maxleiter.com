@@ -18,7 +18,12 @@ The best example is [Create](https://www.curseforge.com/minecraft/mc-mods/create
 >
   <iframe
     width="560"
-    height="315"
+    height="500"
+    style={{
+      maxWidth: '100%',
+      width: '560px',
+      height: '315px',
+    }}
     src="https://www.youtube.com/embed/rR8W-f9YhYA?start=24"
     title="YouTube video player"
     frameBorder="0"
@@ -40,31 +45,28 @@ The best example is [Create](https://www.curseforge.com/minecraft/mc-mods/create
   }
 </div>
 
-So I was pretty lost when I started playing for the first time in years with some of my friends.
+So I was pretty lost when I started playing for the first time in a long time.
 
 ### Table of Contents
 
 ## The Problem
 
-As we started playing the <abbr title="highly curated collection of 200+ mods">Divine Journey 2</abbr> modpack,
+As some friends and I started playing the <abbr title="highly curated collection of 200+ mods">Divine Journey 2 modpack</abbr>,
 I was overwhelmed by the number of modded blocks and items.
 
-To give you a taste, there are 54 &quot;generators&quot; from 16 mods.
-{
+To give you a taste, there are 54 &quot;generators&quot; from 16 mods:
 
-<details>
-  <summary>Mods</summary>
-  Actually Additions, Draconic Additions, Draconic Evolution, Ender IO, Extra
-  Utilities 2, Extreme Reactors, Galacticraft Core, Galacticraft Planets,
-  Immersive Engineering, Industrial Foregoing, Integrated Dynamics,
-  LightningCraft, RFTools, RFTools Dimensions, Thaumcraft, Thaumic Augmentation.
-</details>
-}
+<span style={{ display: 'flex', justifyContent: 'center' }}>
+  <MinecraftInventory
+    dir="app/components/mc/images"
+    columns={9}
+    slotSize={36}
+  />
+</span>
 
-![Screenshot of the generators from Just Enough Items](/blog/vibecoding-mc/generators.png)
-
-Finding them around our base was a pain. My friends knew where everything was, and would be telling me things like
-"put coal in the hopper that feeds the Coke Oven into the Blast Furnace by the biodiesel setup"
+Finding them around our base was a pain. My friends knew where everything was,
+and would be telling me things like "put coal in the hopper that feeds the Coke
+Oven into the Blast Furnace by the biodiesel setup"
 
 There's one obvious solution:
 
@@ -83,14 +85,28 @@ I ~~suffered no harm~~ wrote no Java in the making of this project. More informa
 
 <summary>Click to toggle</summary>
 <p>
-You can bind a keybind to open a UI to filter and search for specific blocks:
+You can bind a keybind to open a UI to filter and search for specific blocks in your vicinity:
 
-<Image
-  src="/blog/vibecoding-mc/tilefinder-2.png"
-  alt="TileFinder"
-  width={800}
-  height={600}
-/>
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  <Image
+    src="/blog/vibecoding-mc/tilefinder-2.png"
+    width={800}
+    height={600}
+    style={{
+      marginBottom: '0',
+    }}
+    alt="Screenshot of the TileFinder UI grouped by mod"
+  />
+  <figcaption
+    style={{
+      fontSize: '0.9rem',
+      color: 'var(--gray)',
+      marginBottom: '0.5rem',
+    }}
+  >
+    Blocks within 32 blocks from me grouped by their mod
+  </figcaption>
+</div>
 
 When you select an item, a (fully configurable) path is drawn to it.
 
@@ -113,8 +129,8 @@ When you select an item, a (fully configurable) path is drawn to it.
   My friends and I have a lot of tasks to do in this modpack (it has a big quest
   system with progression), and keeping track of the items we need or the
   subtasks necessary got annoying. At one point, my friend semi-jokingly
-  suggested using something like JIRA. That's when you know its bad. In their
-  defense, they didn't know about Linear yet.
+  suggested using something like Jira. That&apos;s when you know its bad. In
+  their defense, they didn&apos;t know about Linear yet.
 </p>
 
 <p>

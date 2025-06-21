@@ -1,0 +1,45 @@
+.container {
+  background-color: #282828; /* Dark inventory background */
+  padding: 8px;
+  display: grid;
+  gap: 4px;
+  width: fit-content;
+}
+
+.slot {
+  width: 36px;
+  height: 36px;
+  background-color: #3c3c3c; /* Slot background */
+  border: 1px solid #000;
+  box-shadow: inset 0 0 0 1px #666;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slot:hover {
+  outline: 1px solid #fff;
+  cursor: pointer;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 10;
+  background: #1a0f1e; /* Dark purple-ish tooltip background */
+  border: 1px solid #3b1566;
+  padding: 4px 6px;
+  color: #fff;
+  font-size: 12px;
+  pointer-events: none;
+  white-space: nowrap;
+  /* Center horizontally and appear above the slot */
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -110%);
+}
+
+.mod {
+  color: #7b4dff; /* Mod name color */
+  font-size: 11px;
+} 
