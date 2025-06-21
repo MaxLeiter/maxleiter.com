@@ -5,6 +5,8 @@ slug: vibecoding-minecraft-mods
 date: Jun 21, 2025
 ---
 
+{/* eslint-disable react/jsx-no-undef */}
+
 If you aren't familiar with the extent of the Minecraft modding scene, it's _big_. There are mods with more thought put into them than many AAA games.
 
 The best example is [Create](https://www.curseforge.com/minecraft/mc-mods/create):
@@ -56,13 +58,28 @@ I was overwhelmed by the number of modded blocks and items.
 
 To give you a taste, there are 54 &quot;generators&quot; from 16 mods:
 
-<span style={{ display: 'flex', justifyContent: 'center' }}>
-  <MinecraftInventory
-    dir="app/components/mc/images"
-    columns={9}
-    slotSize={36}
-  />
-</span>
+{<span
+style={{
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
+  }}
+
+>
+
+  <MinecraftInventory dir="app/components/mc/images" />
+    <figcaption
+      style={{
+        fontSize: '0.9rem',
+        color: 'var(--gray)',
+        paddingTop: '0.25rem',
+      }}
+    >
+      I built this UI with v0 and extracted the images from a screenshot using
+      o4-mini with toolcalling.
+    </figcaption>
+</span>}
 
 Finding them around our base was a pain. My friends knew where everything was,
 and would be telling me things like "put coal in the hopper that feeds the Coke
