@@ -9,14 +9,12 @@ export async function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }))
 }
 
-export const generateMetadata = async (
-  props: {
-    params: Promise<{
-      slug: string
-    }>
-  }
-): Promise<Metadata> => {
-  const params = await props.params;
+export const generateMetadata = async (props: {
+  params: Promise<{
+    slug: string
+  }>
+}): Promise<Metadata> => {
+  const params = await props.params
   const post = (await getPosts()).find((p) => p?.slug === params.slug)
   return {
     title: post?.title,
@@ -32,7 +30,9 @@ async function getData({ slug }: { slug: string }) {
   const postIndex = posts.findIndex((p) => p?.slug === slug)
 
   if (postIndex === -1) {
-    throw new Error(`${slug} not found in posts. Did you forget to rename the file?`)
+    throw new Error(
+      `${slug} not found in posts. Did you forget to rename the file?`,
+    )
   }
 
   const post = posts[postIndex]
@@ -46,28 +46,25 @@ async function getData({ slug }: { slug: string }) {
   }
 }
 
-export default async function PostLayout(
-  props: {
-    children: JSX.Element
-    params: Promise<{
-      slug: string
-    }>
-  }
-) {
-  const params = await props.params;
+export default async function PostLayout(props: {
+  children: JSX.Element
+  params: Promise<{
+    slug: string
+  }>
+}) {
+  const params = await props.params
 
-  const {
-    children
-  } = props;
+  const { children } = props
 
-  const { previous, next, title, date, lastModified } = await getData(params)
+  const { previous, next, title, date, lastModified, description } =
+    await getData(params)
 
   const lastModifiedDate = lastModified
     ? new Date(lastModified).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    })
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
     : null
 
   return (
@@ -83,6 +80,8 @@ export default async function PostLayout(
       </div>
       <article>
         <h1 className={styles.title}>{title}</h1>
+        <span className={styles.description}>{description}</span>
+
         {children}
       </article>
       <PostFooter />
