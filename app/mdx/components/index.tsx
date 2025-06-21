@@ -1,6 +1,6 @@
 import { MDXComponents } from 'mdx/types'
 import NextImage from 'next/image'
-// import Link from '@components/link'
+import Link from '@components/link'
 import { MDXNote } from './mdx-note'
 import { Code } from 'bright'
 import { MDXImage } from './mdx-image'
@@ -10,6 +10,7 @@ import Home from '@components/icons/home'
 import { Tweet } from 'react-tweet'
 // import Diff from './mdx-diff'
 import dynamic from 'next/dynamic'
+import { MinecraftInventoryFromDir } from '@components/mc'
 const Diff = dynamic(() => import('./mdx-diff'), {
   loading: () => (
     <div
@@ -24,32 +25,29 @@ const Diff = dynamic(() => import('./mdx-diff'), {
 })
 
 Code.theme = {
-  dark: "solarized-dark",
-  light: "material-palenight",
+  dark: 'solarized-dark',
+  light: 'material-palenight',
   lightSelector: '[data-theme="light"]',
 }
 
 export const mdxComponents: MDXComponents = {
-  // TODO: re-enable once anchor tags are fixed in the app router
-  // a: ({ children, ...props }) => {
-  //   // check if external
-  //   let te = false
-  //   if (props.href?.startsWith('http')) {
-  //     isExternal = true
-  //   }
+  a: ({ children, ...props }) => {
+    let isExternal = false
+    if (props.href?.startsWith('http')) {
+      isExternal = true
+    }
 
-  //   return (
-  //     // @ts-expect-error legacy refs
-  //     <Link
-  //       {...props}
-  //       href={props.href || ''}
-  //       target={isExternal ? '_blank' : undefined}
-  //       rel={isExternal ? 'noopener noreferrer' : undefined}
-  //     >
-  //       {children}
-  //     </Link>
-  //   )
-  // },
+    return (
+      <Link
+        {...props}
+        href={props.href || ''}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+      >
+        {children}
+      </Link>
+    )
+  },
   pre: ({
     children,
     ...props
@@ -57,11 +55,7 @@ export const mdxComponents: MDXComponents = {
     React.HTMLAttributes<HTMLElement>,
     HTMLPreElement
   >) => {
-    return (
-      <Code {...props}>
-        {children as any}
-      </Code>
-    )
+    return <Code {...props}>{children as any}</Code>
   },
   img: MDXImage as any,
   Image: NextImage as any,
@@ -102,4 +96,5 @@ export const mdxComponents: MDXComponents = {
       <Tweet {...props} />
     </div>
   ),
+  MinecraftInventory: MinecraftInventoryFromDir,
 }

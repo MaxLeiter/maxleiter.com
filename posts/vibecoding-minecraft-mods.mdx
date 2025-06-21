@@ -1,0 +1,188 @@
+---
+title: Vibe-coding Minecraft mods
+description: and the lessons learned
+slug: vibecoding-minecraft-mods
+date: Jun 21, 2025
+---
+
+{/* eslint-disable react/jsx-no-undef */}
+
+If you aren't familiar with the extent of the Minecraft modding scene, it's _big_. There are mods with more thought put into them than many AAA games.
+
+The best example is [Create](https://www.curseforge.com/minecraft/mc-mods/create):
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  }}
+>
+  <iframe
+    width="560"
+    height="500"
+    style={{
+      maxWidth: '100%',
+      width: '560px',
+      height: '315px',
+    }}
+    src="https://www.youtube.com/embed/rR8W-f9YhYA?start=24"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+    referrerPolicy="strict-origin-when-cross-origin"
+    allowFullScreen
+  ></iframe>
+  {
+    <figcaption
+      style={{
+        fontSize: '0.9rem',
+        color: 'var(--gray)',
+        paddingTop: '0.1rem',
+      }}
+    >
+      Note that trains (and windmills and assembly lines) are not built into
+      Minecraft.
+    </figcaption>
+  }
+</div>
+
+So I was pretty lost when I started playing for the first time in a long time.
+
+### Table of Contents
+
+## The Problem
+
+As some friends and I started playing the <abbr title="highly curated collection of 200+ mods">Divine Journey 2 modpack</abbr>,
+I was overwhelmed by the number of modded blocks and items.
+
+To give you a taste, there are 54 &quot;generators&quot; from 16 mods:
+
+{<span
+style={{
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
+  }}
+
+>
+
+  <MinecraftInventory dir="app/components/mc/images" />
+    <figcaption
+      style={{
+        fontSize: '0.9rem',
+        color: 'var(--gray)',
+        paddingTop: '0.25rem',
+      }}
+    >
+      I built this UI with v0 and extracted the images from a screenshot using
+      o4-mini with toolcalling.
+    </figcaption>
+</span>}
+
+Finding them around our base was a pain. My friends knew where everything was,
+and would be telling me things like "put coal in the hopper that feeds the Coke
+Oven into the Blast Furnace by the biodiesel setup"
+
+There's one obvious solution:
+
+## The Solution: more mods
+
+I ended up creating two mods with a mix of [OpenAI Codex](https://github.com/openai/codex) (the cli), [Claude Code](https://www.anthropic.com/claude-code), and [Cursor](https://www.cursor.com/) to help me out:
+
+- TileFinder ([GitHub](https://github.com/MaxLeiter/TileFinder/), [CurseForge](https://www.curseforge.com/minecraft/mc-mods/tilefinder/comments)): Search, filter, and easily locate TileEntities (fancy/complex blocks) from all mods
+- Unnamed Project Management mod: a multiplayer mod project management mod
+
+I ~~suffered no harm~~ wrote no Java in the making of this project. More information on the models/coding experience is below; you can collapse the details if you aren't interested in the mods.
+
+### TileFinder
+
+{<details open>
+
+<summary>Click to toggle</summary>
+<p>
+You can bind a keybind to open a UI to filter and search for specific blocks in your vicinity:
+
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  <Image
+    src="/blog/vibecoding-mc/tilefinder-2.png"
+    width={800}
+    height={600}
+    style={{
+      marginBottom: '0',
+    }}
+    alt="Screenshot of the TileFinder UI grouped by mod"
+  />
+  <figcaption
+    style={{
+      fontSize: '0.9rem',
+      color: 'var(--gray)',
+      marginBottom: '0.5rem',
+    }}
+  >
+    Blocks within 32 blocks from me grouped by their mod
+  </figcaption>
+</div>
+
+When you select an item, a (fully configurable) path is drawn to it.
+
+<Image
+  src="/blog/vibecoding-mc/tilefinder-3.png"
+  alt="TileFinder"
+  width={800}
+  height={600}
+/>
+</p>
+</details>}
+
+### Unnamed Project Management mod
+
+{<details open>
+
+<summary>Click to toggle</summary>
+
+<p>
+  My friends and I have a lot of tasks to do in this modpack (it has a big quest
+  system with progression), and keeping track of the items we need or the
+  subtasks necessary got annoying. At one point, my friend semi-jokingly
+  suggested using something like Jira. That&apos;s when you know its bad. In
+  their defense, they didn&apos;t know about Linear yet.
+</p>
+
+<p>
+  I assumed this mod would be more difficult due to multiplayer support, I
+  wanted full realtime sync. Yet again, nothing to worry about. Adding support
+  was almost a perfect one-shot. o3 missed (or did not know it had to) @annotate
+  a function that was supposed to be client-side only; it fixed the issue on its
+  own after running a build. I recall the error message not mentioning _how_ to
+  fix the issue, but thankfully the LLM knew the proper annotation.
+</p>
+
+<p>Below you can see a video of two clients in sync:</p>
+
+<video controls width={400} height={400} autoPlay playsInline muted loop>
+  <source src="/blog/vibecoding-mc/project-management.webm" type="video/webm" />
+</video>
+
+There are also slash commands you can use instead of interacting with the GUI.
+
+</details>}
+
+## Learnings for vibecoding
+
+- o3 is a _great_ agentic model. It's price reduction makes it cheaper than Sonnet 4.
+- Sonnet did a good job when I tried it too. But I felt like it generally did a worse job using tools to e.g. explore the code base. The exception is when inside Claude Code, Sonnet did great work.
+- Write rules files when you see common mistakes. I noticed all models kept grepping the codebase and getting back a lot of built/unnecessary files, which unnecesarily takes up context. Adding rules files (files automatically injected into the context) lets you address these issues.
+- OpenAI Codex as a CLI is good-not-great. I didn't try their web offering, which is probably better, but I'm not sure you can setup an entire environment for it to have a real agentic feedback loop.
+- I could have made every mod in its entirety with any of the tools I tried. But perhaps obviously Cursor + o3 was by far the most effective combo for me as a developer.
+
+## Learnings for developing
+
+- Errors need to suggest fixes.
+  - If there is no one clear fix, they can suggest multiple solutions, or explain in plain-text why the issue occurred. They should do that second part anyways
+- More (AI) tooling is needed around targeting specific package versions.
+  - Minecraft is tricky because it has many versions with many breaking changes, and the LLMs are trained across all the versions. I think one reason I had a lot of success is I was targeting a fairly old version of Minecraft known for its mods (1.12.2).
+  - I've had this same issue at work with npm packages and libraries. Tools/MCPs like [Context7](https://context7.com/) can help substantially with this.
+
+Both mods (total) cost me about $8 in usage.

@@ -1,0 +1,91 @@
+@font-face {
+  font-family: 'Minecraft';
+  src: url('/fonts/MinecraftRegular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Minecraft';
+  src: url('/fonts/MinecraftBold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+.container:global {
+  --font-minecraft: 'Minecraft', var(--font-mono);
+}
+
+/* CSS variables allow dynamic sizing via inline styles */
+.container {
+  /* Fallbacks when JS doesn't inject the inline CSS variables */
+  --slot-size: 36px;
+  --columns: 9;
+
+  padding: 10px;
+  display: grid;
+  width: 100%;
+  gap: 1px;
+  justify-content: center; /* center grid within parent */
+
+  /* Desktop / larger screens: fixed column count (CSS var can be overridden inline) */
+  grid-template-columns: repeat(var(--columns, 9), var(--slot-size, 36px));
+}
+
+/* Container is full-width so React logic can compute how many columns fit. */
+
+.slot {
+  width: var(--slot-size);
+  height: var(--slot-size);
+  background-color: var(--light-gray);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* smooth outline / lift effect */
+  transition: outline-color 120ms ease, transform 120ms ease;
+}
+
+.slot:hover {
+  outline: 1px solid var(--gray);
+  transform: translateY(-2px);
+  cursor: pointer;
+}
+
+.tooltip {
+  font-family: var(--font-minecraft);
+  position: absolute;
+  z-index: 10;
+  background: #1a0f1e; /* Dark purple-ish tooltip background */
+  border: 1px solid var(--gray);
+  padding: 6px 8px;
+  color: #fff;
+  font-size: 16px;
+  pointer-events: none;
+  white-space: nowrap;
+  /* Center horizontally and appear above the slot */
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -110%);
+  outline: 1px solid var(--light-gray);
+  opacity: 0;
+  animation: fadeIn 120ms ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -90%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -110%) scale(1);
+  }
+}
+
+.mod {
+  color: #a989ff; /* Mod name color */
+  font-size: 12px;
+} 

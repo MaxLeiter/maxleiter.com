@@ -15,8 +15,15 @@
   font-weight: 500;
 }
 
-.wrapper .title {
+.title {
   margin-top: 1rem;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+}
+
+.description {
+  margin-bottom: 1rem;
+  color: var(--gray);
 }
 
 /*.header {
