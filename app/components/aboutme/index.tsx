@@ -5,7 +5,7 @@ const AboutMe = () => (
     <p>
       I&apos;m currently building{' '}
       <Link href="https://v0.app" style={{ fontFamily: 'monospace' }} external>
-        v0.app
+        v0
       </Link>{' '}
       at{' '}
       <Link href="https://vercel.com" external>
