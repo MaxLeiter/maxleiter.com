@@ -17,7 +17,7 @@ const Projects: Project[] = [
       'A self-hostable and open-source alternative to GitHub Gist and Pastebin.',
     href: 'https://github.com/maxleiter/drift',
     role: 'Creator',
-    years: ['2022', 'present'],
+    years: ['2022', '2023'],
     type: 'project',
   },
   {
