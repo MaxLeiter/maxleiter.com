@@ -1,0 +1,63 @@
+---
+title: Formatting code should be unnecessary
+description: and we knew this back in the 80s
+slug: formatting
+date: Sep 6, 2025
+---
+
+I had a (maybe slightly overqualified) computer science teacher back in highschool, Mr. Paige. 
+He worked on the [Ada](https://en.wikipedia.org/wiki/Ada_\(programming_language\)) compiler and
+has been programming since the early 80s.
+
+One day I complained about linter tooling that
+was driving me nuts. I said something to the effect of, "it's 2016, how are we still dealing with this sort of thing?"
+
+Turns out, that problem was solved four decades ago (well, three at that point). Back when he was working on Ada,
+they didn't store text sources at all &mdash; they used a structured <abbr title="Intermediate representation">IR</abbr> called [DIANA](https://archive.org/details/dianaintermediat0000unse/page/n7/mode/2up).
+Everyone had their own pretty-printing settings for viewing it however they wanted.
+
+We've been debating some linter settings at work recently and I keep thinking back to 
+Mr. Paige. It's 2025, how are we still dealing with this sort of thing?
+
+---
+
+Well, to answer that it would help to know what we're missing.
+
+I believe he was working with the [Rational R1000](https://en.wikipedia.org/wiki/Rational_R1000), of which there isn't a ton of info 
+(like all things Ada, it was used by the DoD):
+
+![](/blog/formatting/rational.jpg?w=400)
+
+The R1000 had incremental compilation, semantic analysis, version control, and first-class debugging all built-in. It was a workstation similar to the [Xerox Alto](https://en.wikipedia.org/wiki/Xerox_Alto) but using Ada instead of Smalltalk.
+
+<Note title="Fun Fact:">
+The R1000 is fairly undocumented and very rare, but it was used in the writing of software
+for the ISS, the F-22, presumably countless other government projects, and led to the [birth of UML by Grady Booch](https://en.wikipedia.org/wiki/Grady_Booch#Booch_method).
+</Note>
+
+DIANA (Descriptive Intermediate Attributed Notation for Ada) was a key component of Ada that enabled a lot of the more advanced features.
+
+![A diagram scanned from a type-written page. It shows a diagram of Ada Source => Syntax & Semantics => DIANA => Normalization phase => Middle End => simple IR optimization phase => IR => Code Gen. => Executable Image](/blog/formatting/ada.png)
+<figcaption>
+Taken from [Experiences with Code Generation (1984)](https://www2.eecs.berkeley.edu/Pubs/TechRpts/1985/CSD-85-249.pdf)
+</figcaption>
+
+Instead of storing plain-text source code, the R1000 wrote DIANA.
+The compiler and the IDE built into the machine both understood DIANA too, so you could view the source however you wanted. 
+Spaces vs. tabs didn't matter because neither affect the semantics and the editor on the system let you modify the program tree directly (known today as [projectional editing](https://martinfowler.com/bliki/ProjectionalEditing.html)). 
+
+Grady Booch [summarizes it well](https://web.archive.org/web/20160304051102/https://www.ibm.com/developerworks/community/blogs/gradybooch/entry/rational_anniversary?lang=en#pagePlaceBar):
+> R1000 was effectively a DIANA machine. We didn't store source code: source code was simply a pretty-printing of the DIANA tree. 
+
+Imagine that. 
+No wasted time due to formatting discussions or fighting linters,
+without forcing everyone into the same editor setup (looking at you, eslint-config-airbnb).
+
+And there were other benefits:
+
+> Using DIANA with hardware acceleration made it possible to do incremental compilation (unheard of at the time, for strongly typed languages), easy refactoring (though that word had not yet been invented), and incredibly fast integration (essential for the large systems that we being built with Ada).
+
+Today, we don’t need to worry about hardware-accelerated compilation (hopefully),
+and we have better tools for refactoring (cc Anthropic). With formatting, we regressed. 
+I'm not necessarily advocating for everyone to use projectional editing and a live environment,
+but surely we can figure out something that fits into todays programming paradigms.

@@ -5,7 +5,7 @@ import { unstable_cache } from 'next/cache'
 const Projects: Project[] = [
   {
     title: 'X11 on iOS',
-    description: 'Patched, compiled, and packaged X11 for iOS devices.',
+    description: 'Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.',
     href: '/blog/X11',
     role: 'Creator',
     years: ['2020'],
@@ -14,7 +14,7 @@ const Projects: Project[] = [
   {
     title: 'Drift',
     description:
-      'A self-hostable and open-source alternative to GitHub Gist and Pastebin.',
+      'A self-hostable and open-source alternative to GitHub Gist and Pastebin. Made as a testbed for the Next.js App Router and React Server Components.',
     href: 'https://github.com/maxleiter/drift',
     role: 'Creator',
     years: ['2022', '2023'],
@@ -26,38 +26,30 @@ const Projects: Project[] = [
       'Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.',
     href: 'https://github.com/thelounge/thelounge',
     role: 'Maintainer',
-    years: ['2016', 'present'],
+    years: ['2016', '2024'],
     type: 'project',
   },
   {
     title: 'SortableJS-vue3',
-    description: "A TypeScript wrapper for SortableJS that's built for Vue 3.",
+    description: "A TypeScript wrapper for SortableJS built for Vue 3.",
     href: 'https://github.com/maxleiter/sortablejs-vue3/',
     role: 'Creator',
-    years: ['2022 - present'],
+    years: ['2022', 'present'],
     type: 'project',
   },
   {
     title: 'KnightOS',
     description:
-      'Open-source unix-like operating system for z80-based calculators written entirely in z80 asm.',
+      'Open-source unix-like operating system for z80-based calculators written entirely in z80 asm. I wrote a significant portion of the libc and contribued to system libraries.',
     href: 'https://github.com/knightos/knightos',
     role: 'Maintainer',
     years: ['2017', 'present'],
     type: 'project',
   },
   {
-    title: 'thelounge-bot',
-    description: "A helper IRC bot for The Lounge's IRC channel.",
-    href: 'https://github.com/thelounge/thelounge-bot',
-    role: 'Creator',
-    years: ['2016', '2021'],
-    type: 'project',
-  },
-  {
     title: 'MSHW0184 driver for Linux kernel',
     description:
-      'Support for the MSHW0184 device (used in Microsoft Surfaces) in the Linux kernel.',
+      'I finally found an excuse to contribute to the Linux kernel',
     href: 'blog/MSHW0184',
     role: 'Creator',
     years: ['2021'],
@@ -66,55 +58,45 @@ const Projects: Project[] = [
   {
     title: 'jsonTree',
     description:
-      'A 2kb JavaScript library for generating HTML trees from JSON.',
+      'My first open-source project',
     href: 'https://github.com/maxleiter/jsontree',
     role: 'Creator',
     years: ['2015'],
     type: 'project',
   },
   {
-    title: 'Annie',
-    description:
-      "Annie is the official app for the University of Southern California's Annenberg Media Center. Annie placed second place in the AEJMC Best of Digital Competition in August 2020.",
-    href: 'https://www.uscannenbergmedia.com',
-    role: 'Past developer',
-    years: ['2019', '2020'],
-    type: 'project',
-  },
-  {
     title: 'easyarty.com',
     description:
-      'A web app for calculating artillery distances in the video game Hell Let Loose.',
+      'A tiny tool I made for a video game I like but it now gets 250,000+ visitors a year',
     href: 'https://easyarty.com',
     role: 'Creator',
     years: ['2021'],
     type: 'project',
   },
   {
-    title: 'Vercel Raycast',
-    description: 'A Raycast extension for managing Vercel via its REST API.',
-    href: 'https://www.raycast.com/vercel/vercast',
-    role: 'Creator',
-    years: ['2022'],
+    title: 'v0',
+    description: 'I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.',
+    href: 'https://v0.app',
+    role: 'Developer',
+    years: ['2023', 'present'],
     type: 'project',
   },
   {
-    title: 'gitkv',
-    description: 'A simple key-value store using Git as the backend.',
-    href: 'https://github.com/maxleiter/gitkv',
-    role: 'Creator',
-    years: ['2024'],
+    title: 'AI SDK',
+    description: 'I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK. I implemented the Stream Data protocol for multiplexing streams to the client, added server-side function calling support, and generally helped maintain the library.',
+    href: 'https://github.com/vercel/ai',
+    role: 'Developer',
+    years: ['2023', '2024'],
     type: 'project',
   },
   {
-    title: 'TileFinder',
-    description:
-      'Vibe-coded mod for finding nearby tile entities in your world',
-    href: 'https://github.com/MaxLeiter/TileFinder',
-    role: 'Creator',
-    years: ['2025'],
+    title: 'Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening',
+    description: 'I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimtae vertical cup to disk ratios from retinal images.',
+    href: 'https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362',
+    role: '',
     type: 'project',
-  },
+    years: ['2017'],
+  }
 ]
 
 export const getProjects = cache(async (): Promise<Project[]> => {
@@ -140,7 +122,7 @@ export const getProjects = cache(async (): Promise<Project[]> => {
             const fetchUrl =
               process.env.NODE_ENV === 'production'
                 ? `https://api.github.com/repos/${user}/${repo}`
-                : 'http://localhost:3005/mock-stars-response.json'
+                : 'http://localhost:3000/mock-stars-response.json'
             const { stargazers_count, message } = await (
               await fetch(fetchUrl, {
                 headers: {

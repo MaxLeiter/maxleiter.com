@@ -1,4 +1,5 @@
 import ProjectList from '@components/projects'
+import { ProjectsTimeline } from '@components/timeline/timeline'
 import { getProjects } from '@lib/projects'
 
 export const metadata = {
@@ -11,8 +12,10 @@ export const metadata = {
 
 const Projects = async () => {
   const projects = await getProjects()
+  projects.sort((a, b) => parseInt(b.years[0]) - parseInt(a.years[0]))
+
   return (
-    <ProjectList showYears={true} projects={projects} seeMore={false} />
+    <ProjectsTimeline  projects={projects}  />
   )
 }
 

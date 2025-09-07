@@ -16,6 +16,15 @@ article > * + * {
   margin-top: 1em;
 }
 
+.footnotes {
+  margin-top: var(--gap);
+  padding-top: var(--gap-half);
+}
+
+.footnotes * {
+  font-size: 0.9rem;
+}
+
 article p {
   color: var(--article-color);
 }
@@ -68,9 +77,20 @@ article aside,
 article blockquote {
   border: 1px solid var(--lighter-gray);
   background: var(--lightest-gray);
-  padding: var(--gap-half);
+  padding: var(--gap);
   color: var(--article-color);
   margin: var(--gap-half) 0;
+  font-style: normal;
+}
+
+article figcaption > p {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--gray);
+}
+
+article blockquote p {
+  margin: var(--gap-half);
 }
 
 /* Code Snippets */

@@ -1,0 +1,114 @@
+.container {
+    max-width: 42rem;
+    margin: 0 auto;
+}
+
+.timeline {
+    position: relative;
+}
+
+.projectList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+}
+
+.projectItem {
+    position: relative;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.headerGrid {
+    display: grid;
+    grid-template-columns: 5rem 1fr; /* Fixed width for the year column */
+    align-items: center;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .headerGrid {
+        grid-template-columns: 1fr; 
+        grid-template-rows: auto auto; 
+    }
+
+    .year {
+        margin-bottom: 0.25rem;
+    }
+}
+
+.year {
+    width: 5rem; 
+    font-size: 0.875rem;
+    color: var(--light-gray);
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.titleContainer {
+    flex: 1;
+    min-width: 0;
+}
+
+.titleContainer>h3 {
+    margin: 0;
+    padding: 0;
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+.titleBig {
+    font-size: 1rem;
+}
+
+.titleSmall {
+    font-size: 0.875rem;
+}
+
+.titleLink {
+    color: var(--fg);
+    text-decoration: none;
+    font-weight: 500;
+    line-height: 1.25;
+    word-break: break-word;
+    display: inline-block;
+    max-width: min(100%, 80ch);
+}
+
+.titleLink:hover {
+    text-decoration: underline;
+}
+
+.badges {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.description {
+    font-size: 0.875rem;
+    color: var(--comment);
+    line-height: 1.625;
+    padding: 0;
+    margin-top: 0;
+}
+
+.starBadge {
+    display: flex;
+    gap: 0.25rem;
+    cursor: pointer;
+}
+
+.starBadge:hover {
+    background: var(--light-gray);
+    transition: background 0.2s ease-in;
+}
