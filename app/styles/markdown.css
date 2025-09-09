@@ -136,6 +136,9 @@ article div + pre {
 
 article a  {
   text-decoration: none;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 article a:hover {
