@@ -5,7 +5,8 @@ import { unstable_cache } from 'next/cache'
 const Projects: Project[] = [
   {
     title: 'X11 on iOS',
-    description: 'Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.',
+    description:
+      'Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.',
     href: '/blog/X11',
     role: 'Creator',
     years: ['2020'],
@@ -31,7 +32,7 @@ const Projects: Project[] = [
   },
   {
     title: 'SortableJS-vue3',
-    description: "A TypeScript wrapper for SortableJS built for Vue 3.",
+    description: 'A TypeScript wrapper for SortableJS built for Vue 3.',
     href: 'https://github.com/maxleiter/sortablejs-vue3/',
     role: 'Creator',
     years: ['2022', 'present'],
@@ -48,8 +49,7 @@ const Projects: Project[] = [
   },
   {
     title: 'MSHW0184 driver for Linux kernel',
-    description:
-      'I finally found an excuse to contribute to the Linux kernel',
+    description: 'I finally found an excuse to contribute to the Linux kernel',
     href: 'blog/MSHW0184',
     role: 'Creator',
     years: ['2021'],
@@ -57,8 +57,7 @@ const Projects: Project[] = [
   },
   {
     title: 'jsonTree',
-    description:
-      'My first open-source project',
+    description: 'My first open-source project',
     href: 'https://github.com/maxleiter/jsontree',
     role: 'Creator',
     years: ['2015'],
@@ -75,7 +74,8 @@ const Projects: Project[] = [
   },
   {
     title: 'v0',
-    description: 'I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.',
+    description:
+      'I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.',
     href: 'https://v0.app',
     role: 'Developer',
     years: ['2023', 'present'],
@@ -83,20 +83,23 @@ const Projects: Project[] = [
   },
   {
     title: 'AI SDK',
-    description: 'I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK. I implemented the Stream Data protocol for multiplexing streams to the client, added server-side function calling support, and generally helped maintain the library.',
+    description:
+      'I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK. I implemented the Stream Data protocol for multiplexing streams to the client, added server-side function calling support, and generally helped maintain the library.',
     href: 'https://github.com/vercel/ai',
     role: 'Developer',
     years: ['2023', '2024'],
     type: 'project',
   },
   {
-    title: 'Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening',
-    description: 'I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimtae vertical cup to disk ratios from retinal images.',
+    title:
+      'Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening',
+    description:
+      'I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimate vertical cup to disk ratios from retinal images.',
     href: 'https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362',
     role: '',
     type: 'project',
     years: ['2017'],
-  }
+  },
 ]
 
 export const getProjects = cache(async (): Promise<Project[]> => {
