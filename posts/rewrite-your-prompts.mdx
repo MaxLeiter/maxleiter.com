@@ -42,7 +42,7 @@ While OpenAI hasn't said anything as explicit as that (that I have ever seen), i
 Models don't treat every part of a prompt equally, in what is known as position bias. Some models weigh the beginning more, others the end, and as you'll see below it's not even entirely consistent for the same model depending on input.
 
 I first realized this back in September 2023 when I was working with a fine-tuned open-source model.
-It responded best when our RAG examples were reversed, with the most relevant examples at the end of the list. OpenAI and Anthropic models performed vastly better when the most relevant example was first.
+It responded best when our RAG examples were reversed, with the most relevant examples at the end of the list. OpenAI and Anthropic models performed better when the most relevant example was first.
 
 You can see the difference between Qwen and Llama models use of context (across different languages) here:
 
@@ -63,12 +63,12 @@ Some are quite obvious, [like Chinese models being censored to avoid Tiananmen S
 Training data, RLHF, and other post-training adjustments all contribute to this "intrinsic" behavior.
 
 The key point is that you're often prompting against these biases.
-You'll add "Be concise" or "DO NOT BE LAZY" to try and steer the model because you're countering the model's defaults. But since the defaults can and do change,
+You'll add "Be concise" or "DO NOT BE LAZY" to try and steer the model because you're fighting the model's defaults. But since the defaults can and do change,
 your prompts can suddenly be redundant, increasing the cost and decreasing the accuracy (see: Reason #2) of its responses.
 
 ### Reason #3a: Work with the model biases, not against
 
-Another note on model biases is that you should lean into them instead of fighting against them.
+Another note on model biases is that you should lean into them.
 The tricky part with this is the only way to figure out a model's defaults is to have actual usage and careful monitoring (or have evals that let you spot it).
 
 Instead of forcing the model to behave in ways it ignores,
