@@ -1,0 +1,76 @@
+---
+title: You should be rewriting your prompts
+description: We talk about overfitting models but never overfitting prompts to models
+slug: rewrite-your-prompts
+date: Sept 14, 2025
+---
+
+I've been "lucky" to work with a lot of different LLMs over the past few years (there is, in fact, a reason we made the [AI SDK](https://ai-sdk.dev/)).
+When a new model is publically released there's a good chance we've already tried it and evalulated it for use with v0 within a few hours.
+
+Our results did not always improve as expected even if we were using a newer and stricly better model[^1].
+
+## Reason #1: Prompt Format
+
+An early obvious example of where differences between models come into play is markdown vs XML.
+
+Anecdatally, OpenAI models (especially older ones) were _great_ with markdown prompts. It makes sense &mdash; there's a ton of markdown out there on the internet and it doesn't involve a crazy number of tokens or a special DSL.
+
+But when Claude 3.5 hit the scene, [Anthropic used XML in their system prompt](https://docs.anthropic.com/en/release-notes/system-prompts#claude-sonnet-3-5).
+Trying to use the same prompt with gpt-4 did not work nearly as well.
+
+In ["Building with Anthropic Claude: Prompt Workshop with Zack Witten"](https://www.youtube.com/watch?v=hkhDdcM5V94) from August 2024, Anthropic employee Zack Witten answers the question "Why XML and not Markdown?":
+
+> Another great question. Claude was trained with a lot of XML in its training data and so it's sort of seen more of that than it's seen of other formats, so it just works a little bit better
+
+While OpenAI hasn't said anything as explicit as that (that I have ever seen), it seems like every system prompt they've used for ChatGPT has been markdown based, and all of their original prompting tutorials are markdown based as well.
+
+## Reason #2: Position Bias (AKA location matters)
+
+I first realized you should be rewriting prompts back in August 2023.
+I was messing around with a finetuned open-source model and it was performing _really_ poorly.
+The general format was:
+
+```
+<Some system prompt>
+<Example 1>
+<Example 2>
+...
+<Example N>
+...
+```
+
+For OpenAI and Anthropic models, we had Example 1 be the highest ranking example (based on similarity).
+But for this finetune, we had to reverse the order of the examples as that model "paid more attention" to the _end_ of the prompt.
+This is known as "position bias", and it's been well researched
+
+You can see the difference between Qwen and Llama models use of context (across languages) here:
+
+![Table comparing Qwen and Llama models' accuracy across languages (English, Russian, German, Hindi, Vietnamese) for QA tasks, showing position bias by context placement (Top, Middle, Bottom). Each cell reports accuracy under three instruction strategies (Aligned, All-Zero, No-Scores), with means. Bolded numbers mark best performance. Overall, Qwen is more consistent, with slightly higher bottom-position scores, while Llama shows stronger top bias but more variability, especially in German and Hindi.](/blog/prompts/qwen-llama.png)
+
+<figcaption>
+  From "[Position of Uncertainty: A Cross-Linguistic Study of position bias in
+  Large Language Models](https://arxiv.org/pdf/2505.16134)" (2025)
+</figcaption>
+
+From the chart, Qwen performs better when the relevant context is towards the end, while Llama behaves the opposite way.
+As you can see, there isn't a one-size-fits-all "best" position in context; the above paper found differences depending on the language as well.
+
+## Reason #3: Model Biases
+
+Even if you get the format and position right, different models have different biases.
+Some are quite obvious, [like Chinese models being censored to avoid Tianamen Square](https://www.abc.net.au/news/2025-06-04/beijing-ai-and-censors-erase-tiananmen-square-massacre/105370772), but others are more subtle and show up in how it responds and makes decisions.
+Training data, RLHF, and other post-training adjustments all contribute to this "intrinsic" behavior.
+
+The key point is that you're often prompting against these biases.
+You'll add "Be concise" or "DO NOT BE LAZY" to try and steer the model because you're countering the model's defaults. But since the defaults can and do change,
+your prompts can suddenly be redundant, increasing your cost and decreasing the accuracy (see: Reason #2) of its responses.
+
+In other words, prompting isn't just about telling the model what to do, but about aligning (or fighting) with the models defaults, and every model has its own defaults.
+
+## Conclusion
+
+Today, prompts overfit to models just like models overfit to data, and too many people are just switching their models without adjusting their prompts.
+If you're switching models, you should be rewriting your prompts. I think this is why gpt-5 was so hated initially - everyone was using their Claude 4 prompts.
+
+[^1]: "strictly" is a scary word to use here, but I'd argue e.g. gpt-4 is strictly better than gpt-3.5 (except for [chess](https://dynomight.net/chess/), maybe.)
