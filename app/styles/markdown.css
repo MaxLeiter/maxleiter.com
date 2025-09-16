@@ -134,7 +134,7 @@ article div + pre {
   text-decoration: none;
 }
 
-article a  {
+article a {
   text-decoration: none;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -176,4 +176,8 @@ article details {
   .header-link::after {
     opacity: 0.5;
   }
+}
+
+.react-tweet-theme {
+  max-height: 600px;
 }
