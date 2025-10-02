@@ -13,7 +13,7 @@ const About = () => {
     <article>
       <p>
         This site is built on the{' '}
-        <Link external href="https://nextjs.com">
+        <Link external href="https://nextjs.org">
           Next.js 13
         </Link>{' '}
         App Directory and is deployed via{' '}
