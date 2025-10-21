@@ -1,36 +1,16 @@
-import Socials from '@components/socials'
-import ProjectList from '@components/projects'
+import { Hero } from '@components/hero'
+import { PostsSection } from '@components/posts-section'
+import { ProjectsSection } from '@components/projects-section'
 import Link from '@components/link'
-import AboutMe from '@components/aboutme'
-import { getProjects } from '@lib/projects'
 import styles from './page.module.css'
 import TimeOfDay from '../../timer'
-import { ContentListRSC } from '@components/content-list'
-
-const PROJECT_COUNT = 3
 
 export default async function HomePage() {
-  const projects = await getProjects()
-
   return (
-    <>
-      <AboutMe />
-      <Socials />
-      <h2 style={{ padding: 'var(--gap-quarter) 0' }}>My projects</h2>
-      <ProjectList
-        showYears={false}
-        projects={(projects).slice(0, PROJECT_COUNT)}
-        seeMore={true}
-      />
-      {/* <PostsAndDevNotes PostList={<Suspense>
-        <PostListRSC paginate={false} />
-      </Suspense>}
-        NoteList={<Suspense>
-          <NotesListRSC />
-        </Suspense>} */}
-      {/* /> */}
-      <h2 style={{ padding: 'var(--gap-quarter) 0' }}> Posts and other half-baked thoughts</h2>
-      <ContentListRSC />
+    <div className={styles.homePage}>
+      <Hero />
+      <ProjectsSection />
+      <PostsSection />
       <footer className={styles.footer}>
         <span>
           <Link href="/about">About this site</Link>
@@ -49,6 +29,6 @@ export default async function HomePage() {
         </span>
         <TimeOfDay />
       </footer>
-    </>
+    </div>
   )
 }

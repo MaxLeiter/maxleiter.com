@@ -7,10 +7,7 @@
   text-decoration: none !important;
   color: var(--fg) !important;
   outline: none;
-  padding-top: var(--gap);
-  padding-bottom: var(--gap-double);
-  padding-left: var(--gap);
-  padding-right: var(--gap);
+  padding: var(--gap);
   transition: all 0.1s cubic-bezier(0.01, 0.88, 0.93, 0.07);
   border-radius: var(--radius);
   will-change: transform, opacity;

@@ -1,5 +1,5 @@
 .container {
-    max-width: 42rem;
+    max-width: var(--main-content);
     margin: 0 auto;
 }
 
@@ -8,33 +8,44 @@
 }
 
 .projectList {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    border-left: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
 }
 
 .projectItem {
     position: relative;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--gap-half) var(--gap);
+    transition: background-color 0.2s ease;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.projectItem:hover {
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 .content {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--gap-quarter);
 }
 
 .header {
     display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap);
 }
 
 .headerGrid {
-    display: grid;
-    grid-template-columns: 5rem 1fr; /* Fixed width for the year column */
+    display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: var(--gap);
+    flex: 1;
 }
 
 @media (max-width: 768px) {
@@ -49,30 +60,29 @@
 }
 
 .year {
-    width: 5rem; 
-    font-size: 0.875rem;
-    color: var(--light-gray);
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.75rem;
+    color: var(--gray);
+    font-family: var(--font-mono);
 }
 
 .titleContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     flex: 1;
+    flex-wrap: wrap;
     min-width: 0;
 }
 
 .titleContainer>h3 {
     margin: 0;
     padding: 0;
-    font-weight: 500;
+    font-weight: bold;
     line-height: 1.25;
-}
-
-.titleBig {
     font-size: 1rem;
-}
-
-.titleSmall {
-    font-size: 0.875rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    min-width: 0;
 }
 
 .titleLink {
@@ -80,9 +90,9 @@
     text-decoration: none;
     font-weight: 500;
     line-height: 1.25;
-    word-break: break-word;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
     display: inline-block;
-    max-width: min(100%, 80ch);
 }
 
 .titleLink:hover {
@@ -91,15 +101,16 @@
 
 .badges {
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .description {
     font-size: 0.875rem;
-    color: var(--comment);
-    line-height: 1.625;
+    color: var(--gray);
+    line-height: 1.6;
     padding: 0;
-    margin-top: 0;
+    margin: 0;
 }
 
 .starBadge {
