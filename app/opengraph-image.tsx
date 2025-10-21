@@ -1,4 +1,6 @@
 import { ImageResponse } from "next/og"
+import fs from 'fs/promises'
+import path from 'path'
 
 export const size = { width: 1200, height: 600 }
 // TODO: update to support alt once nextjs has a solution for params
@@ -7,9 +9,9 @@ export const contentType = 'image/png'
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async function (): Promise<ImageResponse> {
-  const fontData = await fetch(
-    new URL('./fonts/Inter-Medium.ttf', import.meta.url)
-  ).then((res) => res.arrayBuffer())
+  const fontData = await fs.readFile(
+    path.join(process.cwd(), 'app', 'fonts', 'Inter-Medium.ttf')
+  )
 
   return new ImageResponse(
     (
