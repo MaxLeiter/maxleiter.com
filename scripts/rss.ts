@@ -38,8 +38,10 @@ const combined: (Note | Post)[] = [...posts, ...notes].sort(
 
 const renderer = new marked.Renderer()
 
-renderer.link = (href, _, text) =>
-  `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`
+renderer.link = ({ href, tokens }) => {
+  const text = tokens[0]?.raw || ''
+  return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`
+}
 
 marked.setOptions({
   gfm: true,
