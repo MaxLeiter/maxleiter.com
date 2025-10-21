@@ -72,9 +72,9 @@ export function ProjectsTimeline({ projects }: TimelineVariation3Props) {
                                             <div className={styles.badges}>
                                                 {project.role && <Badge>{project.role}</Badge>}
                                                 {project.stars !== undefined && (
-                                                    <a href={project.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                                                    <a href={project.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }} aria-label={`${project.stars.toLocaleString()} GitHub stars`}>
                                                         <Badge className={styles.starBadge}>
-                                                            <Star size={14} />
+                                                            <Star size={14} aria-hidden="true" />
                                                             {project.stars.toLocaleString()}
                                                         </Badge>
                                                     </a>

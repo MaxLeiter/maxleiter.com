@@ -42,7 +42,7 @@ export async function PostsSection() {
               <Link key={item.title + item.date} href={href} className={styles.postLink}>
                 <article className={styles.post} data-last={index === content.length - 1}>
                   <div className={styles.postMeta}>
-                    <time>{formattedDate}</time>
+                    <time dateTime={item.date}>{formattedDate}</time>
                     <span>/</span>
                     <span>{isPost ? 'Post' : 'Note'}</span>
                   </div>

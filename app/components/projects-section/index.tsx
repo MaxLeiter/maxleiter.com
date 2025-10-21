@@ -33,8 +33,8 @@ export async function ProjectsSection() {
                       <div className={styles.projectMeta}>
                         <span className={styles.role}>{project.role}</span>
                         {project.stars && (
-                          <span className={styles.stars}>
-                            <Star width={12} height={12} />
+                          <span className={styles.stars} aria-label={`${project.stars.toLocaleString()} GitHub stars`}>
+                            <Star width={12} height={12} aria-hidden="true" />
                             {project.stars.toLocaleString()}
                           </span>
                         )}
@@ -50,6 +50,7 @@ export async function ProjectsSection() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
                       <line x1="7" y1="17" x2="17" y2="7"></line>
                       <polyline points="7 7 17 7 17 17"></polyline>
@@ -62,7 +63,7 @@ export async function ProjectsSection() {
           })}
         </div>
         <p className={styles.seeMore}>
-            See some more on <a href="/projects">this page</a>
+            See some more on <Link href="/projects">this page</Link>
         </p>
 
         </div>
