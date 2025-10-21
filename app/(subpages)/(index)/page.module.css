@@ -1,19 +1,25 @@
-@media screen and (max-width: 768px) {
-  .secondHeading {
-    margin-top: var(--gap-half);
-  }
+.homePage {
+  width: 100vw;
+  margin-left: calc(-1 * var(--gap));
+  margin-right: calc(-1 * var(--gap));
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
-
-
 
 .footer {
   margin-top: var(--small-gap);
+  max-width: var(--main-content);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
   display: flex;
   justify-content: space-between;
   color: var(--gray);
 
   .gitSha {
-    /* before, add an mdash */
     &:before {
       content: ' — ';
     }
@@ -21,5 +27,11 @@
     @media (max-width: 600px) {
       display: none;
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 0 calc(var(--gap) * 1.5);
   }
 }

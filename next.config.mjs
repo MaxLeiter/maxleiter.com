@@ -10,7 +10,6 @@ const nextConfig = {
   reactStrictMode: true,
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],
   experimental: {
-    optimizeCss: true,
     mdxRs: true,
   },
   typescript: {

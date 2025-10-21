@@ -60,7 +60,7 @@ export function ProjectsTimeline({ projects }: TimelineVariation3Props) {
                                             {project.hasSpan ? `${project.startYear}-${project.endYear}` : project.years[0]}
                                         </div>
                                         <div className={styles.titleContainer}>
-                                            <h3 className={project.description ? styles.titleBig : styles.titleSmall}>
+                                            <h3>
                                                 {project.href ? (
                                                     <a href={project.href} className={styles.titleLink} target="_blank" rel="noopener noreferrer">
                                                         {project.title}
@@ -69,18 +69,18 @@ export function ProjectsTimeline({ projects }: TimelineVariation3Props) {
                                                     project.title
                                                 )}
                                             </h3>
+                                            <div className={styles.badges}>
+                                                {project.role && <Badge>{project.role}</Badge>}
+                                                {project.stars !== undefined && (
+                                                    <a href={project.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                                                        <Badge className={styles.starBadge}>
+                                                            <Star size={14} />
+                                                            {project.stars.toLocaleString()}
+                                                        </Badge>
+                                                    </a>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className={styles.badges}>
-                                        {project.role && <Badge>{project.role}</Badge>}
-                                        {project.stars !== undefined && (
-                                            <a href={project.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                                                <Badge className={styles.starBadge}>
-                                                    <Star size={14} />
-                                                    {project.stars}
-                                                </Badge>
-                                            </a>
-                                        )}
                                     </div>
                                 </div>
 

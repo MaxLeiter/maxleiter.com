@@ -7,6 +7,19 @@ import { unstable_cache } from 'next/cache'
 
 const thirdPartyPosts: Post[] = [
   {
+    title: 'Introducing the v0 composite model family',
+    description:
+      'Introducing the v0 composite model family.',
+    body: '',
+    date: '2025-06-01T10:00:00.000Z',
+    slug: '',
+    tags: [],
+    lastModified: 0,
+    isThirdParty: true,
+    href: 'https://vercel.com/blog/v0-composite-model-family',
+    type: 'post',
+  },
+  {
     title: 'Introducing AI SDK 3.0 with Generative UI support',
     description:
       'Stream React Components from LLMs to deliver richer user experiences.',
@@ -43,6 +56,19 @@ const thirdPartyPosts: Post[] = [
     lastModified: 0,
     isThirdParty: true,
     href: 'https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site',
+    type: 'post',
+  },
+  {
+    title: 'New edge dev infrastructure',
+    description:
+      'New edge dev infrastructure.',
+    body: '',
+    date: '2020-07-21T10:00:00.000Z',
+    slug: '',
+    tags: [],
+    lastModified: 0,
+    isThirdParty: true,
+    href: 'https://vercel.com/blog/new-edge-dev-infrastructure',
     type: 'post',
   },
 ]
