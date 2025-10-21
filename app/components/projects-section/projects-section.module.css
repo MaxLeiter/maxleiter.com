@@ -27,7 +27,7 @@
   font-size: clamp(1.75rem, 4vw, 3rem);
   font-weight: bold;
   letter-spacing: -0.05em;
-  margin-bottom: calc(var(--gap) * 4);
+  margin-bottom: var(--gap-double);
 }
 
 .projectsGrid {
@@ -108,10 +108,6 @@
 .arrow {
   flex-shrink: 0;
   transition: transform 0.2s ease;
-}
-
-.project:hover .arrow {
-  transform: translate(4px, -4px);
 }
 
 .projectDescription {
