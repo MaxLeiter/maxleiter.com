@@ -31,7 +31,7 @@
 }
 
 .postsContainer {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .postLink {
@@ -42,7 +42,7 @@
 
 .post {
   padding: var(--gap-half) var(--gap);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s ease;
   overflow: hidden;
   min-width: 0;

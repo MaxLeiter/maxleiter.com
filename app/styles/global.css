@@ -38,6 +38,7 @@
   --link: #579dff;
   --green: #2ecc71;
   --red: #e74c3c;
+  --border-color: rgba(255, 255, 255, 0.1);
 
   /* Syntax Highlighting */
   --token: #999;
@@ -91,6 +92,7 @@
   --gray-alpha: rgba(19, 20, 21, 0.5);
   --selection: rgba(0, 0, 0, 0.99);
   --link: #6669ff;
+  --border-color: rgba(0, 0, 0, 0.1);
 
   --token: #666;
   --comment: #999;

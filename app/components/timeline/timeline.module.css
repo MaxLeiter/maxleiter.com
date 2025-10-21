@@ -10,14 +10,14 @@
 .projectList {
     display: grid;
     grid-template-columns: 1fr;
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
 }
 
 .projectItem {
     position: relative;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
     padding: var(--gap-half) var(--gap);
     transition: background-color 0.2s ease;
     overflow: hidden;
