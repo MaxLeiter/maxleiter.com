@@ -58,7 +58,6 @@ export function TerminalContent({
         'cat',
         'lolcat',
         'crt',
-        'konami',
         'clear',
         'exit',
       ]
@@ -110,10 +109,7 @@ export function TerminalContent({
       newOutput.push('  lolcat <text>     - Make text colorful')
       newOutput.push('  clear             - Clear terminal')
       newOutput.push('  exit              - Close terminal')
-      newOutput.push('')
-      newOutput.push('Easter eggs:')
       newOutput.push('  crt               - Toggle CRT filter')
-      newOutput.push('  konami            - ???')
     } else if (lowerCmd === 'ls') {
       newOutput.push('blog       projects   about')
     } else if (lowerCmd.startsWith('ls ')) {
@@ -132,125 +128,64 @@ export function TerminalContent({
     } else if (lowerCmd === 'pwd') {
       newOutput.push('/home/user/portfolio')
     } else if (lowerCmd === 'crt') {
-      const html = document.documentElement
-      if (html.classList.contains('crt-mode')) {
-        html.classList.remove('crt-mode')
+      const body = document.body
+      if (body.classList.contains('crt')) {
+        body.classList.remove('crt')
         newOutput.push('CRT filter disabled')
       } else {
-        html.classList.add('crt-mode')
+        body.classList.add('crt')
         newOutput.push('CRT filter enabled')
         // Add the CRT styles if not already present
         if (!document.getElementById('crt-style')) {
           const style = document.createElement('style')
           style.id = 'crt-style'
           style.textContent = `
-            .crt-mode body {
-              animation: flicker 0.15s infinite;
+            :root {
+              --crt-red: rgb(218, 49, 49);
+              --crt-green: rgb(112, 159, 115);
+              --crt-blue: rgb(40, 129, 206);
             }
 
-            .crt-mode body::before {
-              content: " ";
-              display: block;
-              position: fixed;
-              top: 0;
-              left: 0;
-              bottom: 0;
-              right: 0;
-              background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-              z-index: 2;
-              background-size: 100% 2px, 3px 100%;
+            body.crt {
+              background-color: rgb(25, 25, 30);
+              text-shadow: 0 0 0.2em currentColor, 1px 1px rgba(255, 0, 255, 0.5), -1px -1px rgba(0, 255, 255, 0.4);
+              position: relative;
+            }
+
+            body.crt::before,
+            body.crt::after {
+              content: "";
+              transform: translateZ(0);
               pointer-events: none;
-            }
-
-            .crt-mode body::after {
-              content: " ";
-              display: block;
+              mix-blend-mode: overlay;
               position: fixed;
-              top: 0;
+              height: 100%;
+              width: 100%;
               left: 0;
-              bottom: 0;
-              right: 0;
-              background: rgba(18, 16, 16, 0.1);
-              opacity: 0;
-              z-index: 2;
-              pointer-events: none;
-              animation: flicker 0.15s infinite;
+              top: 0;
+              z-index: 9999;
             }
 
-            @keyframes flicker {
-              0% {
-                opacity: 0.27861;
-              }
-              5% {
-                opacity: 0.34769;
-              }
-              10% {
-                opacity: 0.23604;
-              }
-              15% {
-                opacity: 0.90626;
-              }
-              20% {
-                opacity: 0.18128;
-              }
-              25% {
-                opacity: 0.83891;
-              }
-              30% {
-                opacity: 0.65583;
-              }
-              35% {
-                opacity: 0.67807;
-              }
-              40% {
-                opacity: 0.26559;
-              }
-              45% {
-                opacity: 0.84693;
-              }
-              50% {
-                opacity: 0.96019;
-              }
-              55% {
-                opacity: 0.08594;
-              }
-              60% {
-                opacity: 0.20313;
-              }
-              65% {
-                opacity: 0.71988;
-              }
-              70% {
-                opacity: 0.53455;
-              }
-              75% {
-                opacity: 0.37288;
-              }
-              80% {
-                opacity: 0.71428;
-              }
-              85% {
-                opacity: 0.70419;
-              }
-              90% {
-                opacity: 0.7003;
-              }
-              95% {
-                opacity: 0.36108;
-              }
-              100% {
-                opacity: 0.24387;
-              }
+            body.crt::before {
+              background: repeating-linear-gradient(
+                var(--crt-red) 0px,
+                var(--crt-green) 2px,
+                var(--crt-blue) 4px
+              );
+            }
+
+            body.crt::after {
+              background: repeating-linear-gradient(
+                90deg,
+                var(--crt-red) 1px,
+                var(--crt-green) 2px,
+                var(--crt-blue) 3px
+              );
             }
           `
           document.head.appendChild(style)
         }
       }
-    } else if (lowerCmd === 'konami') {
-      newOutput.push('⬆️ ⬆️ ⬇️ ⬇️ ⬅️ ➡️ ⬅️ ➡️ 🅱️ 🅰️')
-      newOutput.push('<span style="color: #ff6b6b; font-weight: bold;">✨ You found the secret! ✨</span>')
-      newOutput.push('<span style="color: #4ecdc4;">30 extra lives granted!</span>')
-      newOutput.push('<span style="color: #ffd700;">(Just kidding, this does nothing)</span>')
     } else if (lowerCmd.startsWith('echo ')) {
       newOutput.push(trimmedCmd.substring(5))
     } else if (lowerCmd.startsWith('lolcat ')) {
