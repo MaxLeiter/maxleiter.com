@@ -23,12 +23,10 @@ export default async function sitemap() {
       })),
     )
 
-  const routes = ['', '/about', '/projects', '/ie-or-css3', '/talks'].map(
-    (route) => ({
-      url: `https://maxleiter.com${route}`,
-      lastModified: new Date().toISOString().split('T')[0],
-    }),
-  )
+  const routes = ['', '/about', '/projects'].map((route) => ({
+    url: `https://maxleiter.com${route}`,
+    lastModified: new Date().toISOString().split('T')[0],
+  }))
 
   return [...routes, ...blogs]
 }

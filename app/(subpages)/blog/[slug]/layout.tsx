@@ -1,5 +1,6 @@
 import getPosts from '@lib/get-posts'
 import { Metadata } from 'next'
+import { JSX } from 'react'
 
 export async function generateStaticParams() {
   const posts = await getPosts()

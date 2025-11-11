@@ -34,12 +34,10 @@ export function TerminalContent({
 
   // Restore juice mode and CRT from localStorage or URL params on mount
   useEffect(() => {
-    // Check URL params first
     const urlParams = new URLSearchParams(window.location.search)
     const juiceParam = urlParams.has('juice')
     const crtParam = urlParams.has('crt')
 
-    // Use URL params if present, otherwise fall back to localStorage
     const juiceEnabled =
       juiceParam || localStorage.getItem('juice-mode') === 'true'
     const crtEnabled = crtParam || localStorage.getItem('crt-mode') === 'true'
@@ -47,7 +45,6 @@ export function TerminalContent({
     if (juiceEnabled) {
       document.body.classList.add('juice-mode')
       localStorage.setItem('juice-mode', 'true')
-      // Re-initialize juice mode effects
       initJuiceMode()
     }
 
@@ -136,7 +133,6 @@ export function TerminalContent({
   }
 
   const initJuiceMode = () => {
-    // Add juice styles if not already present
     if (!document.getElementById('juice-style')) {
       const style = document.createElement('style')
       style.id = 'juice-style'
