@@ -7,12 +7,14 @@ interface TerminalContentProps {
   blogPosts: BlogPost[]
   projects: Project[]
   aboutContent: any
+  onClose?: () => void
 }
 
 export function TerminalContent({
   blogPosts,
   projects,
   aboutContent,
+  onClose,
 }: TerminalContentProps) {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState<string[]>([
@@ -52,10 +54,11 @@ export function TerminalContent({
         'help',
         'ls',
         'pwd',
-        'whoami',
-        'date',
         'echo',
         'cat',
+        'lolcat',
+        'crt',
+        'konami',
         'clear',
         'exit',
       ]
@@ -89,16 +92,28 @@ export function TerminalContent({
       setOutput([])
       setInput('')
       return
+    } else if (lowerCmd === 'exit') {
+      if (onClose) {
+        onClose()
+      } else {
+        newOutput.push('exit: cannot close terminal from this context')
+      }
+      setOutput(newOutput)
+      setInput('')
+      return
     } else if (lowerCmd === 'help') {
       newOutput.push('Available commands:')
       newOutput.push('  help              - Show available commands')
       newOutput.push('  ls [directory]    - List directory contents')
       newOutput.push('  pwd               - Print working directory')
-      newOutput.push('  whoami            - Show current user')
-      newOutput.push('  date              - Show current date/time')
       newOutput.push('  cat <file>        - Display file contents')
+      newOutput.push('  lolcat <text>     - Make text colorful')
       newOutput.push('  clear             - Clear terminal')
       newOutput.push('  exit              - Close terminal')
+      newOutput.push('')
+      newOutput.push('Easter eggs:')
+      newOutput.push('  crt               - Toggle CRT filter')
+      newOutput.push('  konami            - ???')
     } else if (lowerCmd === 'ls') {
       newOutput.push('blog       projects   about')
     } else if (lowerCmd.startsWith('ls ')) {
@@ -116,12 +131,148 @@ export function TerminalContent({
       }
     } else if (lowerCmd === 'pwd') {
       newOutput.push('/home/user/portfolio')
-    } else if (lowerCmd === 'whoami') {
-      newOutput.push('user')
-    } else if (lowerCmd === 'date') {
-      newOutput.push(new Date().toString())
+    } else if (lowerCmd === 'crt') {
+      const html = document.documentElement
+      if (html.classList.contains('crt-mode')) {
+        html.classList.remove('crt-mode')
+        newOutput.push('CRT filter disabled')
+      } else {
+        html.classList.add('crt-mode')
+        newOutput.push('CRT filter enabled')
+        // Add the CRT styles if not already present
+        if (!document.getElementById('crt-style')) {
+          const style = document.createElement('style')
+          style.id = 'crt-style'
+          style.textContent = `
+            .crt-mode body {
+              animation: flicker 0.15s infinite;
+            }
+
+            .crt-mode body::before {
+              content: " ";
+              display: block;
+              position: fixed;
+              top: 0;
+              left: 0;
+              bottom: 0;
+              right: 0;
+              background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+              z-index: 2;
+              background-size: 100% 2px, 3px 100%;
+              pointer-events: none;
+            }
+
+            .crt-mode body::after {
+              content: " ";
+              display: block;
+              position: fixed;
+              top: 0;
+              left: 0;
+              bottom: 0;
+              right: 0;
+              background: rgba(18, 16, 16, 0.1);
+              opacity: 0;
+              z-index: 2;
+              pointer-events: none;
+              animation: flicker 0.15s infinite;
+            }
+
+            @keyframes flicker {
+              0% {
+                opacity: 0.27861;
+              }
+              5% {
+                opacity: 0.34769;
+              }
+              10% {
+                opacity: 0.23604;
+              }
+              15% {
+                opacity: 0.90626;
+              }
+              20% {
+                opacity: 0.18128;
+              }
+              25% {
+                opacity: 0.83891;
+              }
+              30% {
+                opacity: 0.65583;
+              }
+              35% {
+                opacity: 0.67807;
+              }
+              40% {
+                opacity: 0.26559;
+              }
+              45% {
+                opacity: 0.84693;
+              }
+              50% {
+                opacity: 0.96019;
+              }
+              55% {
+                opacity: 0.08594;
+              }
+              60% {
+                opacity: 0.20313;
+              }
+              65% {
+                opacity: 0.71988;
+              }
+              70% {
+                opacity: 0.53455;
+              }
+              75% {
+                opacity: 0.37288;
+              }
+              80% {
+                opacity: 0.71428;
+              }
+              85% {
+                opacity: 0.70419;
+              }
+              90% {
+                opacity: 0.7003;
+              }
+              95% {
+                opacity: 0.36108;
+              }
+              100% {
+                opacity: 0.24387;
+              }
+            }
+          `
+          document.head.appendChild(style)
+        }
+      }
+    } else if (lowerCmd === 'konami') {
+      newOutput.push('⬆️ ⬆️ ⬇️ ⬇️ ⬅️ ➡️ ⬅️ ➡️ 🅱️ 🅰️')
+      newOutput.push('<span style="color: #ff6b6b; font-weight: bold;">✨ You found the secret! ✨</span>')
+      newOutput.push('<span style="color: #4ecdc4;">30 extra lives granted!</span>')
+      newOutput.push('<span style="color: #ffd700;">(Just kidding, this does nothing)</span>')
     } else if (lowerCmd.startsWith('echo ')) {
       newOutput.push(trimmedCmd.substring(5))
+    } else if (lowerCmd.startsWith('lolcat ')) {
+      const text = trimmedCmd.substring(7)
+      const colors = [
+        '#FF6B6B',
+        '#4ECDC4',
+        '#45B7D1',
+        '#FFA07A',
+        '#98D8C8',
+        '#F7DC6F',
+        '#BB8FCE',
+        '#85C1E2',
+      ]
+      const coloredText = text
+        .split('')
+        .map((char, i) => {
+          const color = colors[i % colors.length]
+          return `<span style="color: ${color}">${char}</span>`
+        })
+        .join('')
+      newOutput.push(coloredText)
     } else if (lowerCmd.startsWith('cat ')) {
       const path = trimmedCmd.substring(4).trim()
       const parts = path.split('/').filter(Boolean)
@@ -201,9 +352,11 @@ export function TerminalContent({
         className="flex-1 overflow-y-auto p-3 text-white/90 space-y-1"
       >
         {output.map((line, i) => (
-          <div key={i} className="text-sm break-words font-mono">
-            {line}
-          </div>
+          <div
+            key={i}
+            className="text-sm break-words font-mono"
+            dangerouslySetInnerHTML={{ __html: line }}
+          />
         ))}
       </div>
 

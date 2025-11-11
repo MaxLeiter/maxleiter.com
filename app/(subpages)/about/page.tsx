@@ -25,9 +25,7 @@ const About = () => {
               <h2 className="text-xl font-mono font-bold mb-3 text-white/90">
                 Max Leiter
               </h2>
-              <p className="mb-4">
-                {ABOUT_CONTENT.bio.content}
-              </p>
+              <p className="mb-4">{ABOUT_CONTENT.bio.content}</p>
               {ABOUT_CONTENT.bio.links && (
                 <div className="flex gap-4 mb-4">
                   {ABOUT_CONTENT.bio.links.map((link) => (
@@ -57,9 +55,9 @@ const About = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Next.js 15
+                  Next.js 16
                 </a>{' '}
-                with the App Directory and is deployed via{' '}
+                with the App Router and is deployed via{' '}
                 <a
                   className="text-blue-400 hover:text-blue-300 underline"
                   href="https://vercel.com/home"
@@ -101,6 +99,14 @@ const About = () => {
                   className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
                 >
                   Twitter
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/MaxLeiter"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  LinkedIn
                 </a>
               </div>
             </section>

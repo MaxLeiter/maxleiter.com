@@ -4,6 +4,11 @@ import withBundleAnalyzer from '@next/bundle-analyzer'
 const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
+    localPatterns: [
+      {
+        pathname: '/blog/**',
+      },
+    ],
   },
   reactStrictMode: true,
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],

@@ -68,9 +68,9 @@ export function CommandPalette({ blogPosts, projects, onClose, onNavigate }: Com
           />
         </div>
 
-        <div className="max-h-96 overflow-y-auto">
+        <div className="max-h-96 overflow-y-auto px-2 py-2">
           {filtered.length === 0 ? (
-            <div className="p-4 text-white/50 text-sm">No results found</div>
+            <div className="px-4 py-3 text-white/50 text-sm">No results found</div>
           ) : (
             filtered.map((item, idx) => (
               <button
@@ -79,7 +79,7 @@ export function CommandPalette({ blogPosts, projects, onClose, onNavigate }: Com
                   onNavigate(item.href)
                   onClose()
                 }}
-                className={`w-full text-left px-4 py-3 border-b border-white/5 transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded transition-colors ${
                   idx === selectedIndex ? "bg-white/10" : "hover:bg-white/5"
                 }`}
               >

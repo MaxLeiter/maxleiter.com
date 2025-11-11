@@ -1,19 +1,19 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Window } from "@components/desktop/window"
-import { TerminalContent } from "@components/desktop/terminal-content"
-import { WidgetRecentPosts } from "@components/desktop/widget-recent-posts"
-import { WidgetTopProjects } from "@components/desktop/widget-top-projects"
-import { useRouter } from "next/navigation"
-import type { BlogPost, Project } from "@lib/portfolio-data"
+import type React from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { Window } from '@components/desktop/window'
+import { TerminalContent } from '@components/desktop/terminal-content'
+import { WidgetRecentPosts } from '@components/desktop/widget-recent-posts'
+import { WidgetTopProjects } from '@components/desktop/widget-top-projects'
+import { useRouter } from 'next/navigation'
+import type { BlogPost, Project } from '@lib/portfolio-data'
 
 interface DesktopItem {
   id: string
   name: string
-  type: "folder" | "app"
+  type: 'folder' | 'app'
   icon: React.ReactNode
   href?: string
   onClick?: () => void
@@ -21,7 +21,13 @@ interface DesktopItem {
 
 function FolderIconDefault() {
   return (
-    <svg height="48" strokeLinejoin="round" viewBox="0 0 16 16" width="48" className="text-foreground">
+    <svg
+      height="48"
+      strokeLinejoin="round"
+      viewBox="0 0 16 16"
+      width="48"
+      className="text-foreground"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -34,11 +40,102 @@ function FolderIconDefault() {
 
 function TerminalIconDefault() {
   return (
-    <svg height="48" strokeLinejoin="round" viewBox="0 0 16 16" width="48" className="text-foreground">
+    <svg
+      height="48"
+      strokeLinejoin="round"
+      viewBox="0 0 16 16"
+      width="48"
+      className="text-foreground"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
         d="M1.53035 12.7804L1.00002 13.3108L-0.0606384 12.2501L0.469692 11.7198L4.18936 8.00011L0.469692 4.28044L-0.0606384 3.75011L1.00002 2.68945L1.53035 3.21978L5.60358 7.29301C5.9941 7.68353 5.9941 8.3167 5.60357 8.70722L1.53035 12.7804ZM8.75002 12.5001H8.00002V14.0001H8.75002H15.25H16V12.5001H15.25H8.75002Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+function GitHubIcon() {
+  return (
+    <svg
+      height="40"
+      width="40"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      className="text-foreground"
+    >
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+    </svg>
+  )
+}
+
+function LinkedInIcon() {
+  return (
+    <svg
+      height="40"
+      width="40"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="text-foreground"
+    >
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  )
+}
+
+function TwitterIcon() {
+  return (
+    <svg
+      height="40"
+      width="40"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="text-foreground"
+    >
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  )
+}
+
+function V0Icon() {
+  return (
+    <svg
+      height="48"
+      width="48"
+      viewBox="0 0 16 16"
+      strokeLinejoin="round"
+      className="text-foreground"
+      style={{ transform: 'translateY(-2px)' }}
+    >
+      <path
+        d="M6.0952 9.4643V5.5238H7.6190V10.5476C7.6190 11.1394 7.1394 11.6190 6.5476 11.6190C6.2651 11.6190 5.9862 11.5101 5.7857 11.3096L0 5.5238H2.1548L6.0952 9.4643Z M16 10.0952H14.4762V6.6071L10.9881 10.0952H14.4762V11.6190H10.5238C9.3403 11.6190 8.3810 10.6597 8.3810 9.4762V5.5238H9.9048V9.0238L13.4047 5.5238H9.9048V4H13.8571C15.0407 4 16 4.9594 16 6.1429V10.0952Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+function AIIcon() {
+  return (
+    <svg
+      height="40"
+      width="40"
+      viewBox="0 0 16 16"
+      strokeLinejoin="round"
+      className="text-foreground"
+    >
+      <path
+        d="M2.5 0.5V0H3.5V0.5C3.5 1.60457 4.39543 2.5 5.5 2.5H6V3V3.5H5.5C4.39543 3.5 3.5 4.39543 3.5 5.5V6H3H2.5V5.5C2.5 4.39543 1.60457 3.5 0.5 3.5H0V3V2.5H0.5C1.60457 2.5 2.5 1.60457 2.5 0.5Z"
+        fill="currentColor"
+      />
+      <path
+        d="M14.5 4.5V5H13.5V4.5C13.5 3.94772 13.0523 3.5 12.5 3.5H12V3V2.5H12.5C13.0523 2.5 13.5 2.05228 13.5 1.5V1H14H14.5V1.5C14.5 2.05228 14.9477 2.5 15.5 2.5H16V3V3.5H15.5C14.9477 3.5 14.5 3.94772 14.5 4.5Z"
+        fill="currentColor"
+      />
+      <path
+        d="M8.40706 4.92939L8.5 4H9.5L9.59294 4.92939C9.82973 7.29734 11.7027 9.17027 14.0706 9.40706L15 9.5V10.5L14.0706 10.5929C11.7027 10.8297 9.82973 12.7027 9.59294 15.0706L9.5 16H8.5L8.40706 15.0706C8.17027 12.7027 6.29734 10.8297 3.92939 10.5929L3 10.5V9.5L3.92939 9.40706C6.29734 9.17027 8.17027 7.29734 8.40706 4.92939Z"
         fill="currentColor"
       />
     </svg>
@@ -51,48 +148,87 @@ interface DesktopClientProps {
   aboutContent: any
 }
 
-export function DesktopClient({ blogPosts, projects, aboutContent }: DesktopClientProps) {
+export function DesktopClient({
+  blogPosts,
+  projects,
+  aboutContent,
+}: DesktopClientProps) {
   const [openTerminal, setOpenTerminal] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "t") {
+      if ((e.metaKey || e.ctrlKey) && e.key === 't') {
         e.preventDefault()
         setOpenTerminal(true)
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   const desktopItems: DesktopItem[] = [
     {
-      id: "blog",
-      name: "blog",
-      type: "folder",
+      id: 'blog',
+      name: 'blog',
+      type: 'folder',
       icon: <FolderIconDefault />,
-      href: "/blog",
+      href: '/blog',
     },
     {
-      id: "projects",
-      name: "projects",
-      type: "folder",
+      id: 'projects',
+      name: 'projects',
+      type: 'folder',
       icon: <FolderIconDefault />,
-      href: "/projects",
+      href: '/projects',
     },
     {
-      id: "about",
-      name: "about",
-      type: "folder",
+      id: 'about',
+      name: 'about',
+      type: 'folder',
       icon: <FolderIconDefault />,
-      href: "/about",
+      href: '/about',
     },
     {
-      id: "terminal",
-      name: "terminal",
-      type: "app",
+      id: 'github',
+      name: 'github',
+      type: 'app',
+      icon: <GitHubIcon />,
+      href: 'https://github.com/maxleiter',
+    },
+    {
+      id: 'linkedin',
+      name: 'linkedin',
+      type: 'app',
+      icon: <LinkedInIcon />,
+      href: 'https://www.linkedin.com/in/MaxLeiter',
+    },
+    {
+      id: 'twitter',
+      name: 'X',
+      type: 'app',
+      icon: <TwitterIcon />,
+      href: 'https://twitter.com/max_leiter',
+    },
+    {
+      id: 'v0',
+      name: 'v0',
+      type: 'app',
+      icon: <V0Icon />,
+      href: 'https://v0.app',
+    },
+    {
+      id: 'ai-sdk',
+      name: 'AI SDK',
+      type: 'app',
+      icon: <AIIcon />,
+      href: 'https://sdk.vercel.ai',
+    },
+    {
+      id: 'terminal',
+      name: 'terminal',
+      type: 'app',
       icon: <TerminalIconDefault />,
       onClick: () => setOpenTerminal(true),
     },
@@ -100,14 +236,17 @@ export function DesktopClient({ blogPosts, projects, aboutContent }: DesktopClie
 
   return (
     <div className="h-screen bg-black text-white/90 overflow-hidden flex flex-col">
-      <div className="h-10 bg-white/5 border-b border-white/10 flex items-center px-4 gap-4 text-xs font-mono">
+      <div className="h-10 bg-white/5 border-b border-white/10 flex items-center px-4 gap-4 text-xs font-mono sticky top-0 z-10">
         <span className="text-white/50">~/</span>
         <span className="ml-auto text-white/40">
-          {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          {new Date().toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
         </span>
       </div>
 
-      <div className="flex-1 p-8 overflow-auto">
+      <div className="flex-1 p-8 overflow-auto relative">
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-shrink-0">
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-4 gap-8 w-fit">
@@ -125,8 +264,18 @@ export function DesktopClient({ blogPosts, projects, aboutContent }: DesktopClie
       </div>
 
       {openTerminal && (
-        <Window title="terminal" onClose={() => setOpenTerminal(false)} defaultWidth={600} defaultHeight={400}>
-          <TerminalContent blogPosts={blogPosts} projects={projects} aboutContent={aboutContent} />
+        <Window
+          title="terminal"
+          onClose={() => setOpenTerminal(false)}
+          defaultWidth={600}
+          defaultHeight={400}
+        >
+          <TerminalContent
+            blogPosts={blogPosts}
+            projects={projects}
+            aboutContent={aboutContent}
+            onClose={() => setOpenTerminal(false)}
+          />
         </Window>
       )}
     </div>
@@ -136,12 +285,27 @@ export function DesktopClient({ blogPosts, projects, aboutContent }: DesktopClie
 function DesktopIcon({ item }: { item: DesktopItem }) {
   const content = (
     <div className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-white/5 transition-colors duration-200 cursor-pointer">
-      <div className="text-white/80 hover:text-white/90 transition-colors">{item.icon}</div>
-      <span className="text-xs font-mono text-white/80 text-center truncate w-16">{item.name}</span>
+      <div className="h-12 flex items-center justify-center text-white/80 hover:text-white/90 transition-colors">
+        {item.icon}
+      </div>
+      <span className="text-xs font-mono text-white/80 text-center truncate w-16">
+        {item.name}
+      </span>
     </div>
   )
 
   if (item.href) {
+    // Check if it's an external link
+    const isExternal = item.href.startsWith('http')
+
+    if (isExternal) {
+      return (
+        <a href={item.href} target="_blank" rel="noopener noreferrer">
+          {content}
+        </a>
+      )
+    }
+
     return <Link href={item.href}>{content}</Link>
   }
 
