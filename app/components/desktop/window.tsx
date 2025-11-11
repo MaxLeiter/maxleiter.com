@@ -31,6 +31,7 @@ export function Window({
   const [isResizing, setIsResizing] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [snapPreview, setSnapPreview] = useState<SnapDirection>(null)
+  const [isClosing, setIsClosing] = useState(false)
 
   const windowRef = useRef<HTMLDivElement>(null)
 
@@ -104,6 +105,19 @@ export function Window({
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen)
+  }
+
+  const handleClose = () => {
+    const isJuiced = document.body.classList.contains('juice-mode')
+    if (isJuiced) {
+      setIsClosing(true)
+      // Wait for animation to complete before actually closing
+      setTimeout(() => {
+        onClose()
+      }, 600)
+    } else {
+      onClose()
+    }
   }
 
   useEffect(() => {
@@ -234,7 +248,9 @@ export function Window({
       {renderSnapPreview()}
       <div
         ref={windowRef}
-        className="fixed bg-black border border-white/20 rounded-lg flex flex-col font-mono text-sm z-50"
+        className={`fixed bg-black border border-white/20 rounded-lg flex flex-col font-mono text-sm z-50 ${
+          isClosing ? 'window-closing' : ''
+        }`}
         style={windowStyle}
         onMouseDown={handleMouseDown}
         role="dialog"
@@ -265,7 +281,7 @@ export function Window({
               )}
             </button>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="text-white/50 hover:text-white/80 hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
               aria-label={`Close ${title}`}
             >
