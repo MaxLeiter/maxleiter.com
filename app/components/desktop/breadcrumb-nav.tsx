@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from 'next/link'
 
 interface BreadcrumbSegment {
   name: string
@@ -14,7 +14,10 @@ export function BreadcrumbNav({ segments }: { segments: BreadcrumbSegment[] }) {
       {segments.map((segment, index) => (
         <div key={index} className="flex items-center gap-2">
           <span>/</span>
-          <Link href={segment.href} className="hover:text-white/90 transition-colors">
+          <Link
+            href={segment.href}
+            className="hover:text-white/90 transition-colors"
+          >
             {segment.name}
           </Link>
         </div>

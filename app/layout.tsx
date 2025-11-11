@@ -67,6 +67,7 @@ export default async function RootLayout({
 }) {
   const { getBlogPosts, getProjectsData } = await import('@lib/portfolio-data')
   const { GlobalKeyboardHandler } = await import('@components/desktop/global-keyboard-handler')
+  const { EffectsProvider } = await import('@components/desktop/effects-context')
 
   const [blogPosts, projects] = await Promise.all([
     getBlogPosts(),
@@ -81,9 +82,11 @@ export default async function RootLayout({
     >
       <body>
         <ThemeProvider>
-          {children}
-          <GlobalKeyboardHandler blogPosts={blogPosts} projects={projects} />
-          <Analytics />
+          <EffectsProvider>
+            {children}
+            <GlobalKeyboardHandler blogPosts={blogPosts} projects={projects} />
+            <Analytics />
+          </EffectsProvider>
         </ThemeProvider>
         {/* {process.env.NODE_ENV === 'development' ? <VercelToolbar /> : null} */}
       </body>

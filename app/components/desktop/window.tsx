@@ -107,10 +107,107 @@ export function Window({
     setIsFullscreen(!isFullscreen)
   }
 
-  const handleClose = () => {
+  const createExplosion = (clickX: number, clickY: number) => {
+    if (!windowRef.current) return
+
+    const centerX = clickX
+    const centerY = clickY
+
+    // Create canvas for particles
+    const canvas = document.createElement('canvas')
+    canvas.style.position = 'fixed'
+    canvas.style.top = '0'
+    canvas.style.left = '0'
+    canvas.style.width = '100vw'
+    canvas.style.height = '100vh'
+    canvas.style.pointerEvents = 'none'
+    canvas.style.zIndex = '9999'
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    document.body.appendChild(canvas)
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Create particles
+    const particles: Array<{
+      x: number
+      y: number
+      vx: number
+      vy: number
+      life: number
+      size: number
+      color: string
+    }> = []
+
+    const particleCount = 50
+    const colors = [
+      '#FF6B6B',
+      '#4ECDC4',
+      '#45B7D1',
+      '#FFA07A',
+      '#98D8C8',
+      '#F7DC6F',
+      '#BB8FCE',
+    ]
+
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5
+      const speed = 5 + Math.random() * 10
+      particles.push({
+        x: centerX,
+        y: centerY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 2, // Slight upward bias
+        life: 1,
+        size: 3 + Math.random() * 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      })
+    }
+
+    // Animate particles
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      let aliveCount = 0
+      particles.forEach((p) => {
+        if (p.life <= 0) return
+        aliveCount++
+
+        // Update position
+        p.x += p.vx
+        p.y += p.vy
+        p.vy += 0.3 // Gravity
+        p.vx *= 0.98 // Air resistance
+        p.life -= 0.02
+
+        // Draw particle
+        ctx.globalAlpha = p.life
+        ctx.fillStyle = p.color
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fill()
+
+        // Add glow
+        ctx.shadowBlur = 10
+        ctx.shadowColor = p.color
+      })
+
+      if (aliveCount > 0) {
+        requestAnimationFrame(animate)
+      } else {
+        canvas.remove()
+      }
+    }
+
+    animate()
+  }
+
+  const handleClose = (e: React.MouseEvent) => {
     const isJuiced = document.body.classList.contains('juice-mode')
     if (isJuiced) {
       setIsClosing(true)
+      createExplosion(e.clientX, e.clientY)
       // Wait for animation to complete before actually closing
       setTimeout(() => {
         onClose()
@@ -281,7 +378,7 @@ export function Window({
               )}
             </button>
             <button
-              onClick={handleClose}
+              onClick={(e) => handleClose(e)}
               className="text-white/50 hover:text-white/80 hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
               aria-label={`Close ${title}`}
             >
