@@ -1,3 +1,4 @@
+@reference "tailwindcss";
 .container {
   max-width: var(--main-content);
   /* remove ul margins */

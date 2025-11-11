@@ -4,7 +4,6 @@ import withBundleAnalyzer from '@next/bundle-analyzer'
 const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
-    domains: ['i.ytimg.com'],
   },
   reactStrictMode: true,
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],
@@ -13,9 +12,6 @@ const nextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   async redirects() {
     return [

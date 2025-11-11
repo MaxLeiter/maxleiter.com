@@ -1,32 +1,12 @@
-import styles from './layout.module.css'
 import '@styles/global.css'
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
+import '@styles/desktop.css'
+import { GeistSans } from 'geist/font/sans'
+import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from 'next-themes'
 import { Viewport } from 'next'
 
 export const dynamic = 'force-static'
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
-      <body>
-        <ThemeProvider>
-          <div className={styles.wrapper}>
-            <main className={styles.main}>{children}</main>
-          </div>
-          <Analytics />
-        </ThemeProvider>
-        {/* {process.env.NODE_ENV === 'development' ? <VercelToolbar /> : null} */}
-      </body>
-    </html>
-  )
-}
 
 export const metadata = {
   metadataBase: new URL('https://maxleiter.com'),
@@ -78,4 +58,35 @@ export const viewport: Viewport = {
     { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
     { media: '(prefers-color-scheme: dark)', color: '#000' },
   ],
+}
+
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const { getBlogPosts, getProjectsData } = await import('@lib/portfolio-data')
+  const { GlobalKeyboardHandler } = await import('@components/desktop/global-keyboard-handler')
+
+  const [blogPosts, projects] = await Promise.all([
+    getBlogPosts(),
+    getProjectsData(),
+  ])
+
+  return (
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+    >
+      <body>
+        <ThemeProvider>
+          {children}
+          <GlobalKeyboardHandler blogPosts={blogPosts} projects={projects} />
+          <Analytics />
+        </ThemeProvider>
+        {/* {process.env.NODE_ENV === 'development' ? <VercelToolbar /> : null} */}
+      </body>
+    </html>
+  )
 }

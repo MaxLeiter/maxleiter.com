@@ -1,3 +1,5 @@
+@reference "tailwindcss";
+
 @font-face {
   font-family: 'Minecraft';
   src: url('/fonts/MinecraftRegular.otf') format('opentype');
@@ -14,7 +16,7 @@
   font-display: swap;
 }
 
-.container:global {
+.container {
   --font-minecraft: 'Minecraft', var(--font-mono);
 }
 

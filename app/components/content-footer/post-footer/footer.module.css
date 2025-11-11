@@ -1,3 +1,4 @@
+@reference "tailwindcss";
 .footer {
   color: var(--article-color);
 

@@ -1,3 +1,4 @@
+@import 'tailwindcss';
 @import './syntax.css';
 @import './markdown.css';
 
@@ -15,10 +16,12 @@
   --header-height: 48px;
 
   /* Typography */
-  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Roboto',
+  --font-sans:
+    var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Roboto',
     'Helvetica Neue', sans-serif;
-  --font-mono: var(--font-geist-mono), 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo',
-    monospace;
+  --font-mono:
+    var(--font-geist-mono), 'SFMono-Regular', 'Consolas', 'Liberation Mono',
+    'Menlo', monospace;
 
   /* Transitions */
   --transition: 0.1s ease-in-out;
@@ -161,43 +164,6 @@ body {
   position: relative;
 }
 
-p,
-li {
-  font-size: 1.1rem;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-sans);
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-h1 {
-  font-size: 2.3rem;
-  font-weight: 600;
-}
-
-h2 {
-  font-size: 1.6rem;
-}
-
-h3 {
-  font-size: 1.4rem;
-}
-
-h4 {
-  font-size: 1.2rem;
-}
-
-h5 {
-  font-size: 1.15rem;
-}
-
 hr {
   border: none;
   border-bottom: 1px solid var(--light-gray);
@@ -224,7 +190,9 @@ a.reset {
   outline: none;
   color: var(--link);
   text-decoration: none;
-  transition: background-color var(--transition), color var(--transition);
+  transition:
+    background-color var(--transition),
+    color var(--transition);
 }
 
 p a:hover,
@@ -290,4 +258,3 @@ th {
   white-space: nowrap;
   border-width: 0;
 }
-

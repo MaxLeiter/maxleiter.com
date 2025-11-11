@@ -1,3 +1,4 @@
+@reference "tailwindcss";
 .transition {
   transition: box-shadow 80ms cubic-bezier(0.01, 0.88, 0.93, 0.07) 0s;
   will-change: box-shadow;

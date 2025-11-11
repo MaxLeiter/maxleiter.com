@@ -1,3 +1,4 @@
+@reference "tailwindcss";
 .navigation {
   display: flex;
   justify-content: space-between;

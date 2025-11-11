@@ -1,6 +1,6 @@
-import ProjectList from '@components/projects'
-import { ProjectsTimeline } from '@components/timeline/timeline'
-import { getProjects } from '@lib/projects'
+import { BreadcrumbNav } from '@components/desktop/breadcrumb-nav'
+import { ListCard } from '@components/desktop/list-card'
+import { getProjectsData } from '@lib/portfolio-data'
 
 export const metadata = {
   title: 'Projects',
@@ -10,13 +10,32 @@ export const metadata = {
   },
 }
 
-const Projects = async () => {
-  const projects = await getProjects()
-  projects.sort((a, b) => parseInt(b.years[0]) - parseInt(a.years[0]))
+export default async function ProjectsPage() {
+  const projects = await getProjectsData()
 
   return (
-    <ProjectsTimeline  projects={projects}  />
+    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+      <BreadcrumbNav segments={[{ name: 'projects', href: '/projects' }]} />
+
+      <div className="flex-1 overflow-auto p-6">
+        <div className="max-w-3xl">
+          <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">projects/</h1>
+
+          <div className="space-y-2">
+            {projects.map((project) => (
+              <ListCard
+                key={project.id}
+                href={project.link}
+                title={project.name}
+                description={project.description}
+                tags={project.tech}
+                external
+                icon="folder"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
-
-export default Projects

@@ -1,7 +1,4 @@
 import getPosts from '@lib/get-posts'
-import Navigation from '@components/content-footer/navigation'
-import PostFooter from '@components/content-footer/post-footer'
-import styles from './layout.module.css'
 import { Metadata } from 'next'
 
 export async function generateStaticParams() {
@@ -25,67 +22,14 @@ export const generateMetadata = async (props: {
   }
 }
 
-async function getData({ slug }: { slug: string }) {
-  const posts = await getPosts()
-  const postIndex = posts.findIndex((p) => p?.slug === slug)
-
-  if (postIndex === -1) {
-    throw new Error(
-      `${slug} not found in posts. Did you forget to rename the file?`,
-    )
-  }
-
-  const post = posts[postIndex]
-
-  const { ...rest } = post
-
-  return {
-    previous: posts[postIndex + 1] || null,
-    next: posts[postIndex - 1] || null,
-    ...rest,
-  }
-}
-
 export default async function PostLayout(props: {
   children: JSX.Element
   params: Promise<{
     slug: string
   }>
 }) {
-  const params = await props.params
-
   const { children } = props
 
-  const { previous, next, title, date, lastModified, description } =
-    await getData(params)
-
-  const lastModifiedDate = lastModified
-    ? new Date(lastModified).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : null
-
-  return (
-    <>
-      <div className={styles.wrapper}>
-        <span className={styles.date}>{date}</span>
-        {lastModified ? (
-          <span className={styles.lastModified}>
-            Last modified {lastModifiedDate}
-          </span>
-        ) : null}
-        {/* {updatedViews && <FadeIn>{updatedViews} views</FadeIn>} */}
-      </div>
-      <article>
-        <h1 className={styles.title}>{title}</h1>
-        <span className={styles.description}>{description}</span>
-
-        {children}
-      </article>
-      <PostFooter />
-      <Navigation previous={previous} next={next} />
-    </>
-  )
+  // Just render children - styling handled in page.tsx
+  return <>{children}</>
 }

@@ -1,0 +1,21 @@
+/* Desktop OS specific styles */
+@reference "tailwindcss";
+
+@layer base {
+  * {
+    outline-color: rgb(136 136 136 / 0.5);
+    border-color: var(--border);
+  }
+
+  body {
+    @apply bg-black text-white/90 antialiased;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Override some variables for desktop mode */
+:root {
+  --desktop-bg: #000000;
+  --desktop-fg: #ffffff;
+  --desktop-header-height: 40px;
+}
