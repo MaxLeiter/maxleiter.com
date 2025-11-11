@@ -1,16 +1,21 @@
-import { BreadcrumbNav } from '@components/desktop/breadcrumb-nav'
 import { ListCard } from '@components/desktop/list-card'
 import { getBlogPosts } from '@lib/portfolio-data'
+import { WindowToolbar } from '@components/desktop/window-toolbar'
+import { ViewTransitionWrapper } from '@components/view-transition-wrapper'
 
 export default async function BlogPage() {
   const posts = await getBlogPosts()
 
   return (
     <div className="min-h-screen bg-black text-white/90 flex flex-col">
-      <BreadcrumbNav segments={[{ name: 'blog', href: '/blog' }]} />
+      <WindowToolbar
+        title="blog"
+        segments={[{ name: 'blog', href: '/blog' }]}
+      />
 
       <div className="flex-1 overflow-auto p-6">
-        <div className="max-w-3xl">
+        <ViewTransitionWrapper name="page-blog">
+          <div className="max-w-3xl">
           <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">
             blog/
           </h1>
@@ -27,7 +32,8 @@ export default async function BlogPage() {
               />
             ))}
           </div>
-        </div>
+          </div>
+        </ViewTransitionWrapper>
       </div>
     </div>
   )

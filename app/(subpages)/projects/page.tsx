@@ -1,6 +1,7 @@
-import { BreadcrumbNav } from '@components/desktop/breadcrumb-nav'
 import { ListCard } from '@components/desktop/list-card'
 import { getProjectsData } from '@lib/portfolio-data'
+import { WindowToolbar } from '@components/desktop/window-toolbar'
+import { ViewTransitionWrapper } from '@components/view-transition-wrapper'
 
 export const metadata = {
   title: 'Projects',
@@ -15,10 +16,14 @@ export default async function ProjectsPage() {
 
   return (
     <div className="min-h-screen bg-black text-white/90 flex flex-col">
-      <BreadcrumbNav segments={[{ name: 'projects', href: '/projects' }]} />
+      <WindowToolbar
+        title="projects"
+        segments={[{ name: 'projects', href: '/projects' }]}
+      />
 
       <div className="flex-1 overflow-auto p-6">
-        <div className="max-w-3xl">
+        <ViewTransitionWrapper name="page-projects">
+          <div className="max-w-3xl">
           <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">projects/</h1>
 
           <div className="space-y-2">
@@ -34,7 +39,8 @@ export default async function ProjectsPage() {
               />
             ))}
           </div>
-        </div>
+          </div>
+        </ViewTransitionWrapper>
       </div>
     </div>
   )

@@ -6,9 +6,10 @@ import type { BlogPost } from '@lib/portfolio-data'
 interface WidgetRecentPostsProps {
   posts: BlogPost[]
   limit?: number
+  onPostClick?: (slug: string) => void
 }
 
-export function WidgetRecentPosts({ posts, limit = 5 }: WidgetRecentPostsProps) {
+export function WidgetRecentPosts({ posts, limit = 5, onPostClick }: WidgetRecentPostsProps) {
   const recentPosts = posts.slice(0, limit)
 
   return (
@@ -17,18 +18,42 @@ export function WidgetRecentPosts({ posts, limit = 5 }: WidgetRecentPostsProps) 
         <h2 className="text-xs font-mono font-semibold text-white/90 uppercase">Recent Posts</h2>
       </div>
       <div className="divide-y divide-white/5">
-        {recentPosts.map((post) => (
-          <Link
-            key={post.slug}
-            href={`/blog/${post.slug}`}
-            className="block px-4 py-3 hover:bg-white/5 transition-colors group"
-          >
-            <h3 className="text-sm font-mono text-white/90 group-hover:text-white/80 transition-colors mb-1">
-              {post.title}
-            </h3>
-            <p className="text-xs text-white/50">{post.date}</p>
-          </Link>
-        ))}
+        {recentPosts.map((post) => {
+          const content = (
+            <>
+              <h3 className="text-sm font-mono text-white/90 group-hover:text-white/80 transition-colors mb-1">
+                {post.title}
+              </h3>
+              <p className="text-xs text-white/50">{post.date}</p>
+            </>
+          )
+
+          if (onPostClick) {
+            return (
+              <Link
+                key={post.slug}
+                href={`/blog/${post.slug}`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  onPostClick(post.slug)
+                }}
+                className="block px-4 py-3 hover:bg-white/5 transition-colors group"
+              >
+                {content}
+              </Link>
+            )
+          }
+
+          return (
+            <Link
+              key={post.slug}
+              href={`/blog/${post.slug}`}
+              className="block px-4 py-3 hover:bg-white/5 transition-colors group"
+            >
+              {content}
+            </Link>
+          )
+        })}
       </div>
       <Link
         href="/blog"

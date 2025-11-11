@@ -14,6 +14,7 @@ const nextConfig = {
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],
   experimental: {
     mdxRs: true,
+    viewTransition: true,
   },
   typescript: {
     ignoreBuildErrors: true,

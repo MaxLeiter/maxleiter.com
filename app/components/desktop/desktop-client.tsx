@@ -8,7 +8,8 @@ import { TerminalContent } from '@components/desktop/terminal-content'
 import { Calculator } from '@components/desktop/calculator'
 import { WidgetRecentPosts } from '@components/desktop/widget-recent-posts'
 import { WidgetTopProjects } from '@components/desktop/widget-top-projects'
-import { useRouter } from 'next/navigation'
+import { BlogPostContentClient } from '@components/blog-post-content-client'
+import { AboutContentClient, ProjectsContentClient, BlogListContentClient } from '@components/page-content-client'
 import type { BlogPost, Project } from '@lib/portfolio-data'
 
 interface DesktopItem {
@@ -17,7 +18,8 @@ interface DesktopItem {
   type: 'folder' | 'app'
   icon: React.ReactNode
   href?: string
-  onClick?: () => void
+  onClick?: (e: React.MouseEvent) => void
+  external?: boolean
 }
 
 function FolderIconDefault() {
@@ -175,7 +177,14 @@ export function DesktopClient({
 }: DesktopClientProps) {
   const [openTerminal, setOpenTerminal] = useState(false)
   const [openCalculator, setOpenCalculator] = useState(false)
-  const router = useRouter()
+  const [openBlogPost, setOpenBlogPost] = useState<string | null>(null)
+  const [openAbout, setOpenAbout] = useState(false)
+  const [openProjects, setOpenProjects] = useState(false)
+  const [openBlogList, setOpenBlogList] = useState(false)
+
+  const currentBlogPost = openBlogPost
+    ? blogPosts.find(post => post.slug === openBlogPost)
+    : null
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -196,6 +205,10 @@ export function DesktopClient({
       type: 'folder',
       icon: <FolderIconDefault />,
       href: '/blog',
+      onClick: (e) => {
+        e.preventDefault()
+        setOpenBlogList(true)
+      },
     },
     {
       id: 'projects',
@@ -203,6 +216,10 @@ export function DesktopClient({
       type: 'folder',
       icon: <FolderIconDefault />,
       href: '/projects',
+      onClick: (e) => {
+        e.preventDefault()
+        setOpenProjects(true)
+      },
     },
     {
       id: 'about',
@@ -210,6 +227,10 @@ export function DesktopClient({
       type: 'folder',
       icon: <FolderIconDefault />,
       href: '/about',
+      onClick: (e) => {
+        e.preventDefault()
+        setOpenAbout(true)
+      },
     },
     {
       id: 'github',
@@ -217,6 +238,7 @@ export function DesktopClient({
       type: 'app',
       icon: <GitHubIcon />,
       href: 'https://github.com/maxleiter',
+      external: true,
     },
     {
       id: 'linkedin',
@@ -224,6 +246,7 @@ export function DesktopClient({
       type: 'app',
       icon: <LinkedInIcon />,
       href: 'https://www.linkedin.com/in/MaxLeiter',
+      external: true,
     },
     {
       id: 'twitter',
@@ -231,6 +254,7 @@ export function DesktopClient({
       type: 'app',
       icon: <TwitterIcon />,
       href: 'https://twitter.com/max_leiter',
+      external: true,
     },
     {
       id: 'v0',
@@ -238,6 +262,7 @@ export function DesktopClient({
       type: 'app',
       icon: <V0Icon />,
       href: 'https://v0.app',
+      external: true,
     },
     {
       id: 'ai-sdk',
@@ -245,6 +270,7 @@ export function DesktopClient({
       type: 'app',
       icon: <AIIcon />,
       href: 'https://sdk.vercel.ai',
+      external: true,
     },
     {
       id: 'terminal',
@@ -285,7 +311,11 @@ export function DesktopClient({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 max-w-6xl items-start">
-            <WidgetRecentPosts posts={blogPosts} limit={5} />
+            <WidgetRecentPosts
+              posts={blogPosts}
+              limit={5}
+              onPostClick={(slug) => setOpenBlogPost(slug)}
+            />
             <WidgetTopProjects projects={projects} limit={5} />
           </div>
         </div>
@@ -319,6 +349,76 @@ export function DesktopClient({
           <Calculator />
         </Window>
       )}
+
+      {openBlogPost && currentBlogPost && (
+        <Window
+          title={currentBlogPost.title}
+          onClose={() => setOpenBlogPost(null)}
+          defaultWidth={800}
+          defaultHeight={600}
+          defaultX={150}
+          defaultY={80}
+          blogSlug={openBlogPost}
+        >
+          <div className="overflow-auto h-full p-6">
+            <BlogPostContentClient
+              slug={openBlogPost}
+              title={currentBlogPost.title}
+              date={currentBlogPost.date}
+              description={currentBlogPost.excerpt}
+              content={currentBlogPost.content}
+            />
+          </div>
+        </Window>
+      )}
+
+      {openAbout && (
+        <Window
+          title="about"
+          onClose={() => setOpenAbout(false)}
+          defaultWidth={800}
+          defaultHeight={600}
+          defaultX={200}
+          defaultY={100}
+          pageType="about"
+        >
+          <div className="overflow-auto h-full p-6">
+            <AboutContentClient content={aboutContent} />
+          </div>
+        </Window>
+      )}
+
+      {openProjects && (
+        <Window
+          title="projects"
+          onClose={() => setOpenProjects(false)}
+          defaultWidth={800}
+          defaultHeight={600}
+          defaultX={250}
+          defaultY={120}
+          pageType="projects"
+        >
+          <div className="overflow-auto h-full p-6">
+            <ProjectsContentClient projects={projects} />
+          </div>
+        </Window>
+      )}
+
+      {openBlogList && (
+        <Window
+          title="blog"
+          onClose={() => setOpenBlogList(false)}
+          defaultWidth={800}
+          defaultHeight={600}
+          defaultX={300}
+          defaultY={140}
+          pageType="blog"
+        >
+          <div className="overflow-auto h-full p-6">
+            <BlogListContentClient posts={blogPosts} />
+          </div>
+        </Window>
+      )}
     </div>
   )
 }
@@ -336,10 +436,7 @@ function DesktopIcon({ item }: { item: DesktopItem }) {
   )
 
   if (item.href) {
-    // Check if it's an external link
-    const isExternal = item.href.startsWith('http')
-
-    if (isExternal) {
+    if (item.external) {
       return (
         <a href={item.href} target="_blank" rel="noopener noreferrer">
           {content}
@@ -347,7 +444,12 @@ function DesktopIcon({ item }: { item: DesktopItem }) {
       )
     }
 
-    return <Link href={item.href}>{content}</Link>
+    // Internal link with progressive enhancement
+    return (
+      <Link href={item.href} onClick={item.onClick}>
+        {content}
+      </Link>
+    )
   }
 
   return (

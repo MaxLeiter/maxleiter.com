@@ -1,5 +1,6 @@
-import { BreadcrumbNav } from '@components/desktop/breadcrumb-nav'
 import { ABOUT_CONTENT } from '@lib/portfolio-data'
+import { WindowToolbar } from '@components/desktop/window-toolbar'
+import { ViewTransitionWrapper } from '@components/view-transition-wrapper'
 
 export const metadata = {
   title: 'About',
@@ -12,10 +13,14 @@ export const metadata = {
 const About = () => {
   return (
     <div className="min-h-screen bg-black text-white/90 flex flex-col">
-      <BreadcrumbNav segments={[{ name: 'about', href: '/about' }]} />
+      <WindowToolbar
+        title="about"
+        segments={[{ name: 'about', href: '/about' }]}
+      />
 
       <div className="flex-1 overflow-auto p-6">
-        <div className="max-w-3xl">
+        <ViewTransitionWrapper name="page-about">
+          <div className="max-w-3xl">
           <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">
             about/
           </h1>
@@ -111,7 +116,8 @@ const About = () => {
               </div>
             </section>
           </div>
-        </div>
+          </div>
+        </ViewTransitionWrapper>
       </div>
     </div>
   )

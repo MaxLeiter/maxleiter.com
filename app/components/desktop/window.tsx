@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, startTransition } from "react"
+import { useRouter } from "next/navigation"
 
 interface WindowProps {
   title: string
@@ -11,6 +12,8 @@ interface WindowProps {
   defaultHeight?: number
   defaultX?: number
   defaultY?: number
+  blogSlug?: string
+  pageType?: 'blog' | 'projects' | 'about' | null
 }
 
 type SnapDirection = "left" | "right" | "top" | "bottom" | null
@@ -23,6 +26,8 @@ export function Window({
   defaultHeight = 400,
   defaultX = 100,
   defaultY = 100,
+  blogSlug,
+  pageType = null,
 }: WindowProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [position, setPosition] = useState({ x: defaultX, y: defaultY })
@@ -34,6 +39,7 @@ export function Window({
   const [isClosing, setIsClosing] = useState(false)
 
   const windowRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const isMobile = window.innerWidth < 768
@@ -104,7 +110,28 @@ export function Window({
   }
 
   const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
+    // If this is a blog post window, navigate with View Transitions
+    if (blogSlug) {
+      if (!isFullscreen) {
+        // Going fullscreen - navigate to blog post page
+        startTransition(() => {
+          router.push(`/blog/${blogSlug}`)
+        })
+      } else {
+        // Exiting fullscreen - navigate back to homepage
+        startTransition(() => {
+          router.push('/')
+        })
+      }
+    } else if (pageType) {
+      // Navigate to the page
+      startTransition(() => {
+        router.push(`/${pageType}`)
+      })
+    } else {
+      // Regular window - just toggle fullscreen state
+      setIsFullscreen(!isFullscreen)
+    }
   }
 
   const createExplosion = (clickX: number, clickY: number) => {
