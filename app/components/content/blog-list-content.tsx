@@ -6,9 +6,16 @@ import type { BlogPost } from '@lib/portfolio-data'
 interface BlogListContentProps {
   posts: BlogPost[]
   onPostClick?: (slug: string) => void
+  onPostHover?: (slug: string) => void
+  onPostHoverEnd?: () => void
 }
 
-export function BlogListContent({ posts, onPostClick }: BlogListContentProps) {
+export function BlogListContent({
+  posts,
+  onPostClick,
+  onPostHover,
+  onPostHoverEnd
+}: BlogListContentProps) {
   return (
     <div className="max-w-3xl">
       <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">blog/</h1>
@@ -30,6 +37,8 @@ export function BlogListContent({ posts, onPostClick }: BlogListContentProps) {
                   }
                 : undefined
             }
+            onMouseEnter={() => onPostHover?.(post.slug)}
+            onMouseLeave={onPostHoverEnd}
           />
         ))}
       </div>

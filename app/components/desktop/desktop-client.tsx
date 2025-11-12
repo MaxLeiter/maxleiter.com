@@ -4,9 +4,9 @@ import type React from 'react'
 import { useState, useEffect, startTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { Window } from '@components/desktop/window'
 import { TerminalContent } from '@components/desktop/terminal-content'
-import { Calculator } from '@components/desktop/calculator'
 import { WidgetRecentPosts } from '@components/desktop/widget-recent-posts'
 import { WidgetTopProjects } from '@components/desktop/widget-top-projects'
 import {
@@ -16,6 +16,19 @@ import {
 } from '@components/page-content-client'
 import type { BlogPost, Project } from '@lib/portfolio-data'
 import { ABOUT_CONTENT } from '@lib/about-content'
+
+const Calculator = dynamic(
+  () =>
+    import('@components/desktop/calculator').then((m) => ({
+      default: m.Calculator,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="p-4 text-white/60 font-mono">Loading calculator...</div>
+    ),
+  },
+)
 
 interface DesktopItem {
   id: string
@@ -207,6 +220,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     {},
   )
   const [nextZIndex, setNextZIndex] = useState(50)
+  const [preloadedPost, setPreloadedPost] = useState<string | null>(null)
 
   const currentBlogPost = openBlogPost
     ? blogPosts.find((post) => post.slug === openBlogPost)
@@ -239,7 +253,21 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       })
     } else {
       setOpenBlogPost(slug)
+      setPreloadedPost(null) // Clear preload when opening
     }
+  }
+
+  const handlePostHover = (slug: string) => {
+    if (!isMobile && !openBlogPost) {
+      setPreloadedPost(slug)
+    }
+  }
+
+  const handlePostHoverEnd = () => {
+    // Keep the preloaded iframe for a bit in case they click
+    setTimeout(() => {
+      setPreloadedPost(null)
+    }, 1000)
   }
 
   // Bring new windows to front automatically
@@ -417,11 +445,22 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
               posts={blogPosts}
               limit={5}
               onPostClick={handlePostClick}
+              onPostHover={handlePostHover}
+              onPostHoverEnd={handlePostHoverEnd}
             />
             <WidgetTopProjects projects={projects} limit={5} />
           </div>
         </div>
       </div>
+
+      {/* Hidden preload iframe */}
+      {preloadedPost && (
+        <iframe
+          src={`/blog/${preloadedPost}?embed=true`}
+          className="hidden"
+          aria-hidden="true"
+        />
+      )}
 
       {openTerminal && (
         <Window
@@ -469,7 +508,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
           onFocus={() => bringToFront(`blog-post-${openBlogPost}`)}
         >
           <iframe
-            src={`/blog/${openBlogPost}`}
+            src={`/blog/${openBlogPost}?embed=true`}
             className="w-full h-full border-0"
             title={currentBlogPost.title}
           />
@@ -528,6 +567,8 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
             <BlogListContentClient
               posts={blogPosts}
               onPostClick={handlePostClick}
+              onPostHover={handlePostHover}
+              onPostHoverEnd={handlePostHoverEnd}
             />
           </div>
         </Window>

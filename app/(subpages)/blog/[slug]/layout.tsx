@@ -31,6 +31,5 @@ export default async function PostLayout(props: {
 }) {
   const { children } = props
 
-  // Just render children - styling handled in page.tsx
   return <>{children}</>
 }

@@ -7,9 +7,17 @@ interface WidgetRecentPostsProps {
   posts: BlogPost[]
   limit?: number
   onPostClick?: (slug: string) => void
+  onPostHover?: (slug: string) => void
+  onPostHoverEnd?: () => void
 }
 
-export function WidgetRecentPosts({ posts, limit = 5, onPostClick }: WidgetRecentPostsProps) {
+export function WidgetRecentPosts({
+  posts,
+  limit = 5,
+  onPostClick,
+  onPostHover,
+  onPostHoverEnd
+}: WidgetRecentPostsProps) {
   const recentPosts = posts.slice(0, limit)
 
   return (
@@ -37,6 +45,8 @@ export function WidgetRecentPosts({ posts, limit = 5, onPostClick }: WidgetRecen
                   e.preventDefault()
                   onPostClick(post.slug)
                 }}
+                onMouseEnter={() => onPostHover?.(post.slug)}
+                onMouseLeave={onPostHoverEnd}
                 className="block px-4 py-3 hover:bg-white/5 transition-colors group"
               >
                 {content}

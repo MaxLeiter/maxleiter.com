@@ -31,15 +31,24 @@ export function ProjectsContentClient({
 interface BlogListContentClientProps {
   posts: BlogPost[]
   onPostClick?: (slug: string) => void
+  onPostHover?: (slug: string) => void
+  onPostHoverEnd?: () => void
 }
 
 export function BlogListContentClient({
   posts,
   onPostClick,
+  onPostHover,
+  onPostHoverEnd,
 }: BlogListContentClientProps) {
   return (
     <ViewTransitionWrapper name="page-blog">
-      <BlogListContent posts={posts} onPostClick={onPostClick} />
+      <BlogListContent
+        posts={posts}
+        onPostClick={onPostClick}
+        onPostHover={onPostHover}
+        onPostHoverEnd={onPostHoverEnd}
+      />
     </ViewTransitionWrapper>
   )
 }

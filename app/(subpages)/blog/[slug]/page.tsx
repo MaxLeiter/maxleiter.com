@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import getPosts, { getPost } from '@lib/get-posts'
-import { BlogPostContent } from '@components/blog-post-content'
-import { WindowToolbar } from '@components/desktop/window-toolbar'
 import { notFound } from 'next/navigation'
+import { BlogPostPageClient } from './blog-post-page-client'
+import { BlogPostContent } from '@components/blog-post-content'
 
 export async function generateStaticParams() {
   const posts = await getPosts()
@@ -20,25 +19,15 @@ export default async function PostPage(props: {
   if (!post) return notFound()
 
   return (
-    <div className="min-h-screen bg-black text-white/90 flex flex-col">
-      <WindowToolbar
+    <BlogPostPageClient slug={params.slug} title={post.title}>
+      <BlogPostContent
+        slug={params.slug}
         title={post.title}
-        segments={[
-          { name: 'blog', href: '/blog' },
-          { name: params.slug, href: `/blog/${params.slug}` },
-        ]}
+        date={post.date}
+        description={post.description}
+        body={post.body}
+        lastModified={post.lastModified}
       />
-
-      <div className="flex-1 overflow-auto p-6">
-        <BlogPostContent
-          slug={params.slug}
-          title={post.title}
-          date={post.date}
-          description={post.description}
-          body={post.body}
-          lastModified={post.lastModified}
-        />
-      </div>
-    </div>
+    </BlogPostPageClient>
   )
 }

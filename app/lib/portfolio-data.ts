@@ -19,7 +19,7 @@ export interface Project {
   content: string
 }
 
-function convertToBlogPost(post: Post): BlogPost | null {
+function convertToBlogPost(post: Post, includeContent: boolean = false): BlogPost | null {
   if (!post.slug) return null
 
   return {
@@ -27,7 +27,7 @@ function convertToBlogPost(post: Post): BlogPost | null {
     title: post.title,
     date: post.date,
     excerpt: post.description,
-    content: post.body,
+    content: includeContent ? post.body : '',
   }
 }
 
@@ -42,10 +42,11 @@ function convertToProject(project: ProjectType, index: number): Project {
   }
 }
 
-export async function getBlogPosts(): Promise<BlogPost[]> {
+export async function getBlogPosts(opts?: { includeContent?: boolean }): Promise<BlogPost[]> {
   const posts = await getPosts(false)
+  const includeContent = opts?.includeContent ?? false
   return posts
-    .map(convertToBlogPost)
+    .map(post => convertToBlogPost(post, includeContent))
     .filter((post): post is BlogPost => post !== null)
 }
 
