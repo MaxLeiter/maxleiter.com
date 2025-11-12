@@ -8,7 +8,9 @@ interface ProjectsContentProps {
 export function ProjectsContent({ projects }: ProjectsContentProps) {
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">projects/</h1>
+      <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">
+        projects/
+      </h1>
 
       <div className="space-y-2">
         {projects.map((project) => (
@@ -19,7 +21,7 @@ export function ProjectsContent({ projects }: ProjectsContentProps) {
             description={project.description}
             tags={project.tech}
             external
-            icon="folder"
+            icon={false}
           />
         ))}
       </div>

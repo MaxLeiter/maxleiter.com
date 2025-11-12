@@ -33,9 +33,26 @@ export function Window({
   zIndex = 50,
   onFocus,
 }: WindowProps) {
+  // Constrain initial size to viewport
+  const constrainToViewport = (width: number, height: number, x: number, y: number) => {
+    const maxWidth = window.innerWidth - 40 // Leave 20px padding on each side
+    const maxHeight = window.innerHeight - 80 // Leave space for top bar (40px) and padding
+
+    return {
+      width: Math.min(width, maxWidth),
+      height: Math.min(height, maxHeight),
+      x: Math.max(20, Math.min(x, window.innerWidth - width - 20)),
+      y: Math.max(60, Math.min(y, window.innerHeight - height - 20))
+    }
+  }
+
+  const initialConstraints = typeof window !== 'undefined'
+    ? constrainToViewport(defaultWidth, defaultHeight, defaultX, defaultY)
+    : { width: defaultWidth, height: defaultHeight, x: defaultX, y: defaultY }
+
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [position, setPosition] = useState({ x: defaultX, y: defaultY })
-  const [size, setSize] = useState({ width: defaultWidth, height: defaultHeight })
+  const [position, setPosition] = useState({ x: initialConstraints.x, y: initialConstraints.y })
+  const [size, setSize] = useState({ width: initialConstraints.width, height: initialConstraints.height })
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })

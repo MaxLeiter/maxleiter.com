@@ -11,9 +11,7 @@ interface BlogListContentProps {
 export function BlogListContent({ posts, onPostClick }: BlogListContentProps) {
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">
-        blog/
-      </h1>
+      <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">blog/</h1>
 
       <div className="space-y-2">
         {posts.map((post) => (
@@ -23,11 +21,15 @@ export function BlogListContent({ posts, onPostClick }: BlogListContentProps) {
             title={post.title}
             description={post.excerpt}
             meta={post.date}
-            icon="file"
-            onClick={onPostClick ? (e) => {
-              e.preventDefault()
-              onPostClick(post.slug)
-            } : undefined}
+            icon
+            onClick={
+              onPostClick
+                ? (e) => {
+                    e.preventDefault()
+                    onPostClick(post.slug)
+                  }
+                : undefined
+            }
           />
         ))}
       </div>

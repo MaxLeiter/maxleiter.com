@@ -53,24 +53,6 @@ export function BlogPostContentClient({
         >
           {children}
         </div>
-
-        <div className="mt-8 p-6 bg-white/5 border border-white/10 rounded-lg">
-          <p className="text-white/70 font-mono text-sm mb-4">
-            Continue reading the full article...
-          </p>
-          <Link
-            href={`/blog/${slug}`}
-            onClick={(e) => {
-              e.preventDefault()
-              startTransition(() => {
-                router.push(`/blog/${slug}`)
-              })
-            }}
-            className="inline-block bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 hover:text-white/90 px-2 py-1 rounded-lg font-mono text-sm transition-colors"
-          >
-            Read Full Article →
-          </Link>
-        </div>
       </article>
     </ViewTransitionWrapper>
   )
