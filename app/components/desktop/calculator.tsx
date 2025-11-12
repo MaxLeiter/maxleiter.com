@@ -176,7 +176,8 @@ export function Calculator() {
           <h3 className="font-semibold mb-1 text-white">KnightOS Emulator</h3>
           <p className="text-white/70 leading-relaxed text-xs">
             Running KnightOS, an open-source OS for TI calculators. Fully
-            functional TI-84+ SE emulator in your browser.
+            functional TI-84+ SE emulator in your browser. The first project I
+            ever contributed to.
           </p>
           <button
             onClick={() => setShowInfo(false)}
