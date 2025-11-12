@@ -4,9 +4,90 @@ import { useEffect, useRef, useState } from 'react'
 
 export function Calculator() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const emulatorRef = useRef<any>(null)
+  const [showInfo, setShowInfo] = useState(false)
+  const [scale, setScale] = useState(1)
+  const [showKeyboard, setShowKeyboard] = useState(false)
+
+  // Key mappings from ide_emu.js
+  const keyMappings: { [key: string]: number } = {
+    'down': 0x00,
+    'left': 0x01,
+    'right': 0x02,
+    'up': 0x03,
+    '2nd': 0x65,
+    'enter': 0x10,
+    'mode': 0x66,
+    'y=': 0x64,
+    'window': 0x63,
+    'zoom': 0x62,
+    'trace': 0x61,
+    'graph': 0x60,
+    '0': 0x40,
+    '1': 0x41,
+    '2': 0x31,
+    '3': 0x21,
+    '4': 0x42,
+    '5': 0x32,
+    '6': 0x22,
+    '7': 0x43,
+    '8': 0x33,
+    '9': 0x23,
+  }
+
+  const pressKey = (keyCode: number) => {
+    if (emulatorRef.current?.asic?.hardware?.Keyboard) {
+      try {
+        emulatorRef.current.asic.hardware.Keyboard.press(keyCode)
+        setTimeout(() => {
+          emulatorRef.current.asic.hardware.Keyboard.release(keyCode)
+        }, 100)
+      } catch (err) {
+        console.error('Key press error:', err)
+      }
+    }
+  }
+
+  // Handle responsive scaling based on parent container
+  useEffect(() => {
+    const updateScale = () => {
+      if (containerRef.current) {
+        const parent = containerRef.current.parentElement?.parentElement?.parentElement
+        if (!parent) return
+
+        const parentWidth = parent.clientWidth
+        const parentHeight = parent.clientHeight
+        const calculatorWidth = 645
+        const calculatorHeight = 422
+
+        // Reserve space for keyboard (roughly 400px) and other UI elements
+        const availableHeight = parentHeight - 450
+
+        // Calculate scale to fit within parent with padding
+        const scaleX = (parentWidth - 80) / calculatorWidth
+        const scaleY = (availableHeight - 80) / calculatorHeight
+        const newScale = Math.min(scaleX, scaleY, 2.0) // Allow up to 2x scale
+
+        setScale(Math.max(newScale, 0.4)) // Minimum 0.4x scale
+      }
+    }
+
+    updateScale()
+    window.addEventListener('resize', updateScale)
+
+    // Use ResizeObserver to watch parent container changes
+    const resizeObserver = new ResizeObserver(updateScale)
+    if (containerRef.current?.parentElement?.parentElement?.parentElement) {
+      resizeObserver.observe(containerRef.current.parentElement.parentElement.parentElement)
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateScale)
+      resizeObserver.disconnect()
+    }
+  }, [])
 
   useEffect(() => {
     let cleanup: (() => void) | null = null
@@ -19,14 +100,12 @@ export function Calculator() {
         if (!(window as any).require || !(window as any).require.config) {
           console.log('Loading RequireJS...')
           await loadScript('/knightos/require.min.js')
-          // Wait a bit for RequireJS to initialize
           await new Promise(resolve => setTimeout(resolve, 200))
         }
 
-        // Configure RequireJS
+        // Configure RequireJS exactly like try.knightos.org
         const requireJS = (window as any).require
         if (!requireJS || !requireJS.config) {
-          console.error('RequireJS object:', requireJS)
           throw new Error('RequireJS failed to load')
         }
 
@@ -37,246 +116,36 @@ export function Calculator() {
             'z80e': 'z80e'
           },
           shim: {
-            'kpack': { exports: 'exports' },
-            'genkfs': { exports: 'exports' },
-            'scas': { exports: 'exports' },
             'z80e': { exports: 'exports' },
             'ide_emu': { exports: 'exports' },
           },
         })
 
-        // Initialize toolchain object
-        ;(window as any).toolchain = {
-          kpack: null,
-          genkfs: null,
-          scas: null,
-          z80e: null,
-          ide_emu: null,
-          kernel_rom: null,
+        // Download pre-configured ROM
+        console.log('Downloading ROM...')
+        const romResponse = await fetch('/knightos/KnightOS-TI84pSE.rom')
+        if (!romResponse.ok) {
+          throw new Error(`Failed to load ROM: ${romResponse.status}`)
         }
+        const romData = await romResponse.arrayBuffer()
+        console.log('ROM loaded, size:', romData.byteLength)
 
-        // Download kernel from local copy
-        console.log('Downloading kernel...')
-        const kernelResponse = await fetch('/knightos/kernel-TI84pSE.rom')
-        const kernelData = await kernelResponse.arrayBuffer()
-        ;(window as any).toolchain.kernel_rom = new Uint8Array(kernelData)
-        console.log('Kernel loaded')
-
-        let modulesLoaded = 0
-        const totalModules = 4
-
-        const checkAndInit = async () => {
-          modulesLoaded++
-          console.log(`Modules loaded: ${modulesLoaded}/${totalModules}`)
-
-          if (modulesLoaded === totalModules) {
-            console.log('All modules loaded, initializing...')
-            try {
-              const toolchain = (window as any).toolchain
-
-              // Set up filesystem exactly like TKO does
-              console.log('Setting up filesystem...')
-
-              // Helper to safely create directory
-              const safeMkdir = (fs: any, path: string) => {
-                try {
-                  fs.mkdir(path)
-                } catch (e: any) {
-                  if (!e.message?.includes('File exists')) {
-                    throw e
-                  }
-                }
-              }
-
-              toolchain.genkfs.FS.writeFile('/kernel.rom', toolchain.kernel_rom, {
-                encoding: 'binary',
-              })
-              safeMkdir(toolchain.genkfs.FS, '/root')
-              safeMkdir(toolchain.genkfs.FS, '/root/etc')
-              safeMkdir(toolchain.kpack.FS, '/packages')
-              safeMkdir(toolchain.kpack.FS, '/pkgroot')
-              safeMkdir(toolchain.kpack.FS, '/pkgroot/include')
-              safeMkdir(toolchain.scas.FS, '/include')
-
-              // Install core KnightOS packages
-              console.log('Installing core packages...')
-              await installPackage('core', 'init')
-              await installPackage('core', 'kernel-headers')
-              await installPackage('core', 'corelib')
-
-              // Verify includes were copied
-              console.log('Checking includes...')
-              try {
-                const includeFiles = toolchain.scas.FS.readdir('/include')
-                console.log('Include files:', includeFiles)
-              } catch (e) {
-                console.error('Failed to read includes:', e)
-              }
-
-              // Load and compile hello world program
-              console.log('Loading hello world program...')
-              const helloAsmResponse = await fetch('/knightos/hello-world.asm')
-              const helloAsmText = await helloAsmResponse.text()
-
-              // Write the ASM file to scas filesystem
-              toolchain.scas.FS.writeFile('/hello.asm', helloAsmText)
-
-              // Assemble the program
-              console.log('Assembling program...')
-              const errorLog: string[] = []
-              const logOutput: string[] = []
-              const oldError = (window as any).ide_error
-              const oldLog = (window as any).ide_log
-
-              ;(window as any).ide_error = (text: string) => {
-                console.error('Assembly error:', text)
-                errorLog.push(text)
-                if (oldError) oldError(text)
-              }
-
-              ;(window as any).ide_log = (text: string) => {
-                console.log('Assembly log:', text)
-                logOutput.push(text)
-                if (oldLog) oldLog(text)
-              }
-
-              // Try to capture all output from scas
-              let scasOutput = ''
-              const oldPrint = toolchain.scas.Module.print
-              const oldPrintErr = toolchain.scas.Module.printErr
-
-              toolchain.scas.Module.print = (text: string) => {
-                console.log('scas stdout:', text)
-                scasOutput += text + '\n'
-                if (oldPrint) oldPrint(text)
-              }
-
-              toolchain.scas.Module.printErr = (text: string) => {
-                console.error('scas stderr:', text)
-                scasOutput += 'ERROR: ' + text + '\n'
-                if (oldPrintErr) oldPrintErr(text)
-              }
-
-              // Check that kernel.inc exists and can be read
-              try {
-                const kernelIncData = toolchain.scas.FS.readFile('/include/kernel.inc', { encoding: 'utf8' })
-                console.log('kernel.inc length:', kernelIncData.length)
-                console.log('kernel.inc first 500 chars:', kernelIncData.substring(0, 500))
-
-                // Check for pcall macro
-                if (kernelIncData.includes('pcall')) {
-                  console.log('✓ kernel.inc contains pcall macro')
-                } else {
-                  console.error('✗ kernel.inc does NOT contain pcall macro!')
-                }
-
-                // Try to read macros.inc directly
-                const macrosInc = toolchain.scas.FS.readFile('/include/macros.inc', { encoding: 'utf8' })
-                console.log('macros.inc length:', macrosInc.length)
-                if (macrosInc.includes('pcall')) {
-                  console.log('✓ macros.inc contains pcall')
-                  console.log('pcall definition snippet:', macrosInc.substring(macrosInc.indexOf('pcall'), macrosInc.indexOf('pcall') + 200))
-                }
-              } catch (e) {
-                console.error('Failed to read includes:', e)
-              }
-
-              // TKO uses exact same command - just /main.asm, -I/include/, -o, executable
-              console.log('Calling scas with:', ['/hello.asm', '-I/include/', '-o', 'executable'])
-              const result = toolchain.scas.Module.callMain(['/hello.asm', '-I/include/', '-o', 'executable'])
-              console.log('scas return code:', result)
-
-              toolchain.scas.Module.print = oldPrint
-              toolchain.scas.Module.printErr = oldPrintErr
-              ;(window as any).ide_error = oldError
-              ;(window as any).ide_log = oldLog
-
-              console.log('Full scas output:', scasOutput)
-              console.log('Assembly log output:', logOutput)
-              console.log('Assembly error output:', errorLog)
-
-              // List files in root to debug
-              console.log('Files in scas root:', toolchain.scas.FS.readdir('/'))
-
-              // Check if assembly succeeded
-              if (!toolchain.scas.FS.analyzePath('/executable').exists) {
-                console.error('Assembly errors:', errorLog)
-                console.error('Executable not found at /executable')
-                throw new Error('Assembly failed: ' + (errorLog.length > 0 ? errorLog.join('; ') : 'No output file created'))
-              }
-
-              console.log('Assembly successful!')
-
-              // Read the assembled executable
-              const executable = toolchain.scas.FS.readFile('/executable', { encoding: 'binary' })
-
-              // Write executable to genkfs filesystem
-              toolchain.genkfs.FS.writeFile('/root/bin/hello', executable, { encoding: 'binary' })
-
-              // Set up inittab to boot to hello program
-              console.log('Setting up inittab to boot hello...')
-              toolchain.genkfs.FS.writeFile('/root/etc/inittab', '/bin/hello')
-
-              // Generate ROM with filesystem (THIS IS THE KEY STEP!)
-              console.log('Generating ROM...')
-              toolchain.genkfs.FS.writeFile('/kernel.rom', new Uint8Array(toolchain.kernel_rom), {
-                encoding: 'binary',
-              })
-              toolchain.genkfs.Module.callMain(['/kernel.rom', '/root'])
-              const rom = toolchain.genkfs.FS.readFile('/kernel.rom', { encoding: 'binary' })
-
-              // Create emulator instance
-              if (canvasRef.current) {
-                console.log('Creating emulator...')
-                const ide_emu = toolchain.ide_emu
-                const emu = new ide_emu(canvasRef.current)
-                emulatorRef.current = emu
-
-                console.log('Loading ROM into emulator...')
-                emu.load_rom(rom.buffer)
-
-                console.log('Emulator ready!')
-                setLoading(false)
-              }
-            } catch (err) {
-              console.error('Error initializing emulator:', err)
-              setError(err instanceof Error ? err.message : 'Failed to initialize')
-            }
-          }
-        }
-
-        // Load modules one at a time like the original - using exact same paths as TKO
-        console.log('Loading scas...')
-        requireJS(['scas'], (scas: any) => {
-          console.log('scas loaded')
-          ;(window as any).toolchain.scas = scas
-          // Only call preRun if it has entries
-          if (scas.Module.preRun && scas.Module.preRun.length > 0) {
-            scas.Module.preRun.pop()()
-          }
-          checkAndInit()
-        })
-
-        console.log('Loading kpack...')
-        requireJS(['kpack'], (kpack: any) => {
-          console.log('kpack loaded')
-          ;(window as any).toolchain.kpack = kpack
-          checkAndInit()
-        })
-
-        console.log('Loading genkfs...')
-        requireJS(['genkfs'], (genkfs: any) => {
-          console.log('genkfs loaded')
-          ;(window as any).toolchain.genkfs = genkfs
-          checkAndInit()
-        })
-
+        // Load modules exactly like try.knightos.org ide_emu.js
         console.log('Loading ide_emu...')
         requireJS(['ide_emu'], (ide_emu: any) => {
           console.log('ide_emu loaded')
-          ;(window as any).toolchain.ide_emu = ide_emu
-          ;(window as any).toolchain.z80e = requireJS('z80e')
-          checkAndInit()
+
+          if (canvasRef.current) {
+            console.log('Creating emulator...')
+            const emu = new ide_emu(canvasRef.current)
+            emulatorRef.current = emu
+
+            console.log('Loading ROM into emulator...')
+            emu.load_rom(romData)
+
+            console.log('Emulator ready!')
+            setLoading(false)
+          }
         })
 
         cleanup = () => {
@@ -285,8 +154,7 @@ export function Calculator() {
           }
         }
       } catch (err) {
-        console.error('Error loading scripts:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load')
+        console.error('Error loading emulator:', err)
         setLoading(false)
       }
     }
@@ -299,41 +167,209 @@ export function Calculator() {
   }, [])
 
   return (
-    <div className="h-full flex flex-col items-center justify-center bg-black p-4">
+    <div className="h-full w-full flex flex-col items-center justify-start bg-black p-2 sm:p-4 relative overflow-auto">
+      {/* Info Icon */}
+      <button
+        onClick={() => setShowInfo(!showInfo)}
+        className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors text-sm"
+        aria-label="Info about KnightOS"
+      >
+        i
+      </button>
+
+      {/* Info Tooltip */}
+      {showInfo && (
+        <div className="absolute top-10 right-2 z-10 bg-black border border-white/20 rounded p-3 max-w-xs text-xs text-white/90 shadow-xl">
+          <h3 className="font-semibold mb-1 text-white">KnightOS Emulator</h3>
+          <p className="text-white/70 leading-relaxed text-xs">
+            Running KnightOS, an open-source OS for TI calculators.
+            Fully functional TI-84+ SE emulator in your browser.
+          </p>
+          <button
+            onClick={() => setShowInfo(false)}
+            className="mt-2 text-xs text-white/50 hover:text-white/70"
+          >
+            Close
+          </button>
+        </div>
+      )}
+
       {loading && (
         <div className="text-white/70 text-sm font-mono mb-4">
           Loading KnightOS...
         </div>
       )}
-      {error && (
-        <div className="text-red-400 text-sm font-mono mb-4">
-          Error: {error}
-        </div>
-      )}
-      <div className="relative">
-        <img
-          src="/knightos/skin.png"
-          alt="Calculator"
-          className="pointer-events-none"
-          style={{ imageRendering: 'pixelated' }}
-        />
-        <canvas
-          ref={canvasRef}
-          className="absolute"
+
+      <div
+        className="shrink-0 mb-2 flex justify-center w-full"
+        style={{
+          height: `${422 * scale}px`,
+        }}
+      >
+        <div
+          ref={containerRef}
           style={{
-            top: '52px',
-            left: '28px',
-            width: '384px',
-            height: '256px',
-            imageRendering: 'pixelated',
+            transform: `scale(${scale})`,
+            transformOrigin: 'top center',
           }}
-          width={384}
-          height={256}
-        />
+        >
+          <div
+            className="relative"
+            style={{
+              width: '645px',
+              height: '422px',
+              backgroundImage: 'url(/knightos/skin.png)',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              margin: '0 auto',
+            }}
+          >
+            <canvas
+              ref={canvasRef}
+              className="absolute"
+              style={{
+                top: '130px',
+                left: '122px',
+                backgroundColor: '#97af97',
+                imageRendering: 'pixelated',
+              }}
+              width={385}
+              height={256}
+            />
+          </div>
+        </div>
       </div>
-      {!loading && !error && (
-        <div className="mt-4 text-white/50 text-xs font-mono text-center">
-          Click the screen to focus. Use arrow keys, F1-F5, Enter, and Esc.
+
+      {!loading && (
+        <div className="shrink-0 w-full max-w-md px-2">
+          <div className="text-white/50 text-xs font-mono text-center mb-2">
+            Click screen to focus • Arrow keys & numbers
+          </div>
+
+          {/* Mobile Keyboard Toggle */}
+          <button
+            onClick={() => setShowKeyboard(!showKeyboard)}
+            className="w-full mb-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white/90 hover:text-white rounded text-sm transition-colors border border-white/20"
+          >
+            {showKeyboard ? '▼ Hide Keyboard' : '▲ Show Keyboard'}
+          </button>
+
+          {/* Mobile On-Screen Keyboard */}
+          {showKeyboard && (
+            <div className="w-full p-3 bg-black border border-white/20 rounded">
+              <div className="grid gap-2">
+                {/* Arrow Keys */}
+                <div className="flex justify-center mb-2">
+                  <div className="grid grid-cols-3 gap-1" style={{ maxWidth: '180px' }}>
+                    <div></div>
+                    <button
+                      onClick={() => pressKey(keyMappings['up'])}
+                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-sm active:bg-white/30"
+                    >
+                      ↑
+                    </button>
+                    <div></div>
+                    <button
+                      onClick={() => pressKey(keyMappings['left'])}
+                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-sm active:bg-white/30"
+                    >
+                      ←
+                    </button>
+                    <button
+                      onClick={() => pressKey(keyMappings['enter'])}
+                      className="bg-white/20 hover:bg-white/30 text-white border border-white/40 font-bold py-2 px-2 rounded text-xs active:bg-white/40"
+                    >
+                      ENTER
+                    </button>
+                    <button
+                      onClick={() => pressKey(keyMappings['right'])}
+                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-sm active:bg-white/30"
+                    >
+                      →
+                    </button>
+                    <div></div>
+                    <button
+                      onClick={() => pressKey(keyMappings['down'])}
+                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-sm active:bg-white/30"
+                    >
+                      ↓
+                    </button>
+                    <div></div>
+                  </div>
+                </div>
+
+                {/* Function Keys */}
+                <div className="grid grid-cols-5 gap-1 mb-2">
+                  <button
+                    onClick={() => pressKey(keyMappings['y='])}
+                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                  >
+                    Y=
+                  </button>
+                  <button
+                    onClick={() => pressKey(keyMappings['window'])}
+                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                  >
+                    WIN
+                  </button>
+                  <button
+                    onClick={() => pressKey(keyMappings['zoom'])}
+                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                  >
+                    ZM
+                  </button>
+                  <button
+                    onClick={() => pressKey(keyMappings['trace'])}
+                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                  >
+                    TRC
+                  </button>
+                  <button
+                    onClick={() => pressKey(keyMappings['graph'])}
+                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                  >
+                    GRF
+                  </button>
+                </div>
+
+                {/* Number Pad */}
+                <div className="grid grid-cols-3 gap-2">
+                  {['7', '8', '9', '4', '5', '6', '1', '2', '3'].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => pressKey(keyMappings[num])}
+                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-3 px-4 rounded active:bg-white/30"
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Bottom Row */}
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  <button
+                    onClick={() => pressKey(keyMappings['2nd'])}
+                    className="bg-white/20 hover:bg-white/30 text-white border border-white/40 font-bold py-2 px-3 rounded text-xs active:bg-white/40"
+                  >
+                    2nd
+                  </button>
+                  <button
+                    onClick={() => pressKey(keyMappings['0'])}
+                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-4 rounded active:bg-white/30"
+                  >
+                    0
+                  </button>
+                  <button
+                    onClick={() => pressKey(keyMappings['mode'])}
+                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-xs active:bg-white/30"
+                  >
+                    MODE
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -364,54 +400,4 @@ function loadScript(src: string): Promise<void> {
     }
     document.head.appendChild(script)
   })
-}
-
-async function installPackage(repo: string, name: string): Promise<void> {
-  const fullName = `${repo}/${name}`
-  console.log(`Installing ${fullName}`)
-
-  const response = await fetch(`/knightos/packages/${repo}-${name}.pkg`)
-  if (!response.ok) {
-    throw new Error(`Failed to load package ${fullName}: ${response.status}`)
-  }
-  const data = await response.arrayBuffer()
-
-  const kpack = (window as any).toolchain.kpack
-  const fileName = `/packages/${repo}-${name}.pkg`
-
-  kpack.FS.writeFile(fileName, new Uint8Array(data), { encoding: 'binary' })
-  kpack.Module.callMain(['-e', fileName, '/pkgroot'])
-
-  // Copy to other filesystems
-  const scas = (window as any).toolchain.scas
-  const genkfs = (window as any).toolchain.genkfs
-
-  copyBetweenSystems(kpack.FS, scas.FS, '/pkgroot/include', '/include', 'utf8')
-  copyBetweenSystems(kpack.FS, genkfs.FS, '/pkgroot', '/root', 'binary')
-}
-
-function copyBetweenSystems(
-  fs1: any,
-  fs2: any,
-  from: string,
-  to: string,
-  encoding: string
-) {
-  const files = fs1.readdir(from)
-  for (const f of files) {
-    if (f === '.' || f === '..') continue
-
-    const fs1p = `${from}/${f}`
-    const fs2p = `${to}/${f}`
-    const stat = fs1.stat(fs1p)
-
-    if (fs1.isDir(stat.mode)) {
-      try {
-        fs2.mkdir(fs2p)
-      } catch {}
-      copyBetweenSystems(fs1, fs2, fs1p, fs2p, encoding)
-    } else {
-      fs2.writeFile(fs2p, fs1.readFile(fs1p, { encoding }), { encoding })
-    }
-  }
 }
