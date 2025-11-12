@@ -13,18 +13,18 @@ export function Calculator() {
 
   // Key mappings from ide_emu.js
   const keyMappings: { [key: string]: number } = {
-    'down': 0x00,
-    'left': 0x01,
-    'right': 0x02,
-    'up': 0x03,
+    down: 0x00,
+    left: 0x01,
+    right: 0x02,
+    up: 0x03,
     '2nd': 0x65,
-    'enter': 0x10,
-    'mode': 0x66,
+    enter: 0x10,
+    mode: 0x66,
     'y=': 0x64,
-    'window': 0x63,
-    'zoom': 0x62,
-    'trace': 0x61,
-    'graph': 0x60,
+    window: 0x63,
+    zoom: 0x62,
+    trace: 0x61,
+    graph: 0x60,
     '0': 0x40,
     '1': 0x41,
     '2': 0x31,
@@ -54,7 +54,8 @@ export function Calculator() {
   useEffect(() => {
     const updateScale = () => {
       if (containerRef.current) {
-        const parent = containerRef.current.parentElement?.parentElement?.parentElement
+        const parent =
+          containerRef.current.parentElement?.parentElement?.parentElement
         if (!parent) return
 
         const parentWidth = parent.clientWidth
@@ -65,7 +66,6 @@ export function Calculator() {
         // Reserve space for keyboard (roughly 400px) and other UI elements
         const availableHeight = parentHeight - 450
 
-        // Calculate scale to fit within parent with padding
         const scaleX = (parentWidth - 80) / calculatorWidth
         const scaleY = (availableHeight - 80) / calculatorHeight
         const newScale = Math.min(scaleX, scaleY, 2.0) // Allow up to 2x scale
@@ -77,10 +77,11 @@ export function Calculator() {
     updateScale()
     window.addEventListener('resize', updateScale)
 
-    // Use ResizeObserver to watch parent container changes
     const resizeObserver = new ResizeObserver(updateScale)
     if (containerRef.current?.parentElement?.parentElement?.parentElement) {
-      resizeObserver.observe(containerRef.current.parentElement.parentElement.parentElement)
+      resizeObserver.observe(
+        containerRef.current.parentElement.parentElement.parentElement,
+      )
     }
 
     return () => {
@@ -96,14 +97,12 @@ export function Calculator() {
       try {
         console.log('Initializing KnightOS emulator...')
 
-        // Load RequireJS if not already loaded
         if (!(window as any).require || !(window as any).require.config) {
           console.log('Loading RequireJS...')
           await loadScript('/knightos/require.min.js')
-          await new Promise(resolve => setTimeout(resolve, 200))
+          await new Promise((resolve) => setTimeout(resolve, 200))
         }
 
-        // Configure RequireJS exactly like try.knightos.org
         const requireJS = (window as any).require
         if (!requireJS || !requireJS.config) {
           throw new Error('RequireJS failed to load')
@@ -113,38 +112,37 @@ export function Calculator() {
         requireJS.config({
           baseUrl: '/knightos',
           paths: {
-            'z80e': 'z80e'
+            z80e: 'z80e',
           },
           shim: {
-            'z80e': { exports: 'exports' },
-            'ide_emu': { exports: 'exports' },
+            z80e: { exports: 'exports' },
+            ide_emu: { exports: 'exports' },
           },
         })
 
-        // Download pre-configured ROM
         console.log('Downloading ROM...')
         const romResponse = await fetch('/knightos/KnightOS-TI84pSE.rom')
         if (!romResponse.ok) {
           throw new Error(`Failed to load ROM: ${romResponse.status}`)
         }
         const romData = await romResponse.arrayBuffer()
-        console.log('ROM loaded, size:', romData.byteLength)
 
-        // Load modules exactly like try.knightos.org ide_emu.js
-        console.log('Loading ide_emu...')
         requireJS(['ide_emu'], (ide_emu: any) => {
-          console.log('ide_emu loaded')
-
           if (canvasRef.current) {
-            console.log('Creating emulator...')
             const emu = new ide_emu(canvasRef.current)
             emulatorRef.current = emu
 
-            console.log('Loading ROM into emulator...')
             emu.load_rom(romData)
 
-            console.log('Emulator ready!')
             setLoading(false)
+
+            // Send Y= command after 2 seconds to fix emulation bug
+            setTimeout(() => {
+              if (emu && pressKey(keyMappings['y='])) {
+                console.log('Sending Y= command to fix emulation bug')
+                emu.sendKeys('Y=')
+              }
+            }, 2500)
           }
         })
 
@@ -182,8 +180,8 @@ export function Calculator() {
         <div className="absolute top-10 right-2 z-10 bg-black border border-white/20 rounded p-3 max-w-xs text-xs text-white/90 shadow-xl">
           <h3 className="font-semibold mb-1 text-white">KnightOS Emulator</h3>
           <p className="text-white/70 leading-relaxed text-xs">
-            Running KnightOS, an open-source OS for TI calculators.
-            Fully functional TI-84+ SE emulator in your browser.
+            Running KnightOS, an open-source OS for TI calculators. Fully
+            functional TI-84+ SE emulator in your browser.
           </p>
           <button
             onClick={() => setShowInfo(false)}
@@ -247,7 +245,6 @@ export function Calculator() {
             Click screen to focus • Arrow keys & numbers
           </div>
 
-          {/* Mobile Keyboard Toggle */}
           <button
             onClick={() => setShowKeyboard(!showKeyboard)}
             className="w-full mb-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white/90 hover:text-white rounded text-sm transition-colors border border-white/20"
@@ -255,13 +252,15 @@ export function Calculator() {
             {showKeyboard ? '▼ Hide Keyboard' : '▲ Show Keyboard'}
           </button>
 
-          {/* Mobile On-Screen Keyboard */}
           {showKeyboard && (
             <div className="w-full p-3 bg-black border border-white/20 rounded">
               <div className="grid gap-2">
                 {/* Arrow Keys */}
                 <div className="flex justify-center mb-2">
-                  <div className="grid grid-cols-3 gap-1" style={{ maxWidth: '180px' }}>
+                  <div
+                    className="grid grid-cols-3 gap-1"
+                    style={{ maxWidth: '180px' }}
+                  >
                     <div></div>
                     <button
                       onClick={() => pressKey(keyMappings['up'])}

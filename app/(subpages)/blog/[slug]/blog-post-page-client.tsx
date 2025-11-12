@@ -16,7 +16,6 @@ export function BlogPostPageClient({
   children,
 }: BlogPostPageClientProps) {
   const searchParams = useSearchParams()
-  console.log('searchParams', searchParams)
   const isEmbed =
     searchParams.get('embed') !== null &&
     searchParams.get('embed') !== undefined
