@@ -1,3 +1,5 @@
+@reference "tailwindcss";
+
 .note {
   position: relative;
   border: 1px solid var(--lighter-gray);

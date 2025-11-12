@@ -1,6 +1,7 @@
-import ProjectList from '@components/projects'
-import { ProjectsTimeline } from '@components/timeline/timeline'
-import { getProjects } from '@lib/projects'
+import { getProjectsData } from '@lib/portfolio-data'
+import { WindowToolbar } from '@components/desktop/window-toolbar'
+import { ViewTransitionWrapper } from '@components/view-transition-wrapper'
+import { ProjectsContent } from '@components/content/projects-content'
 
 export const metadata = {
   title: 'Projects',
@@ -10,13 +11,21 @@ export const metadata = {
   },
 }
 
-const Projects = async () => {
-  const projects = await getProjects()
-  projects.sort((a, b) => parseInt(b.years[0]) - parseInt(a.years[0]))
+export default async function ProjectsPage() {
+  const projects = await getProjectsData()
 
   return (
-    <ProjectsTimeline  projects={projects}  />
+    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+      <WindowToolbar
+        title="projects"
+        segments={[{ name: 'projects', href: '/projects' }]}
+      />
+
+      <main className="flex-1 overflow-auto p-6">
+        <ViewTransitionWrapper name="page-projects">
+          <ProjectsContent projects={projects} />
+        </ViewTransitionWrapper>
+      </main>
+    </div>
   )
 }
-
-export default Projects

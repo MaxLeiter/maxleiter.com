@@ -1,4 +1,3 @@
-export { default as MinecraftInventory } from './MinecraftInventory'
 export type {
   MinecraftItem,
   MinecraftInventoryProps,

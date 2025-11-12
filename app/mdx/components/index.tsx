@@ -10,7 +10,7 @@ import Home from '@components/icons/home'
 import { Tweet } from 'react-tweet'
 // import Diff from './mdx-diff'
 import dynamic from 'next/dynamic'
-import { MinecraftInventoryFromDir } from '@components/mc'
+
 const Diff = dynamic(() => import('./mdx-diff'), {
   loading: () => (
     <div
@@ -23,6 +23,12 @@ const Diff = dynamic(() => import('./mdx-diff'), {
     />
   ),
 })
+
+// Dynamically import MinecraftInventoryFromDir to avoid bundling 'fs' on client
+const MinecraftInventoryFromDir = dynamic(
+  () => import('@components/mc').then((mod) => mod.MinecraftInventoryFromDir),
+  { ssr: true }
+)
 
 Code.theme = {
   dark: 'solarized-dark',

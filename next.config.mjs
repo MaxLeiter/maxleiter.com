@@ -4,18 +4,21 @@ import withBundleAnalyzer from '@next/bundle-analyzer'
 const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
-    domains: ['i.ytimg.com'],
+    localPatterns: [
+      {
+        pathname: '/blog/**',
+      },
+    ],
   },
   reactStrictMode: true,
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],
   experimental: {
     mdxRs: true,
+    viewTransition: true,
+    inlineCss: true,
   },
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   async redirects() {
     return [

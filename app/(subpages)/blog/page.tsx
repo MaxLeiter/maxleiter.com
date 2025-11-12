@@ -1,9 +1,23 @@
-import { PostListRSC } from '@components/posts-list/rsc'
+import { getBlogPosts } from '@lib/portfolio-data'
+import { WindowToolbar } from '@components/desktop/window-toolbar'
+import { ViewTransitionWrapper } from '@components/view-transition-wrapper'
+import { BlogListContent } from '@components/content/blog-list-content'
 
-const Blog = async () => {
+export default async function BlogPage() {
+  const posts = await getBlogPosts({ includeContent: false })
+
   return (
-    <PostListRSC paginate={true} />
+    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+      <WindowToolbar
+        title="blog"
+        segments={[{ name: 'blog', href: '/blog' }]}
+      />
+
+      <main className="flex-1 overflow-auto p-6">
+        <ViewTransitionWrapper name="page-blog">
+          <BlogListContent posts={posts} />
+        </ViewTransitionWrapper>
+      </main>
+    </div>
   )
 }
-
-export default Blog

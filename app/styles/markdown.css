@@ -3,6 +3,10 @@ article {
   line-height: 1.7;
 }
 
+article p {
+  margin-top: 1em;
+}
+
 article h2,
 article h3,
 article h4,
@@ -10,6 +14,27 @@ article h5,
 article h6 {
   padding-top: var(--gap);
   padding-bottom: var(--gap-half);
+}
+
+article h1 {
+  font-size: 2.3rem;
+  font-weight: 600;
+}
+
+article h2 {
+  font-size: 1.6rem;
+}
+
+article h3 {
+  font-size: 1.4rem;
+}
+
+article h4 {
+  font-size: 1.2rem;
+}
+
+article h5 {
+  font-size: 1.15rem;
 }
 
 article > * + * {
@@ -23,10 +48,6 @@ article > * + * {
 
 .footnotes * {
   font-size: 0.9rem;
-}
-
-article p {
-  color: var(--article-color);
 }
 
 article aside p {

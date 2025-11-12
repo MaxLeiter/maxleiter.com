@@ -1,4 +1,6 @@
-import Link from '@components/link'
+import { WindowToolbar } from '@components/desktop/window-toolbar'
+import { ViewTransitionWrapper } from '@components/view-transition-wrapper'
+import { AboutContent } from '@components/content/about-content'
 
 export const metadata = {
   title: 'About',
@@ -10,27 +12,18 @@ export const metadata = {
 
 const About = () => {
   return (
-    <article>
-      <p>
-        This site is built on the{' '}
-        <Link external href="https://nextjs.org">
-          Next.js 13
-        </Link>{' '}
-        App Directory and is deployed via{' '}
-        <Link external href="https://vercel.com/home">
-          Vercel
-        </Link>
-        . The icons are from{' '}
-        <Link external href="https://feathericons.com/">
-          Feather Icons
-        </Link>
-        . You can view the source on{' '}
-        <Link external href="https://github.com/maxleiter/maxleiter.com">
-          GitHub
-        </Link>
-        .
-      </p>
-    </article>
+    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+      <WindowToolbar
+        title="about"
+        segments={[{ name: 'about', href: '/about' }]}
+      />
+
+      <main className="flex-1 overflow-auto p-6">
+        <ViewTransitionWrapper name="page-about">
+          <AboutContent />
+        </ViewTransitionWrapper>
+      </main>
+    </div>
   )
 }
 

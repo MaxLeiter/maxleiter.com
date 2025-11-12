@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>z80e</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="panel panel-primary collapsible" id="debugger">
+            <div class="panel-heading">
+              <h3 class="panel-title">Debugger Console</h3>
+            </div>
+            <pre>
+OpenTI Debugger
+Alpha
+</pre>
+            <div class="input-group">
+              <span class="input-group-addon">z80e > </span>
+              <input type="text" class="form-control">
+            </div>
+          </div>
+          <div class="panel panel-danger">
+            <div class="panel-heading">
+              <h3 class="panel-title">Debugger Stepper</h3>
+            </div>
+            <div class="btn-group toolbar">
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-floppy-save"></span>
+              </button>
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-floppy-open"></span>
+              </button>
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-play"></span>
+              </button>
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-forward"></span>
+              </button>
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-log-in"></span>
+              </button>
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-log-out"></span>
+              </button>
+            </div>
+            <div class="panel-body disassembler">
+              <div class="row disassemble-row">
+                <div class="col-md-2 disassemble-lineno">
+                  0005
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD B, A
+                </div>
+              </div>
+              <div class="row disassemble-row">
+                <div class="col-md-2 disassemble-lineno">
+                  0006
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD A, B
+                </div>
+              </div>
+              <div class="row disassemble-row">
+                <div class="col-md-2 disassemble-lineno">
+                  0007
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD B, A
+                </div>
+              </div>
+              <div class="row disassemble-row">
+                <div class="col-md-2 disassemble-lineno">
+                  0008
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD A, B
+                </div>
+              </div>
+              <div class="row disassemble-row">
+                <div class="col-md-2 disassemble-lineno">
+                  0009
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD B, A
+                </div>
+              </div>
+              <div class="row disassemble-row">
+                <div class="col-md-2 disassemble-lineno">
+                  0010
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD A, B
+                </div>
+              </div>
+              <div class="row disassemble-row disassemble-breakpoint">
+                <div class="col-md-2 disassemble-lineno">
+                  0011
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD B, A
+                </div>
+              </div>
+              <div class="row disassemble-row">
+                <div class="col-md-2 disassemble-lineno">
+                  0012
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD A, B
+                </div>
+              </div>
+              <div class="row disassemble-row disassemble-current">
+                <div class="col-md-2 disassemble-lineno">
+                  0013
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD B, A
+                </div>
+              </div>
+              <div class="row disassemble-row">
+                <div class="col-md-2 disassemble-lineno">
+                  0014
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD A, B
+                </div>
+              </div>
+              <div class="row disassemble-row">
+                <div class="col-md-2 disassemble-lineno">
+                  0015
+                </div>
+                <div class="col-md-10 disassemble-line">
+                  LD B, A
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" style="position: relative;">
+          <canvas id="screen" width="384" height="256" />
+        </div>
+        <div class="col-md-3">
+          <div class="panel panel-primary collapsible" id="log">
+            <div class="panel-heading">
+              <h3 class="panel-title">Logging</h3>
+            </div>
+            <pre></pre>
+          </div>
+          <div class="panel panel-default collapsed">
+            <div class="panel-heading">
+              <h3 class="panel-title">Some more controls</h3>
+            </div>
+            <div class="panel-body">
+              Here will be something else.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <script>
+        var Module = {
+            memoryInitializerPrefixURL: "js/lib/"
+        };
+    </script>
+    <script src="js/lib/z80e.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="js/lib/bootstrap.min.js"></script>
+    <script data-main="js/main.js" src="js/lib/require.js"></script>
+    <script>requirejs.config({urlArgs: "bust=" +  (new Date()).getTime()});</script>
+  </body>
+</html>
+
