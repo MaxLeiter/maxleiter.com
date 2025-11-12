@@ -472,15 +472,16 @@ export function Window({
           onFocus?.()
         }}
         role="dialog"
-        aria-label={title}
+        aria-labelledby={`window-title-${title.replace(/\s+/g, '-')}`}
+        aria-modal="false"
       >
         {/* Window Header */}
-        <div
+        <header
           className={`window-header h-8 bg-white/5 border-b border-white/10 flex items-center justify-between px-3 rounded-t-lg select-none ${
             !isFullscreen ? "cursor-move" : ""
           }`}
         >
-          <span className="text-white/60 text-xs">{title}</span>
+          <h3 id={`window-title-${title.replace(/\s+/g, '-')}`} className="text-white/60 text-xs font-normal">{title}</h3>
           <div className="flex items-center gap-1">
             <button
               onClick={toggleFullscreen}
@@ -506,7 +507,7 @@ export function Window({
               ✕
             </button>
           </div>
-        </div>
+        </header>
 
         {/* Window Content */}
         <div className="flex-1 overflow-hidden">{children}</div>

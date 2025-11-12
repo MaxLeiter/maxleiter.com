@@ -15,6 +15,7 @@ const nextConfig = {
   experimental: {
     mdxRs: true,
     viewTransition: true,
+    inlineCss: true,
   },
   typescript: {
     ignoreBuildErrors: true,

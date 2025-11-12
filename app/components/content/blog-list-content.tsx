@@ -20,7 +20,7 @@ export function BlogListContent({
     <div className="max-w-3xl">
       <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">blog/</h1>
 
-      <div className="space-y-2">
+      <ul className="space-y-2">
         {posts.map((post) => (
           <ListCard
             key={post.slug}
@@ -41,7 +41,7 @@ export function BlogListContent({
             onMouseLeave={onPostHoverEnd}
           />
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

@@ -34,8 +34,8 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
   }
 
   return (
-    <div className="h-10 bg-white/5 border-b border-white/10 flex items-center justify-between px-4 select-none sticky top-0 z-10">
-      <div className="flex items-center gap-2 text-sm font-mono text-white/60">
+    <header className="h-10 bg-white/5 border-b border-white/10 flex items-center justify-between px-4 select-none sticky top-0 z-10">
+      <nav className="flex items-center gap-2 text-sm font-mono text-white/60" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-white/90 transition-colors">
           ~
         </Link>
@@ -50,7 +50,7 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
             </Link>
           </div>
         ))}
-      </div>
+      </nav>
       <div className="flex items-center gap-1">
         {showMinimize && (
           <button
@@ -72,6 +72,6 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
           ✕
         </button>
       </div>
-    </div>
+    </header>
   )
 }

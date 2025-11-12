@@ -12,7 +12,7 @@ export function ProjectsContent({ projects }: ProjectsContentProps) {
         projects/
       </h1>
 
-      <div className="space-y-2">
+      <ul className="space-y-2">
         {projects.map((project) => (
           <ListCard
             key={project.id}
@@ -24,7 +24,7 @@ export function ProjectsContent({ projects }: ProjectsContentProps) {
             icon={false}
           />
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

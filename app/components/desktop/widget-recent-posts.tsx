@@ -27,7 +27,7 @@ export function WidgetRecentPosts({
           Recent Posts
         </h2>
       </div>
-      <div className="divide-y divide-white/5">
+      <ul className="divide-y divide-white/5">
         {recentPosts.map((post) => {
           const content = (
             <>
@@ -40,33 +40,35 @@ export function WidgetRecentPosts({
 
           if (onPostClick) {
             return (
-              <Link
-                key={post.slug}
-                href={`/blog/${post.slug}`}
-                onClick={(e) => {
-                  e.preventDefault()
-                  onPostClick(post.slug)
-                }}
-                onMouseEnter={() => onPostHover?.(post.slug)}
-                onMouseLeave={onPostHoverEnd}
-                className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-white/5 transition-colors group"
-              >
-                {content}
-              </Link>
+              <li key={post.slug}>
+                <Link
+                  href={`/blog/${post.slug}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    onPostClick(post.slug)
+                  }}
+                  onMouseEnter={() => onPostHover?.(post.slug)}
+                  onMouseLeave={onPostHoverEnd}
+                  className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-white/5 transition-colors group"
+                >
+                  {content}
+                </Link>
+              </li>
             )
           }
 
           return (
-            <Link
-              key={post.slug}
-              href={`/blog/${post.slug}`}
-              className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-white/5 transition-colors group"
-            >
-              {content}
-            </Link>
+            <li key={post.slug}>
+              <Link
+                href={`/blog/${post.slug}`}
+                className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-white/5 transition-colors group"
+              >
+                {content}
+              </Link>
+            </li>
           )
         })}
-      </div>
+      </ul>
       <Link
         href="/blog"
         className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors border-t border-white/10"
