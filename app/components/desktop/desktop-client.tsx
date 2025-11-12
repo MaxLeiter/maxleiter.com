@@ -212,6 +212,12 @@ interface DesktopClientProps {
   projects: Project[]
 }
 
+declare global {
+  interface Window {
+    __INITIAL_TIME__?: string
+  }
+}
+
 export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
   const router = useRouter()
   const isMobile = useIsMobile()
@@ -228,6 +234,29 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
   const [nextZIndex, setNextZIndex] = useState(50)
   const [preloadedPost, setPreloadedPost] = useState<string | null>(null)
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Initialize time from the inline script to avoid hydration mismatch
+  const [currentTime, setCurrentTime] = useState(() => {
+    if (typeof window !== 'undefined' && window.__INITIAL_TIME__) {
+      return window.__INITIAL_TIME__
+    }
+    return ''
+  })
+
+  useEffect(() => {
+    const updateTime = () => {
+      const time = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+      setCurrentTime(time)
+    }
+
+    updateTime()
+
+    const interval = setInterval(updateTime, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   const currentBlogPost = openBlogPost
     ? blogPosts.find((post) => post.slug === openBlogPost)
@@ -435,11 +464,8 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
         <span className="text-white/50" aria-hidden>
           ~/
         </span>
-        <time className="ml-auto text-white/40">
-          {new Date().toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
+        <time id="menubar-clock" className="ml-auto text-white/40">
+          {currentTime}
         </time>
       </header>
 

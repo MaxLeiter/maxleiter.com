@@ -5,6 +5,30 @@ import {
   ABOUT_CONTENT,
 } from '@lib/portfolio-data'
 
+function ClockInitScript() {
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `(${(() => {
+          const clock = document.getElementById('menubar-clock')
+          if (!clock) {
+            return
+          }
+
+          const time = new Date().toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+
+          window.__INITIAL_TIME__ = time
+
+          clock.textContent = time
+        }).toString()})()`,
+      }}
+    />
+  )
+}
+
 export default async function Desktop() {
   const [blogPosts, projects] = await Promise.all([
     getBlogPosts({ includeContent: false }),
@@ -12,9 +36,9 @@ export default async function Desktop() {
   ])
 
   return (
-    <DesktopClient
-      blogPosts={blogPosts}
-      projects={projects}
-    />
+    <>
+      <DesktopClient blogPosts={blogPosts} projects={projects} />
+      <ClockInitScript />
+    </>
   )
 }
