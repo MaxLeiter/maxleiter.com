@@ -176,14 +176,6 @@ blockquote {
   border-left: 3px solid var(--light-gray);
 }
 
-button {
-  border: none;
-  padding: 0;
-  margin: 0;
-  line-height: inherit;
-  font-size: inherit;
-}
-
 p a,
 article a,
 a.reset {

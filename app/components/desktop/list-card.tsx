@@ -8,6 +8,7 @@ interface ListCardProps {
   tags?: string[]
   external?: boolean
   icon?: 'file' | 'folder'
+  onClick?: (e: React.MouseEvent) => void
 }
 
 export function ListCard({
@@ -18,6 +19,7 @@ export function ListCard({
   tags,
   external = false,
   icon = 'file',
+  onClick,
 }: ListCardProps) {
   const Component = external ? 'a' : Link
   const externalProps = external
@@ -53,6 +55,7 @@ export function ListCard({
     <Component
       href={href}
       className="block p-3 rounded hover:bg-white/5 transition-colors border border-white/10 group"
+      onClick={onClick}
       {...externalProps}
     >
       <div className="flex items-start justify-between gap-3">

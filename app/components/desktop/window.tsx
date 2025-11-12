@@ -14,6 +14,8 @@ interface WindowProps {
   defaultY?: number
   blogSlug?: string
   pageType?: 'blog' | 'projects' | 'about' | null
+  zIndex?: number
+  onFocus?: () => void
 }
 
 type SnapDirection = "left" | "right" | "top" | "bottom" | null
@@ -28,6 +30,8 @@ export function Window({
   defaultY = 100,
   blogSlug,
   pageType = null,
+  zIndex = 50,
+  onFocus,
 }: WindowProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [position, setPosition] = useState({ x: defaultX, y: defaultY })
@@ -357,6 +361,7 @@ export function Window({
         height: "calc(100vh - 40px)",
         backdropFilter: "blur(12px)",
         backgroundColor: "rgba(0, 0, 0, 0.85)",
+        zIndex,
       }
     : {
         left: `${position.x}px`,
@@ -365,6 +370,7 @@ export function Window({
         height: `${size.height}px`,
         backdropFilter: "blur(12px)",
         backgroundColor: "rgba(0, 0, 0, 0.85)",
+        zIndex,
       }
 
   return (
@@ -372,11 +378,14 @@ export function Window({
       {renderSnapPreview()}
       <div
         ref={windowRef}
-        className={`fixed bg-black border border-white/20 rounded-lg flex flex-col font-mono text-sm z-50 ${
+        className={`fixed bg-black border border-white/20 rounded-lg flex flex-col font-mono text-sm ${
           isClosing ? 'window-closing' : ''
         }`}
         style={windowStyle}
-        onMouseDown={handleMouseDown}
+        onMouseDown={(e) => {
+          handleMouseDown(e)
+          onFocus?.()
+        }}
         role="dialog"
         aria-label={title}
       >

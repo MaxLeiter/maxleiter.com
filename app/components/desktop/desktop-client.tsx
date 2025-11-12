@@ -168,12 +168,14 @@ interface DesktopClientProps {
   blogPosts: BlogPost[]
   projects: Project[]
   aboutContent: any
+  blogPostPreviews: Record<string, React.ReactNode>
 }
 
 export function DesktopClient({
   blogPosts,
   projects,
   aboutContent,
+  blogPostPreviews,
 }: DesktopClientProps) {
   const [openTerminal, setOpenTerminal] = useState(false)
   const [openCalculator, setOpenCalculator] = useState(false)
@@ -181,10 +183,47 @@ export function DesktopClient({
   const [openAbout, setOpenAbout] = useState(false)
   const [openProjects, setOpenProjects] = useState(false)
   const [openBlogList, setOpenBlogList] = useState(false)
+  const [focusedWindow, setFocusedWindow] = useState<string | null>(null)
+  const [windowZIndexes, setWindowZIndexes] = useState<Record<string, number>>({})
+  const [nextZIndex, setNextZIndex] = useState(50)
 
   const currentBlogPost = openBlogPost
     ? blogPosts.find(post => post.slug === openBlogPost)
     : null
+
+  const bringToFront = (windowId: string) => {
+    setFocusedWindow(windowId)
+    setWindowZIndexes(prev => ({
+      ...prev,
+      [windowId]: nextZIndex
+    }))
+    setNextZIndex(prev => prev + 1)
+  }
+
+  // Bring new windows to front automatically
+  useEffect(() => {
+    if (openTerminal) bringToFront('terminal')
+  }, [openTerminal])
+
+  useEffect(() => {
+    if (openCalculator) bringToFront('calculator')
+  }, [openCalculator])
+
+  useEffect(() => {
+    if (openBlogPost) bringToFront(`blog-post-${openBlogPost}`)
+  }, [openBlogPost])
+
+  useEffect(() => {
+    if (openAbout) bringToFront('about')
+  }, [openAbout])
+
+  useEffect(() => {
+    if (openProjects) bringToFront('projects')
+  }, [openProjects])
+
+  useEffect(() => {
+    if (openBlogList) bringToFront('blog-list')
+  }, [openBlogList])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -327,6 +366,8 @@ export function DesktopClient({
           onClose={() => setOpenTerminal(false)}
           defaultWidth={600}
           defaultHeight={400}
+          zIndex={windowZIndexes['terminal'] || 50}
+          onFocus={() => bringToFront('terminal')}
         >
           <TerminalContent
             blogPosts={blogPosts}
@@ -345,6 +386,8 @@ export function DesktopClient({
           defaultHeight={600}
           defaultX={200}
           defaultY={100}
+          zIndex={windowZIndexes['calculator'] || 50}
+          onFocus={() => bringToFront('calculator')}
         >
           <Calculator />
         </Window>
@@ -359,6 +402,8 @@ export function DesktopClient({
           defaultX={150}
           defaultY={80}
           blogSlug={openBlogPost}
+          zIndex={windowZIndexes[`blog-post-${openBlogPost}`] || 50}
+          onFocus={() => bringToFront(`blog-post-${openBlogPost}`)}
         >
           <div className="overflow-auto h-full p-6">
             <BlogPostContentClient
@@ -366,8 +411,9 @@ export function DesktopClient({
               title={currentBlogPost.title}
               date={currentBlogPost.date}
               description={currentBlogPost.excerpt}
-              content={currentBlogPost.content}
-            />
+            >
+              {blogPostPreviews[openBlogPost]}
+            </BlogPostContentClient>
           </div>
         </Window>
       )}
@@ -381,6 +427,8 @@ export function DesktopClient({
           defaultX={200}
           defaultY={100}
           pageType="about"
+          zIndex={windowZIndexes['about'] || 50}
+          onFocus={() => bringToFront('about')}
         >
           <div className="overflow-auto h-full p-6">
             <AboutContentClient content={aboutContent} />
@@ -397,6 +445,8 @@ export function DesktopClient({
           defaultX={250}
           defaultY={120}
           pageType="projects"
+          zIndex={windowZIndexes['projects'] || 50}
+          onFocus={() => bringToFront('projects')}
         >
           <div className="overflow-auto h-full p-6">
             <ProjectsContentClient projects={projects} />
@@ -413,9 +463,14 @@ export function DesktopClient({
           defaultX={300}
           defaultY={140}
           pageType="blog"
+          zIndex={windowZIndexes['blog-list'] || 50}
+          onFocus={() => bringToFront('blog-list')}
         >
           <div className="overflow-auto h-full p-6">
-            <BlogListContentClient posts={blogPosts} />
+            <BlogListContentClient
+              posts={blogPosts}
+              onPostClick={(slug) => setOpenBlogPost(slug)}
+            />
           </div>
         </Window>
       )}
