@@ -94,14 +94,21 @@ article ol > li > ul {
   list-style-type: circle;
 }
 
-article aside,
-article blockquote {
+article aside {
   border: 1px solid var(--lighter-gray);
   background: var(--lightest-gray);
   padding: var(--gap);
   color: var(--article-color);
   margin: var(--gap-half) 0;
   font-style: normal;
+}
+
+article blockquote {
+  border-left: 3px solid var(--light-gray);
+  padding-left: var(--gap);
+  margin: var(--gap) 0;
+  font-style: italic;
+  color: var(--gray);
 }
 
 article figcaption > p {
@@ -111,7 +118,11 @@ article figcaption > p {
 }
 
 article blockquote p {
-  margin: var(--gap-half);
+  margin: 0;
+}
+
+article blockquote p:not(:last-child) {
+  margin-bottom: var(--gap-half);
 }
 
 /* Code Snippets */
