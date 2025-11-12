@@ -5,6 +5,9 @@ import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from 'next-themes'
 import { Viewport } from 'next'
+import { getBlogPosts, getProjectsData } from '@lib/portfolio-data'
+import { GlobalKeyboardHandler } from '@components/desktop/global-keyboard-handler'
+import { EffectsProvider } from '@components/desktop/effects-context'
 
 export const dynamic = 'force-static'
 
@@ -65,12 +68,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { getBlogPosts, getProjectsData } = await import('@lib/portfolio-data')
-  const { GlobalKeyboardHandler } = await import('@components/desktop/global-keyboard-handler')
-  const { EffectsProvider } = await import('@components/desktop/effects-context')
-
   const [blogPosts, projects] = await Promise.all([
-    getBlogPosts({ includeContent: false }),
+    getBlogPosts(),
     getProjectsData(),
   ])
 

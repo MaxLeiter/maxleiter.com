@@ -1,7 +1,14 @@
 'use client'
 
 import type React from 'react'
-import { useState, useEffect, startTransition, useRef, ViewTransition } from 'react'
+import {
+  useState,
+  useEffect,
+  startTransition,
+  useRef,
+  ViewTransition,
+  useMemo,
+} from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
@@ -240,7 +247,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       const postSlug = params.get('openPost')
-      if (postSlug && blogPosts.find(p => p.slug === postSlug)) {
+      if (postSlug && blogPosts.find((p) => p.slug === postSlug)) {
         setOpenBlogPost(postSlug)
         bringToFront(`blog-post-${postSlug}`)
         // Clean up URL without adding to history
@@ -298,125 +305,128 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  const desktopItems: DesktopItem[] = [
-    // Folders first
-    {
-      id: 'blog',
-      name: 'blog',
-      type: 'folder',
-      icon: <FolderIconDefault />,
-      href: '/blog',
-      onClick: (e) => {
-        e.preventDefault()
-        if (isMobile) {
-          startTransition(() => {
-            router.push('/blog')
-          })
-        } else {
-          setOpenBlogList(true)
-          bringToFront('blog-list')
-        }
+  const desktopItems: DesktopItem[] = useMemo(
+    () => [
+      // Folders first
+      {
+        id: 'blog',
+        name: 'blog',
+        type: 'folder',
+        icon: <FolderIconDefault />,
+        href: '/blog',
+        onClick: (e) => {
+          e.preventDefault()
+          if (isMobile) {
+            startTransition(() => {
+              router.push('/blog')
+            })
+          } else {
+            setOpenBlogList(true)
+            bringToFront('blog-list')
+          }
+        },
       },
-    },
-    {
-      id: 'projects',
-      name: 'projects',
-      type: 'folder',
-      icon: <FolderIconDefault />,
-      href: '/projects',
-      onClick: (e) => {
-        e.preventDefault()
-        if (isMobile) {
-          startTransition(() => {
-            router.push('/projects')
-          })
-        } else {
-          setOpenProjects(true)
-          bringToFront('projects')
-        }
+      {
+        id: 'projects',
+        name: 'projects',
+        type: 'folder',
+        icon: <FolderIconDefault />,
+        href: '/projects',
+        onClick: (e) => {
+          e.preventDefault()
+          if (isMobile) {
+            startTransition(() => {
+              router.push('/projects')
+            })
+          } else {
+            setOpenProjects(true)
+            bringToFront('projects')
+          }
+        },
       },
-    },
-    {
-      id: 'about',
-      name: 'about',
-      type: 'folder',
-      icon: <FolderIconDefault />,
-      href: '/about',
-      onClick: (e) => {
-        e.preventDefault()
-        if (isMobile) {
-          startTransition(() => {
-            router.push('/about')
-          })
-        } else {
-          setOpenAbout(true)
-          bringToFront('about')
-        }
+      {
+        id: 'about',
+        name: 'about',
+        type: 'folder',
+        icon: <FolderIconDefault />,
+        href: '/about',
+        onClick: (e) => {
+          e.preventDefault()
+          if (isMobile) {
+            startTransition(() => {
+              router.push('/about')
+            })
+          } else {
+            setOpenAbout(true)
+            bringToFront('about')
+          }
+        },
       },
-    },
-    // Local apps
-    {
-      id: 'terminal',
-      name: 'terminal',
-      type: 'app',
-      icon: <TerminalIconDefault />,
-      onClick: () => {
-        setOpenTerminal(true)
-        bringToFront('terminal')
+      // Local apps
+      {
+        id: 'terminal',
+        name: 'terminal',
+        type: 'app',
+        icon: <TerminalIconDefault />,
+        onClick: () => {
+          setOpenTerminal(true)
+          bringToFront('terminal')
+        },
       },
-    },
-    {
-      id: 'calculator',
-      name: 'calc',
-      type: 'app',
-      icon: <CalculatorIcon />,
-      onClick: () => {
-        setOpenCalculator(true)
-        bringToFront('calculator')
+      {
+        id: 'calculator',
+        name: 'calc',
+        type: 'app',
+        icon: <CalculatorIcon />,
+        onClick: () => {
+          setOpenCalculator(true)
+          bringToFront('calculator')
+        },
       },
-    },
-    // External links
-    {
-      id: 'github',
-      name: 'github',
-      type: 'app',
-      icon: <GitHubIcon />,
-      href: 'https://github.com/maxleiter',
-      external: true,
-    },
-    {
-      id: 'linkedin',
-      name: 'linkedin',
-      type: 'app',
-      icon: <LinkedInIcon />,
-      href: 'https://www.linkedin.com/in/MaxLeiter',
-      external: true,
-    },
-    {
-      id: 'twitter',
-      name: 'X',
-      type: 'app',
-      icon: <TwitterIcon />,
-      href: 'https://twitter.com/max_leiter',
-      external: true,
-    },
-    {
-      id: 'v0',
-      name: 'v0',
-      type: 'app',
-      icon: <V0Icon />,
-      href: 'https://v0.app',
-      external: true,
-    },
-    {
-      id: 'ai-sdk',
-      name: 'AI SDK',
-      type: 'app',
-      icon: <AIIcon />,
-      href: 'https://sdk.vercel.ai',
-      external: true,
-    },
-  ]
+      // External links
+      {
+        id: 'github',
+        name: 'github',
+        type: 'app',
+        icon: <GitHubIcon />,
+        href: 'https://github.com/maxleiter',
+        external: true,
+      },
+      {
+        id: 'linkedin',
+        name: 'linkedin',
+        type: 'app',
+        icon: <LinkedInIcon />,
+        href: 'https://www.linkedin.com/in/MaxLeiter',
+        external: true,
+      },
+      {
+        id: 'twitter',
+        name: 'X',
+        type: 'app',
+        icon: <TwitterIcon />,
+        href: 'https://twitter.com/max_leiter',
+        external: true,
+      },
+      {
+        id: 'v0',
+        name: 'v0',
+        type: 'app',
+        icon: <V0Icon />,
+        href: 'https://v0.app',
+        external: true,
+      },
+      {
+        id: 'ai-sdk',
+        name: 'AI SDK',
+        type: 'app',
+        icon: <AIIcon />,
+        href: 'https://sdk.vercel.ai',
+        external: true,
+      },
+    ],
+    [isMobile, router],
+  )
 
   return (
     <div className="h-screen bg-black text-white/90 overflow-hidden flex flex-col">
