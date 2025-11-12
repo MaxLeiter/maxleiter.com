@@ -1,8 +1,9 @@
 'use client'
 
 import type React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, startTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Window } from '@components/desktop/window'
 import { TerminalContent } from '@components/desktop/terminal-content'
 import { Calculator } from '@components/desktop/calculator'
@@ -177,6 +178,8 @@ export function DesktopClient({
   aboutContent,
   blogPostPreviews,
 }: DesktopClientProps) {
+  const router = useRouter()
+  const [isMobile, setIsMobile] = useState(false)
   const [openTerminal, setOpenTerminal] = useState(false)
   const [openCalculator, setOpenCalculator] = useState(false)
   const [openBlogPost, setOpenBlogPost] = useState<string | null>(null)
@@ -191,6 +194,17 @@ export function DesktopClient({
     ? blogPosts.find(post => post.slug === openBlogPost)
     : null
 
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   const bringToFront = (windowId: string) => {
     setFocusedWindow(windowId)
     setWindowZIndexes(prev => ({
@@ -198,6 +212,16 @@ export function DesktopClient({
       [windowId]: nextZIndex
     }))
     setNextZIndex(prev => prev + 1)
+  }
+
+  const handlePostClick = (slug: string) => {
+    if (isMobile) {
+      startTransition(() => {
+        router.push(`/blog/${slug}`)
+      })
+    } else {
+      setOpenBlogPost(slug)
+    }
   }
 
   // Bring new windows to front automatically
@@ -246,7 +270,13 @@ export function DesktopClient({
       href: '/blog',
       onClick: (e) => {
         e.preventDefault()
-        setOpenBlogList(true)
+        if (isMobile) {
+          startTransition(() => {
+            router.push('/blog')
+          })
+        } else {
+          setOpenBlogList(true)
+        }
       },
     },
     {
@@ -257,7 +287,13 @@ export function DesktopClient({
       href: '/projects',
       onClick: (e) => {
         e.preventDefault()
-        setOpenProjects(true)
+        if (isMobile) {
+          startTransition(() => {
+            router.push('/projects')
+          })
+        } else {
+          setOpenProjects(true)
+        }
       },
     },
     {
@@ -268,7 +304,13 @@ export function DesktopClient({
       href: '/about',
       onClick: (e) => {
         e.preventDefault()
-        setOpenAbout(true)
+        if (isMobile) {
+          startTransition(() => {
+            router.push('/about')
+          })
+        } else {
+          setOpenAbout(true)
+        }
       },
     },
     {
@@ -353,7 +395,7 @@ export function DesktopClient({
             <WidgetRecentPosts
               posts={blogPosts}
               limit={5}
-              onPostClick={(slug) => setOpenBlogPost(slug)}
+              onPostClick={handlePostClick}
             />
             <WidgetTopProjects projects={projects} limit={5} />
           </div>
@@ -469,7 +511,7 @@ export function DesktopClient({
           <div className="overflow-auto h-full p-6">
             <BlogListContentClient
               posts={blogPosts}
-              onPostClick={(slug) => setOpenBlogPost(slug)}
+              onPostClick={handlePostClick}
             />
           </div>
         </Window>
