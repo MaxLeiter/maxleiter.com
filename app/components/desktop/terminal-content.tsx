@@ -25,12 +25,48 @@ export function TerminalContent({
   ])
   const outputRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [visualViewport, setVisualViewport] = useState({
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+  })
 
   useEffect(() => {
     if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight
     }
   }, [output])
+
+  // Handle visual viewport changes (mobile keyboard detection)
+  useEffect(() => {
+    const updateVisualViewport = () => {
+      if (typeof window !== 'undefined' && window.visualViewport) {
+        setVisualViewport({
+          height: window.visualViewport.height,
+          width: window.visualViewport.width,
+        })
+
+        // Scroll input into view when keyboard opens
+        if (inputRef.current) {
+          setTimeout(() => {
+            inputRef.current?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'end',
+            })
+          }, 100)
+        }
+      }
+    }
+
+    if (typeof window !== 'undefined' && window.visualViewport) {
+      updateVisualViewport()
+      window.visualViewport.addEventListener('resize', updateVisualViewport)
+
+      return () => {
+        window.visualViewport?.removeEventListener('resize', updateVisualViewport)
+      }
+    }
+  }, [])
 
   // Restore juice mode and CRT from localStorage or URL params on mount
   useEffect(() => {
@@ -515,7 +551,13 @@ export function TerminalContent({
   }, [input])
 
   return (
-    <div className="h-full flex flex-col">
+    <div
+      ref={containerRef}
+      className="h-full flex flex-col"
+      style={{
+        maxHeight: visualViewport.height ? `${visualViewport.height}px` : '100vh',
+      }}
+    >
       <div
         ref={outputRef}
         className="flex-1 overflow-y-auto p-3 text-white/90 space-y-1"
@@ -529,7 +571,7 @@ export function TerminalContent({
         ))}
       </div>
 
-      <div className="h-12 border-t border-white/10 px-3 flex items-center bg-white/5">
+      <div className="shrink-0 h-12 border-t border-white/10 px-3 flex items-center bg-white/5">
         <span className="text-white/80 mr-2 text-base font-mono">$</span>
         <input
           ref={inputRef}
