@@ -39,7 +39,7 @@ export function BlogPostPageClient({
         />
       )}
 
-      <div className="flex-1 overflow-auto p-6">{children}</div>
+      <main className="flex-1 overflow-auto p-6">{children}</main>
     </div>
   )
 }

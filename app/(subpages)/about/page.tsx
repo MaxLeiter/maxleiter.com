@@ -18,11 +18,11 @@ const About = () => {
         segments={[{ name: 'about', href: '/about' }]}
       />
 
-      <div className="flex-1 overflow-auto p-6">
+      <main className="flex-1 overflow-auto p-6">
         <ViewTransitionWrapper name="page-about">
           <AboutContent />
         </ViewTransitionWrapper>
-      </div>
+      </main>
     </div>
   )
 }

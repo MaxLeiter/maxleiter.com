@@ -430,27 +430,27 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
 
   return (
     <div className="h-screen bg-black text-white/90 overflow-hidden flex flex-col">
-      <div className="h-10 bg-white/5 border-b border-white/10 flex items-center px-4 gap-4 text-xs font-mono sticky top-0 z-10">
+      <header className="h-10 3xl:h-12 bg-white/5 border-b border-white/10 flex items-center px-4 3xl:px-6 gap-4 3xl:gap-6 text-xs 3xl:text-sm font-mono sticky top-0 z-10">
         <span className="text-white/50">~/</span>
-        <span className="ml-auto text-white/40">
+        <time className="ml-auto text-white/40">
           {new Date().toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit',
           })}
-        </span>
-      </div>
+        </time>
+      </header>
 
-      <div className="flex-1 p-8 overflow-auto relative">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="shrink-0">
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-8 w-fit">
+      <main className="flex-1 p-8 3xl:p-12 overflow-auto relative">
+        <div className="flex flex-col lg:flex-row gap-8 3xl:gap-12">
+          <nav className="shrink-0" aria-label="Desktop applications">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-8 3xl:gap-12 w-fit">
               {desktopItems.map((item) => (
                 <DesktopIcon key={item.id} item={item} />
               ))}
             </div>
-          </div>
+          </nav>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 max-w-6xl items-start">
+          <aside className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 3xl:gap-10 max-w-6xl 3xl:max-w-7xl items-start">
             <WidgetRecentPosts
               posts={blogPosts}
               limit={5}
@@ -459,9 +459,9 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
               onPostHoverEnd={handlePostHoverEnd}
             />
             <WidgetTopProjects projects={projects} limit={5} />
-          </div>
+          </aside>
         </div>
-      </div>
+      </main>
 
       {/* Hidden preload iframe */}
       {preloadedPost && (
@@ -591,15 +591,15 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
 
 function DesktopIcon({ item }: { item: DesktopItem }) {
   const content = (
-    <div className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-white/5 transition-colors duration-200 cursor-pointer relative">
-      <div className="h-12 flex items-center justify-center text-white/80 hover:text-white/90 transition-colors">
+    <div className="flex flex-col items-center gap-2 3xl:gap-3 p-3 3xl:p-4 rounded-lg hover:bg-white/5 transition-colors duration-200 cursor-pointer relative">
+      <div className="h-12 3xl:h-16 flex items-center justify-center text-white/80 hover:text-white/90 transition-colors 3xl:scale-125">
         {item.icon}
       </div>
-      <span className="text-xs font-mono text-white/80 text-center truncate w-16">
+      <span className="text-xs 3xl:text-sm font-mono text-white/80 text-center truncate w-16 3xl:w-20">
         {item.name}
       </span>
       {item.external && (
-        <div className="absolute top-1 right-1">
+        <div className="absolute top-1 right-1 3xl:top-2 3xl:right-2">
           <ExternalLinkIcon />
         </div>
       )}

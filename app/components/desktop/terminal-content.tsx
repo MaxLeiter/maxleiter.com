@@ -3,6 +3,11 @@
 import { useState, useRef, useEffect } from 'react'
 import type { BlogPost, Project } from '@lib/portfolio-data'
 import { useEffects } from '@components/desktop/effects-context'
+import {
+  findCommand,
+  getCompletions as getCommandCompletions,
+  type CommandContext,
+} from './terminal/commands'
 
 interface TerminalContentProps {
   blogPosts: BlogPost[]
@@ -346,13 +351,11 @@ export function TerminalContent({
     const typingThrottle = 50 // ms between sounds
 
     const typingHandler = (e: KeyboardEvent) => {
-      // Only play for actual character keys, not modifiers
       if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
         const now = Date.now()
         if (now - lastTypingTime < typingThrottle) return
         lastTypingTime = now
 
-        // Randomly pick a typing sound
         const randomSound =
           typingSounds[Math.floor(Math.random() * typingSounds.length)]
         const sound = randomSound.cloneNode() as HTMLAudioElement
@@ -381,164 +384,53 @@ export function TerminalContent({
     return () => input?.removeEventListener('focus', handleFocus)
   }, [])
 
+  const commandContext: CommandContext = {
+    blogPosts,
+    projects,
+    aboutContent,
+    onClose,
+    toggleJuice,
+    toggleCrt,
+  }
+
   const getCompletions = (partial: string): string[] => {
-    const trimmed = partial.trim()
-    const parts = trimmed.split(' ')
-
-    if (parts.length === 1) {
-      const commands = [
-        'help',
-        'ls',
-        'pwd',
-        'echo',
-        'cat',
-        'lolcat',
-        'crt',
-        'juice',
-        'clear',
-        'exit',
-      ]
-      return commands.filter((c) => c.startsWith(parts[0].toLowerCase()))
-    }
-
-    if (parts[0].toLowerCase() === 'ls') {
-      const dirs = ['blog', 'projects', 'about']
-      return dirs.filter((d) => d.startsWith(parts[1]?.toLowerCase() || ''))
-    }
-
-    if (parts[0].toLowerCase() === 'cat') {
-      const allFiles = [
-        ...blogPosts.map((p) => `blog/${p.slug}.md`),
-        ...projects.map((p) => `projects/${p.id}.md`),
-        'about/bio.md',
-      ]
-      const partial = parts.slice(1).join('/')
-      return allFiles.filter((f) => f.startsWith(partial))
-    }
-
-    return []
+    return getCommandCompletions(partial, commandContext)
   }
 
   const handleCommand = (cmd: string) => {
     const trimmedCmd = cmd.trim()
-    const lowerCmd = trimmedCmd.toLowerCase()
+
+    if (!trimmedCmd) {
+      setInput('')
+      return
+    }
+
     const newOutput = [...output, `$ ${trimmedCmd}`]
 
-    if (lowerCmd === 'clear') {
-      setOutput([])
-      setInput('')
-      return
-    } else if (lowerCmd === 'exit') {
-      if (onClose) {
+    const parts = trimmedCmd.split(' ')
+    const commandName = parts[0].toLowerCase()
+    const args = parts.slice(1)
+
+    const command = findCommand(commandName)
+
+    if (command) {
+      const result = command.execute(args, commandContext)
+
+      if (result.clearScreen) {
+        setOutput([])
+        setInput('')
+        return
+      }
+
+      if (result.closeTerminal && onClose) {
         onClose()
-      } else {
-        newOutput.push('exit: cannot close terminal from this context')
+        return
       }
-      setOutput(newOutput)
-      setInput('')
-      return
-    } else if (lowerCmd === 'help') {
-      newOutput.push('Available commands:')
-      newOutput.push('  help              - Show available commands')
-      newOutput.push('  ls [directory]    - List directory contents')
-      newOutput.push('  pwd               - Print working directory')
-      newOutput.push('  cat <file>        - Display file contents')
-      newOutput.push('  lolcat <text>     - Make text colorful')
-      newOutput.push('  clear             - Clear terminal')
-      newOutput.push('  exit              - Close terminal')
-      newOutput.push('  crt               - Toggle CRT filter')
-      newOutput.push('  juice             - JUICE IT')
-    } else if (lowerCmd === 'ls') {
-      newOutput.push('blog       projects   about')
-    } else if (lowerCmd.startsWith('ls ')) {
-      const dir = trimmedCmd.substring(3).trim().replace(/\/$/, '')
-      if (dir === 'blog') {
-        const files = blogPosts.map((p) => `${p.slug}.md`).join('  ')
-        newOutput.push(files)
-      } else if (dir === 'projects') {
-        const files = projects.map((p) => `${p.id}.md`).join('  ')
-        newOutput.push(files)
-      } else if (dir === 'about') {
-        newOutput.push('bio.md')
-      } else {
-        newOutput.push(`ls: cannot access '${dir}': No such file or directory`)
-      }
-    } else if (lowerCmd === 'pwd') {
-      newOutput.push('/home/user/portfolio')
-    } else if (lowerCmd === 'crt') {
-      const wasEnabled = document.body.classList.contains('crt')
-      toggleCrt()
-      newOutput.push(wasEnabled ? 'CRT filter disabled' : 'CRT filter enabled')
-    } else if (lowerCmd === 'juice') {
-      const wasEnabled = document.body.classList.contains('juice-mode')
-      toggleJuice()
-      newOutput.push(wasEnabled ? 'UNJUICED' : 'JUICED')
-    } else if (lowerCmd.startsWith('echo ')) {
-      newOutput.push(trimmedCmd.substring(5))
-    } else if (lowerCmd.startsWith('lolcat ')) {
-      const text = trimmedCmd.substring(7)
-      const colors = [
-        '#FF6B6B',
-        '#4ECDC4',
-        '#45B7D1',
-        '#FFA07A',
-        '#98D8C8',
-        '#F7DC6F',
-        '#BB8FCE',
-        '#85C1E2',
-      ]
-      const coloredText = text
-        .split('')
-        .map((char, i) => {
-          const color = colors[i % colors.length]
-          return `<span style="color: ${color}">${char}</span>`
-        })
-        .join('')
-      newOutput.push(coloredText)
-    } else if (lowerCmd.startsWith('cat ')) {
-      const path = trimmedCmd.substring(4).trim()
-      const parts = path.split('/').filter(Boolean)
 
-      if (parts.length === 1) {
-        // Check if it's a directory
-        if (['blog', 'projects', 'about'].includes(parts[0])) {
-          newOutput.push(`cat: ${path}: Is a directory`)
-        } else {
-          newOutput.push(`cat: ${path}: No such file or directory`)
-        }
-      } else if (parts.length === 2) {
-        const [dir, filename] = parts
-        const cleanFilename = filename.replace(/\.md$/, '')
-
-        if (dir === 'blog') {
-          const post = blogPosts.find((p) => p.slug === cleanFilename)
-          if (post) {
-            newOutput.push(post.content)
-          } else {
-            newOutput.push(`cat: ${path}: No such file or directory`)
-          }
-        } else if (dir === 'projects') {
-          const project = projects.find((p) => p.id === cleanFilename)
-          if (project) {
-            newOutput.push(project.content)
-          } else {
-            newOutput.push(`cat: ${path}: No such file or directory`)
-          }
-        } else if (dir === 'about') {
-          const aboutItem = aboutContent[cleanFilename]
-          if (aboutItem) {
-            newOutput.push(aboutItem.content)
-          } else {
-            newOutput.push(`cat: ${path}: No such file or directory`)
-          }
-        } else {
-          newOutput.push(`cat: ${path}: No such file or directory`)
-        }
-      } else {
-        newOutput.push(`cat: ${path}: No such file or directory`)
-      }
-    } else if (trimmedCmd) {
-      newOutput.push(`command not found: ${trimmedCmd}`)
+      newOutput.push(...result.output)
+    } else {
+      newOutput.push(`command not found: ${commandName}`)
+      newOutput.push(`Type 'help' to see available commands`)
     }
 
     setOutput(newOutput)

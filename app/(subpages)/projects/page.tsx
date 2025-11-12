@@ -21,11 +21,11 @@ export default async function ProjectsPage() {
         segments={[{ name: 'projects', href: '/projects' }]}
       />
 
-      <div className="flex-1 overflow-auto p-6">
+      <main className="flex-1 overflow-auto p-6">
         <ViewTransitionWrapper name="page-projects">
           <ProjectsContent projects={projects} />
         </ViewTransitionWrapper>
-      </div>
+      </main>
     </div>
   )
 }

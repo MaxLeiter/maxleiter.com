@@ -1,43 +1,63 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import type { BlogPost, Project } from "@lib/portfolio-data"
+import { useState, useEffect } from 'react'
+import type { BlogPost, Project } from '@lib/portfolio-data'
 
 interface CommandPaletteProps {
   blogPosts: BlogPost[]
   projects: Project[]
   onClose: () => void
-  onNavigate: (path: string) => void
+  onNavigate: (path: string, external: boolean) => void
 }
 
-export function CommandPalette({ blogPosts, projects, onClose, onNavigate }: CommandPaletteProps) {
-  const [search, setSearch] = useState("")
+export function CommandPalette({
+  blogPosts,
+  projects,
+  onClose,
+  onNavigate,
+}: CommandPaletteProps) {
+  const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   const allItems = [
-    ...blogPosts.map((p) => ({ type: "blog" as const, slug: p.slug, title: p.title, href: `/blog/${p.slug}` })),
-    ...projects.map((p) => ({ type: "project" as const, id: p.id, title: p.name, href: `/projects` })),
-    { type: "nav" as const, title: "Blog", href: "/blog" },
-    { type: "nav" as const, title: "Projects", href: "/projects" },
-    { type: "nav" as const, title: "About", href: "/about" },
+    { type: 'nav' as const, title: 'Blog', href: '/blog' },
+    { type: 'nav' as const, title: 'Projects', href: '/projects' },
+    { type: 'nav' as const, title: 'About', href: '/about' },
+    ...blogPosts.map((p) => ({
+      type: 'blog' as const,
+      slug: p.slug,
+      title: p.title,
+      href: `/blog/${p.slug}`,
+    })),
+    ...projects.map((p) => ({
+      type: 'project' as const,
+      id: p.id,
+      title: p.name,
+      href: p.link || '/projects',
+      external: Boolean(p.link),
+    })),
   ]
 
   const filtered = search
-    ? allItems.filter((item) => item.title.toLowerCase().includes(search.toLowerCase()))
+    ? allItems.filter((item) =>
+        item.title.toLowerCase().includes(search.toLowerCase()),
+      )
     : allItems
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-      if (e.key === "ArrowDown") {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowDown') {
         e.preventDefault()
         setSelectedIndex((prev) => (prev + 1) % filtered.length)
       }
-      if (e.key === "ArrowUp") {
+      if (e.key === 'ArrowUp') {
         e.preventDefault()
-        setSelectedIndex((prev) => (prev - 1 + filtered.length) % filtered.length)
+        setSelectedIndex(
+          (prev) => (prev - 1 + filtered.length) % filtered.length,
+        )
       }
-      if (e.key === "Enter") {
+      if (e.key === 'Enter') {
         const item = filtered[selectedIndex]
         if (item) {
           onNavigate(item.href)
@@ -46,8 +66,8 @@ export function CommandPalette({ blogPosts, projects, onClose, onNavigate }: Com
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [filtered, selectedIndex, onClose, onNavigate])
 
   return (
@@ -64,13 +84,15 @@ export function CommandPalette({ blogPosts, projects, onClose, onNavigate }: Com
             }}
             placeholder="Search posts, projects, or navigate..."
             className="w-full bg-transparent outline-none text-white/90 font-mono placeholder-white/40"
-            style={{ fontSize: "16px" }}
+            style={{ fontSize: '16px' }}
           />
         </div>
 
         <div className="max-h-96 overflow-y-auto px-2 py-2">
           {filtered.length === 0 ? (
-            <div className="px-4 py-3 text-white/50 text-sm">No results found</div>
+            <div className="px-4 py-3 text-white/50 text-sm">
+              No results found
+            </div>
           ) : (
             filtered.map((item, idx) => (
               <button
@@ -80,11 +102,15 @@ export function CommandPalette({ blogPosts, projects, onClose, onNavigate }: Com
                   onClose()
                 }}
                 className={`w-full text-left px-4 py-3 rounded transition-colors ${
-                  idx === selectedIndex ? "bg-white/10" : "hover:bg-white/5"
+                  idx === selectedIndex ? 'bg-white/10' : 'hover:bg-white/5'
                 }`}
               >
                 <div className="text-xs text-white/40 font-mono uppercase mb-1">
-                  {item.type === "blog" ? "Blog Post" : item.type === "project" ? "Project" : "Navigation"}
+                  {item.type === 'blog'
+                    ? 'Blog Post'
+                    : item.type === 'project'
+                      ? 'Project'
+                      : 'Navigation'}
                 </div>
                 <div className="text-white/90 font-mono">{item.title}</div>
               </button>

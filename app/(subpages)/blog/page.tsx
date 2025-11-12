@@ -13,11 +13,11 @@ export default async function BlogPage() {
         segments={[{ name: 'blog', href: '/blog' }]}
       />
 
-      <div className="flex-1 overflow-auto p-6">
+      <main className="flex-1 overflow-auto p-6">
         <ViewTransitionWrapper name="page-blog">
           <BlogListContent posts={posts} />
         </ViewTransitionWrapper>
-      </div>
+      </main>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import Link from 'next/link'
 import type { BlogPost } from '@lib/portfolio-data'
@@ -16,23 +16,25 @@ export function WidgetRecentPosts({
   limit = 5,
   onPostClick,
   onPostHover,
-  onPostHoverEnd
+  onPostHoverEnd,
 }: WidgetRecentPostsProps) {
   const recentPosts = posts.slice(0, limit)
 
   return (
     <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
-      <div className="border-b border-white/10 px-4 py-3">
-        <h2 className="text-xs font-mono font-semibold text-white/90 uppercase">Recent Posts</h2>
+      <div className="border-b border-white/10 px-4 3xl:px-5 py-3 3xl:py-4">
+        <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-white/90 uppercase">
+          Recent Posts
+        </h2>
       </div>
       <div className="divide-y divide-white/5">
         {recentPosts.map((post) => {
           const content = (
             <>
-              <h3 className="text-sm font-mono text-white/90 group-hover:text-white/80 transition-colors mb-1">
+              <h3 className="text-sm 3xl:text-base font-mono text-white/90 group-hover:text-white/80 transition-colors mb-1">
                 {post.title}
               </h3>
-              <p className="text-xs text-white/50">{post.date}</p>
+              <p className="text-xs 3xl:text-sm text-white/50">{post.date}</p>
             </>
           )
 
@@ -47,7 +49,7 @@ export function WidgetRecentPosts({
                 }}
                 onMouseEnter={() => onPostHover?.(post.slug)}
                 onMouseLeave={onPostHoverEnd}
-                className="block px-4 py-3 hover:bg-white/5 transition-colors group"
+                className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-white/5 transition-colors group"
               >
                 {content}
               </Link>
@@ -58,7 +60,7 @@ export function WidgetRecentPosts({
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="block px-4 py-3 hover:bg-white/5 transition-colors group"
+              className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-white/5 transition-colors group"
             >
               {content}
             </Link>
@@ -67,7 +69,7 @@ export function WidgetRecentPosts({
       </div>
       <Link
         href="/blog"
-        className="block px-4 py-2 text-center text-xs font-mono text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors border-t border-white/10"
+        className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors border-t border-white/10"
       >
         View all posts →
       </Link>
