@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState, useEffect, startTransition } from 'react'
+import { useState, useEffect, startTransition, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
@@ -16,6 +16,7 @@ import {
 } from '@components/page-content-client'
 import type { BlogPost, Project } from '@lib/portfolio-data'
 import { ABOUT_CONTENT } from '@lib/about-content'
+import { useIsMobile } from './use-is-mobile'
 
 const Calculator = dynamic(
   () =>
@@ -206,7 +207,7 @@ interface DesktopClientProps {
 
 export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
   const router = useRouter()
-  const [isMobile, setIsMobile] = useState(false)
+  const isMobile = useIsMobile()
   const [openTerminal, setOpenTerminal] = useState(false)
   const [openCalculator, setOpenCalculator] = useState(false)
   const [openBlogPost, setOpenBlogPost] = useState<string | null>(null)
@@ -219,21 +220,11 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
   )
   const [nextZIndex, setNextZIndex] = useState(50)
   const [preloadedPost, setPreloadedPost] = useState<string | null>(null)
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const currentBlogPost = openBlogPost
     ? blogPosts.find((post) => post.slug === openBlogPost)
     : null
-
-  // Detect mobile screen size
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   const bringToFront = (windowId: string) => {
     setFocusedWindow(windowId)
@@ -252,6 +243,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     } else {
       setOpenBlogPost(slug)
       setPreloadedPost(null) // Clear preload when opening
+      bringToFront(`blog-post-${slug}`)
     }
   }
 
@@ -263,35 +255,22 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
 
   const handlePostHoverEnd = () => {
     // Keep the preloaded iframe for a bit in case they click
-    setTimeout(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+    }
+    hoverTimeoutRef.current = setTimeout(() => {
       setPreloadedPost(null)
     }, 1000)
   }
 
-  // Bring new windows to front automatically
+  // Cleanup hover timeout on unmount
   useEffect(() => {
-    if (openTerminal) bringToFront('terminal')
-  }, [openTerminal])
-
-  useEffect(() => {
-    if (openCalculator) bringToFront('calculator')
-  }, [openCalculator])
-
-  useEffect(() => {
-    if (openBlogPost) bringToFront(`blog-post-${openBlogPost}`)
-  }, [openBlogPost])
-
-  useEffect(() => {
-    if (openAbout) bringToFront('about')
-  }, [openAbout])
-
-  useEffect(() => {
-    if (openProjects) bringToFront('projects')
-  }, [openProjects])
-
-  useEffect(() => {
-    if (openBlogList) bringToFront('blog-list')
-  }, [openBlogList])
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -321,6 +300,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
           })
         } else {
           setOpenBlogList(true)
+          bringToFront('blog-list')
         }
       },
     },
@@ -338,6 +318,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
           })
         } else {
           setOpenProjects(true)
+          bringToFront('projects')
         }
       },
     },
@@ -355,6 +336,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
           })
         } else {
           setOpenAbout(true)
+          bringToFront('about')
         }
       },
     },
@@ -364,14 +346,20 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       name: 'terminal',
       type: 'app',
       icon: <TerminalIconDefault />,
-      onClick: () => setOpenTerminal(true),
+      onClick: () => {
+        setOpenTerminal(true)
+        bringToFront('terminal')
+      },
     },
     {
       id: 'calculator',
       name: 'calc',
       type: 'app',
       icon: <CalculatorIcon />,
-      onClick: () => setOpenCalculator(true),
+      onClick: () => {
+        setOpenCalculator(true)
+        bringToFront('calculator')
+      },
     },
     // External links
     {
@@ -430,7 +418,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
 
       <div className="flex-1 p-8 overflow-auto relative">
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-8 w-fit">
               {desktopItems.map((item) => (
                 <DesktopIcon key={item.id} item={item} />

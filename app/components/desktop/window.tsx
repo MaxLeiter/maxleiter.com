@@ -124,9 +124,30 @@ export function Window({
     }
   }
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isFullscreen) return
+    if ((e.target as HTMLElement).closest(".window-header") && !(e.target as HTMLElement).closest("button")) {
+      const touch = e.touches[0]
+      setIsDragging(true)
+      setDragOffset({
+        x: touch.clientX - position.x,
+        y: touch.clientY - position.y,
+      })
+      // Prevent scrolling when dragging
+      e.preventDefault()
+    }
+  }
+
   const handleResizeMouseDown = (e: React.MouseEvent) => {
     if (isFullscreen) return
     e.stopPropagation()
+    setIsResizing(true)
+  }
+
+  const handleResizeTouchStart = (e: React.TouchEvent) => {
+    if (isFullscreen) return
+    e.stopPropagation()
+    e.preventDefault()
     setIsResizing(true)
   }
 
@@ -283,6 +304,28 @@ export function Window({
       }
     }
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging || isResizing) {
+        e.preventDefault() // Prevent scrolling
+        const touch = e.touches[0]
+
+        if (isDragging) {
+          const newX = touch.clientX - dragOffset.x
+          const newY = touch.clientY - dragOffset.y
+
+          setPosition({ x: newX, y: newY })
+
+          const snapDir = getSnapDirection(touch.clientX, touch.clientY)
+          setSnapPreview(snapDir)
+        }
+        if (isResizing) {
+          const newWidth = Math.max(300, touch.clientX - position.x)
+          const newHeight = Math.max(200, touch.clientY - position.y)
+          setSize({ width: newWidth, height: newHeight })
+        }
+      }
+    }
+
     const handleMouseUp = (e: MouseEvent) => {
       if (isDragging) {
         const snapDir = getSnapDirection(e.clientX, e.clientY)
@@ -299,14 +342,35 @@ export function Window({
       setIsResizing(false)
     }
 
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isDragging && e.changedTouches[0]) {
+        const touch = e.changedTouches[0]
+        const snapDir = getSnapDirection(touch.clientX, touch.clientY)
+        if (snapDir) {
+          const snapped = getSnappedPosition(snapDir)
+          if (snapped) {
+            setPosition(snapped.position)
+            setSize(snapped.size)
+          }
+        }
+        setSnapPreview(null)
+      }
+      setIsDragging(false)
+      setIsResizing(false)
+    }
+
     if (isDragging || isResizing) {
       document.addEventListener("mousemove", handleMouseMove)
       document.addEventListener("mouseup", handleMouseUp)
+      document.addEventListener("touchmove", handleTouchMove, { passive: false })
+      document.addEventListener("touchend", handleTouchEnd)
     }
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove)
       document.removeEventListener("mouseup", handleMouseUp)
+      document.removeEventListener("touchmove", handleTouchMove)
+      document.removeEventListener("touchend", handleTouchEnd)
     }
   }, [isDragging, isResizing, dragOffset, position])
 
@@ -403,6 +467,10 @@ export function Window({
           handleMouseDown(e)
           onFocus?.()
         }}
+        onTouchStart={(e) => {
+          handleTouchStart(e)
+          onFocus?.()
+        }}
         role="dialog"
         aria-label={title}
       >
@@ -447,6 +515,7 @@ export function Window({
           <div
             className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
             onMouseDown={handleResizeMouseDown}
+            onTouchStart={handleResizeTouchStart}
             aria-label="Resize window"
             role="slider"
             tabIndex={0}

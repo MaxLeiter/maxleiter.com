@@ -7,7 +7,7 @@ import {
 
 export default async function Desktop() {
   const [blogPosts, projects] = await Promise.all([
-    getBlogPosts(),
+    getBlogPosts({ includeContent: false }),
     getProjectsData(),
   ])
 

@@ -4,7 +4,7 @@ import { ViewTransitionWrapper } from '@components/view-transition-wrapper'
 import { BlogListContent } from '@components/content/blog-list-content'
 
 export default async function BlogPage() {
-  const posts = await getBlogPosts()
+  const posts = await getBlogPosts({ includeContent: false })
 
   return (
     <div className="min-h-screen bg-black text-white/90 flex flex-col">

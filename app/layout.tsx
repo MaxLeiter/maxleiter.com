@@ -70,7 +70,7 @@ export default async function RootLayout({
   const { EffectsProvider } = await import('@components/desktop/effects-context')
 
   const [blogPosts, projects] = await Promise.all([
-    getBlogPosts(),
+    getBlogPosts({ includeContent: false }),
     getProjectsData(),
   ])
 
