@@ -41,19 +41,28 @@ export function TerminalContent({
   useEffect(() => {
     const updateVisualViewport = () => {
       if (typeof window !== 'undefined' && window.visualViewport) {
+        const newHeight = window.visualViewport.height
+        const newWidth = window.visualViewport.width
+
         setVisualViewport({
-          height: window.visualViewport.height,
-          width: window.visualViewport.width,
+          height: newHeight,
+          width: newWidth,
         })
+
+        // Adjust container position to account for keyboard
+        if (containerRef.current) {
+          const offsetTop = window.visualViewport.offsetTop || 0
+          containerRef.current.style.transform = `translateY(${offsetTop}px)`
+        }
 
         // Scroll input into view when keyboard opens
         if (inputRef.current) {
           setTimeout(() => {
             inputRef.current?.scrollIntoView({
               behavior: 'smooth',
-              block: 'end',
+              block: 'nearest',
             })
-          }, 100)
+          }, 150)
         }
       }
     }
@@ -61,9 +70,17 @@ export function TerminalContent({
     if (typeof window !== 'undefined' && window.visualViewport) {
       updateVisualViewport()
       window.visualViewport.addEventListener('resize', updateVisualViewport)
+      window.visualViewport.addEventListener('scroll', updateVisualViewport)
 
       return () => {
-        window.visualViewport?.removeEventListener('resize', updateVisualViewport)
+        window.visualViewport?.removeEventListener(
+          'resize',
+          updateVisualViewport,
+        )
+        window.visualViewport?.removeEventListener(
+          'scroll',
+          updateVisualViewport,
+        )
       }
     }
   }, [])
@@ -555,7 +572,9 @@ export function TerminalContent({
       ref={containerRef}
       className="h-full flex flex-col"
       style={{
-        maxHeight: visualViewport.height ? `${visualViewport.height}px` : '100vh',
+        maxHeight: visualViewport.height
+          ? `${visualViewport.height}px`
+          : '100vh',
       }}
     >
       <div
@@ -587,6 +606,8 @@ export function TerminalContent({
           className="flex-1 bg-transparent outline-none text-white/90 text-base font-mono"
           placeholder="Type command..."
           style={{ fontSize: '16px' }}
+          autoCorrect="off"
+          autoCapitalize="off"
         />
       </div>
     </div>
