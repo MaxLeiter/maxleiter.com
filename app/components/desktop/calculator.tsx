@@ -95,8 +95,6 @@ export function Calculator() {
 
     const initEmulator = async () => {
       try {
-        console.log('Initializing KnightOS emulator...')
-
         if (!(window as any).require || !(window as any).require.config) {
           console.log('Loading RequireJS...')
           await loadScript('/knightos/require.min.js')
@@ -108,7 +106,6 @@ export function Calculator() {
           throw new Error('RequireJS failed to load')
         }
 
-        console.log('Configuring RequireJS...')
         requireJS.config({
           baseUrl: '/knightos',
           paths: {
@@ -120,7 +117,6 @@ export function Calculator() {
           },
         })
 
-        console.log('Downloading ROM...')
         const romResponse = await fetch('/knightos/KnightOS-TI84pSE.rom')
         if (!romResponse.ok) {
           throw new Error(`Failed to load ROM: ${romResponse.status}`)
@@ -139,7 +135,6 @@ export function Calculator() {
             // Send Y= command after 2 seconds to fix emulation bug
             setTimeout(() => {
               if (emu && pressKey(keyMappings['y='])) {
-                console.log('Sending Y= command to fix emulation bug')
                 emu.sendKeys('Y=')
               }
             }, 2500)
