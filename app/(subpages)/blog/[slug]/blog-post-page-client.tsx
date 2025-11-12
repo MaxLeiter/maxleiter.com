@@ -1,6 +1,6 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { WindowToolbar } from '@components/desktop/window-toolbar'
 import type { ReactNode } from 'react'
 
@@ -16,9 +16,14 @@ export function BlogPostPageClient({
   children,
 }: BlogPostPageClientProps) {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const isEmbed =
     searchParams.get('embed') !== null &&
     searchParams.get('embed') !== undefined
+
+  const handleMinimize = () => {
+    router.push(`/?openPost=${slug}`)
+  }
 
   return (
     <div className="min-h-screen bg-black text-white/90 flex flex-col">
@@ -29,6 +34,8 @@ export function BlogPostPageClient({
             { name: 'blog', href: '/blog' },
             { name: slug, href: `/blog/${slug}` },
           ]}
+          showMinimize={true}
+          onMinimize={handleMinimize}
         />
       )}
 

@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState, useEffect, startTransition, useRef } from 'react'
+import { useState, useEffect, startTransition, useRef, ViewTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
@@ -234,6 +234,20 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     }))
     setNextZIndex((prev) => prev + 1)
   }
+
+  // Check for openPost URL parameter on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const postSlug = params.get('openPost')
+      if (postSlug && blogPosts.find(p => p.slug === postSlug)) {
+        setOpenBlogPost(postSlug)
+        bringToFront(`blog-post-${postSlug}`)
+        // Clean up URL without adding to history
+        window.history.replaceState({}, '', '/')
+      }
+    }
+  }, [blogPosts])
 
   const handlePostClick = (slug: string) => {
     if (isMobile) {
@@ -493,11 +507,13 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
           zIndex={windowZIndexes[`blog-post-${openBlogPost}`] || 50}
           onFocus={() => bringToFront(`blog-post-${openBlogPost}`)}
         >
-          <iframe
-            src={`/blog/${openBlogPost}?embed=true`}
-            className="w-full h-full border-0"
-            title={currentBlogPost.title}
-          />
+          <ViewTransition name={`blog-post-${openBlogPost}`}>
+            <iframe
+              src={`/blog/${openBlogPost}?embed=true`}
+              className="w-full h-full border-0"
+              title={currentBlogPost.title}
+            />
+          </ViewTransition>
         </Window>
       )}
 

@@ -12,15 +12,25 @@ interface BreadcrumbSegment {
 interface WindowToolbarProps {
   title: string
   segments?: BreadcrumbSegment[]
+  showMinimize?: boolean
+  onMinimize?: () => void
 }
 
-export function WindowToolbar({ title, segments = [] }: WindowToolbarProps) {
+export function WindowToolbar({ title, segments = [], showMinimize = false, onMinimize }: WindowToolbarProps) {
   const router = useRouter()
 
   const handleClose = () => {
     startTransition(() => {
       router.push('/')
     })
+  }
+
+  const handleMinimize = () => {
+    if (onMinimize) {
+      startTransition(() => {
+        onMinimize()
+      })
+    }
   }
 
   return (
@@ -42,6 +52,18 @@ export function WindowToolbar({ title, segments = [] }: WindowToolbarProps) {
         ))}
       </div>
       <div className="flex items-center gap-1">
+        {showMinimize && (
+          <button
+            onClick={handleMinimize}
+            className="text-white/50 hover:text-white/80 hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
+            aria-label="Minimize window"
+            title="Minimize"
+          >
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+              <rect x="4" y="4" width="8" height="8" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+          </button>
+        )}
         <button
           onClick={handleClose}
           className="text-white/50 hover:text-white/80 hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
