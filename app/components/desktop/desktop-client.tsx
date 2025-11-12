@@ -461,8 +461,8 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     <div className="h-screen bg-black text-white/90 overflow-hidden flex flex-col">
       <h1 className="sr-only">Max Leiter's website</h1>
       <header className="h-10 3xl:h-12 bg-white/5 border-b border-white/10 flex items-center px-4 3xl:px-6 gap-4 3xl:gap-6 text-xs 3xl:text-sm font-mono sticky top-0 z-10">
-        <span className="text-white/50" aria-hidden>
-          ~/
+        <span className="text-white/60" aria-hidden>
+          ~
         </span>
         <time id="menubar-clock" className="ml-auto text-white/40">
           {currentTime}
