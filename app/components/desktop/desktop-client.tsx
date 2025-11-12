@@ -24,9 +24,7 @@ const Calculator = dynamic(
     })),
   {
     ssr: false,
-    loading: () => (
-      <div className="p-4 text-white/60 font-mono">Loading calculator...</div>
-    ),
+    loading: () => null,
   },
 )
 
@@ -370,7 +368,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     },
     {
       id: 'calculator',
-      name: 'calculator',
+      name: 'calc',
       type: 'app',
       icon: <CalculatorIcon />,
       onClick: () => setOpenCalculator(true),
@@ -433,7 +431,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       <div className="flex-1 p-8 overflow-auto relative">
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-shrink-0">
-            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-4 gap-8 w-fit">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-8 w-fit">
               {desktopItems.map((item) => (
                 <DesktopIcon key={item.id} item={item} />
               ))}

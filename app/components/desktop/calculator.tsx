@@ -1,5 +1,6 @@
 'use client'
 
+import { Spinner } from '@components/spinner'
 import { useEffect, useRef, useState } from 'react'
 
 export function Calculator() {
@@ -170,7 +171,6 @@ export function Calculator() {
         i
       </button>
 
-      {/* Info Tooltip */}
       {showInfo && (
         <div className="absolute top-10 right-2 z-10 bg-black border border-white/20 rounded p-3 max-w-xs text-xs text-white/90 shadow-xl">
           <h3 className="font-semibold mb-1 text-white">KnightOS Emulator</h3>
@@ -185,12 +185,6 @@ export function Calculator() {
           >
             Close
           </button>
-        </div>
-      )}
-
-      {loading && (
-        <div className="text-white/70 text-sm font-mono mb-4">
-          Loading KnightOS...
         </div>
       )}
 

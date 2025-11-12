@@ -52,7 +52,22 @@ export async function getBlogPosts(opts?: { includeContent?: boolean }): Promise
 
 export async function getProjectsData(): Promise<Project[]> {
   const projects = await getProjects()
-  return projects.map(convertToProject)
+  return projects
+    .map(convertToProject)
+    .sort((a, b) => {
+      // Get the most recent year from each project
+      const getLatestYear = (tech: string[]) => {
+        if (tech.includes('present')) return Infinity
+        const years = tech.map(y => parseInt(y)).filter(y => !isNaN(y))
+        return years.length > 0 ? Math.max(...years) : 0
+      }
+
+      const yearA = getLatestYear(a.tech)
+      const yearB = getLatestYear(b.tech)
+
+      // Sort descending (newest first)
+      return yearB - yearA
+    })
 }
 
 export { ABOUT_CONTENT } from './about-content'
