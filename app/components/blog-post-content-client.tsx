@@ -1,9 +1,4 @@
-'use client'
-
 import { ViewTransitionWrapper } from './view-transition-wrapper'
-import { useRouter } from 'next/navigation'
-import { startTransition } from 'react'
-import Link from 'next/link'
 
 interface BlogPostContentClientProps {
   slug: string
@@ -20,8 +15,6 @@ export function BlogPostContentClient({
   description,
   children,
 }: BlogPostContentClientProps) {
-  const router = useRouter()
-
   return (
     <ViewTransitionWrapper name={`blog-post-${slug}`}>
       <article className="max-w-3xl mx-auto">

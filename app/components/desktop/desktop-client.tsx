@@ -9,13 +9,13 @@ import { TerminalContent } from '@components/desktop/terminal-content'
 import { Calculator } from '@components/desktop/calculator'
 import { WidgetRecentPosts } from '@components/desktop/widget-recent-posts'
 import { WidgetTopProjects } from '@components/desktop/widget-top-projects'
-import { BlogPostContentClient } from '@components/blog-post-content-client'
 import {
   AboutContentClient,
   ProjectsContentClient,
   BlogListContentClient,
 } from '@components/page-content-client'
 import type { BlogPost, Project } from '@lib/portfolio-data'
+import { ABOUT_CONTENT } from '@lib/about-content'
 
 interface DesktopItem {
   id: string
@@ -191,16 +191,9 @@ function CalculatorIcon() {
 interface DesktopClientProps {
   blogPosts: BlogPost[]
   projects: Project[]
-  aboutContent: any
-  blogPostPreviews: Record<string, React.ReactNode>
 }
 
-export function DesktopClient({
-  blogPosts,
-  projects,
-  aboutContent,
-  blogPostPreviews,
-}: DesktopClientProps) {
+export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
   const router = useRouter()
   const [isMobile, setIsMobile] = useState(false)
   const [openTerminal, setOpenTerminal] = useState(false)
@@ -442,7 +435,7 @@ export function DesktopClient({
           <TerminalContent
             blogPosts={blogPosts}
             projects={projects}
-            aboutContent={aboutContent}
+            aboutContent={ABOUT_CONTENT}
             onClose={() => setOpenTerminal(false)}
           />
         </Window>
@@ -475,16 +468,11 @@ export function DesktopClient({
           zIndex={windowZIndexes[`blog-post-${openBlogPost}`] || 50}
           onFocus={() => bringToFront(`blog-post-${openBlogPost}`)}
         >
-          <div className="overflow-auto h-full p-6">
-            <BlogPostContentClient
-              slug={openBlogPost}
-              title={currentBlogPost.title}
-              date={currentBlogPost.date}
-              description={currentBlogPost.excerpt}
-            >
-              {blogPostPreviews[openBlogPost]}
-            </BlogPostContentClient>
-          </div>
+          <iframe
+            src={`/blog/${openBlogPost}`}
+            className="w-full h-full border-0"
+            title={currentBlogPost.title}
+          />
         </Window>
       )}
 
@@ -501,7 +489,7 @@ export function DesktopClient({
           onFocus={() => bringToFront('about')}
         >
           <div className="overflow-auto h-full p-6">
-            <AboutContentClient content={aboutContent} />
+            <AboutContentClient />
           </div>
         </Window>
       )}

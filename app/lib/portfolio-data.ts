@@ -1,6 +1,3 @@
-// Unified data structure for blog posts and projects
-// Used by terminal, blog page, projects page, and desktop
-
 import { getPosts } from './get-posts'
 import { getProjects } from './projects'
 import type { Post, Project as ProjectType } from './types'
@@ -34,7 +31,6 @@ function convertToBlogPost(post: Post): BlogPost | null {
   }
 }
 
-// Convert your Project type to desktop OS Project format
 function convertToProject(project: ProjectType, index: number): Project {
   return {
     id: project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
@@ -58,13 +54,4 @@ export async function getProjectsData(): Promise<Project[]> {
   return projects.map(convertToProject)
 }
 
-export const ABOUT_CONTENT = {
-  bio: {
-    content: `I'm currently building v0 at Vercel. I'm interested in politics, tech, and building a fast, accessible web.`,
-    title: 'About',
-    links: [
-      { text: 'v0.app', url: 'https://v0.app' },
-      { text: 'vercel.com', url: 'https://vercel.com' },
-    ],
-  },
-}
+export { ABOUT_CONTENT } from './about-content'

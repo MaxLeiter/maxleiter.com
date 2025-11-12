@@ -21,7 +21,7 @@ const About = () => {
 
       <div className="flex-1 overflow-auto p-6">
         <ViewTransitionWrapper name="page-about">
-          <AboutContent content={ABOUT_CONTENT} />
+          <AboutContent />
         </ViewTransitionWrapper>
       </div>
     </div>
