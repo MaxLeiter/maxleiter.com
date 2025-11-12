@@ -1,7 +1,6 @@
 import { WindowToolbar } from '@components/desktop/window-toolbar'
 import { ViewTransitionWrapper } from '@components/view-transition-wrapper'
 import { AboutContent } from '@components/content/about-content'
-import { ABOUT_CONTENT } from '@lib/portfolio-data'
 
 export const metadata = {
   title: 'About',
