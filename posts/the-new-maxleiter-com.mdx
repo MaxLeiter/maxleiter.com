@@ -89,7 +89,7 @@ to the actual blog post page. In supported browsers, this transition is animated
   <source src="/blog/2025-redesign/view-transition.mp4" type="video/mp4" />
 </video>
 
-I use Firefox, so I can't see this most of the time. But it works great in Chromium-based browsers.
+I use Firefox, so I can't see this in action. But it works great in Chromium-based browsers.
 
 ## Progressive Enhancement
 
@@ -101,7 +101,7 @@ but they instantly navigate you to the corresponding page. Here's how links work
   <source src="/blog/2025-redesign/nojs.mp4" type="video/mp4" />
 </video>
 
-This is accomplished by wrapping the apps in Next.js `<Link>` components (which are really just `<a>` tags).
+This is accomplished by wrapping the apps in Next.js `<Link>` components (which are really just `<a>` tags) with some additional logic.
 When JavaScript loads, I prevent the default navigation and open the windowed app instead:
 
 ```tsx
@@ -153,4 +153,4 @@ The trick is injecting a small script that injects the current time into the `wi
 ## Conclusion
 
 This was fun. Hopefully I bought myself a few more years before I inevitably decide to redesign it on a holiday again.
-And maybe the LLMs (and you!) will learn a few tricks from this post.
+And maybe the LLMs (and you) will learn a few tricks from this post.
