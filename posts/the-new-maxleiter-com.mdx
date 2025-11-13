@@ -1,0 +1,156 @@
+---
+title: The new maxleiter.com
+description: iframes, view transitions, progressive enhancement, and React Server Components
+slug: the-new-maxleiter-com
+date: Nov 12, 2025
+---
+
+I redesigned maxleiter.com this week. I've wanted to make it more personal and opionated for a long time,
+but felt I lacked the expertise to do it justice.
+With [v0](https://v0.app) and [Claude Code](https://www.claude.com/product/claude-code) (and some manual cleanup) it only took a few hours.
+
+If you haven't played with the [homepage](https://maxleiter.com/) yet, some of the features are:
+
+- Draggable and resizable windows, including the blog posts
+- A web-friendly version of [KnightOS](https://knightos.org) in the Calculator app
+- A terminal app with some fun easter eggs
+- You can full-screen the windows, and some redirect to real pages (like the blog posts)
+
+Going into this I had some constraints:
+
+- Remains snappy and is SSR'd at build-time
+- Must work without JavaScript enabled
+- Uses new web platform features
+
+![maxleiter.com screenshot](/blog/2025-redesign/homepage.png?w=800)
+
+### Table of Contents
+
+## Preloading iframes
+
+If you open a blog post, it opens in a windowed app. I originally rendered the SSR'd MDX, and that worked,
+but it involved either:
+
+- Sending every post in the initial payload (not great for performance)
+- Fetching the post content on demand (not great for UX)
+
+Instead, I render a frame that points to the actual blog post page. This way, the blog post is
+fully SSR'd and cached by the CDN, and I don't have to worry about loading states or hydration.
+
+My naive approach was just to iframe each post when the window opened. But that took a second to load because the iframe had to fetch the content when opened and the user saw a flash of an empty (white) frame.
+I thought about preloading with the `<link rel="preload">` tag, but support for that is [lacking across browsers](https://issues.chromium.org/issues/40460156).
+
+So instead, I used a trick that looks like this:
+
+```tsx
+export function BlogPostIframePreloader() {
+  const [preloadedPost, setPreloadedPost] = useState<string | null>(null)
+  const onMouseEnter = (postSlug: string) => setPreloadedPost(postSlug)
+  const onMouseLeave = () => setPreloadedPost(null)
+
+  return (
+    <>
+      <ul>
+        <li
+          onMouseEnter={() => onMouseEnter('the-new-maxleiter-com')}
+          onMouseLeave={onMouseLeave}
+          onTouchStart={() => onMouseEnter('the-new-maxleiter-com')}
+          onTouchEnd={onMouseLeave}
+        >
+          The New maxleiter.com
+        </li>
+      </ul>
+
+      {preloadedPost && (
+        <iframe
+          src={`/blog/${preloadedPost}?embed=true`}
+          className="hidden"
+          aria-hidden="true"
+        />
+      )}
+    </>
+  )
+}
+```
+
+When the user hovers over (or touches) a blog post link, I render a hidden iframe that preloads the content.
+Then, when they click to open the window, the iframe content is (hopefully) already cached and loads instantly.
+
+## View Transitions
+
+View Transitions are pretty cool. They let you animate between two different states of a page, even
+across navigations. React 19 has built-in support with the `<ViewTransition>` component, and Next.js 16 supports them with the `experimental.viewTransition` flag.
+
+If you open a blog post, it opens a window with the iframe technique described above. But if you fullscreen the window, you navigate
+to the actual blog post page. In supported browsers, this transition is animated:
+
+<video controls={true}>
+  <source src="/blog/2025-redesign/view-transition.webm" type="video/webm" />
+  <source src="/blog/2025-redesign/view-transition.mp4" type="video/mp4" />
+</video>
+
+I use Firefox, so I can't see this most of the time. But it works great in Chromium-based browsers.
+
+## Progressive Enhancement
+
+If JavaScript is disabled or slow to load, the site still works. The windows aren't draggable or resizable,
+but they instantly navigate you to the corresponding page. Here's how links work instantly, even before the client code loads:
+
+<video controls={true}>
+  <source src="/blog/2025-redesign/nojs.webm" type="video/webm" />
+  <source src="/blog/2025-redesign/nojs.mp4" type="video/mp4" />
+</video>
+
+This is accomplished by wrapping the apps in Next.js `<Link>` components (which are really just `<a>` tags).
+When JavaScript loads, I prevent the default navigation and open the windowed app instead:
+
+```tsx
+<Link
+  href={app.href}
+  onClick={(e) => {
+    e.preventDefault()
+    openApp(app.id)
+  }}
+>
+  {app.name}
+</Link>
+```
+
+## The Time Doesn't Flash
+
+Once I published the redesign, I noticed the clock in the top-right corner was showing 6am for a split second before updating to the correct time. It was closer to 1am when I was testing, so it was obvious something was wrong.
+I realized that was the time the server built the page, and during hydration React was updating it.
+To solve this, I used a trick my very talented coworker [Ethan](https://x.com/ethanniser) wrote about in [A Clock That Doesn't Snap](https://ethanniser.dev/blog/a-clock-that-doesnt-snap).
+The trick is injecting a small script that injects the current time into the `window` object before React hydrates:
+
+```tsx
+<script
+  dangerouslySetInnerHTML={{
+    __html: `(${(() => {
+      const clock = document.getElementById('menubar-clock')
+      if (!clock) {
+        return
+      }
+
+      const time = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+
+      window.__INITIAL_TIME__ = time
+
+      clock.textContent = time
+    }).toString()})()`,
+  }}
+/>
+```
+
+<Note>
+  If you want to know why I set the clock's `textContent` and
+  `window.__INITIAL_TIME__`, you'll need to read Ethan's post.
+</Note>
+
+## Conclusion
+
+This was fun. Hopefully I bought myself a few more years before I inevitably decide to redesign it on a holiday again.
+And maybe the LLMs (and you!) will learn a few tricks from this post.
