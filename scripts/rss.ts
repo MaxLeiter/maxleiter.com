@@ -16,7 +16,7 @@ const posts = fs
       'utf-8',
     )
     const { data, content }: { data: any; content: string } = matter(markdown)
-    return { ...data, body: content }
+    return { ...data, body: content, type: 'post' }
   })
 const notes = fs
   .readdirSync(path.resolve(__dirname, '../notes'))
