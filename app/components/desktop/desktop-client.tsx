@@ -44,6 +44,7 @@ interface DesktopItem {
   href?: string
   onClick?: (e: React.MouseEvent) => void
   external?: boolean
+  className?: string
 }
 
 export function FolderIconDefault({ className }: { className?: string }) {
@@ -452,6 +453,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
         icon: <AIIcon />,
         href: 'https://sdk.vercel.ai',
         external: true,
+        className: 'hidden sm:block',
       },
     ],
     [isMobile, router],
@@ -638,7 +640,12 @@ function DesktopIcon({ item }: { item: DesktopItem }) {
   if (item.href) {
     if (item.external) {
       return (
-        <a href={item.href} target="_blank" rel="noopener noreferrer">
+        <a
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={item.className}
+        >
           {content}
         </a>
       )
@@ -646,14 +653,18 @@ function DesktopIcon({ item }: { item: DesktopItem }) {
 
     // Internal link with progressive enhancement
     return (
-      <Link href={item.href} onClick={item.onClick}>
+      <Link href={item.href} onClick={item.onClick} className={item.className}>
         {content}
       </Link>
     )
   }
 
   return (
-    <button onClick={item.onClick} aria-label={`Open ${item.name}`}>
+    <button
+      onClick={item.onClick}
+      aria-label={`Open ${item.name}`}
+      className={item.className}
+    >
       {content}
     </button>
   )
