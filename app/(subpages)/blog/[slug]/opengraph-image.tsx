@@ -6,15 +6,18 @@ export const size = { width: 1200, height: 600 }
 // TODO: update to support alt once nextjs has a solution for params
 export const alt = ''
 export const contentType = 'image/png'
+export const dynamic = 'force-static'
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async function ({
-  params,
+  _params,
 }: {
-  params: { slug: string }
+  _params: Promise<{ slug: string }>
 }): Promise<ImageResponse> {
+  const params = await _params
+
   const res = await fetch(
-    `https://raw.githubusercontent.com/MaxLeiter/maxleiter.com/master/posts/${params.slug}.mdx`
+    `https://raw.githubusercontent.com/MaxLeiter/maxleiter.com/master/posts/${params.slug}.mdx`,
   )
 
   if (!res.ok) {
@@ -30,7 +33,7 @@ export default async function ({
   }
 
   const fontData = await fs.readFile(
-    path.join(process.cwd(), 'app', 'fonts', 'Inter-Medium.ttf')
+    path.join(process.cwd(), 'app', 'fonts', 'Inter-Medium.ttf'),
   )
 
   return new ImageResponse(
@@ -119,6 +122,6 @@ export default async function ({
       ],
       width: 1200,
       height: 630,
-    }
+    },
   )
 }
