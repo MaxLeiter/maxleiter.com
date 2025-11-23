@@ -10,9 +10,9 @@ export const dynamic = 'force-static'
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async function ({
-  _params,
+  params: _params,
 }: {
-  _params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>
 }): Promise<ImageResponse> {
   const params = await _params
 
