@@ -435,7 +435,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
         name: 'X',
         type: 'app',
         icon: <TwitterIcon />,
-        href: 'https://twitter.com/max_leiter',
+        href: 'https://twitter.com/maxleiter',
         external: true,
       },
       {

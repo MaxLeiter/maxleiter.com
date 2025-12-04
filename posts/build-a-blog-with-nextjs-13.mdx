@@ -9,7 +9,11 @@ I've been tinkering with this website and the [Next.js 13 App Router](https://be
 and it's been a great experience, especially in the last few months. But I've seen some confusion around
 how to use the new features and React Server Components, so I wrote up an outline on building this website.
 
-<Note> This post has been updated for [Next.js 15.](https://nextjs.org/blog/next-15) </Note>
+<Note>
+  {' '}
+  This post has been updated for [Next.js
+  15.](https://nextjs.org/blog/next-15){' '}
+</Note>
 
 To address the React-sized elephant in the room:
 you do not need this fancy setup to build a blog.
@@ -104,8 +108,9 @@ export default function Header() {
       <Link href="/">
         <HomeIcon />
       </Link>
-      // If you want to add a Client Component here like a theme switcher, mark that
-      // component with "use client" and leave the majority of the header as an RSC
+      // If you want to add a Client Component here like a theme switcher, mark
+      that // component with "use client" and leave the majority of the header
+      as an RSC
     </header>
   )
 }
@@ -449,7 +454,7 @@ export default async function PostPage({
     slug: string
   }>
 }) {
-  const params = await _params;
+  const params = await _params
   const post = await getPost(params.slug)
   // notFound is a Next.js utility
   if (!post) return notFound()
@@ -458,9 +463,9 @@ export default async function PostPage({
 }
 ```
 
-We can now render a post; that's pretty cool. 
+We can now render a post; that's pretty cool.
 
-We can optionally choose to build all of our posts at build time, 
+We can optionally choose to build all of our posts at build time,
 by adding \`generateStaticParams\` to the page:
 
 ```tsx
@@ -473,10 +478,10 @@ export async function generateStaticParams() {
 ```
 
 <Note>
-  If you think it's bad that we call \`getPost\` _and_ \`getPosts()\`, remember the
-  we wrapped \`getPosts\` in \`cache\`. \`getPost\` just calls
-  \`getPosts\`, so we're not making any unnecessary requests to the filesystem (or
-  wherever you're getting your posts from).
+  If you think it's bad that we call \`getPost\` _and_ \`getPosts()\`, remember
+  the we wrapped \`getPosts\` in \`cache\`. \`getPost\` just calls \`getPosts\`,
+  so we're not making any unnecessary requests to the filesystem (or wherever
+  you're getting your posts from).
 </Note>
 
 ## SEO
@@ -521,7 +526,7 @@ export const metadata = {
   twitter: {
     title: 'Max Leiter',
     card: 'summary_large_image',
-    creator: '@max_leiter',
+    creator: '@maxleiter',
   },
   icons: {
     shortcut: 'https://maxleiter.com/favicons/favicon.ico',
@@ -652,10 +657,10 @@ main()
 ## Deployment
 
 I use Vercel for deployments (I may be bias), but you can use any static site provider you want with a setup
-like this because it supports [static export](https://beta.nextjs.org/docs/configuring/static-export). 
+like this because it supports [static export](https://beta.nextjs.org/docs/configuring/static-export).
 
 ## Wrapping up
 
-I hope this post was helpful to you. 
+I hope this post was helpful to you.
 As a reminder, you can find the source code for this site [here](https://github.com/maxleiter/maxleiter.com).
 Please try to not think negatively of me for anything you find (but feel free to offer praise for anything you like).

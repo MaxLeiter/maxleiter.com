@@ -100,7 +100,7 @@ export function AboutContent({ content }: AboutContentProps) {
               GitHub
             </a>
             <a
-              href="https://twitter.com/max_leiter"
+              href="https://twitter.com/maxleiter"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"

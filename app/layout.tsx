@@ -44,7 +44,7 @@ export const metadata = {
   twitter: {
     title: 'Max Leiter',
     card: 'summary_large_image',
-    creator: '@max_leiter',
+    creator: '@maxleiter',
   },
   icons: {
     shortcut: 'https://maxleiter.com/favicons/favicon.ico',
