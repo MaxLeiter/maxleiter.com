@@ -13,6 +13,8 @@ interface EffectsContextType {
   crtMode: boolean
   toggleJuice: () => void
   toggleCrt: () => void
+  showCommandPalette: boolean
+  setShowCommandPalette: (show: boolean) => void
 }
 
 const EffectsContext = createContext<EffectsContextType | null>(null)
@@ -28,6 +30,7 @@ export function useEffects() {
 export function EffectsProvider({ children }: { children: React.ReactNode }) {
   const [juiceMode, setJuiceMode] = useState(false)
   const [crtMode, setCrtMode] = useState(false)
+  const [showCommandPalette, setShowCommandPalette] = useState(false)
 
   // Initialize from localStorage and URL params
   useEffect(() => {
@@ -82,7 +85,7 @@ export function EffectsProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <EffectsContext.Provider
-      value={{ juiceMode, crtMode, toggleJuice, toggleCrt }}
+      value={{ juiceMode, crtMode, toggleJuice, toggleCrt, showCommandPalette, setShowCommandPalette }}
     >
       {children}
     </EffectsContext.Provider>
@@ -101,7 +104,7 @@ function initCrtStyles() {
       }
 
       body.crt {
-        background-color: rgb(25, 25, 30);
+        background-color: var(--bg);
         text-shadow: 0 0 0.2em currentColor, 1px 1px rgba(255, 0, 255, 0.5), -1px -1px rgba(0, 255, 255, 0.4);
         position: relative;
       }
@@ -179,7 +182,7 @@ function initJuiceMode() {
         border-radius: 50%;
         pointer-events: none;
         z-index: 9998;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+        background: radial-gradient(circle, hsla(0, 0%, 100%, 0.8), hsla(0, 0%, 100%, 0));
         animation: trail-fade 0.6s ease-out forwards;
       }
 

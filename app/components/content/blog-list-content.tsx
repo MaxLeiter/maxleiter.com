@@ -18,7 +18,7 @@ export function BlogListContent({
 }: BlogListContentProps) {
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">blog/</h1>
+      <h1 className="text-3xl font-mono font-bold mb-8" style={{ color: 'var(--article-color)' }}>blog/</h1>
 
       <ul className="space-y-2">
         {posts.map((post) => (

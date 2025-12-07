@@ -30,6 +30,7 @@
   /* Dark Mode Colors */
   --bg: #000000;
   --bg-alpha: hsla(0, 0%, 0%, 0.9);
+  --bg-window-alpha: rgba(0, 0, 0, 0.75);
   --fg: #e5e5e5;
   --gray: #999;
   --light-gray: #444;
@@ -85,6 +86,7 @@
 [data-theme='light'] {
   --bg: #fff;
   --bg-alpha: hsla(0, 0%, 100%, 0.9);
+  --bg-window-alpha: rgba(255, 255, 255, 0.75);
   --fg: #444;
   --gray: rgb(100, 100, 100);
   --light-gray: rgb(222, 222, 222);

@@ -27,6 +27,8 @@ import type { BlogPost, Project } from '@lib/portfolio-data'
 import type { Book } from '@lib/types'
 import { ABOUT_CONTENT } from '@lib/about-content'
 import { useIsMobile } from './use-is-mobile'
+import { useEffects } from '@components/desktop/effects-context'
+import { ThemeToggle } from '@components/theme-toggle'
 
 const Calculator = dynamic(
   () =>
@@ -180,7 +182,8 @@ export function ExternalLinkIcon() {
       width="16"
       strokeLinejoin="round"
       viewBox="0 0 16 16"
-      className="text-white/30 size-3"
+      className="size-3"
+      style={{ color: 'var(--gray)' }}
     >
       <path
         fillRule="evenodd"
@@ -211,6 +214,22 @@ function CalculatorIcon() {
   )
 }
 
+function SearchIcon() {
+  return (
+    <svg
+      height="14"
+      width="14"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <circle cx="6.5" cy="6.5" r="5" />
+      <line x1="10" y1="10" x2="15" y2="15" />
+    </svg>
+  )
+}
+
 interface DesktopClientProps {
   blogPosts: BlogPost[]
   projects: Project[]
@@ -226,6 +245,7 @@ declare global {
 export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps) {
   const router = useRouter()
   const isMobile = useIsMobile()
+  const { setShowCommandPalette } = useEffects()
   const [openTerminal, setOpenTerminal] = useState(false)
   const [openCalculator, setOpenCalculator] = useState(false)
   const [openBlogPost, setOpenBlogPost] = useState<string | null>(null)
@@ -238,7 +258,7 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
   const [windowZIndexes, setWindowZIndexes] = useState<Record<string, number>>(
     {},
   )
-  const [nextZIndex, setNextZIndex] = useState(50)
+  const nextZIndexRef = useRef(50)
   const [preloadedPost, setPreloadedPost] = useState<string | null>(null)
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -271,11 +291,12 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
 
   const bringToFront = (windowId: string) => {
     setFocusedWindow(windowId)
+    const zIndex = nextZIndexRef.current
+    nextZIndexRef.current += 1
     setWindowZIndexes((prev) => ({
       ...prev,
-      [windowId]: nextZIndex,
+      [windowId]: zIndex,
     }))
-    setNextZIndex((prev) => prev + 1)
   }
 
   // Check for openPost URL parameter on mount
@@ -502,15 +523,26 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
   )
 
   return (
-    <div className="h-screen bg-black text-white/90 overflow-hidden flex flex-col">
+    <div className="h-screen bg-[var(--bg)] text-[var(--fg)] overflow-hidden flex flex-col">
       <h1 className="sr-only">Max Leiter's website</h1>
-      <header className="h-10 3xl:h-12 bg-white/5 border-b border-white/10 flex items-center px-4 3xl:px-6 gap-4 3xl:gap-6 text-xs 3xl:text-sm font-mono sticky top-0 z-10">
-        <span className="text-white/60" aria-hidden>
+      <header className="h-10 3xl:h-12 bg-[var(--lightest-gray)] border-b border-[var(--border-color)] flex items-center px-4 3xl:px-6 gap-4 3xl:gap-6 text-xs 3xl:text-sm font-mono sticky top-0 z-10">
+        <span className="text-[var(--gray)]" aria-hidden>
           ~
         </span>
-        <time id="menubar-clock" className="ml-auto text-white/40">
-          {currentTime}
-        </time>
+        <div className="ml-auto flex items-center gap-4">
+          <ThemeToggle />
+          <button
+            onClick={() => setShowCommandPalette(true)}
+            className="text-[var(--gray)] hover:text-[var(--fg)] transition-colors p-1"
+            aria-label="Search (⌘K)"
+            title="Search (⌘K)"
+          >
+            <SearchIcon />
+          </button>
+          <time id="menubar-clock" className="text-[var(--gray)]">
+            {currentTime}
+          </time>
+        </div>
       </header>
 
       <main className="flex-1 p-8 3xl:p-12 overflow-auto relative">
@@ -700,11 +732,11 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
 
 function DesktopIcon({ item }: { item: DesktopItem }) {
   const content = (
-    <div className="flex flex-col items-center gap-2 3xl:gap-3 p-3 3xl:p-4 rounded-lg hover:bg-white/5 transition-colors duration-200 cursor-pointer relative">
-      <div className="h-12 3xl:h-16 flex items-center justify-center text-white/80 hover:text-white/90 transition-colors 3xl:scale-125">
+    <div className="flex flex-col items-center gap-2 3xl:gap-3 p-3 3xl:p-4 rounded-lg transition-colors duration-200 cursor-pointer relative" style={{ '--hover-bg': 'rgba(255, 255, 255, 0.05)' } as React.CSSProperties}>
+      <div className="h-12 3xl:h-16 flex items-center justify-center transition-colors 3xl:scale-125" style={{ color: 'var(--fg)', opacity: 0.8 }}>
         {item.icon}
       </div>
-      <span className="text-xs 3xl:text-sm font-mono text-white/80 text-center truncate w-16 3xl:w-20">
+      <span className="text-xs 3xl:text-sm font-mono text-center truncate w-16 3xl:w-20" style={{ color: 'var(--fg)', opacity: 0.8 }}>
         {item.name}
       </span>
       {item.external && (

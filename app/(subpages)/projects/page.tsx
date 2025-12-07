@@ -15,7 +15,7 @@ export default async function ProjectsPage() {
   const projects = await getProjectsData()
 
   return (
-    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
       <WindowToolbar
         title="projects"
         segments={[{ name: 'projects', href: '/projects' }]}

@@ -38,7 +38,7 @@ export function BlogPostPageClient({
   }
 
   return (
-    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
       {!isEmbed && (
         <div id="blog-toolbar">
           <WindowToolbar

@@ -34,9 +34,9 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
   }
 
   return (
-    <header className="h-10 bg-white/5 border-b border-white/10 flex items-center justify-between px-4 select-none sticky top-0 z-10">
-      <nav className="flex items-center gap-2 text-sm font-mono text-white/60" aria-label="Breadcrumb">
-        <Link href="/" className="hover:text-white/90 transition-colors">
+    <header className="h-10 bg-[var(--lightest-gray)] border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10">
+      <nav className="flex items-center gap-2 text-sm font-mono text-[var(--gray)]" aria-label="Breadcrumb">
+        <Link href="/" className="hover:text-[var(--fg)] transition-colors">
           ~
         </Link>
         {segments.map((segment, index) => (
@@ -44,7 +44,7 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
             <span>/</span>
             <Link
               href={segment.href}
-              className="hover:text-white/90 transition-colors"
+              className="hover:text-[var(--fg)] transition-colors"
             >
               {segment.name}
             </Link>
@@ -55,7 +55,7 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
         {showMinimize && (
           <button
             onClick={handleMinimize}
-            className="text-white/50 hover:text-white/80 hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
+            className="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
             aria-label="Minimize window"
             title="Minimize"
           >
@@ -66,7 +66,7 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
         )}
         <button
           onClick={handleClose}
-          className="text-white/50 hover:text-white/80 hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
+          className="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
           aria-label={`Close ${title}`}
         >
           ✕

@@ -7,7 +7,7 @@ export default async function BlogPage() {
   const posts = await getBlogPosts({ includeContent: false })
 
   return (
-    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
       <WindowToolbar
         title="blog"
         segments={[{ name: 'blog', href: '/blog' }]}

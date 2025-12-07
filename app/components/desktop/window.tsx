@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useRef, useEffect, startTransition } from "react"
-import { useRouter } from "next/navigation"
+import type React from 'react'
+import { useState, useRef, useEffect, startTransition } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface WindowProps {
   title: string
@@ -13,12 +13,12 @@ interface WindowProps {
   defaultX?: number
   defaultY?: number
   blogSlug?: string
-  pageType?: 'blog' | 'projects' | 'about' | null
+  pageType?: 'blog' | 'projects' | 'about' | 'labs' | 'books' | null
   zIndex?: number
   onFocus?: () => void
 }
 
-type SnapDirection = "left" | "right" | "top" | "bottom" | null
+type SnapDirection = 'left' | 'right' | 'top' | 'bottom' | null
 
 export function Window({
   title,
@@ -34,7 +34,12 @@ export function Window({
   onFocus,
 }: WindowProps) {
   // Constrain initial size to viewport
-  const constrainToViewport = (width: number, height: number, x: number, y: number) => {
+  const constrainToViewport = (
+    width: number,
+    height: number,
+    x: number,
+    y: number,
+  ) => {
     const maxWidth = window.innerWidth - 40 // Leave 20px padding on each side
     const maxHeight = window.innerHeight - 80 // Leave space for top bar (40px) and padding
 
@@ -42,17 +47,24 @@ export function Window({
       width: Math.min(width, maxWidth),
       height: Math.min(height, maxHeight),
       x: Math.max(20, Math.min(x, window.innerWidth - width - 20)),
-      y: Math.max(60, Math.min(y, window.innerHeight - height - 20))
+      y: Math.max(60, Math.min(y, window.innerHeight - height - 20)),
     }
   }
 
-  const initialConstraints = typeof window !== 'undefined'
-    ? constrainToViewport(defaultWidth, defaultHeight, defaultX, defaultY)
-    : { width: defaultWidth, height: defaultHeight, x: defaultX, y: defaultY }
+  const initialConstraints =
+    typeof window !== 'undefined'
+      ? constrainToViewport(defaultWidth, defaultHeight, defaultX, defaultY)
+      : { width: defaultWidth, height: defaultHeight, x: defaultX, y: defaultY }
 
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [position, setPosition] = useState({ x: initialConstraints.x, y: initialConstraints.y })
-  const [size, setSize] = useState({ width: initialConstraints.width, height: initialConstraints.height })
+  const [position, setPosition] = useState({
+    x: initialConstraints.x,
+    y: initialConstraints.y,
+  })
+  const [size, setSize] = useState({
+    width: initialConstraints.width,
+    height: initialConstraints.height,
+  })
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
@@ -75,10 +87,10 @@ export function Window({
     const windowWidth = window.innerWidth
     const windowHeight = window.innerHeight
 
-    if (mouseX < SNAP_DISTANCE) return "left"
-    if (mouseX > windowWidth - SNAP_DISTANCE) return "right"
-    if (mouseY < SNAP_DISTANCE + 40) return "top"
-    if (mouseY > windowHeight - SNAP_DISTANCE) return "bottom"
+    if (mouseX < SNAP_DISTANCE) return 'left'
+    if (mouseX > windowWidth - SNAP_DISTANCE) return 'right'
+    if (mouseY < SNAP_DISTANCE + 40) return 'top'
+    if (mouseY > windowHeight - SNAP_DISTANCE) return 'bottom'
 
     return null
   }
@@ -88,22 +100,22 @@ export function Window({
     const windowHeight = window.innerHeight
 
     switch (direction) {
-      case "left":
+      case 'left':
         return {
           position: { x: 0, y: 40 },
           size: { width: windowWidth / 2, height: windowHeight - 40 },
         }
-      case "right":
+      case 'right':
         return {
           position: { x: windowWidth / 2, y: 40 },
           size: { width: windowWidth / 2, height: windowHeight - 40 },
         }
-      case "top":
+      case 'top':
         return {
           position: { x: position.x, y: 40 },
           size: { width: size.width, height: (windowHeight - 40) / 2 },
         }
-      case "bottom":
+      case 'bottom':
         return {
           position: { x: position.x, y: (windowHeight - 40) / 2 + 40 },
           size: { width: size.width, height: (windowHeight - 40) / 2 },
@@ -115,7 +127,10 @@ export function Window({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (isFullscreen) return
-    if ((e.target as HTMLElement).closest(".window-header") && !(e.target as HTMLElement).closest("button")) {
+    if (
+      (e.target as HTMLElement).closest('.window-header') &&
+      !(e.target as HTMLElement).closest('button')
+    ) {
       setIsDragging(true)
       setDragOffset({
         x: e.clientX - position.x,
@@ -126,7 +141,10 @@ export function Window({
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (isFullscreen) return
-    if ((e.target as HTMLElement).closest(".window-header") && !(e.target as HTMLElement).closest("button")) {
+    if (
+      (e.target as HTMLElement).closest('.window-header') &&
+      !(e.target as HTMLElement).closest('button')
+    ) {
       const touch = e.touches[0]
       setIsDragging(true)
       setDragOffset({
@@ -221,7 +239,8 @@ export function Window({
     ]
 
     for (let i = 0; i < particleCount; i++) {
-      const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5
+      const angle =
+        (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5
       const speed = 5 + Math.random() * 10
       particles.push({
         x: centerX,
@@ -360,17 +379,19 @@ export function Window({
     }
 
     if (isDragging || isResizing) {
-      document.addEventListener("mousemove", handleMouseMove)
-      document.addEventListener("mouseup", handleMouseUp)
-      document.addEventListener("touchmove", handleTouchMove, { passive: false })
-      document.addEventListener("touchend", handleTouchEnd)
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, {
+        passive: false,
+      })
+      document.addEventListener('touchend', handleTouchEnd)
     }
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove)
-      document.removeEventListener("mouseup", handleMouseUp)
-      document.removeEventListener("touchmove", handleTouchMove)
-      document.removeEventListener("touchend", handleTouchEnd)
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
     }
   }, [isDragging, isResizing, dragOffset, position])
 
@@ -381,55 +402,55 @@ export function Window({
     const windowHeight = window.innerHeight
 
     let previewStyle: React.CSSProperties = {}
-    let label = ""
+    let label = ''
 
     switch (snapPreview) {
-      case "left":
+      case 'left':
         previewStyle = {
           left: 0,
           top: 40,
           width: windowWidth / 2,
           height: windowHeight - 40,
         }
-        label = "Snap Left"
+        label = 'Snap Left'
         break
-      case "right":
+      case 'right':
         previewStyle = {
           left: windowWidth / 2,
           top: 40,
           width: windowWidth / 2,
           height: windowHeight - 40,
         }
-        label = "Snap Right"
+        label = 'Snap Right'
         break
-      case "top":
+      case 'top':
         previewStyle = {
           left: position.x,
           top: 40,
           width: size.width,
           height: (windowHeight - 40) / 2,
         }
-        label = "Snap Top"
+        label = 'Snap Top'
         break
-      case "bottom":
+      case 'bottom':
         previewStyle = {
           left: position.x,
           top: (windowHeight - 40) / 2 + 40,
           width: size.width,
           height: (windowHeight - 40) / 2,
         }
-        label = "Snap Bottom"
+        label = 'Snap Bottom'
         break
     }
 
     return (
       <div
-        className="fixed border-2 border-white/30 bg-white/5 pointer-events-none z-40 flex items-center justify-center"
+        className="fixed border-2 border-[var(--border-color)] bg-[var(--lighter-gray)] pointer-events-none z-40 flex items-center justify-center"
         style={previewStyle}
         role="status"
         aria-live="polite"
       >
-        <span className="text-white/50 text-xs font-mono">{label}</span>
+        <span className="text-[var(--gray)] text-xs font-mono">{label}</span>
       </div>
     )
   }
@@ -437,11 +458,11 @@ export function Window({
   const windowStyle: React.CSSProperties = isFullscreen
     ? {
         left: 0,
-        top: "40px",
-        width: "100%",
-        height: "calc(100vh - 40px)",
-        backdropFilter: "blur(12px)",
-        backgroundColor: "rgba(0, 0, 0, 0.85)",
+        top: '40px',
+        width: '100%',
+        height: 'calc(100vh - 40px)',
+        backdropFilter: 'blur(12px)',
+        backgroundColor: 'var(--bg-window-alpha)',
         zIndex,
       }
     : {
@@ -449,8 +470,8 @@ export function Window({
         top: `${position.y}px`,
         width: `${size.width}px`,
         height: `${size.height}px`,
-        backdropFilter: "blur(12px)",
-        backgroundColor: "rgba(0, 0, 0, 0.85)",
+        backdropFilter: 'blur(12px)',
+        backgroundColor: 'var(--bg-window-alpha)',
         zIndex,
       }
 
@@ -459,7 +480,7 @@ export function Window({
       {renderSnapPreview()}
       <div
         ref={windowRef}
-        className={`fixed bg-black border border-white/20 rounded-lg flex flex-col font-mono text-sm ${
+        className={`fixed border border-[var(--border-color)] rounded-lg flex flex-col font-mono text-sm ${
           isClosing ? 'window-closing' : ''
         }`}
         style={windowStyle}
@@ -477,31 +498,50 @@ export function Window({
       >
         {/* Window Header */}
         <header
-          className={`window-header h-8 bg-white/5 border-b border-white/10 flex items-center justify-between px-3 rounded-t-lg select-none ${
-            !isFullscreen ? "cursor-move" : ""
+          className={`window-header h-8 bg-[var(--lighter-gray)] border-b border-[var(--border-color)] flex items-center justify-between px-3 rounded-t-lg select-none ${
+            !isFullscreen ? 'cursor-move' : ''
           }`}
         >
-          <h3 id={`window-title-${title.replace(/\s+/g, '-')}`} className="text-white/60 text-xs font-normal">{title}</h3>
+          <h3
+            id={`window-title-${title.replace(/\s+/g, '-')}`}
+            className="text-[var(--gray)] text-xs font-normal"
+          >
+            {title}
+          </h3>
           <div className="flex items-center gap-1">
             <button
               onClick={toggleFullscreen}
-              className="text-white/50 hover:text-white/80 hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
-              aria-label={isFullscreen ? "Restore window" : "Maximize window"}
-              title={isFullscreen ? "Restore" : "Maximize"}
+              className="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
+              aria-label={isFullscreen ? 'Restore window' : 'Maximize window'}
+              title={isFullscreen ? 'Restore' : 'Maximize'}
             >
               {isFullscreen ? (
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                  <rect x="4" y="4" width="8" height="8" stroke="currentColor" strokeWidth="1.5" />
+                  <rect
+                    x="4"
+                    y="4"
+                    width="8"
+                    height="8"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
                 </svg>
               ) : (
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                  <rect x="2" y="2" width="12" height="12" stroke="currentColor" strokeWidth="1.5" />
+                  <rect
+                    x="2"
+                    y="2"
+                    width="12"
+                    height="12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
                 </svg>
               )}
             </button>
             <button
               onClick={(e) => handleClose(e)}
-              className="text-white/50 hover:text-white/80 hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
+              className="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
               aria-label={`Close ${title}`}
             >
               ✕
@@ -521,7 +561,10 @@ export function Window({
             role="slider"
             tabIndex={0}
           >
-            <svg className="w-full h-full text-white/20" viewBox="0 0 16 16">
+            <svg
+              className="w-full h-full text-[var(--border-color)]"
+              viewBox="0 0 16 16"
+            >
               <path d="M16 16L16 12L12 16Z M16 8L8 16Z" fill="currentColor" />
             </svg>
           </div>

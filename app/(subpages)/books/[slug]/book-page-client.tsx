@@ -11,7 +11,7 @@ interface BookPageClientProps {
 
 export function BookPageClient({ slug, title, children }: BookPageClientProps) {
   return (
-    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
       <WindowToolbar
         title={title}
         segments={[

@@ -23,39 +23,49 @@ export function BookContent({
               <img
                 src={coverUrl}
                 alt={`Cover of ${title}`}
-                className="w-32 h-auto rounded border border-white/10 shadow-lg m-0!"
+                className="w-32 h-auto rounded border shadow-lg m-0!"
+                style={{
+                  borderColor: 'var(--border-color)',
+                }}
               />
             </div>
           )}
           <div className="flex-1">
             {series && (
-              <p className="text-white/40 font-mono text-sm mb-1">
+              <p className="font-mono text-sm mb-1" style={{ color: 'var(--fg)', opacity: 0.4 }}>
                 {series.name}
               </p>
             )}
-            <h1 className="text-3xl font-mono font-bold text-white/90 mb-1 leading-tight">
+            <h1 className="text-3xl font-mono font-bold mb-1 leading-tight" style={{ color: 'var(--fg)', opacity: 0.9 }}>
               {title}
             </h1>
-            <p className="text-lg text-white/70 font-mono mb-3">{author}</p>
-            <span className="text-white/50 font-mono text-sm">
+            <p className="text-lg font-mono mb-3" style={{ color: 'var(--fg)', opacity: 0.7 }}>{author}</p>
+            <span className="font-mono text-sm" style={{ color: 'var(--fg)', opacity: 0.5 }}>
               Read {date}
             </span>
             {description && (
-              <p className="text-gray-400 font-mono text-sm">{description}</p>
+              <p className="font-mono text-sm" style={{ color: 'var(--fg)', opacity: 0.5 }}>{description}</p>
             )}
           </div>
         </div>
 
         {series && (
-          <div className="mb-6 p-4 rounded-lg border border-white/10 bg-white/5">
-            <h2 className="text-sm font-mono font-semibold text-white/70 mb-3 !pt-0">
+          <div
+            className="mb-6 p-4 rounded-lg border"
+            style={{
+              borderColor: 'var(--border-color)',
+              backgroundColor: 'rgba(229, 229, 229, 0.05)',
+            }}
+          >
+            <h2 className="text-sm font-mono font-semibold mb-3 !pt-0" style={{ color: 'var(--fg)', opacity: 0.7 }}>
               Books in this series
             </h2>
             <ol className="space-y-1">
               {series.books.map((book, index) => (
                 <li
                   key={book.title}
-                  className="text-sm font-mono text-white/60"
+                  className="text-sm font-mono"
+                  style={{ color: 'var(--fg)', opacity: 0.6 }}
                 >
                   {index + 1}. {book.title}
                 </li>
@@ -66,17 +76,33 @@ export function BookContent({
 
         {body && (
           <div
-            className="prose prose-invert prose-sm max-w-none
-                        prose-headings:font-mono prose-headings:text-white/90
-                        prose-p:text-white/80 prose-p:leading-relaxed
-                        prose-a:text-blue-400 prose-a:no-underline hover:prose-a:text-blue-300
-                        prose-code:text-white/90 prose-code:bg-white/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-                        prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10
-                        prose-img:rounded-lg prose-img:border prose-img:border-white/10
-                        prose-blockquote:border-l-white/20 prose-blockquote:text-white/70
-                        prose-strong:text-white/90 prose-strong:font-semibold
-                        prose-ul:text-white/80 prose-ol:text-white/80
-                        prose-li:text-white/80"
+            className="prose prose-sm max-w-none
+                        prose-headings:font-mono prose-headings:leading-tight
+                        prose-p:leading-relaxed
+                        prose-a:no-underline
+                        prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+                        prose-pre:border
+                        prose-img:rounded-lg prose-img:border
+                        prose-strong:font-semibold"
+            style={{
+              '--tw-prose-body': 'var(--fg)',
+              '--tw-prose-headings': 'var(--fg)',
+              '--tw-prose-lead': 'var(--fg)',
+              '--tw-prose-links': 'var(--link)',
+              '--tw-prose-bold': 'var(--fg)',
+              '--tw-prose-counters': 'var(--fg)',
+              '--tw-prose-bullets': 'var(--fg)',
+              '--tw-prose-hr': 'var(--border-color)',
+              '--tw-prose-quotes': 'var(--fg)',
+              '--tw-prose-quote-borders': 'var(--border-color)',
+              '--tw-prose-captions': 'var(--fg)',
+              '--tw-prose-code': 'var(--fg)',
+              '--tw-prose-pre-code': 'var(--fg)',
+              '--tw-prose-pre-bg': 'rgba(229, 229, 229, 0.05)',
+              '--tw-prose-pre-border': 'var(--border-color)',
+              '--tw-prose-th-borders': 'var(--border-color)',
+              '--tw-prose-td-borders': 'var(--border-color)',
+            } as any}
           >
             <PostBody>{body}</PostBody>
           </div>

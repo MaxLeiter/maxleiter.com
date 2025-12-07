@@ -15,7 +15,7 @@ function ExternalLinkIcon() {
       width="14"
       strokeLinejoin="round"
       viewBox="0 0 16 16"
-      className="text-white/50 group-hover:text-white/80 transition-colors"
+      className="text-[var(--gray)] group-hover:text-[var(--fg)] transition-colors"
     >
       <path
         fillRule="evenodd"
@@ -41,13 +41,13 @@ export function WidgetTopProjects({
   }
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
-      <div className="border-b border-white/10 px-4 3xl:px-5 py-3 3xl:py-4">
-        <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-white/90 uppercase">
+    <div className="bg-[var(--lightest-gray)] border border-[var(--border-color)] rounded-lg overflow-hidden">
+      <div className="border-b border-[var(--border-color)] px-4 3xl:px-5 py-3 3xl:py-4">
+        <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-[var(--fg)] uppercase">
           Top Projects
         </h2>
       </div>
-      <ul className="divide-y divide-white/5">
+      <ul className="divide-y divide-[var(--lighter-gray)]">
         {topProjects.map((project) => {
           const Component = project.link && project.link !== '#' ? 'a' : 'div'
           const linkProps =
@@ -62,16 +62,16 @@ export function WidgetTopProjects({
           return (
             <li key={project.id}>
               <Component
-                className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-white/5 transition-colors group"
+                className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-[var(--lighter-gray)] transition-colors group"
                 {...linkProps}
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="text-sm 3xl:text-base font-mono text-white/90 group-hover:text-white/80 transition-colors flex-1">
+                  <h3 className="text-sm 3xl:text-base font-mono text-[var(--fg)] group-hover:text-[var(--gray)] transition-colors flex-1">
                     {project.name}
                   </h3>
                   {project.link && project.link !== '#' && <ExternalLinkIcon />}
                 </div>
-                <p className="text-xs 3xl:text-sm text-white/50 mb-2">
+                <p className="text-xs 3xl:text-sm text-[var(--gray)] mb-2">
                   {project.description}
                 </p>
                 {project.tech && project.tech.length > 0 && (
@@ -79,7 +79,7 @@ export function WidgetTopProjects({
                     {project.tech.map((tech) => (
                       <span
                         key={tech}
-                        className="inline-block px-1.5 3xl:px-2 py-0.5 3xl:py-1 text-xs 3xl:text-sm bg-white/5 text-white/70 rounded border border-white/10"
+                        className="inline-block px-1.5 3xl:px-2 py-0.5 3xl:py-1 text-xs 3xl:text-sm bg-[var(--lighter-gray)] text-[var(--gray)] rounded border border-[var(--border-color)]"
                       >
                         {formatYears(project.tech) === tech
                           ? formatYears(project.tech)
@@ -95,7 +95,7 @@ export function WidgetTopProjects({
       </ul>
       <Link
         href="/projects"
-        className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors border-t border-white/10"
+        className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] transition-colors border-t border-[var(--border-color)]"
       >
         View all projects →
       </Link>

@@ -23,13 +23,13 @@ export function AboutContent({ content }: AboutContentProps) {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">
+      <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
         about/
       </h1>
 
-      <div className="space-y-6 text-white/70 leading-relaxed">
+      <div className="space-y-6 text-[var(--gray)] leading-relaxed">
         <section>
-          <h2 className="text-xl font-mono font-bold mb-3 text-white/90">
+          <h2 className="text-xl font-mono font-bold mb-3 text-[var(--fg)]">
             Max Leiter
           </h2>
           <p className="mb-4">{aboutData.bio.content}</p>
@@ -41,7 +41,7 @@ export function AboutContent({ content }: AboutContentProps) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 underline"
+                  className="text-[var(--link)] hover:opacity-80 underline transition-opacity"
                 >
                   {link.text}
                 </a>
@@ -51,13 +51,13 @@ export function AboutContent({ content }: AboutContentProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-mono font-bold mb-3 text-white/90">
+          <h2 className="text-xl font-mono font-bold mb-3 text-[var(--fg)]">
             This site
           </h2>
           <p>
             This site is built on{' '}
             <a
-              className="text-blue-400 hover:text-blue-300 underline"
+              className="text-[var(--link)] hover:opacity-80 underline transition-opacity"
               href="https://nextjs.org"
               target="_blank"
               rel="noopener noreferrer"
@@ -66,7 +66,7 @@ export function AboutContent({ content }: AboutContentProps) {
             </a>{' '}
             with the App Router and is deployed via{' '}
             <a
-              className="text-blue-400 hover:text-blue-300 underline"
+              className="text-[var(--link)] hover:opacity-80 underline transition-opacity"
               href="https://vercel.com/home"
               target="_blank"
               rel="noopener noreferrer"
@@ -75,7 +75,7 @@ export function AboutContent({ content }: AboutContentProps) {
             </a>
             . You can view the source on{' '}
             <a
-              className="text-blue-400 hover:text-blue-300 underline"
+              className="text-[var(--link)] hover:opacity-80 underline transition-opacity"
               href="https://github.com/maxleiter/maxleiter.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -87,7 +87,7 @@ export function AboutContent({ content }: AboutContentProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-mono font-bold mb-3 text-white/90">
+          <h2 className="text-xl font-mono font-bold mb-3 text-[var(--fg)]">
             Contact
           </h2>
           <div className="flex gap-6">
@@ -95,7 +95,7 @@ export function AboutContent({ content }: AboutContentProps) {
               href="https://github.com/maxleiter"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+              className="inline-flex items-center gap-2 text-[var(--link)] hover:opacity-80 transition-opacity"
             >
               GitHub
             </a>
@@ -103,7 +103,7 @@ export function AboutContent({ content }: AboutContentProps) {
               href="https://twitter.com/maxleiter"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+              className="inline-flex items-center gap-2 text-[var(--link)] hover:opacity-80 transition-opacity"
             >
               Twitter
             </a>
@@ -111,7 +111,7 @@ export function AboutContent({ content }: AboutContentProps) {
               href="https://www.linkedin.com/in/MaxLeiter"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+              className="inline-flex items-center gap-2 text-[var(--link)] hover:opacity-80 transition-opacity"
             >
               LinkedIn
             </a>

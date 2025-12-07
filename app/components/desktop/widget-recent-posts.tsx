@@ -21,20 +21,20 @@ export function WidgetRecentPosts({
   const recentPosts = posts.slice(0, limit)
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
-      <div className="border-b border-white/10 px-4 3xl:px-5 py-3 3xl:py-4">
-        <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-white/90 uppercase">
+    <div className="bg-[var(--lightest-gray)] border border-[var(--border-color)] rounded-lg overflow-hidden">
+      <div className="border-b border-[var(--border-color)] px-4 3xl:px-5 py-3 3xl:py-4">
+        <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-[var(--fg)] uppercase">
           Recent Posts
         </h2>
       </div>
-      <ul className="divide-y divide-white/5">
+      <ul className="divide-y divide-[var(--lighter-gray)]">
         {recentPosts.map((post) => {
           const content = (
             <>
-              <h3 className="text-sm 3xl:text-base font-mono text-white/90 group-hover:text-white/80 transition-colors mb-1">
+              <h3 className="text-sm 3xl:text-base font-mono text-[var(--fg)] group-hover:text-[var(--gray)] transition-colors mb-1">
                 {post.title}
               </h3>
-              <p className="text-xs 3xl:text-sm text-white/50">{post.date}</p>
+              <p className="text-xs 3xl:text-sm text-[var(--gray)]">{post.date}</p>
             </>
           )
 
@@ -49,7 +49,7 @@ export function WidgetRecentPosts({
                   }}
                   onMouseEnter={() => onPostHover?.(post.slug)}
                   onMouseLeave={onPostHoverEnd}
-                  className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-white/5 transition-colors group"
+                  className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-[var(--lighter-gray)] transition-colors group"
                 >
                   {content}
                 </Link>
@@ -61,7 +61,7 @@ export function WidgetRecentPosts({
             <li key={post.slug}>
               <Link
                 href={`/blog/${post.slug}`}
-                className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-white/5 transition-colors group"
+                className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-[var(--lighter-gray)] transition-colors group"
               >
                 {content}
               </Link>
@@ -71,7 +71,7 @@ export function WidgetRecentPosts({
       </ul>
       <Link
         href="/blog"
-        className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors border-t border-white/10"
+        className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] transition-colors border-t border-[var(--border-color)]"
       >
         View all posts →
       </Link>

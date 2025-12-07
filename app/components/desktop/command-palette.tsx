@@ -71,9 +71,9 @@ export function CommandPalette({
   }, [filtered, selectedIndex, onClose, onNavigate])
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20 px-4">
-      <div className="w-full max-w-2xl bg-black border border-white/20 rounded-lg shadow-2xl overflow-hidden">
-        <div className="border-b border-white/10 px-4 py-3">
+    <div className="fixed inset-0 backdrop-blur-sm z-[9999] flex items-start justify-center pt-20 px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }} onClick={onClose}>
+      <div className="w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden" style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border-color)', borderWidth: '1px' }} onClick={(e) => e.stopPropagation()}>
+        <div className="border-b px-4 py-3" style={{ borderColor: 'var(--border-color)' }}>
           <input
             autoFocus
             type="text"
@@ -83,14 +83,19 @@ export function CommandPalette({
               setSelectedIndex(0)
             }}
             placeholder="Search posts, projects, or navigate..."
-            className="w-full bg-transparent outline-none text-white/90 font-mono placeholder-white/40"
-            style={{ fontSize: '16px' }}
+            className="w-full bg-transparent outline-none font-mono"
+            style={{
+              fontSize: '16px',
+              color: 'var(--fg)',
+              opacity: 0.9,
+              '--placeholder-color': 'var(--fg)'
+            } as React.CSSProperties & { '--placeholder-color': string }}
           />
         </div>
 
         <div className="max-h-96 overflow-y-auto px-2 py-2">
           {filtered.length === 0 ? (
-            <div className="px-4 py-3 text-white/50 text-sm">
+            <div className="px-4 py-3 text-sm" style={{ color: 'var(--gray)' }}>
               No results found
             </div>
           ) : (
@@ -101,18 +106,30 @@ export function CommandPalette({
                   onNavigate(item.href)
                   onClose()
                 }}
-                className={`w-full text-left px-4 py-3 rounded transition-colors ${
-                  idx === selectedIndex ? 'bg-white/10' : 'hover:bg-white/5'
-                }`}
+                className="w-full text-left px-4 py-3 rounded transition-colors font-mono"
+                style={{
+                  backgroundColor: idx === selectedIndex ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                  color: 'var(--fg)'
+                }}
+                onMouseEnter={(e) => {
+                  if (idx !== selectedIndex) {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (idx !== selectedIndex) {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }
+                }}
               >
-                <div className="text-xs text-white/40 font-mono uppercase mb-1">
+                <div className="text-xs font-mono uppercase mb-1" style={{ color: 'var(--gray)' }}>
                   {item.type === 'blog'
                     ? 'Blog Post'
                     : item.type === 'project'
                       ? 'Project'
                       : 'Navigation'}
                 </div>
-                <div className="text-white/90 font-mono">{item.title}</div>
+                <div style={{ color: 'var(--fg)', opacity: 0.9 }}>{item.title}</div>
               </button>
             ))
           )}

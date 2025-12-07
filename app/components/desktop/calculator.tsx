@@ -161,27 +161,29 @@ export function Calculator() {
   }, [])
 
   return (
-    <div className="h-full w-full flex flex-col items-center justify-start bg-black p-2 sm:p-4 relative overflow-auto">
+    <div className="h-full w-full flex flex-col items-center justify-start bg-[var(--bg)] p-2 sm:p-4 relative overflow-auto">
       {/* Info Icon */}
       <button
         onClick={() => setShowInfo(!showInfo)}
-        className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors text-sm"
+        className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-[var(--lightest-gray)] hover:bg-[var(--gray)] flex items-center justify-center text-[var(--gray)] hover:text-[var(--fg)] transition-colors text-sm"
         aria-label="Info about KnightOS"
       >
         i
       </button>
 
       {showInfo && (
-        <div className="absolute top-10 right-2 z-10 bg-black border border-white/20 rounded p-3 max-w-xs text-xs text-white/90 shadow-xl">
-          <h3 className="font-semibold mb-1 text-white">KnightOS Emulator</h3>
-          <p className="text-white/70 leading-relaxed text-xs">
+        <div className="absolute top-10 right-2 z-10 bg-[var(--bg)] border border-[var(--border-color)] rounded p-3 max-w-xs text-xs text-[var(--fg)] shadow-xl">
+          <h3 className="font-semibold mb-1 text-[var(--fg)]">
+            KnightOS Emulator
+          </h3>
+          <p className="text-[var(--gray)] leading-relaxed text-xs">
             Running KnightOS, an open-source OS for TI calculators. Fully
             functional TI-84+ SE emulator in your browser. The first project I
             ever contributed to.
           </p>
           <button
             onClick={() => setShowInfo(false)}
-            className="mt-2 text-xs text-white/50 hover:text-white/70"
+            className="mt-2 text-xs text-[var(--gray)] hover:text-[var(--fg)]"
           >
             Close
           </button>
@@ -231,19 +233,19 @@ export function Calculator() {
 
       {!loading && (
         <div className="shrink-0 w-full max-w-md px-2">
-          <div className="text-white/50 text-xs font-mono text-center mb-2">
+          <div className="text-[var(--gray)] text-xs font-mono text-center mb-2">
             Click screen to focus • Arrow keys & numbers
           </div>
 
           <button
             onClick={() => setShowKeyboard(!showKeyboard)}
-            className="w-full mb-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white/90 hover:text-white rounded text-sm transition-colors border border-white/20"
+            className="w-full mb-2 px-3 py-2 bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] hover:text-[var(--fg)] rounded text-sm transition-colors border border-[var(--border-color)]"
           >
             {showKeyboard ? '▼ Hide Keyboard' : '▲ Show Keyboard'}
           </button>
 
           {showKeyboard && (
-            <div className="w-full p-3 bg-black border border-white/20 rounded">
+            <div className="w-full p-3 bg-[var(--bg)] border border-[var(--border-color)] rounded">
               <div className="grid gap-2">
                 {/* Arrow Keys */}
                 <div className="flex justify-center mb-2">
@@ -254,33 +256,33 @@ export function Calculator() {
                     <div></div>
                     <button
                       onClick={() => pressKey(keyMappings['up'])}
-                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-sm active:bg-white/30"
+                      className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-3 rounded text-sm active:bg-[var(--gray)]"
                     >
                       ↑
                     </button>
                     <div></div>
                     <button
                       onClick={() => pressKey(keyMappings['left'])}
-                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-sm active:bg-white/30"
+                      className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-3 rounded text-sm active:bg-[var(--gray)]"
                     >
                       ←
                     </button>
                     <button
                       onClick={() => pressKey(keyMappings['enter'])}
-                      className="bg-white/20 hover:bg-white/30 text-white border border-white/40 font-bold py-2 px-2 rounded text-xs active:bg-white/40"
+                      className="bg-[var(--gray)] hover:text-[var(--fg)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-2 rounded text-xs active:bg-[var(--gray)]"
                     >
                       ENTER
                     </button>
                     <button
                       onClick={() => pressKey(keyMappings['right'])}
-                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-sm active:bg-white/30"
+                      className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-3 rounded text-sm active:bg-[var(--gray)]"
                     >
                       →
                     </button>
                     <div></div>
                     <button
                       onClick={() => pressKey(keyMappings['down'])}
-                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-sm active:bg-white/30"
+                      className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-3 rounded text-sm active:bg-[var(--gray)]"
                     >
                       ↓
                     </button>
@@ -292,31 +294,31 @@ export function Calculator() {
                 <div className="grid grid-cols-5 gap-1 mb-2">
                   <button
                     onClick={() => pressKey(keyMappings['y='])}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                    className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] text-xs py-2 px-1 rounded active:bg-[var(--gray)]"
                   >
                     Y=
                   </button>
                   <button
                     onClick={() => pressKey(keyMappings['window'])}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                    className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] text-xs py-2 px-1 rounded active:bg-[var(--gray)]"
                   >
                     WIN
                   </button>
                   <button
                     onClick={() => pressKey(keyMappings['zoom'])}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                    className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] text-xs py-2 px-1 rounded active:bg-[var(--gray)]"
                   >
                     ZM
                   </button>
                   <button
                     onClick={() => pressKey(keyMappings['trace'])}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                    className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] text-xs py-2 px-1 rounded active:bg-[var(--gray)]"
                   >
                     TRC
                   </button>
                   <button
                     onClick={() => pressKey(keyMappings['graph'])}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 text-xs py-2 px-1 rounded active:bg-white/30"
+                    className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] text-xs py-2 px-1 rounded active:bg-[var(--gray)]"
                   >
                     GRF
                   </button>
@@ -328,7 +330,7 @@ export function Calculator() {
                     <button
                       key={num}
                       onClick={() => pressKey(keyMappings[num])}
-                      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-3 px-4 rounded active:bg-white/30"
+                      className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-3 px-4 rounded active:bg-[var(--gray)]"
                     >
                       {num}
                     </button>
@@ -339,19 +341,19 @@ export function Calculator() {
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   <button
                     onClick={() => pressKey(keyMappings['2nd'])}
-                    className="bg-white/20 hover:bg-white/30 text-white border border-white/40 font-bold py-2 px-3 rounded text-xs active:bg-white/40"
+                    className="bg-[var(--gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-3 rounded text-xs active:bg-[var(--gray)]"
                   >
                     2nd
                   </button>
                   <button
                     onClick={() => pressKey(keyMappings['0'])}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-4 rounded active:bg-white/30"
+                    className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-4 rounded active:bg-[var(--gray)]"
                   >
                     0
                   </button>
                   <button
                     onClick={() => pressKey(keyMappings['mode'])}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold py-2 px-3 rounded text-xs active:bg-white/30"
+                    className="bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-3 rounded text-xs active:bg-[var(--gray)]"
                   >
                     MODE
                   </button>

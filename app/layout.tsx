@@ -77,7 +77,7 @@ export default async function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body>
-        <ThemeProvider>
+        <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem>
           <EffectsProvider>
             {children}
             <GlobalKeyboardHandler blogPosts={blogPosts} projects={projects} />

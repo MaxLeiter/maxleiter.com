@@ -30,35 +30,43 @@ export function BlogPostContent({
     <ViewTransitionWrapper name={`blog-post-${slug}`}>
       <article className="max-w-3xl mx-auto">
         <div className="mb-1">
-          <span className="text-white/50 font-mono text-sm">{date}</span>
+          <span className="font-mono text-sm" style={{ color: 'var(--gray)' }}>{date}</span>
           {lastModifiedDate && (
-            <span className="text-white/40 font-mono text-xs ml-4">
+            <span className="font-mono text-xs ml-4" style={{ color: 'var(--gray)' }}>
               Last modified {lastModifiedDate}
             </span>
           )}
         </div>
 
-        <h1 className="text-3xl font-mono font-bold text-white/90 mb-2! mt-2! leading-10">
+        <h1 className="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style={{ color: 'var(--article-color)' }}>
           {title}
         </h1>
         {description && (
-          <p className="text-gray-400 font-mono text-base mb-4 mt-0!">
+          <p className="font-mono text-base mb-4 mt-0!" style={{ color: 'var(--article-color)' }}>
             {description}
           </p>
         )}
 
         <div
-          className="prose prose-invert prose-sm max-w-none
-                        prose-headings:font-mono prose-headings:text-white/90
-                        prose-p:text-white/80 prose-p:leading-relaxed
-                        prose-a:text-blue-400 prose-a:no-underline hover:prose-a:text-blue-300
-                        prose-code:text-white/90 prose-code:bg-white/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-                        prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10
-                        prose-img:rounded-lg prose-img:border prose-img:border-white/10
-                        prose-blockquote:border-l-white/20 prose-blockquote:text-white/70
-                        prose-strong:text-white/90 prose-strong:font-semibold
-                        prose-ul:text-white/80 prose-ol:text-white/80
-                        prose-li:text-white/80"
+          className="prose prose-sm max-w-none dark:prose-invert
+                        prose-headings:font-mono
+                        prose-p:leading-relaxed
+                        prose-a:no-underline
+                        prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+                        prose-pre:border
+                        prose-img:rounded-lg prose-img:border
+                        prose-strong:font-semibold"
+          style={{
+            '--prose-headings': 'var(--article-color)',
+            '--prose-body': 'var(--article-color)',
+            '--prose-links': 'var(--link)',
+            '--prose-code': 'var(--article-color)',
+            '--prose-pre-bg': 'var(--lighter-gray)',
+            '--prose-pre-border': 'var(--border-color)',
+            '--prose-blockquote-border': 'var(--light-gray)',
+            '--prose-blockquote-text': 'var(--gray)',
+            '--prose-img-border': 'var(--border-color)',
+          } as React.CSSProperties}
         >
           <PostBody>{body}</PostBody>
         </div>

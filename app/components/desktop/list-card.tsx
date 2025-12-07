@@ -33,7 +33,7 @@ export function ListCard({
 
   const IconSvg = icon ? (
     <svg
-      className="w-4 h-4 text-white/50 mt-0.5 flex-shrink-0 group-hover:text-white/80 transition-colors"
+      className="w-4 h-4 text-[var(--gray)] mt-0.5 flex-shrink-0 group-hover:text-[var(--fg)] transition-colors"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -51,7 +51,7 @@ export function ListCard({
     <li>
       <Component
         href={href}
-        className="block p-3 rounded hover:bg-white/5 transition-colors border border-white/10 group"
+        className="block p-3 rounded hover:bg-[var(--lighter-gray)] transition-colors border border-[var(--border-color)] group"
         onClick={onClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -61,26 +61,26 @@ export function ListCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               {IconSvg}
-              <h2 className="font-mono text-sm font-semibold text-white/90 group-hover:text-white/80 transition-colors">
+              <h2 className="font-mono text-sm font-semibold text-[var(--fg)] group-hover:text-[var(--gray)] transition-colors">
                 {title}
               </h2>
             </div>
             {description && (
-              <p className="text-sm text-white/60 mb-2">{description}</p>
+              <p className="text-sm text-[var(--gray)] mb-2">{description}</p>
             )}
             {tags && tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-block px-1.5 py-0.5 text-xs bg-white/5 text-white/70 rounded border border-white/10"
+                    className="inline-block px-1.5 py-0.5 text-xs bg-[var(--lighter-gray)] text-[var(--gray)] rounded border border-[var(--border-color)]"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
             )}
-            {meta && <p className="text-xs text-white/30 mt-1">{meta}</p>}
+            {meta && <p className="text-xs text-[var(--light-gray)] mt-1">{meta}</p>}
           </div>
           {external && <ExternalLinkIcon />}
         </div>

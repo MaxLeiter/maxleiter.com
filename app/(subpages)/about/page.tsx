@@ -12,7 +12,7 @@ export const metadata = {
 
 const About = () => {
   return (
-    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
       <WindowToolbar
         title="about"
         segments={[{ name: 'about', href: '/about' }]}

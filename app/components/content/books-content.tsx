@@ -31,9 +31,15 @@ function GenreFilter({
         onClick={() => onSelect(null)}
         className={`px-3 py-1.5 text-xs font-mono rounded-full border transition-colors ${
           selected === null
-            ? 'bg-white/10 border-white/20 text-white'
-            : 'border-white/10 text-white/60 hover:text-white/80 hover:border-white/20'
+            ? 'bg-white/10 dark:bg-white/10 border-white/20 dark:border-white/20'
+            : 'border-white/10 dark:border-white/10 text-white/60 dark:text-white/60 hover:text-white/80 dark:hover:text-white/80 hover:border-white/20 dark:hover:border-white/20'
         }`}
+        style={{
+          backgroundColor: selected === null ? 'rgba(229, 229, 229, 0.1)' : 'transparent',
+          borderColor: selected === null ? 'rgba(229, 229, 229, 0.2)' : 'rgba(229, 229, 229, 0.1)',
+          color: selected === null ? 'var(--fg)' : 'var(--fg)',
+          opacity: selected === null ? 1 : 0.6,
+        }}
       >
         All
       </button>
@@ -43,9 +49,15 @@ function GenreFilter({
           onClick={() => onSelect(genre)}
           className={`px-3 py-1.5 text-xs font-mono rounded-full border transition-colors ${
             selected === genre
-              ? 'bg-white/10 border-white/20 text-white'
-              : 'border-white/10 text-white/60 hover:text-white/80 hover:border-white/20'
+              ? 'bg-white/10 dark:bg-white/10 border-white/20 dark:border-white/20'
+              : 'border-white/10 dark:border-white/10 text-white/60 dark:text-white/60 hover:text-white/80 dark:hover:text-white/80 hover:border-white/20 dark:hover:border-white/20'
           }`}
+          style={{
+            backgroundColor: selected === genre ? 'rgba(229, 229, 229, 0.1)' : 'transparent',
+            borderColor: selected === genre ? 'rgba(229, 229, 229, 0.2)' : 'rgba(229, 229, 229, 0.1)',
+            color: selected === genre ? 'var(--fg)' : 'var(--fg)',
+            opacity: selected === genre ? 1 : 0.6,
+          }}
         >
           {GENRE_LABELS[genre]}
         </button>
@@ -72,11 +84,27 @@ function BookCard({
     <li>
       <Link
         href={`/books/${book.slug}`}
-        className="flex gap-4 p-3 rounded hover:bg-white/5 transition-colors border border-white/10 group"
+        className="flex gap-4 p-3 rounded transition-colors border group"
         onClick={handleClick}
+        style={{
+          borderColor: 'var(--border-color)',
+          backgroundColor: 'transparent',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(229, 229, 229, 0.05)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent'
+        }}
       >
         {book.coverUrl && (
-          <div className="flex-shrink-0 w-16 h-24 bg-white/5 rounded overflow-hidden border border-white/10">
+          <div
+            className="flex-shrink-0 w-16 h-24 rounded overflow-hidden border"
+            style={{
+              backgroundColor: 'rgba(229, 229, 229, 0.05)',
+              borderColor: 'var(--border-color)',
+            }}
+          >
             <img
               src={book.coverUrl}
               alt={`Cover of ${book.title}`}
@@ -86,15 +114,21 @@ function BookCard({
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <h2 className="font-mono text-sm font-semibold text-white/90 group-hover:text-white transition-colors">
+          <h2
+            className="font-mono text-sm font-semibold transition-colors group-hover:opacity-100"
+            style={{
+              color: 'var(--fg)',
+              opacity: 0.9,
+            }}
+          >
             {book.title}
           </h2>
-          <p className="text-sm text-white/60 mt-0.5">{book.author}</p>
+          <p className="text-sm mt-0.5" style={{ color: 'var(--fg)', opacity: 0.6 }}>{book.author}</p>
           <div className="flex items-center gap-3 mt-2">
-            <span className="text-xs text-white/40 font-mono">{book.date}</span>
+            <span className="text-xs font-mono" style={{ color: 'var(--fg)', opacity: 0.4 }}>{book.date}</span>
           </div>
           {book.description && (
-            <p className="text-xs text-white/50 mt-2 line-clamp-2">
+            <p className="text-xs mt-2 line-clamp-2" style={{ color: 'var(--fg)', opacity: 0.5 }}>
               {book.description}
             </p>
           )}
@@ -122,11 +156,11 @@ export function BooksContent({ books, onBookClick }: BooksContentProps) {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-white/90">
+      <h1 className="text-3xl font-mono font-bold mb-8" style={{ color: 'var(--fg)' }}>
         books/
       </h1>
 
-      <p className="text-white/60 font-mono text-sm mb-6">
+      <p className="font-mono text-sm mb-6" style={{ color: 'var(--fg)', opacity: 0.6 }}>
         Some of the books I&apos;ve read and enjoyed.
       </p>
 
@@ -139,7 +173,7 @@ export function BooksContent({ books, onBookClick }: BooksContentProps) {
       )}
 
       {filteredBooks.length === 0 ? (
-        <p className="text-white/60 font-mono text-sm">No books yet.</p>
+        <p className="font-mono text-sm" style={{ color: 'var(--fg)', opacity: 0.6 }}>No books yet.</p>
       ) : (
         <ul className="space-y-2">
           {filteredBooks.map((book) => (

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { CommandPalette } from '@components/desktop/command-palette'
 import { useRouter } from 'next/navigation'
 import type { BlogPost, Project } from '@lib/portfolio-data'
+import { useEffects } from '@components/desktop/effects-context'
 
 interface GlobalKeyboardHandlerProps {
   blogPosts: BlogPost[]
@@ -14,7 +15,7 @@ export function GlobalKeyboardHandler({
   blogPosts,
   projects,
 }: GlobalKeyboardHandlerProps) {
-  const [showCommandPalette, setShowCommandPalette] = useState(false)
+  const { showCommandPalette, setShowCommandPalette } = useEffects()
   const router = useRouter()
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export function GlobalKeyboardHandler({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [setShowCommandPalette])
 
   if (!showCommandPalette) return null
 

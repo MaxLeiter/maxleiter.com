@@ -15,7 +15,7 @@ export default async function BooksPage() {
   const books = await getBooks()
 
   return (
-    <div className="min-h-screen bg-black text-white/90 flex flex-col">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
       <WindowToolbar
         title="books"
         segments={[{ name: 'books', href: '/books' }]}
