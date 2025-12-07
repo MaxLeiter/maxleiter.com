@@ -80,7 +80,7 @@ export function ListCard({
                 ))}
               </div>
             )}
-            {meta && <p className="text-xs text-[var(--light-gray)] mt-1">{meta}</p>}
+            {meta && <p className="text-xs text-[var(--gray)] mt-1">{meta}</p>}
           </div>
           {external && <ExternalLinkIcon />}
         </div>

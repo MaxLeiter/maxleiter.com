@@ -471,7 +471,7 @@ export function TerminalContent({
     >
       <div
         ref={outputRef}
-        className="flex-1 overflow-y-auto p-3 text-white/90 space-y-1"
+        className="flex-1 overflow-y-auto p-3 text-[var(--fg)] space-y-1"
       >
         {output.map((line, i) => (
           <div
@@ -482,8 +482,8 @@ export function TerminalContent({
         ))}
       </div>
 
-      <div className="shrink-0 h-12 border-t border-white/10 px-3 flex items-center bg-white/5">
-        <span className="text-white/80 mr-2 text-base font-mono">$</span>
+      <div className="shrink-0 h-12 border-t border-[var(--border-color)] px-3 flex items-center bg-[var(--lightest-gray)]">
+        <span className="text-[var(--fg)] mr-2 text-base font-mono">$</span>
         <input
           ref={inputRef}
           type="text"
@@ -495,7 +495,7 @@ export function TerminalContent({
             }
           }}
           autoFocus
-          className="flex-1 bg-transparent outline-none text-white/90 text-base font-mono"
+          className="flex-1 bg-transparent outline-none text-[var(--fg)] text-base font-mono"
           placeholder="Type command..."
           style={{ fontSize: '16px' }}
           autoCorrect="off"
