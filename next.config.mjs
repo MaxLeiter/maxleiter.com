@@ -9,6 +9,14 @@ const nextConfig = {
         pathname: '/blog/**',
       },
     ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'pbs.twimg.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   reactStrictMode: true,
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],

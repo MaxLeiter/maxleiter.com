@@ -4,6 +4,7 @@ import {
   getProjectsData,
   ABOUT_CONTENT,
 } from '@lib/portfolio-data'
+import { getBooks } from '@lib/get-books'
 
 function ClockInitScript() {
   return (
@@ -30,14 +31,15 @@ function ClockInitScript() {
 }
 
 export default async function Desktop() {
-  const [blogPosts, projects] = await Promise.all([
+  const [blogPosts, projects, books] = await Promise.all([
     getBlogPosts({ includeContent: false }),
     getProjectsData(),
+    getBooks(),
   ])
 
   return (
     <>
-      <DesktopClient blogPosts={blogPosts} projects={projects} />
+      <DesktopClient blogPosts={blogPosts} projects={projects} books={books} />
       <ClockInitScript />
     </>
   )

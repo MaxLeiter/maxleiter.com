@@ -20,8 +20,11 @@ import {
   AboutContentClient,
   ProjectsContentClient,
   BlogListContentClient,
+  LabsContentClient,
+  BooksContentClient,
 } from '@components/page-content-client'
 import type { BlogPost, Project } from '@lib/portfolio-data'
+import type { Book } from '@lib/types'
 import { ABOUT_CONTENT } from '@lib/about-content'
 import { useIsMobile } from './use-is-mobile'
 
@@ -211,6 +214,7 @@ function CalculatorIcon() {
 interface DesktopClientProps {
   blogPosts: BlogPost[]
   projects: Project[]
+  books: Book[]
 }
 
 declare global {
@@ -219,7 +223,7 @@ declare global {
   }
 }
 
-export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
+export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps) {
   const router = useRouter()
   const isMobile = useIsMobile()
   const [openTerminal, setOpenTerminal] = useState(false)
@@ -228,6 +232,8 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
   const [openAbout, setOpenAbout] = useState(false)
   const [openProjects, setOpenProjects] = useState(false)
   const [openBlogList, setOpenBlogList] = useState(false)
+  const [openLabs, setOpenLabs] = useState(false)
+  const [openBooks, setOpenBooks] = useState(false)
   const [focusedWindow, setFocusedWindow] = useState<string | null>(null)
   const [windowZIndexes, setWindowZIndexes] = useState<Record<string, number>>(
     {},
@@ -389,6 +395,42 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
           } else {
             setOpenAbout(true)
             bringToFront('about')
+          }
+        },
+      },
+      {
+        id: 'labs',
+        name: 'labs',
+        type: 'folder',
+        icon: <FolderIconDefault />,
+        href: '/labs',
+        onClick: (e) => {
+          e.preventDefault()
+          if (isMobile) {
+            startTransition(() => {
+              router.push('/labs')
+            })
+          } else {
+            setOpenLabs(true)
+            bringToFront('labs')
+          }
+        },
+      },
+      {
+        id: 'books',
+        name: 'books',
+        type: 'folder',
+        icon: <FolderIconDefault />,
+        href: '/books',
+        onClick: (e) => {
+          e.preventDefault()
+          if (isMobile) {
+            startTransition(() => {
+              router.push('/books')
+            })
+          } else {
+            setOpenBooks(true)
+            bringToFront('books')
           }
         },
       },
@@ -613,6 +655,42 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
               onPostHover={handlePostHover}
               onPostHoverEnd={handlePostHoverEnd}
             />
+          </div>
+        </Window>
+      )}
+
+      {openLabs && (
+        <Window
+          title="labs"
+          onClose={() => setOpenLabs(false)}
+          defaultWidth={800}
+          defaultHeight={600}
+          defaultX={350}
+          defaultY={160}
+          pageType="labs"
+          zIndex={windowZIndexes['labs'] || 50}
+          onFocus={() => bringToFront('labs')}
+        >
+          <div className="overflow-auto h-full p-6">
+            <LabsContentClient />
+          </div>
+        </Window>
+      )}
+
+      {openBooks && (
+        <Window
+          title="books"
+          onClose={() => setOpenBooks(false)}
+          defaultWidth={800}
+          defaultHeight={600}
+          defaultX={400}
+          defaultY={180}
+          pageType="books"
+          zIndex={windowZIndexes['books'] || 50}
+          onFocus={() => bringToFront('books')}
+        >
+          <div className="overflow-auto h-full p-6">
+            <BooksContentClient books={books} />
           </div>
         </Window>
       )}

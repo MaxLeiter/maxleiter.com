@@ -3,13 +3,11 @@ import path from 'path'
 import type { Post } from './types'
 import fs from 'fs/promises'
 import { cache } from 'react'
-import { unstable_cache } from 'next/cache'
 
 const thirdPartyPosts: Post[] = [
   {
     title: 'Introducing the v0 composite model family',
-    description:
-      'Introducing the v0 composite model family.',
+    description: 'Introducing the v0 composite model family.',
     body: '',
     date: '2025-06-01T10:00:00.000Z',
     slug: '',
@@ -60,8 +58,7 @@ const thirdPartyPosts: Post[] = [
   },
   {
     title: 'New edge dev infrastructure',
-    description:
-      'New edge dev infrastructure.',
+    description: 'New edge dev infrastructure.',
     body: '',
     date: '2020-07-21T10:00:00.000Z',
     slug: '',

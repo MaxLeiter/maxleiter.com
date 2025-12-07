@@ -8,6 +8,7 @@ import Info from '@components/icons/info'
 import { FileTree, File, Folder } from '@components/file-tree'
 import Home from '@components/icons/home'
 import { Tweet } from 'react-tweet'
+import { TweetThread } from './tweet-thread'
 // import Diff from './mdx-diff'
 import dynamic from 'next/dynamic'
 
@@ -102,5 +103,6 @@ export const mdxComponents: MDXComponents = {
       <Tweet {...props} />
     </div>
   ),
+  TweetThread,
   MinecraftInventory: MinecraftInventoryFromDir,
 }
