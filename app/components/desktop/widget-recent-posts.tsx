@@ -21,13 +21,13 @@ export function WidgetRecentPosts({
   const recentPosts = posts.slice(0, limit)
 
   return (
-    <div className="bg-[var(--lightest-gray)] border border-[var(--border-color)] rounded-lg overflow-hidden">
+    <div className="border border-[var(--border-color)] rounded-lg overflow-hidden backdrop-blur-sm" style={{ backgroundColor: 'var(--bg-widget)' }}>
       <div className="border-b border-[var(--border-color)] px-4 3xl:px-5 py-3 3xl:py-4">
         <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-[var(--fg)] uppercase">
           Recent Posts
         </h2>
       </div>
-      <ul className="divide-y divide-[var(--lighter-gray)]">
+      <ul className="divide-y divide-[var(--border-color)]">
         {recentPosts.map((post) => {
           const content = (
             <>
@@ -49,7 +49,7 @@ export function WidgetRecentPosts({
                   }}
                   onMouseEnter={() => onPostHover?.(post.slug)}
                   onMouseLeave={onPostHoverEnd}
-                  className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-[var(--lighter-gray)] transition-colors group"
+                  className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group"
                 >
                   {content}
                 </Link>
@@ -61,7 +61,7 @@ export function WidgetRecentPosts({
             <li key={post.slug}>
               <Link
                 href={`/blog/${post.slug}`}
-                className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-[var(--lighter-gray)] transition-colors group"
+                className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group"
               >
                 {content}
               </Link>
@@ -71,7 +71,7 @@ export function WidgetRecentPosts({
       </ul>
       <Link
         href="/blog"
-        className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] transition-colors border-t border-[var(--border-color)]"
+        className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors border-t border-[var(--border-color)]"
       >
         View all posts →
       </Link>
