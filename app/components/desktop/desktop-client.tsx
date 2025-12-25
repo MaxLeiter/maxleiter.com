@@ -556,11 +556,23 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
         e.preventDefault()
         dispatch({ type: 'OPEN_WINDOW', id: 'terminal' })
       }
+      // Ctrl+W to close focused window (not Cmd since browser intercepts it)
+      if (e.ctrlKey && !e.metaKey && e.key === 'w') {
+        const focused = windowState.focusedWindow
+        if (focused) {
+          e.preventDefault()
+          if (focused.startsWith('blog-post-')) {
+            dispatch({ type: 'CLOSE_BLOG_POST' })
+          } else if (windowState.openWindows.has(focused as WindowId)) {
+            dispatch({ type: 'CLOSE_WINDOW', id: focused as WindowId })
+          }
+        }
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [windowState.focusedWindow, windowState.openWindows])
 
   const desktopItems: DesktopItem[] = useMemo(
     () => [

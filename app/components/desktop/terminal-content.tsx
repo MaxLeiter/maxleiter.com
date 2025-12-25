@@ -6,6 +6,8 @@ import { useEffects } from '@components/desktop/effects-context'
 import {
   findCommand,
   getCompletions as getCommandCompletions,
+  tokenize,
+  parseArgs,
   type CommandContext,
 } from './terminal/commands'
 
@@ -407,14 +409,23 @@ export function TerminalContent({
 
     const newOutput = [...output, `$ ${trimmedCmd}`]
 
-    const parts = trimmedCmd.split(' ')
-    const commandName = parts[0].toLowerCase()
-    const args = parts.slice(1)
+    const tokens = tokenize(trimmedCmd)
+    const commandName = tokens[0].toLowerCase()
+    const argTokens = tokens.slice(1)
 
     const command = findCommand(commandName)
 
     if (command) {
-      const result = command.execute(args, commandContext)
+      const parseResult = parseArgs(argTokens, command)
+
+      if (!parseResult.success) {
+        newOutput.push(parseResult.error)
+        setOutput(newOutput)
+        setInput('')
+        return
+      }
+
+      const result = command.execute(parseResult.args, commandContext)
 
       if (result.clearScreen) {
         setOutput([])

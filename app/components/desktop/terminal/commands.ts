@@ -15,12 +15,148 @@ export interface CommandResult {
   closeTerminal?: boolean
 }
 
+// Flag definition for commands that support flags
+export interface FlagDefinition {
+  short?: string // e.g., 'l' for -l
+  long?: string // e.g., 'long' for --long
+  type: 'boolean' | 'string'
+  description?: string
+  default?: boolean | string
+}
+
+// Parsed arguments passed to execute()
+export interface ParsedArgs {
+  positional: string[] // Non-flag arguments
+  flags: Record<string, boolean | string> // Parsed flag values
+  raw: string[] // Original unparsed args
+}
+
+// Result from parseArgs - either success or error
+export type ParseResult =
+  | { success: true; args: ParsedArgs }
+  | { success: false; error: string }
+
 export interface Command {
   name: string
   description: string
   usage: string
   aliases?: string[]
-  execute: (args: string[], context: CommandContext) => CommandResult
+  flags?: Record<string, FlagDefinition> // Optional flag definitions
+  execute: (args: ParsedArgs, context: CommandContext) => CommandResult
+}
+
+// Tokenize input string, respecting quoted strings
+export function tokenize(input: string): string[] {
+  const tokens: string[] = []
+  let current = ''
+  let inQuote: '"' | "'" | null = null
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i]
+
+    if (inQuote) {
+      if (char === inQuote) {
+        inQuote = null
+      } else {
+        current += char
+      }
+    } else if (char === '"' || char === "'") {
+      inQuote = char
+    } else if (char === ' ') {
+      if (current) {
+        tokens.push(current)
+        current = ''
+      }
+    } else {
+      current += char
+    }
+  }
+
+  if (current) {
+    tokens.push(current)
+  }
+
+  return tokens
+}
+
+// Parse arguments for a command, validating flags
+export function parseArgs(tokens: string[], command: Command): ParseResult {
+  const positional: string[] = []
+  const flags: Record<string, boolean | string> = {}
+  const raw = tokens
+
+  // Initialize defaults from flag definitions
+  if (command.flags) {
+    for (const [key, def] of Object.entries(command.flags)) {
+      if (def.default !== undefined) {
+        flags[key] = def.default
+      }
+    }
+  }
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+
+    if (token.startsWith('--')) {
+      // Long flag
+      const flagName = token.slice(2)
+      const [name, value] = flagName.split('=')
+
+      if (!command.flags) {
+        return { success: false, error: `${command.name}: unsupported argument '${token}'` }
+      }
+
+      const flagDef = Object.entries(command.flags).find(([_, def]) => def.long === name)
+      if (!flagDef) {
+        return { success: false, error: `${command.name}: unknown flag '${token}'` }
+      }
+
+      const [flagKey, def] = flagDef
+      if (def.type === 'boolean') {
+        flags[flagKey] = true
+      } else if (value !== undefined) {
+        flags[flagKey] = value
+      } else if (i + 1 < tokens.length && !tokens[i + 1].startsWith('-')) {
+        flags[flagKey] = tokens[++i]
+      } else {
+        return { success: false, error: `${command.name}: flag '${token}' requires a value` }
+      }
+    } else if (token.startsWith('-') && token.length > 1) {
+      // Short flag(s)
+      const flagChars = token.slice(1)
+
+      if (!command.flags) {
+        return { success: false, error: `${command.name}: unsupported argument '${token}'` }
+      }
+
+      for (let j = 0; j < flagChars.length; j++) {
+        const char = flagChars[j]
+        const flagDef = Object.entries(command.flags).find(([_, def]) => def.short === char)
+
+        if (!flagDef) {
+          return { success: false, error: `${command.name}: unknown flag '-${char}'` }
+        }
+
+        const [flagKey, def] = flagDef
+        if (def.type === 'boolean') {
+          flags[flagKey] = true
+        } else if (j === flagChars.length - 1) {
+          // String flag must be last in combined flags
+          if (i + 1 < tokens.length && !tokens[i + 1].startsWith('-')) {
+            flags[flagKey] = tokens[++i]
+          } else {
+            return { success: false, error: `${command.name}: flag '-${char}' requires a value` }
+          }
+        } else {
+          return { success: false, error: `${command.name}: flag '-${char}' requires a value` }
+        }
+      }
+    } else {
+      positional.push(token)
+    }
+  }
+
+  return { success: true, args: { positional, flags, raw } }
 }
 
 // Command registry
@@ -46,13 +182,13 @@ export const commands: Command[] = [
     description: 'List directory contents',
     usage: 'ls [directory]',
     execute: (args, context) => {
-      if (args.length === 0) {
+      if (args.positional.length === 0) {
         return {
           output: ['blog       projects   about'],
         }
       }
 
-      const dir = args[0].replace(/\/$/, '')
+      const dir = args.positional[0].replace(/\/$/, '')
       if (dir === 'blog') {
         const files = context.blogPosts.map((p) => `${p.slug}.md`).join('  ')
         return { output: [files] }
@@ -83,13 +219,13 @@ export const commands: Command[] = [
     description: 'Display file contents',
     usage: 'cat <file>',
     execute: (args, context) => {
-      if (args.length === 0) {
+      if (args.positional.length === 0) {
         return {
           output: ['cat: missing file operand', 'Usage: cat <file>'],
         }
       }
 
-      const path = args[0]
+      const path = args.positional[0]
       const parts = path.split('/').filter(Boolean)
 
       if (parts.length === 1) {
@@ -130,7 +266,7 @@ export const commands: Command[] = [
     usage: 'echo <text>',
     execute: (args) => {
       return {
-        output: [args.join(' ')],
+        output: [args.positional.join(' ')],
       }
     },
   },
@@ -139,13 +275,13 @@ export const commands: Command[] = [
     description: 'Make text colorful',
     usage: 'lolcat <text>',
     execute: (args) => {
-      if (args.length === 0) {
+      if (args.positional.length === 0) {
         return {
           output: ['lolcat: missing text operand', 'Usage: lolcat <text>'],
         }
       }
 
-      const text = args.join(' ')
+      const text = args.positional.join(' ')
       const colors = [
         '#FF6B6B',
         '#4ECDC4',
