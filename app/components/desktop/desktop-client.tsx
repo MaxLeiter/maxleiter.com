@@ -8,7 +8,7 @@ import {
   useRef,
   ViewTransition,
   useMemo,
-  useCallback,
+  useReducer,
 } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -243,34 +243,84 @@ declare global {
 
 type WindowId = 'terminal' | 'calculator' | 'about' | 'projects' | 'blog-list' | 'labs' | 'talks'
 
+interface WindowState {
+  openWindows: Set<WindowId>
+  blogPostSlug: string | null
+  focusedWindow: string | null
+  zIndexes: Record<string, number>
+  nextZIndex: number
+}
+
+type WindowAction =
+  | { type: 'OPEN_WINDOW'; id: WindowId }
+  | { type: 'CLOSE_WINDOW'; id: WindowId }
+  | { type: 'OPEN_BLOG_POST'; slug: string }
+  | { type: 'CLOSE_BLOG_POST' }
+  | { type: 'FOCUS'; id: string }
+
+function windowReducer(state: WindowState, action: WindowAction): WindowState {
+  switch (action.type) {
+    case 'OPEN_WINDOW': {
+      const newWindows = new Set(state.openWindows)
+      newWindows.add(action.id)
+      return {
+        ...state,
+        openWindows: newWindows,
+        focusedWindow: action.id,
+        zIndexes: { ...state.zIndexes, [action.id]: state.nextZIndex },
+        nextZIndex: state.nextZIndex + 1,
+      }
+    }
+    case 'CLOSE_WINDOW': {
+      const newWindows = new Set(state.openWindows)
+      newWindows.delete(action.id)
+      return { ...state, openWindows: newWindows }
+    }
+    case 'OPEN_BLOG_POST': {
+      const windowId = `blog-post-${action.slug}`
+      return {
+        ...state,
+        blogPostSlug: action.slug,
+        focusedWindow: windowId,
+        zIndexes: { ...state.zIndexes, [windowId]: state.nextZIndex },
+        nextZIndex: state.nextZIndex + 1,
+      }
+    }
+    case 'CLOSE_BLOG_POST':
+      return { ...state, blogPostSlug: null }
+    case 'FOCUS': {
+      return {
+        ...state,
+        focusedWindow: action.id,
+        zIndexes: { ...state.zIndexes, [action.id]: state.nextZIndex },
+        nextZIndex: state.nextZIndex + 1,
+      }
+    }
+    default:
+      return state
+  }
+}
+
+const initialWindowState: WindowState = {
+  openWindows: new Set(),
+  blogPostSlug: null,
+  focusedWindow: null,
+  zIndexes: {},
+  nextZIndex: 50,
+}
+
 export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
   const router = useRouter()
   const isMobile = useIsMobile()
   const { setShowCommandPalette } = useEffects()
 
-  // Consolidated window state
-  const [openWindows, setOpenWindows] = useState<Set<WindowId>>(new Set())
-  const [openBlogPost, setOpenBlogPost] = useState<string | null>(null)
-  const [focusedWindow, setFocusedWindow] = useState<string | null>(null)
-  const [windowZIndexes, setWindowZIndexes] = useState<Record<string, number>>({})
-  const nextZIndexRef = useRef(50)
+  const [windowState, dispatch] = useReducer(windowReducer, initialWindowState)
   const [preloadedPost, setPreloadedPost] = useState<string | null>(null)
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const openWindow = useCallback((id: WindowId) => {
-    setOpenWindows(prev => new Set(prev).add(id))
-    bringToFront(id)
-  }, [])
-
-  const closeWindow = useCallback((id: WindowId) => {
-    setOpenWindows(prev => {
-      const next = new Set(prev)
-      next.delete(id)
-      return next
-    })
-  }, [])
-
-  const isOpen = useCallback((id: WindowId) => openWindows.has(id), [openWindows])
+  // Convenience accessors
+  const isOpen = (id: WindowId) => windowState.openWindows.has(id)
+  const getZIndex = (id: string) => windowState.zIndexes[id] || 50
 
   // Initialize time from the inline script to avoid hydration mismatch
   const [currentTime, setCurrentTime] = useState(() => {
@@ -295,19 +345,9 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     return () => clearInterval(interval)
   }, [])
 
-  const currentBlogPost = openBlogPost
-    ? blogPosts.find((post) => post.slug === openBlogPost)
+  const currentBlogPost = windowState.blogPostSlug
+    ? blogPosts.find((post) => post.slug === windowState.blogPostSlug)
     : null
-
-  const bringToFront = (windowId: string) => {
-    setFocusedWindow(windowId)
-    const zIndex = nextZIndexRef.current
-    nextZIndexRef.current += 1
-    setWindowZIndexes((prev) => ({
-      ...prev,
-      [windowId]: zIndex,
-    }))
-  }
 
   // Check for openPost URL parameter on mount
   useEffect(() => {
@@ -315,9 +355,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       const params = new URLSearchParams(window.location.search)
       const postSlug = params.get('openPost')
       if (postSlug && blogPosts.find((p) => p.slug === postSlug)) {
-        setOpenBlogPost(postSlug)
-        bringToFront(`blog-post-${postSlug}`)
-        // Clean up URL without adding to history
+        dispatch({ type: 'OPEN_BLOG_POST', slug: postSlug })
         window.history.replaceState({}, '', '/')
       }
     }
@@ -329,20 +367,18 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
         router.push(`/blog/${slug}`)
       })
     } else {
-      setOpenBlogPost(slug)
-      setPreloadedPost(null) // Clear preload when opening
-      bringToFront(`blog-post-${slug}`)
+      dispatch({ type: 'OPEN_BLOG_POST', slug })
+      setPreloadedPost(null)
     }
   }
 
   const handlePostHover = (slug: string) => {
-    if (!isMobile && !openBlogPost) {
+    if (!isMobile && !windowState.blogPostSlug) {
       setPreloadedPost(slug)
     }
   }
 
   const handlePostHoverEnd = () => {
-    // Keep the preloaded iframe for a bit in case they click
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current)
     }
@@ -364,13 +400,13 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 't') {
         e.preventDefault()
-        openWindow('terminal')
+        dispatch({ type: 'OPEN_WINDOW', id: 'terminal' })
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [openWindow])
+  }, [])
 
   const desktopItems: DesktopItem[] = useMemo(
     () => [
@@ -388,7 +424,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
               router.push('/blog')
             })
           } else {
-            openWindow('blog-list')
+            dispatch({ type: 'OPEN_WINDOW', id: 'blog-list' })
           }
         },
       },
@@ -405,7 +441,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
               router.push('/projects')
             })
           } else {
-            openWindow('projects')
+            dispatch({ type: 'OPEN_WINDOW', id: 'projects' })
           }
         },
       },
@@ -422,7 +458,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
               router.push('/about')
             })
           } else {
-            openWindow('about')
+            dispatch({ type: 'OPEN_WINDOW', id: 'about' })
           }
         },
       },
@@ -439,7 +475,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
               router.push('/labs')
             })
           } else {
-            openWindow('labs')
+            dispatch({ type: 'OPEN_WINDOW', id: 'labs' })
           }
         },
       },
@@ -456,7 +492,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
               router.push('/talks')
             })
           } else {
-            openWindow('talks')
+            dispatch({ type: 'OPEN_WINDOW', id: 'talks' })
           }
         },
       },
@@ -467,7 +503,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
         type: 'app',
         icon: <TerminalIconDefault />,
         onClick: () => {
-          openWindow('terminal')
+          dispatch({ type: 'OPEN_WINDOW', id: 'terminal' })
         },
       },
       {
@@ -476,7 +512,7 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
         type: 'app',
         icon: <CalculatorIcon />,
         onClick: () => {
-          openWindow('calculator')
+          dispatch({ type: 'OPEN_WINDOW', id: 'calculator' })
         },
       },
       // External links
@@ -583,17 +619,17 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       {isOpen('terminal') && (
         <Window
           title="terminal"
-          onClose={() => closeWindow('terminal')}
+          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'terminal' })}
           defaultWidth={600}
           defaultHeight={400}
-          zIndex={windowZIndexes['terminal'] || 50}
-          onFocus={() => bringToFront('terminal')}
+          zIndex={getZIndex('terminal')}
+          onFocus={() => dispatch({ type: 'FOCUS', id: 'terminal' })}
         >
           <TerminalContent
             blogPosts={blogPosts}
             projects={projects}
             aboutContent={ABOUT_CONTENT}
-            onClose={() => closeWindow('terminal')}
+            onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'terminal' })}
           />
         </Window>
       )}
@@ -601,33 +637,33 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       {isOpen('calculator') && (
         <Window
           title="calculator"
-          onClose={() => closeWindow('calculator')}
+          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'calculator' })}
           defaultWidth={500}
           defaultHeight={600}
           defaultX={200}
           defaultY={100}
-          zIndex={windowZIndexes['calculator'] || 50}
-          onFocus={() => bringToFront('calculator')}
+          zIndex={getZIndex('calculator')}
+          onFocus={() => dispatch({ type: 'FOCUS', id: 'calculator' })}
         >
           <Calculator />
         </Window>
       )}
 
-      {openBlogPost && currentBlogPost && (
+      {windowState.blogPostSlug && currentBlogPost && (
         <Window
           title={currentBlogPost.title}
-          onClose={() => setOpenBlogPost(null)}
+          onClose={() => dispatch({ type: 'CLOSE_BLOG_POST' })}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={150}
           defaultY={80}
-          blogSlug={openBlogPost}
-          zIndex={windowZIndexes[`blog-post-${openBlogPost}`] || 50}
-          onFocus={() => bringToFront(`blog-post-${openBlogPost}`)}
+          blogSlug={windowState.blogPostSlug}
+          zIndex={getZIndex(`blog-post-${windowState.blogPostSlug}`)}
+          onFocus={() => dispatch({ type: 'FOCUS', id: `blog-post-${windowState.blogPostSlug}` })}
         >
-          <ViewTransition name={`blog-post-${openBlogPost}`}>
+          <ViewTransition name={`blog-post-${windowState.blogPostSlug}`}>
             <iframe
-              src={`/blog/${openBlogPost}?embed=true`}
+              src={`/blog/${windowState.blogPostSlug}?embed=true`}
               className="w-full h-full border-0"
               title={currentBlogPost.title}
             />
@@ -638,14 +674,14 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       {isOpen('about') && (
         <Window
           title="about"
-          onClose={() => closeWindow('about')}
+          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'about' })}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={200}
           defaultY={100}
           pageType="about"
-          zIndex={windowZIndexes['about'] || 50}
-          onFocus={() => bringToFront('about')}
+          zIndex={getZIndex('about')}
+          onFocus={() => dispatch({ type: 'FOCUS', id: 'about' })}
         >
           <div className="overflow-auto h-full p-6">
             <AboutContentClient />
@@ -656,14 +692,14 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       {isOpen('projects') && (
         <Window
           title="projects"
-          onClose={() => closeWindow('projects')}
+          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'projects' })}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={250}
           defaultY={120}
           pageType="projects"
-          zIndex={windowZIndexes['projects'] || 50}
-          onFocus={() => bringToFront('projects')}
+          zIndex={getZIndex('projects')}
+          onFocus={() => dispatch({ type: 'FOCUS', id: 'projects' })}
         >
           <div className="overflow-auto h-full p-6">
             <ProjectsContentClient projects={projects} />
@@ -674,14 +710,14 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       {isOpen('blog-list') && (
         <Window
           title="blog"
-          onClose={() => closeWindow('blog-list')}
+          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'blog-list' })}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={300}
           defaultY={140}
           pageType="blog"
-          zIndex={windowZIndexes['blog-list'] || 50}
-          onFocus={() => bringToFront('blog-list')}
+          zIndex={getZIndex('blog-list')}
+          onFocus={() => dispatch({ type: 'FOCUS', id: 'blog-list' })}
         >
           <div className="overflow-auto h-full p-6">
             <BlogListContentClient
@@ -697,14 +733,14 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       {isOpen('labs') && (
         <Window
           title="labs"
-          onClose={() => closeWindow('labs')}
+          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'labs' })}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={350}
           defaultY={160}
           pageType="labs"
-          zIndex={windowZIndexes['labs'] || 50}
-          onFocus={() => bringToFront('labs')}
+          zIndex={getZIndex('labs')}
+          onFocus={() => dispatch({ type: 'FOCUS', id: 'labs' })}
         >
           <div className="overflow-auto h-full p-6">
             <LabsContentClient />
@@ -715,14 +751,14 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       {isOpen('talks') && (
         <Window
           title="talks"
-          onClose={() => closeWindow('talks')}
+          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'talks' })}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={400}
           defaultY={180}
           pageType="talks"
-          zIndex={windowZIndexes['talks'] || 50}
-          onFocus={() => bringToFront('talks')}
+          zIndex={getZIndex('talks')}
+          onFocus={() => dispatch({ type: 'FOCUS', id: 'talks' })}
         >
           <div className="overflow-auto h-full p-6">
             <TalksContentClient />
