@@ -1,5 +1,5 @@
 {
-  "extends": ["next/core-web-vitals", "plugin:mdx/recommended"],
+  "extends": ["plugin:mdx/recommended"],
   "rules": {
     "prefer-const": "error",
     "no-var": "error",
@@ -18,7 +18,10 @@
     "no-whitespace-before-property": "error",
     "object-shorthand": ["error", "always"],
     "no-unsafe-optional-chaining": "error",
-    "no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }]
+    "no-unused-expressions": [
+      "error",
+      { "allowShortCircuit": true, "allowTernary": true }
+    ]
   },
   "settings": {
     "mdx/code-blocks": true

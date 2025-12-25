@@ -8,6 +8,7 @@ import {
   useRef,
   ViewTransition,
   useMemo,
+  useCallback,
 } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -21,10 +22,9 @@ import {
   ProjectsContentClient,
   BlogListContentClient,
   LabsContentClient,
-  BooksContentClient,
+  TalksContentClient,
 } from '@components/page-content-client'
 import type { BlogPost, Project } from '@lib/portfolio-data'
-import type { Book } from '@lib/types'
 import { ABOUT_CONTENT } from '@lib/about-content'
 import { useIsMobile } from './use-is-mobile'
 import { useEffects } from '@components/desktop/effects-context'
@@ -233,7 +233,6 @@ function SearchIcon() {
 interface DesktopClientProps {
   blogPosts: BlogPost[]
   projects: Project[]
-  books: Book[]
 }
 
 declare global {
@@ -242,25 +241,36 @@ declare global {
   }
 }
 
-export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps) {
+type WindowId = 'terminal' | 'calculator' | 'about' | 'projects' | 'blog-list' | 'labs' | 'talks'
+
+export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
   const router = useRouter()
   const isMobile = useIsMobile()
   const { setShowCommandPalette } = useEffects()
-  const [openTerminal, setOpenTerminal] = useState(false)
-  const [openCalculator, setOpenCalculator] = useState(false)
+
+  // Consolidated window state
+  const [openWindows, setOpenWindows] = useState<Set<WindowId>>(new Set())
   const [openBlogPost, setOpenBlogPost] = useState<string | null>(null)
-  const [openAbout, setOpenAbout] = useState(false)
-  const [openProjects, setOpenProjects] = useState(false)
-  const [openBlogList, setOpenBlogList] = useState(false)
-  const [openLabs, setOpenLabs] = useState(false)
-  const [openBooks, setOpenBooks] = useState(false)
   const [focusedWindow, setFocusedWindow] = useState<string | null>(null)
-  const [windowZIndexes, setWindowZIndexes] = useState<Record<string, number>>(
-    {},
-  )
+  const [windowZIndexes, setWindowZIndexes] = useState<Record<string, number>>({})
   const nextZIndexRef = useRef(50)
   const [preloadedPost, setPreloadedPost] = useState<string | null>(null)
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const openWindow = useCallback((id: WindowId) => {
+    setOpenWindows(prev => new Set(prev).add(id))
+    bringToFront(id)
+  }, [])
+
+  const closeWindow = useCallback((id: WindowId) => {
+    setOpenWindows(prev => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+  }, [])
+
+  const isOpen = useCallback((id: WindowId) => openWindows.has(id), [openWindows])
 
   // Initialize time from the inline script to avoid hydration mismatch
   const [currentTime, setCurrentTime] = useState(() => {
@@ -354,13 +364,13 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 't') {
         e.preventDefault()
-        setOpenTerminal(true)
+        openWindow('terminal')
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [openWindow])
 
   const desktopItems: DesktopItem[] = useMemo(
     () => [
@@ -378,8 +388,7 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
               router.push('/blog')
             })
           } else {
-            setOpenBlogList(true)
-            bringToFront('blog-list')
+            openWindow('blog-list')
           }
         },
       },
@@ -396,8 +405,7 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
               router.push('/projects')
             })
           } else {
-            setOpenProjects(true)
-            bringToFront('projects')
+            openWindow('projects')
           }
         },
       },
@@ -414,8 +422,7 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
               router.push('/about')
             })
           } else {
-            setOpenAbout(true)
-            bringToFront('about')
+            openWindow('about')
           }
         },
       },
@@ -432,26 +439,24 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
               router.push('/labs')
             })
           } else {
-            setOpenLabs(true)
-            bringToFront('labs')
+            openWindow('labs')
           }
         },
       },
       {
-        id: 'books',
-        name: 'books',
+        id: 'talks',
+        name: 'talks',
         type: 'folder',
         icon: <FolderIconDefault />,
-        href: '/books',
+        href: '/talks',
         onClick: (e) => {
           e.preventDefault()
           if (isMobile) {
             startTransition(() => {
-              router.push('/books')
+              router.push('/talks')
             })
           } else {
-            setOpenBooks(true)
-            bringToFront('books')
+            openWindow('talks')
           }
         },
       },
@@ -462,8 +467,7 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
         type: 'app',
         icon: <TerminalIconDefault />,
         onClick: () => {
-          setOpenTerminal(true)
-          bringToFront('terminal')
+          openWindow('terminal')
         },
       },
       {
@@ -472,8 +476,7 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
         type: 'app',
         icon: <CalculatorIcon />,
         onClick: () => {
-          setOpenCalculator(true)
-          bringToFront('calculator')
+          openWindow('calculator')
         },
       },
       // External links
@@ -577,10 +580,10 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
         />
       )}
 
-      {openTerminal && (
+      {isOpen('terminal') && (
         <Window
           title="terminal"
-          onClose={() => setOpenTerminal(false)}
+          onClose={() => closeWindow('terminal')}
           defaultWidth={600}
           defaultHeight={400}
           zIndex={windowZIndexes['terminal'] || 50}
@@ -590,15 +593,15 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
             blogPosts={blogPosts}
             projects={projects}
             aboutContent={ABOUT_CONTENT}
-            onClose={() => setOpenTerminal(false)}
+            onClose={() => closeWindow('terminal')}
           />
         </Window>
       )}
 
-      {openCalculator && (
+      {isOpen('calculator') && (
         <Window
           title="calculator"
-          onClose={() => setOpenCalculator(false)}
+          onClose={() => closeWindow('calculator')}
           defaultWidth={500}
           defaultHeight={600}
           defaultX={200}
@@ -632,10 +635,10 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
         </Window>
       )}
 
-      {openAbout && (
+      {isOpen('about') && (
         <Window
           title="about"
-          onClose={() => setOpenAbout(false)}
+          onClose={() => closeWindow('about')}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={200}
@@ -650,10 +653,10 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
         </Window>
       )}
 
-      {openProjects && (
+      {isOpen('projects') && (
         <Window
           title="projects"
-          onClose={() => setOpenProjects(false)}
+          onClose={() => closeWindow('projects')}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={250}
@@ -668,10 +671,10 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
         </Window>
       )}
 
-      {openBlogList && (
+      {isOpen('blog-list') && (
         <Window
           title="blog"
-          onClose={() => setOpenBlogList(false)}
+          onClose={() => closeWindow('blog-list')}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={300}
@@ -691,10 +694,10 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
         </Window>
       )}
 
-      {openLabs && (
+      {isOpen('labs') && (
         <Window
           title="labs"
-          onClose={() => setOpenLabs(false)}
+          onClose={() => closeWindow('labs')}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={350}
@@ -709,20 +712,20 @@ export function DesktopClient({ blogPosts, projects, books }: DesktopClientProps
         </Window>
       )}
 
-      {openBooks && (
+      {isOpen('talks') && (
         <Window
-          title="books"
-          onClose={() => setOpenBooks(false)}
+          title="talks"
+          onClose={() => closeWindow('talks')}
           defaultWidth={800}
           defaultHeight={600}
           defaultX={400}
           defaultY={180}
-          pageType="books"
-          zIndex={windowZIndexes['books'] || 50}
-          onFocus={() => bringToFront('books')}
+          pageType="talks"
+          zIndex={windowZIndexes['talks'] || 50}
+          onFocus={() => bringToFront('talks')}
         >
           <div className="overflow-auto h-full p-6">
-            <BooksContentClient books={books} />
+            <TalksContentClient />
           </div>
         </Window>
       )}

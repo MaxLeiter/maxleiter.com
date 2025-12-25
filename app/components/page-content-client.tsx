@@ -6,6 +6,7 @@ import { ProjectsContent } from './content/projects-content'
 import { BlogListContent } from './content/blog-list-content'
 import { LabsContent } from './content/labs-content'
 import { BooksContent } from './content/books-content'
+import { TalksContent } from './content/talks-content'
 import type { BlogPost, Project } from '@lib/portfolio-data'
 import type { Book } from '@lib/types'
 
@@ -76,6 +77,14 @@ export function BooksContentClient({
   return (
     <ViewTransitionWrapper name="page-books">
       <BooksContent books={books} onBookClick={onBookClick} />
+    </ViewTransitionWrapper>
+  )
+}
+
+export function TalksContentClient() {
+  return (
+    <ViewTransitionWrapper name="page-talks">
+      <TalksContent />
     </ViewTransitionWrapper>
   )
 }
