@@ -33,12 +33,6 @@ const LABS: Lab[] = [
     description: 'A key-value store backed by a git repository',
     url: 'https://github.com/MaxLeiter/gitkv',
   },
-  {
-    id: 'talksabouttech',
-    name: 'talksabout.tech',
-    description: 'Talks I like from around the web',
-    url: 'https://talksabout.tech/',
-  },
 ]
 
 export function LabsContent() {
