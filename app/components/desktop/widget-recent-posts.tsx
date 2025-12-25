@@ -21,7 +21,10 @@ export function WidgetRecentPosts({
   const recentPosts = posts.slice(0, limit)
 
   return (
-    <div className="border border-[var(--border-color)] rounded-lg overflow-hidden backdrop-blur-sm" style={{ backgroundColor: 'var(--bg-widget)' }}>
+    <div
+      className="border border-[var(--border-color)] rounded-lg overflow-hidden backdrop-blur-sm"
+      style={{ backgroundColor: 'var(--bg-widget)' }}
+    >
       <div className="border-b border-[var(--border-color)] px-4 3xl:px-5 py-3 3xl:py-4">
         <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-[var(--fg)] uppercase">
           Recent Posts
@@ -34,7 +37,9 @@ export function WidgetRecentPosts({
               <h3 className="text-sm 3xl:text-base font-mono text-[var(--fg)] group-hover:text-[var(--gray)] transition-colors mb-1">
                 {post.title}
               </h3>
-              <p className="text-xs 3xl:text-sm text-[var(--gray)]">{post.date}</p>
+              <p className="text-xs 3xl:text-sm text-[var(--gray)]">
+                {post.date}
+              </p>
             </>
           )
 
@@ -49,6 +54,7 @@ export function WidgetRecentPosts({
                   }}
                   onMouseEnter={() => onPostHover?.(post.slug)}
                   onMouseLeave={onPostHoverEnd}
+                  prefetch
                   className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group"
                 >
                   {content}
@@ -62,6 +68,7 @@ export function WidgetRecentPosts({
               <Link
                 href={`/blog/${post.slug}`}
                 className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group"
+                prefetch
               >
                 {content}
               </Link>

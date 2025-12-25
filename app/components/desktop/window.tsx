@@ -13,7 +13,7 @@ interface WindowProps {
   defaultX?: number
   defaultY?: number
   blogSlug?: string
-  pageType?: 'blog' | 'projects' | 'about' | 'labs' | 'books' | null
+  pageType?: 'blog' | 'projects' | 'about' | 'labs' | 'books' | 'talks' | null
   zIndex?: number
   onFocus?: () => void
 }
@@ -70,6 +70,12 @@ export function Window({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [snapPreview, setSnapPreview] = useState<SnapDirection>(null)
   const [isClosing, setIsClosing] = useState(false)
+  // Track pre-snap state to restore when unsnapping
+  const [isSnapped, setIsSnapped] = useState(false)
+  const [preSnapState, setPreSnapState] = useState<{
+    position: { x: number; y: number }
+    size: { width: number; height: number }
+  } | null>(null)
 
   const windowRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
@@ -131,11 +137,24 @@ export function Window({
       (e.target as HTMLElement).closest('.window-header') &&
       !(e.target as HTMLElement).closest('button')
     ) {
+      // If window is snapped, restore pre-snap size and center window on cursor
+      if (isSnapped && preSnapState) {
+        const restoredWidth = preSnapState.size.width
+        // Calculate new position to center the restored window on cursor
+        const newX = e.clientX - restoredWidth / 2
+        const newY = e.clientY - 16 // Offset to account for header height
+        setSize(preSnapState.size)
+        setPosition({ x: newX, y: newY })
+        setDragOffset({ x: restoredWidth / 2, y: 16 })
+        setIsSnapped(false)
+        setPreSnapState(null)
+      } else {
+        setDragOffset({
+          x: e.clientX - position.x,
+          y: e.clientY - position.y,
+        })
+      }
       setIsDragging(true)
-      setDragOffset({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      })
     }
   }
 
@@ -146,11 +165,23 @@ export function Window({
       !(e.target as HTMLElement).closest('button')
     ) {
       const touch = e.touches[0]
+      // If window is snapped, restore pre-snap size and center window on cursor
+      if (isSnapped && preSnapState) {
+        const restoredWidth = preSnapState.size.width
+        const newX = touch.clientX - restoredWidth / 2
+        const newY = touch.clientY - 16
+        setSize(preSnapState.size)
+        setPosition({ x: newX, y: newY })
+        setDragOffset({ x: restoredWidth / 2, y: 16 })
+        setIsSnapped(false)
+        setPreSnapState(null)
+      } else {
+        setDragOffset({
+          x: touch.clientX - position.x,
+          y: touch.clientY - position.y,
+        })
+      }
       setIsDragging(true)
-      setDragOffset({
-        x: touch.clientX - position.x,
-        y: touch.clientY - position.y,
-      })
       // Prevent scrolling when dragging
       e.preventDefault()
     }
@@ -351,8 +382,13 @@ export function Window({
         if (snapDir) {
           const snapped = getSnappedPosition(snapDir)
           if (snapped) {
+            // Save pre-snap state before snapping (only if not already snapped)
+            if (!isSnapped) {
+              setPreSnapState({ position, size })
+            }
             setPosition(snapped.position)
             setSize(snapped.size)
+            setIsSnapped(true)
           }
         }
         setSnapPreview(null)
@@ -368,8 +404,13 @@ export function Window({
         if (snapDir) {
           const snapped = getSnappedPosition(snapDir)
           if (snapped) {
+            // Save pre-snap state before snapping (only if not already snapped)
+            if (!isSnapped) {
+              setPreSnapState({ position, size })
+            }
             setPosition(snapped.position)
             setSize(snapped.size)
+            setIsSnapped(true)
           }
         }
         setSnapPreview(null)
@@ -379,6 +420,8 @@ export function Window({
     }
 
     if (isDragging || isResizing) {
+      // Prevent text selection while dragging/resizing
+      document.body.style.userSelect = 'none'
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
       document.addEventListener('touchmove', handleTouchMove, {
@@ -388,12 +431,13 @@ export function Window({
     }
 
     return () => {
+      document.body.style.userSelect = ''
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
       document.removeEventListener('touchmove', handleTouchMove)
       document.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [isDragging, isResizing, dragOffset, position])
+  }, [isDragging, isResizing, dragOffset, position, size, isSnapped])
 
   const renderSnapPreview = () => {
     if (!snapPreview) return null

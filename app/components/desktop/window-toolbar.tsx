@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useRouter } from 'next/navigation'
 import { startTransition } from 'react'
@@ -16,7 +16,12 @@ interface WindowToolbarProps {
   onMinimize?: () => void
 }
 
-export function WindowToolbar({ title, segments = [], showMinimize = false, onMinimize }: WindowToolbarProps) {
+export function WindowToolbar({
+  title,
+  segments = [],
+  showMinimize = false,
+  onMinimize,
+}: WindowToolbarProps) {
   const router = useRouter()
 
   const handleClose = () => {
@@ -35,7 +40,10 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
 
   return (
     <header className="h-10 bg-[var(--lightest-gray)] border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10">
-      <nav className="flex items-center gap-2 text-sm font-mono text-[var(--gray)]" aria-label="Breadcrumb">
+      <nav
+        className="flex items-center gap-2 text-sm font-mono text-[var(--gray)]"
+        aria-label="Breadcrumb"
+      >
         <Link href="/" className="hover:text-[var(--fg)] transition-colors">
           ~
         </Link>
@@ -45,6 +53,7 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
             <Link
               href={segment.href}
               className="hover:text-[var(--fg)] transition-colors"
+              prefetch
             >
               {segment.name}
             </Link>
@@ -60,7 +69,14 @@ export function WindowToolbar({ title, segments = [], showMinimize = false, onMi
             title="Minimize"
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-              <rect x="4" y="4" width="8" height="8" stroke="currentColor" strokeWidth="1.5" />
+              <rect
+                x="4"
+                y="4"
+                width="8"
+                height="8"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
             </svg>
           </button>
         )}

@@ -9,9 +9,10 @@ import {
   ViewTransition,
   useMemo,
   useReducer,
+  useCallback,
 } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, type AppRouterInstance } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { Window } from '@components/desktop/window'
 import { TerminalContent } from '@components/desktop/terminal-content'
@@ -241,7 +242,14 @@ declare global {
   }
 }
 
-type WindowId = 'terminal' | 'calculator' | 'about' | 'projects' | 'blog-list' | 'labs' | 'talks'
+type WindowId =
+  | 'terminal'
+  | 'calculator'
+  | 'about'
+  | 'projects'
+  | 'blog-list'
+  | 'labs'
+  | 'talks'
 
 interface WindowState {
   openWindows: Set<WindowId>
@@ -309,6 +317,119 @@ const initialWindowState: WindowState = {
   nextZIndex: 50,
 }
 
+function createFolderClickHandler(
+  windowId: WindowId,
+  route: string,
+  isMobile: boolean,
+  router: AppRouterInstance,
+  dispatch: React.Dispatch<WindowAction>,
+) {
+  return (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (isMobile) {
+      startTransition(() => {
+        router.push(route)
+      })
+    } else {
+      dispatch({ type: 'OPEN_WINDOW', id: windowId })
+    }
+  }
+}
+
+const folderItems: Array<{
+  id: string
+  name: string
+  windowId: WindowId
+  route: string
+}> = [
+  { id: 'blog', name: 'blog', windowId: 'blog-list', route: '/blog' },
+  {
+    id: 'projects',
+    name: 'projects',
+    windowId: 'projects',
+    route: '/projects',
+  },
+  { id: 'about', name: 'about', windowId: 'about', route: '/about' },
+  { id: 'labs', name: 'labs', windowId: 'labs', route: '/labs' },
+  { id: 'talks', name: 'talks', windowId: 'talks', route: '/talks' },
+]
+
+interface ContentWindowConfig {
+  id: WindowId
+  title: string
+  pageType: string
+  defaultX: number
+  defaultY: number
+}
+
+const CONTENT_WINDOW_CONFIGS: ContentWindowConfig[] = [
+  {
+    id: 'about',
+    title: 'about',
+    pageType: 'about',
+    defaultX: 200,
+    defaultY: 100,
+  },
+  {
+    id: 'projects',
+    title: 'projects',
+    pageType: 'projects',
+    defaultX: 250,
+    defaultY: 120,
+  },
+  {
+    id: 'blog-list',
+    title: 'blog',
+    pageType: 'blog',
+    defaultX: 300,
+    defaultY: 140,
+  },
+  { id: 'labs', title: 'labs', pageType: 'labs', defaultX: 350, defaultY: 160 },
+  {
+    id: 'talks',
+    title: 'talks',
+    pageType: 'talks',
+    defaultX: 400,
+    defaultY: 180,
+  },
+]
+
+interface ContentWindowProps {
+  config: ContentWindowConfig
+  isOpen: boolean
+  zIndex: number
+  onClose: () => void
+  onFocus: () => void
+  children: React.ReactNode
+}
+
+function ContentWindow({
+  config,
+  isOpen,
+  zIndex,
+  onClose,
+  onFocus,
+  children,
+}: ContentWindowProps) {
+  if (!isOpen) return null
+
+  return (
+    <Window
+      title={config.title}
+      onClose={onClose}
+      defaultWidth={800}
+      defaultHeight={600}
+      defaultX={config.defaultX}
+      defaultY={config.defaultY}
+      pageType={config.pageType as any}
+      zIndex={zIndex}
+      onFocus={onFocus}
+    >
+      <div className="overflow-auto h-full p-6">{children}</div>
+    </Window>
+  )
+}
+
 export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
   const router = useRouter()
   const isMobile = useIsMobile()
@@ -361,31 +482,37 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
     }
   }, [blogPosts])
 
-  const handlePostClick = (slug: string) => {
-    if (isMobile) {
-      startTransition(() => {
-        router.push(`/blog/${slug}`)
-      })
-    } else {
-      dispatch({ type: 'OPEN_BLOG_POST', slug })
-      setPreloadedPost(null)
-    }
-  }
+  const handlePostClick = useCallback(
+    (slug: string) => {
+      if (isMobile) {
+        startTransition(() => {
+          router.push(`/blog/${slug}`)
+        })
+      } else {
+        dispatch({ type: 'OPEN_BLOG_POST', slug })
+        setPreloadedPost(null)
+      }
+    },
+    [isMobile, router],
+  )
 
-  const handlePostHover = (slug: string) => {
-    if (!isMobile && !windowState.blogPostSlug) {
-      setPreloadedPost(slug)
-    }
-  }
+  const handlePostHover = useCallback(
+    (slug: string) => {
+      if (!isMobile && !windowState.blogPostSlug) {
+        setPreloadedPost(slug)
+      }
+    },
+    [isMobile, windowState.blogPostSlug],
+  )
 
-  const handlePostHoverEnd = () => {
+  const handlePostHoverEnd = useCallback(() => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current)
     }
     hoverTimeoutRef.current = setTimeout(() => {
       setPreloadedPost(null)
     }, 1000)
-  }
+  }, [])
 
   // Cleanup hover timeout on unmount
   useEffect(() => {
@@ -395,6 +522,33 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
       }
     }
   }, [])
+
+  const renderWindowContent = useCallback(
+    (windowId: WindowId) => {
+      switch (windowId) {
+        case 'about':
+          return <AboutContentClient />
+        case 'projects':
+          return <ProjectsContentClient projects={projects} />
+        case 'blog-list':
+          return (
+            <BlogListContentClient
+              posts={blogPosts}
+              onPostClick={handlePostClick}
+              onPostHover={handlePostHover}
+              onPostHoverEnd={handlePostHoverEnd}
+            />
+          )
+        case 'labs':
+          return <LabsContentClient />
+        case 'talks':
+          return <TalksContentClient />
+        default:
+          return null
+      }
+    },
+    [blogPosts, projects, handlePostClick, handlePostHover, handlePostHoverEnd],
+  )
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -410,92 +564,21 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
 
   const desktopItems: DesktopItem[] = useMemo(
     () => [
-      // Folders first
-      {
-        id: 'blog',
-        name: 'blog',
-        type: 'folder',
+      // Folders - generated from config
+      ...folderItems.map((folder) => ({
+        id: folder.id,
+        name: folder.name,
+        type: 'folder' as const,
         icon: <FolderIconDefault />,
-        href: '/blog',
-        onClick: (e) => {
-          e.preventDefault()
-          if (isMobile) {
-            startTransition(() => {
-              router.push('/blog')
-            })
-          } else {
-            dispatch({ type: 'OPEN_WINDOW', id: 'blog-list' })
-          }
-        },
-      },
-      {
-        id: 'projects',
-        name: 'projects',
-        type: 'folder',
-        icon: <FolderIconDefault />,
-        href: '/projects',
-        onClick: (e) => {
-          e.preventDefault()
-          if (isMobile) {
-            startTransition(() => {
-              router.push('/projects')
-            })
-          } else {
-            dispatch({ type: 'OPEN_WINDOW', id: 'projects' })
-          }
-        },
-      },
-      {
-        id: 'about',
-        name: 'about',
-        type: 'folder',
-        icon: <FolderIconDefault />,
-        href: '/about',
-        onClick: (e) => {
-          e.preventDefault()
-          if (isMobile) {
-            startTransition(() => {
-              router.push('/about')
-            })
-          } else {
-            dispatch({ type: 'OPEN_WINDOW', id: 'about' })
-          }
-        },
-      },
-      {
-        id: 'labs',
-        name: 'labs',
-        type: 'folder',
-        icon: <FolderIconDefault />,
-        href: '/labs',
-        onClick: (e) => {
-          e.preventDefault()
-          if (isMobile) {
-            startTransition(() => {
-              router.push('/labs')
-            })
-          } else {
-            dispatch({ type: 'OPEN_WINDOW', id: 'labs' })
-          }
-        },
-      },
-      {
-        id: 'talks',
-        name: 'talks',
-        type: 'folder',
-        icon: <FolderIconDefault />,
-        href: '/talks',
-        onClick: (e) => {
-          e.preventDefault()
-          if (isMobile) {
-            startTransition(() => {
-              router.push('/talks')
-            })
-          } else {
-            dispatch({ type: 'OPEN_WINDOW', id: 'talks' })
-          }
-        },
-      },
+        href: folder.route,
+        onClick: createFolderClickHandler(
+          folder.windowId,
+          folder.route,
+          isMobile,
+          router,
+          dispatch,
+        ),
+      })),
       // Local apps
       {
         id: 'terminal',
@@ -659,7 +742,12 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
           defaultY={80}
           blogSlug={windowState.blogPostSlug}
           zIndex={getZIndex(`blog-post-${windowState.blogPostSlug}`)}
-          onFocus={() => dispatch({ type: 'FOCUS', id: `blog-post-${windowState.blogPostSlug}` })}
+          onFocus={() =>
+            dispatch({
+              type: 'FOCUS',
+              id: `blog-post-${windowState.blogPostSlug}`,
+            })
+          }
         >
           <ViewTransition name={`blog-post-${windowState.blogPostSlug}`}>
             <iframe
@@ -671,111 +759,41 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
         </Window>
       )}
 
-      {isOpen('about') && (
-        <Window
-          title="about"
-          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'about' })}
-          defaultWidth={800}
-          defaultHeight={600}
-          defaultX={200}
-          defaultY={100}
-          pageType="about"
-          zIndex={getZIndex('about')}
-          onFocus={() => dispatch({ type: 'FOCUS', id: 'about' })}
+      {/* Content windows - generated from config */}
+      {CONTENT_WINDOW_CONFIGS.map((config) => (
+        <ContentWindow
+          key={config.id}
+          config={config}
+          isOpen={isOpen(config.id)}
+          zIndex={getZIndex(config.id)}
+          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: config.id })}
+          onFocus={() => dispatch({ type: 'FOCUS', id: config.id })}
         >
-          <div className="overflow-auto h-full p-6">
-            <AboutContentClient />
-          </div>
-        </Window>
-      )}
-
-      {isOpen('projects') && (
-        <Window
-          title="projects"
-          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'projects' })}
-          defaultWidth={800}
-          defaultHeight={600}
-          defaultX={250}
-          defaultY={120}
-          pageType="projects"
-          zIndex={getZIndex('projects')}
-          onFocus={() => dispatch({ type: 'FOCUS', id: 'projects' })}
-        >
-          <div className="overflow-auto h-full p-6">
-            <ProjectsContentClient projects={projects} />
-          </div>
-        </Window>
-      )}
-
-      {isOpen('blog-list') && (
-        <Window
-          title="blog"
-          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'blog-list' })}
-          defaultWidth={800}
-          defaultHeight={600}
-          defaultX={300}
-          defaultY={140}
-          pageType="blog"
-          zIndex={getZIndex('blog-list')}
-          onFocus={() => dispatch({ type: 'FOCUS', id: 'blog-list' })}
-        >
-          <div className="overflow-auto h-full p-6">
-            <BlogListContentClient
-              posts={blogPosts}
-              onPostClick={handlePostClick}
-              onPostHover={handlePostHover}
-              onPostHoverEnd={handlePostHoverEnd}
-            />
-          </div>
-        </Window>
-      )}
-
-      {isOpen('labs') && (
-        <Window
-          title="labs"
-          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'labs' })}
-          defaultWidth={800}
-          defaultHeight={600}
-          defaultX={350}
-          defaultY={160}
-          pageType="labs"
-          zIndex={getZIndex('labs')}
-          onFocus={() => dispatch({ type: 'FOCUS', id: 'labs' })}
-        >
-          <div className="overflow-auto h-full p-6">
-            <LabsContentClient />
-          </div>
-        </Window>
-      )}
-
-      {isOpen('talks') && (
-        <Window
-          title="talks"
-          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'talks' })}
-          defaultWidth={800}
-          defaultHeight={600}
-          defaultX={400}
-          defaultY={180}
-          pageType="talks"
-          zIndex={getZIndex('talks')}
-          onFocus={() => dispatch({ type: 'FOCUS', id: 'talks' })}
-        >
-          <div className="overflow-auto h-full p-6">
-            <TalksContentClient />
-          </div>
-        </Window>
-      )}
+          {renderWindowContent(config.id)}
+        </ContentWindow>
+      ))}
     </div>
   )
 }
 
 function DesktopIcon({ item }: { item: DesktopItem }) {
   const content = (
-    <div className="flex flex-col items-center gap-2 3xl:gap-3 p-3 3xl:p-4 rounded-lg transition-colors duration-200 cursor-pointer relative" style={{ '--hover-bg': 'rgba(255, 255, 255, 0.05)' } as React.CSSProperties}>
-      <div className="h-12 3xl:h-16 flex items-center justify-center transition-colors 3xl:scale-125" style={{ color: 'var(--fg)', opacity: 0.8 }}>
+    <div
+      className="flex flex-col items-center gap-2 3xl:gap-3 p-3 3xl:p-4 rounded-lg transition-colors duration-200 cursor-pointer relative"
+      style={
+        { '--hover-bg': 'rgba(255, 255, 255, 0.05)' } as React.CSSProperties
+      }
+    >
+      <div
+        className="h-12 3xl:h-16 flex items-center justify-center transition-colors 3xl:scale-125"
+        style={{ color: 'var(--fg)', opacity: 0.8 }}
+      >
         {item.icon}
       </div>
-      <span className="text-xs 3xl:text-sm font-mono text-center truncate w-16 3xl:w-20" style={{ color: 'var(--fg)', opacity: 0.8 }}>
+      <span
+        className="text-xs 3xl:text-sm font-mono text-center truncate w-16 3xl:w-20"
+        style={{ color: 'var(--fg)', opacity: 0.8 }}
+      >
         {item.name}
       </span>
       {item.external && (
