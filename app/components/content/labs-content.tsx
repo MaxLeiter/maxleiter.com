@@ -9,6 +9,12 @@ export interface Lab {
 
 const LABS: Lab[] = [
   {
+    id: 'HFSViewer',
+    name: 'HFS Viewer',
+    description: 'A Swift UI app for opening HFS disk images',
+    url: '/blog/HFSViewer',
+  },
+  {
     id: 'rsc-llm-edge',
     name: 'RSC LLM on the Edge',
     description:
