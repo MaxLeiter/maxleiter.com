@@ -7,8 +7,9 @@ import { BlogListContent } from './content/blog-list-content'
 import { LabsContent } from './content/labs-content'
 import { BooksContent } from './content/books-content'
 import { TalksContent } from './content/talks-content'
+import { NotesContent } from './content/notes-content'
 import type { BlogPost, Project } from '@lib/portfolio-data'
-import type { Book } from '@lib/types'
+import type { Book, Note } from '@lib/types'
 
 export function AboutContentClient() {
   return (
@@ -85,6 +86,22 @@ export function TalksContentClient() {
   return (
     <ViewTransitionWrapper name="page-talks">
       <TalksContent />
+    </ViewTransitionWrapper>
+  )
+}
+
+interface NotesContentClientProps {
+  notes: Note[]
+  onNoteClick?: (slug: string) => void
+}
+
+export function NotesContentClient({
+  notes,
+  onNoteClick,
+}: NotesContentClientProps) {
+  return (
+    <ViewTransitionWrapper name="page-notes">
+      <NotesContent notes={notes} onNoteClick={onNoteClick} />
     </ViewTransitionWrapper>
   )
 }

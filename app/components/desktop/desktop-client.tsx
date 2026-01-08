@@ -24,8 +24,10 @@ import {
   BlogListContentClient,
   LabsContentClient,
   TalksContentClient,
+  NotesContentClient,
 } from '@components/page-content-client'
 import type { BlogPost, Project } from '@lib/portfolio-data'
+import type { Note } from '@lib/types'
 import { ABOUT_CONTENT } from '@lib/about-content'
 import { useIsMobile } from './use-is-mobile'
 import { useEffects } from '@components/desktop/effects-context'
@@ -234,6 +236,7 @@ function SearchIcon() {
 interface DesktopClientProps {
   blogPosts: BlogPost[]
   projects: Project[]
+  notes?: Note[]
 }
 
 declare global {
@@ -250,6 +253,7 @@ type WindowId =
   | 'blog-list'
   | 'labs'
   | 'talks'
+  | 'notes'
 
 interface WindowState {
   openWindows: Set<WindowId>
@@ -343,6 +347,7 @@ const folderItems: Array<{
   route: string
 }> = [
   { id: 'blog', name: 'blog', windowId: 'blog-list', route: '/blog' },
+  { id: 'notes', name: 'notes', windowId: 'notes', route: '/notes' },
   {
     id: 'projects',
     name: 'projects',
@@ -384,6 +389,7 @@ const CONTENT_WINDOW_CONFIGS: ContentWindowConfig[] = [
     defaultX: 300,
     defaultY: 140,
   },
+  { id: 'notes', title: 'notes', pageType: 'notes', defaultX: 325, defaultY: 150 },
   { id: 'labs', title: 'labs', pageType: 'labs', defaultX: 350, defaultY: 160 },
   {
     id: 'talks',
@@ -430,7 +436,7 @@ function ContentWindow({
   )
 }
 
-export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
+export function DesktopClient({ blogPosts, projects, notes = [] }: DesktopClientProps) {
   const router = useRouter()
   const isMobile = useIsMobile()
   const { setShowCommandPalette } = useEffects()
@@ -543,11 +549,13 @@ export function DesktopClient({ blogPosts, projects }: DesktopClientProps) {
           return <LabsContentClient />
         case 'talks':
           return <TalksContentClient />
+        case 'notes':
+          return <NotesContentClient notes={notes} />
         default:
           return null
       }
     },
-    [blogPosts, projects, handlePostClick, handlePostHover, handlePostHoverEnd],
+    [blogPosts, projects, notes, handlePostClick, handlePostHover, handlePostHoverEnd],
   )
 
   useEffect(() => {

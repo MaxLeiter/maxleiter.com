@@ -6,6 +6,18 @@ import { cache } from 'react'
 
 const thirdPartyPosts: Post[] = [
   {
+    title: 'How we made v0 an effective coding agent',
+    description: 'Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.',
+    body: '',
+    date: '2026-01-07T10:00:00.000Z',
+    slug: '',
+    tags: [],
+    lastModified: 0,
+    isThirdParty: true,
+    href: 'https://vercel.com/blog/how-we-made-v0-an-effective-coding-agent',
+    type: 'post',
+  },
+  {
     title: 'Introducing the v0 composite model family',
     description: 'Introducing the v0 composite model family.',
     body: '',
