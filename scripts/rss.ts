@@ -4,6 +4,7 @@ import path from 'path'
 import { marked } from 'marked'
 import matter from 'gray-matter'
 import { Note, Post } from '@lib/types'
+import { externalPosts } from '@lib/external-posts'
 
 const posts = fs
   .readdirSync(path.resolve(__dirname, '../posts'))
@@ -32,7 +33,7 @@ const notes = fs
     return { ...data, body: content }
   })
 
-const combined: (Note | Post)[] = [...posts, ...notes].sort(
+const combined: (Note | Post)[] = [...posts, ...notes, ...externalPosts].sort(
   (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
 )
 
@@ -65,12 +66,21 @@ const main = () => {
   })
 
   combined.forEach((post) => {
-    const url = `https://maxleiter.com/${post.type === 'post' ? 'blog' : 'notes'}/${post.slug}`
+    // For external posts, use the href directly
+    const url = post.isThirdParty && post.href
+      ? post.href
+      : `https://maxleiter.com/${post.type === 'post' ? 'blog' : 'notes'}/${post.slug}`
+
+    // For external posts, use description instead of rendered body
+    const itemDescription = post.isThirdParty
+      ? `${post.description || ''}<br><br><a href="${url}">Read on ${new URL(url).hostname}</a>`
+      : renderPost(post.body)
+
     feed.item({
       title: post.title,
-      description: renderPost(post.body),
+      description: itemDescription,
       date: new Date(post?.date),
-      author: 'Max Leiter',
+      author: post.isThirdParty ? new URL(url).hostname : 'Max Leiter',
       url,
       categories: [post.type],
       guid: url,
