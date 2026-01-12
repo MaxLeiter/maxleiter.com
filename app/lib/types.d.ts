@@ -30,24 +30,3 @@ export type Note = Base & {
   slug: string
   type: 'snippet' | 'tip' | 'note'
 }
-
-export type BookGenre = 'sci-fi' | 'fantasy' | 'non-fiction' | 'horror' | 'thriller'
-
-export type Book = Base & {
-  slug: string
-  author: string
-  isbn?: string
-  date: string // date read/reviewed
-  rating?: number // out of 5
-  body: string
-  coverUrl?: string
-  genre?: BookGenre
-  series?: {
-    name: string
-    books: {
-      title: string
-      isbn?: string
-    }[]
-  }
-  type: 'book'
-}

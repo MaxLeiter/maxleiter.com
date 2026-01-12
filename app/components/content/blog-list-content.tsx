@@ -53,13 +53,13 @@ export function BlogListContent({
 
       {popularPosts.length > 0 && (
         <section className="mb-10">
-          <h2 className="text-sm font-mono text-[var(--gray)] mb-3">popular</h2>
+          <h2 className="text-sm font-mono text-(--gray) mb-3">popular</h2>
           <ul className="space-y-2">{popularPosts.map(renderPost)}</ul>
         </section>
       )}
 
       <section>
-        <h2 className="text-sm font-mono text-[var(--gray)] mb-3">all posts</h2>
+        <h2 className="text-sm font-mono text-(--gray) mb-3">all posts</h2>
         <ul className="space-y-2">{posts.map(renderPost)}</ul>
       </section>
     </div>

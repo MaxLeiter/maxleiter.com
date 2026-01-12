@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { track } from '@vercel/analytics'
 import type { Project } from '@lib/portfolio-data'
 
 interface WidgetTopProjectsProps {
@@ -66,6 +67,11 @@ export function WidgetTopProjects({
             <li key={project.id}>
               <Component
                 className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group"
+                onClick={() =>
+                  project.link &&
+                  project.link !== '#' &&
+                  track('project_click', { project: project.id })
+                }
                 {...linkProps}
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
@@ -98,6 +104,9 @@ export function WidgetTopProjects({
       </ul>
       <Link
         href="/projects"
+        onClick={() =>
+          track('nav_click', { section: 'projects', source: 'widget' })
+        }
         className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors border-t border-[var(--border-color)]"
       >
         View all projects →

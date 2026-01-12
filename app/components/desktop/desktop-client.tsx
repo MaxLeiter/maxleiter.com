@@ -12,7 +12,9 @@ import {
   useCallback,
 } from 'react'
 import Link from 'next/link'
-import { useRouter, type AppRouterInstance } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+import { track } from '@vercel/analytics'
 import dynamic from 'next/dynamic'
 import { Window } from '@components/desktop/window'
 import { TerminalContent } from '@components/desktop/terminal-content'
@@ -331,6 +333,7 @@ function createFolderClickHandler(
 ) {
   return (e: React.MouseEvent) => {
     e.preventDefault()
+    track('nav_click', { section: windowId })
     if (isMobile) {
       startTransition(() => {
         router.push(route)
@@ -390,7 +393,13 @@ const CONTENT_WINDOW_CONFIGS: ContentWindowConfig[] = [
     defaultX: 300,
     defaultY: 140,
   },
-  { id: 'notes', title: 'notes', pageType: 'notes', defaultX: 325, defaultY: 150 },
+  {
+    id: 'notes',
+    title: 'notes',
+    pageType: 'notes',
+    defaultX: 325,
+    defaultY: 150,
+  },
   { id: 'labs', title: 'labs', pageType: 'labs', defaultX: 350, defaultY: 160 },
   {
     id: 'talks',
@@ -437,7 +446,11 @@ function ContentWindow({
   )
 }
 
-export function DesktopClient({ blogPosts, projects, notes = [] }: DesktopClientProps) {
+export function DesktopClient({
+  blogPosts,
+  projects,
+  notes = [],
+}: DesktopClientProps) {
   const router = useRouter()
   const isMobile = useIsMobile()
   const { setShowCommandPalette } = useEffects()
@@ -491,6 +504,7 @@ export function DesktopClient({ blogPosts, projects, notes = [] }: DesktopClient
 
   const handlePostClick = useCallback(
     (slug: string) => {
+      track('blog_click', { slug })
       if (isMobile) {
         startTransition(() => {
           router.push(`/blog/${slug}`)
@@ -556,7 +570,14 @@ export function DesktopClient({ blogPosts, projects, notes = [] }: DesktopClient
           return null
       }
     },
-    [blogPosts, projects, notes, handlePostClick, handlePostHover, handlePostHoverEnd],
+    [
+      blogPosts,
+      projects,
+      notes,
+      handlePostClick,
+      handlePostHover,
+      handlePostHoverEnd,
+    ],
   )
 
   useEffect(() => {
@@ -666,26 +687,26 @@ export function DesktopClient({ blogPosts, projects, notes = [] }: DesktopClient
   )
 
   return (
-    <div className="h-screen bg-[var(--bg)] text-[var(--fg)] overflow-hidden flex flex-col">
+    <div className="h-screen bg-(--bg) text-(--fg) overflow-hidden flex flex-col">
       <h1 className="sr-only">Max Leiter's website</h1>
       <header
-        className="h-10 3xl:h-12 border-b border-[var(--border-color)] flex items-center px-4 3xl:px-6 gap-4 3xl:gap-6 text-xs 3xl:text-sm font-mono sticky top-0 z-10"
+        className="h-10 3xl:h-12 border-b border-(--border-color) flex items-center px-4 3xl:px-6 gap-4 3xl:gap-6 text-xs 3xl:text-sm font-mono sticky top-0 z-10"
         style={windowStyles.translucentBg}
       >
-        <span className="text-[var(--gray)]" aria-hidden>
+        <span className="text-(--gray)" aria-hidden>
           ~
         </span>
         <div className="ml-auto flex items-center gap-4">
           <ThemeToggle />
           <button
             onClick={() => setShowCommandPalette(true)}
-            className="text-[var(--gray)] hover:text-[var(--fg)] transition-colors p-1"
+            className="text-(--gray) hover:text-(--fg) transition-colors p-1"
             aria-label="Search (⌘K)"
             title="Search (⌘K)"
           >
             <SearchIcon />
           </button>
-          <time id="menubar-clock" className="text-[var(--gray)]">
+          <time id="menubar-clock" className="text-(--gray)">
             {currentTime}
           </time>
         </div>
@@ -704,7 +725,7 @@ export function DesktopClient({ blogPosts, projects, notes = [] }: DesktopClient
           <aside className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 3xl:gap-10 max-w-6xl 3xl:max-w-7xl items-start">
             <WidgetRecentPosts
               posts={blogPosts}
-              limit={5}
+              recentLimit={3}
               onPostClick={handlePostClick}
               onPostHover={handlePostHover}
               onPostHoverEnd={handlePostHoverEnd}

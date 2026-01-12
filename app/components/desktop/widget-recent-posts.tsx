@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { track } from '@vercel/analytics'
 import type { BlogPost } from '@lib/portfolio-data'
 import { POPULAR_SLUGS } from '@lib/popular-posts'
 
@@ -100,6 +101,9 @@ export function WidgetRecentPosts({
 
       <Link
         href="/blog"
+        onClick={() =>
+          track('nav_click', { section: 'blog', source: 'widget' })
+        }
         className="block px-4 3xl:px-5 py-2 3xl:py-3 text-center text-xs 3xl:text-sm font-mono text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors border-t border-[var(--border-color)]"
       >
         View all posts →

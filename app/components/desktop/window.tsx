@@ -14,7 +14,7 @@ interface WindowProps {
   defaultX?: number
   defaultY?: number
   blogSlug?: string
-  pageType?: 'blog' | 'projects' | 'about' | 'labs' | 'books' | 'talks' | null
+  pageType?: 'blog' | 'projects' | 'about' | 'labs' | 'talks' | null
   zIndex?: number
   onFocus?: () => void
 }
