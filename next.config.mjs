@@ -25,9 +25,6 @@ const nextConfig = {
     viewTransition: true,
     inlineCss: true,
   },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   async redirects() {
     return [
       {

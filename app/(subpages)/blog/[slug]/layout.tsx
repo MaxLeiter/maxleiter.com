@@ -1,6 +1,6 @@
 import getPosts from '@lib/get-posts'
 import { Metadata } from 'next'
-import { JSX } from 'react'
+import { ReactNode } from 'react'
 
 export async function generateStaticParams() {
   const posts = await getPosts()
@@ -12,7 +12,6 @@ export const generateMetadata = async (props: {
     slug: string
   }>
 }): Promise<Metadata> => {
-  console.log('Generating metadata for slug:', (await props.params).slug) // Debug log to check slug
   const params = await props.params
   const post = (await getPosts()).find((p) => p?.slug === params.slug)
   return {
@@ -25,7 +24,7 @@ export const generateMetadata = async (props: {
 }
 
 export default async function PostLayout(props: {
-  children: JSX.Element
+  children: ReactNode
   params: Promise<{
     slug: string
   }>

@@ -60,7 +60,7 @@ export function CommandPalette({
       if (e.key === 'Enter') {
         const item = filtered[selectedIndex]
         if (item) {
-          onNavigate(item.href)
+          onNavigate(item.href, Boolean(item.href.startsWith('http')))
           onClose()
         }
       }
@@ -71,9 +71,24 @@ export function CommandPalette({
   }, [filtered, selectedIndex, onClose, onNavigate])
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm z-[9999] flex items-start justify-center pt-20 px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }} onClick={onClose}>
-      <div className="w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden" style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--border-color)', borderWidth: '1px' }} onClick={(e) => e.stopPropagation()}>
-        <div className="border-b px-4 py-3" style={{ borderColor: 'var(--border-color)' }}>
+    <div
+      className="fixed inset-0 backdrop-blur-sm z-[9999] flex items-start justify-center pt-20 px-4"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden"
+        style={{
+          backgroundColor: 'var(--bg)',
+          borderColor: 'var(--border-color)',
+          borderWidth: '1px',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="border-b px-4 py-3"
+          style={{ borderColor: 'var(--border-color)' }}
+        >
           <input
             autoFocus
             type="text"
@@ -84,12 +99,14 @@ export function CommandPalette({
             }}
             placeholder="Search posts, projects, or navigate..."
             className="w-full bg-transparent outline-none font-mono"
-            style={{
-              fontSize: '16px',
-              color: 'var(--fg)',
-              opacity: 0.9,
-              '--placeholder-color': 'var(--fg)'
-            } as React.CSSProperties & { '--placeholder-color': string }}
+            style={
+              {
+                fontSize: '16px',
+                color: 'var(--fg)',
+                opacity: 0.9,
+                '--placeholder-color': 'var(--fg)',
+              } as React.CSSProperties & { '--placeholder-color': string }
+            }
           />
         </div>
 
@@ -101,19 +118,24 @@ export function CommandPalette({
           ) : (
             filtered.map((item, idx) => (
               <button
+                // @ts-expect-error - TODO: strict typing
                 key={`${item.type}-${item.slug || item.id || item.title}`}
                 onClick={() => {
-                  onNavigate(item.href)
+                  onNavigate(item.href, Boolean(item.href.startsWith('http')))
                   onClose()
                 }}
                 className="w-full text-left px-4 py-3 rounded transition-colors font-mono"
                 style={{
-                  backgroundColor: idx === selectedIndex ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
-                  color: 'var(--fg)'
+                  backgroundColor:
+                    idx === selectedIndex
+                      ? 'rgba(255, 255, 255, 0.15)'
+                      : 'transparent',
+                  color: 'var(--fg)',
                 }}
                 onMouseEnter={(e) => {
                   if (idx !== selectedIndex) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'
+                    e.currentTarget.style.backgroundColor =
+                      'rgba(255, 255, 255, 0.08)'
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -122,14 +144,19 @@ export function CommandPalette({
                   }
                 }}
               >
-                <div className="text-xs font-mono uppercase mb-1" style={{ color: 'var(--gray)' }}>
+                <div
+                  className="text-xs font-mono uppercase mb-1"
+                  style={{ color: 'var(--gray)' }}
+                >
                   {item.type === 'blog'
                     ? 'Blog Post'
                     : item.type === 'project'
                       ? 'Project'
                       : 'Navigation'}
                 </div>
-                <div style={{ color: 'var(--fg)', opacity: 0.9 }}>{item.title}</div>
+                <div style={{ color: 'var(--fg)', opacity: 0.9 }}>
+                  {item.title}
+                </div>
               </button>
             ))
           )}

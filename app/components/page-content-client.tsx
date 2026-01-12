@@ -8,7 +8,7 @@ import { LabsContent } from './content/labs-content'
 import { TalksContent } from './content/talks-content'
 import { NotesContent } from './content/notes-content'
 import type { BlogPost, Project } from '@lib/portfolio-data'
-import type { Book, Note } from '@lib/types'
+import type { Note } from '@lib/types'
 
 export function AboutContentClient() {
   return (
