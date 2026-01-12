@@ -3,8 +3,8 @@ import RSS from 'rss'
 import path from 'path'
 import { marked } from 'marked'
 import matter from 'gray-matter'
-import { Note, Post } from '@lib/types'
-import { externalPosts } from '@lib/external-posts'
+import { Note, Post } from '../app/lib/types'
+import { externalPosts } from '../app/lib/external-posts'
 
 const posts = fs
   .readdirSync(path.resolve(__dirname, '../posts'))
@@ -66,13 +66,16 @@ const main = () => {
   })
 
   combined.forEach((post) => {
+    const isThirdParty = post.type === 'post' && post.isThirdParty
+
     // For external posts, use the href directly
-    const url = post.isThirdParty && post.href
-      ? post.href
-      : `https://maxleiter.com/${post.type === 'post' ? 'blog' : 'notes'}/${post.slug}`
+    const url =
+      isThirdParty && post.href
+        ? post.href
+        : `https://maxleiter.com/${post.type === 'post' ? 'blog' : 'notes'}/${post.slug}`
 
     // For external posts, use description instead of rendered body
-    const itemDescription = post.isThirdParty
+    const itemDescription = isThirdParty
       ? `${post.description || ''}<br><br><a href="${url}">Read on ${new URL(url).hostname}</a>`
       : renderPost(post.body)
 
@@ -80,7 +83,7 @@ const main = () => {
       title: post.title,
       description: itemDescription,
       date: new Date(post?.date),
-      author: post.isThirdParty ? new URL(url).hostname : 'Max Leiter',
+      author: isThirdParty ? new URL(url).hostname : 'Max Leiter',
       url,
       categories: [post.type],
       guid: url,
