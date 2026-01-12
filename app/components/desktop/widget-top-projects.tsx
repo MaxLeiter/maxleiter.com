@@ -41,10 +41,13 @@ export function WidgetTopProjects({
   }
 
   return (
-    <div className="border border-[var(--border-color)] rounded-lg overflow-hidden backdrop-blur-sm" style={{ backgroundColor: 'var(--bg-widget)' }}>
+    <div
+      className="border border-[var(--border-color)] rounded-lg overflow-hidden backdrop-blur-sm"
+      style={{ backgroundColor: 'var(--bg-widget)' }}
+    >
       <div className="border-b border-[var(--border-color)] px-4 3xl:px-5 py-3 3xl:py-4">
         <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-[var(--fg)] uppercase">
-          Top Projects
+          Projects
         </h2>
       </div>
       <ul className="divide-y divide-[var(--border-color)]">

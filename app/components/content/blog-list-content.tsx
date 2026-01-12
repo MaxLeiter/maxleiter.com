@@ -2,6 +2,7 @@
 
 import { ListCard } from '@components/desktop/list-card'
 import type { BlogPost } from '@lib/portfolio-data'
+import { POPULAR_SLUGS } from '@lib/popular-posts'
 
 interface BlogListContentProps {
   posts: BlogPost[]
@@ -14,34 +15,53 @@ export function BlogListContent({
   posts,
   onPostClick,
   onPostHover,
-  onPostHoverEnd
+  onPostHoverEnd,
 }: BlogListContentProps) {
+  const popularPosts = POPULAR_SLUGS.map((slug) =>
+    posts.find((p) => p.slug === slug),
+  ).filter((p): p is BlogPost => p !== undefined)
+
+  const renderPost = (post: BlogPost) => (
+    <ListCard
+      key={post.slug}
+      href={`/blog/${post.slug}`}
+      title={post.title}
+      description={post.excerpt}
+      meta={post.date}
+      icon
+      onClick={
+        onPostClick
+          ? (e) => {
+              e.preventDefault()
+              onPostClick(post.slug)
+            }
+          : undefined
+      }
+      onMouseEnter={() => onPostHover?.(post.slug)}
+      onMouseLeave={onPostHoverEnd}
+    />
+  )
+
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8" style={{ color: 'var(--article-color)' }}>blog/</h1>
+      <h1
+        className="text-3xl font-mono font-bold mb-8"
+        style={{ color: 'var(--article-color)' }}
+      >
+        blog/
+      </h1>
 
-      <ul className="space-y-2">
-        {posts.map((post) => (
-          <ListCard
-            key={post.slug}
-            href={`/blog/${post.slug}`}
-            title={post.title}
-            description={post.excerpt}
-            meta={post.date}
-            icon
-            onClick={
-              onPostClick
-                ? (e) => {
-                    e.preventDefault()
-                    onPostClick(post.slug)
-                  }
-                : undefined
-            }
-            onMouseEnter={() => onPostHover?.(post.slug)}
-            onMouseLeave={onPostHoverEnd}
-          />
-        ))}
-      </ul>
+      {popularPosts.length > 0 && (
+        <section className="mb-10">
+          <h2 className="text-sm font-mono text-[var(--gray)] mb-3">popular</h2>
+          <ul className="space-y-2">{popularPosts.map(renderPost)}</ul>
+        </section>
+      )}
+
+      <section>
+        <h2 className="text-sm font-mono text-[var(--gray)] mb-3">all posts</h2>
+        <ul className="space-y-2">{posts.map(renderPost)}</ul>
+      </section>
     </div>
   )
 }
