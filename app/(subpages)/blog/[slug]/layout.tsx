@@ -12,6 +12,7 @@ export const generateMetadata = async (props: {
     slug: string
   }>
 }): Promise<Metadata> => {
+  console.log('Generating metadata for slug:', (await props.params).slug) // Debug log to check slug
   const params = await props.params
   const post = (await getPosts()).find((p) => p?.slug === params.slug)
   return {

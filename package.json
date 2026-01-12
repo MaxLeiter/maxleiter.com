@@ -16,8 +16,8 @@
     "@fec/remark-a11y-emoji": "4.0.2",
     "@mdx-js/loader": "3.1.1",
     "@mdx-js/react": "3.1.1",
-    "@next/bundle-analyzer": "16.1.1-canary.5",
-    "@next/mdx": "16.1.1-canary.5",
+    "@next/bundle-analyzer": "16.1.1-canary.21",
+    "@next/mdx": "16.1.1-canary.21",
     "@octokit/rest": "20.0.2",
     "@radix-ui/react-tabs": "^1.1.13",
     "@supabase/supabase-js": "2.39.7",
@@ -30,15 +30,15 @@
     "globby": "15.0.0",
     "htmlparser2": "10.0.0",
     "lodash.debounce": "4.0.8",
-    "next": "16.1.1-canary.5",
+    "next": "16.1.1-canary.21",
     "next-mdx-remote": "5.0.0",
     "next-remote-watch": "2.0.0",
     "next-themes": "0.4.6",
     "postcss": "8.5.6",
     "prettier": "3.6.2",
-    "react": "19.2.0",
+    "react": "19.2.3",
     "react-diff-viewer": "3.1.1",
-    "react-dom": "19.2.0",
+    "react-dom": "19.2.3",
     "react-tweet": "3.2.2",
     "rehype-highlight": "7.0.2",
     "rehype-img-size": "1.0.1",
@@ -50,19 +50,15 @@
     "youtubei": "0.0.1-rc.36"
   },
   "devDependencies": {
-    "@types/diff": "8.0.0",
     "@types/mdx": "2.0.13",
     "@types/node": "24.9.1",
-    "@types/prettier": "3.0.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/rss": "0.0.32",
     "@typescript-eslint/eslint-plugin": "8.46.2",
     "@typescript-eslint/parser": "8.46.2",
-    "class-variance-authority": "^0.7.1",
     "clsx": "2.1.1",
     "concurrently": "9.2.1",
-    "critters": "0.0.25",
     "dotenv": "17.2.3",
     "eslint": "9.38.0",
     "eslint-plugin-import": "2.32.0",
@@ -88,16 +84,5 @@
     "semi": false,
     "singleQuote": true
   },
-  "next-unused": {
-    "alias": {
-      "@components": "components/",
-      "@data": "data/",
-      "@lib": "lib/",
-      "@styles": "styles/"
-    },
-    "include": [
-      "components",
-      "lib"
-    ]
-  }
+  "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531"
 }

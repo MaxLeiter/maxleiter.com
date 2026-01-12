@@ -3,6 +3,7 @@
 import type React from 'react'
 import { useState, useRef, useEffect, startTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { windowStyles, getHeaderClassName } from '@lib/window-styles'
 
 interface WindowProps {
   title: string
@@ -118,8 +119,8 @@ export function Window({
         }
       case 'top':
         return {
-          position: { x: position.x, y: 40 },
-          size: { width: size.width, height: (windowHeight - 40) / 2 },
+          position: { x: 0, y: 40 },
+          size: { width: windowWidth, height: windowHeight - 40 },
         }
       case 'bottom':
         return {
@@ -469,12 +470,12 @@ export function Window({
         break
       case 'top':
         previewStyle = {
-          left: position.x,
+          left: 0,
           top: 40,
-          width: size.width,
-          height: (windowHeight - 40) / 2,
+          width: windowWidth,
+          height: windowHeight - 40,
         }
-        label = 'Snap Top'
+        label = 'Fullscreen'
         break
       case 'bottom':
         previewStyle = {
@@ -542,20 +543,19 @@ export function Window({
       >
         {/* Window Header */}
         <header
-          className={`window-header h-8 bg-[var(--lighter-gray)] border-b border-[var(--border-color)] flex items-center justify-between px-3 rounded-t-lg select-none ${
-            !isFullscreen ? 'cursor-move' : ''
-          }`}
+          className={getHeaderClassName(isFullscreen)}
+          style={windowStyles.translucentBg}
         >
           <h3
             id={`window-title-${title.replace(/\s+/g, '-')}`}
-            className="text-[var(--gray)] text-xs font-normal"
+            className={windowStyles.title}
           >
             {title}
           </h3>
           <div className="flex items-center gap-1">
             <button
               onClick={toggleFullscreen}
-              className="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
+              className={windowStyles.button}
               aria-label={isFullscreen ? 'Restore window' : 'Maximize window'}
               title={isFullscreen ? 'Restore' : 'Maximize'}
             >
@@ -585,7 +585,7 @@ export function Window({
             </button>
             <button
               onClick={(e) => handleClose(e)}
-              className="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
+              className={windowStyles.button}
               aria-label={`Close ${title}`}
             >
               ✕

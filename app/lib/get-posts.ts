@@ -5,7 +5,6 @@ import fs from 'fs/promises'
 import { cache } from 'react'
 import { externalPosts } from './external-posts'
 
-
 export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
   const posts = await fs.readdir('./posts/')
 

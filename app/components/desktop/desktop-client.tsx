@@ -32,6 +32,7 @@ import { ABOUT_CONTENT } from '@lib/about-content'
 import { useIsMobile } from './use-is-mobile'
 import { useEffects } from '@components/desktop/effects-context'
 import { ThemeToggle } from '@components/theme-toggle'
+import { windowStyles } from '@lib/window-styles'
 
 const Calculator = dynamic(
   () =>
@@ -667,7 +668,10 @@ export function DesktopClient({ blogPosts, projects, notes = [] }: DesktopClient
   return (
     <div className="h-screen bg-[var(--bg)] text-[var(--fg)] overflow-hidden flex flex-col">
       <h1 className="sr-only">Max Leiter's website</h1>
-      <header className="h-10 3xl:h-12 bg-[var(--lightest-gray)] border-b border-[var(--border-color)] flex items-center px-4 3xl:px-6 gap-4 3xl:gap-6 text-xs 3xl:text-sm font-mono sticky top-0 z-10">
+      <header
+        className="h-10 3xl:h-12 border-b border-[var(--border-color)] flex items-center px-4 3xl:px-6 gap-4 3xl:gap-6 text-xs 3xl:text-sm font-mono sticky top-0 z-10"
+        style={windowStyles.translucentBg}
+      >
         <span className="text-[var(--gray)]" aria-hidden>
           ~
         </span>

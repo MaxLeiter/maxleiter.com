@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { startTransition } from 'react'
 import Link from 'next/link'
+import { windowStyles } from '@lib/window-styles'
 
 interface BreadcrumbSegment {
   name: string
@@ -39,7 +40,7 @@ export function WindowToolbar({
   }
 
   return (
-    <header className="h-10 bg-[var(--lightest-gray)] border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10">
+    <header className={windowStyles.toolbar} style={windowStyles.translucentBg}>
       <nav
         className="flex items-center gap-2 text-sm font-mono text-[var(--gray)]"
         aria-label="Breadcrumb"
@@ -64,7 +65,7 @@ export function WindowToolbar({
         {showMinimize && (
           <button
             onClick={handleMinimize}
-            className="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
+            className={windowStyles.button}
             aria-label="Minimize window"
             title="Minimize"
           >
@@ -82,7 +83,7 @@ export function WindowToolbar({
         )}
         <button
           onClick={handleClose}
-          className="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-[var(--lighter-gray)] w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
+          className="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors"
           aria-label={`Close ${title}`}
         >
           ✕

@@ -14,18 +14,18 @@ function EmbedInitScript() {
       dangerouslySetInnerHTML={{
         __html: `(${(() => {
           // Check if we're in embed mode
-          const urlParams = new URLSearchParams(window.location.search);
-          const isEmbed = urlParams.get('embed') !== null;
+          const urlParams = new URLSearchParams(window.location.search)
+          const isEmbed = urlParams.get('embed') !== null
 
           // Store in global for React to read on hydration
-          window.__IS_EMBED__ = isEmbed;
+          window.__IS_EMBED__ = isEmbed
 
           // If embed mode, remove the toolbar from DOM immediately
           // This ensures the DOM matches what React will render on hydration
           if (isEmbed) {
-            const toolbar = document.getElementById('blog-toolbar');
+            const toolbar = document.getElementById('blog-toolbar')
             if (toolbar) {
-              toolbar.remove();
+              toolbar.remove()
             }
           }
         }).toString()})()`,
@@ -40,6 +40,7 @@ export default async function PostPage(props: {
   }>
 }) {
   const params = await props.params
+  console.log('Params:', params) // Debug log to check params
   const post = await getPost(params.slug)
 
   if (!post) return notFound()
