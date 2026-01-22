@@ -31,7 +31,7 @@ export function BlogListContent({
         href={href}
         title={post.title}
         description={post.excerpt}
-        meta={post.date}
+        meta={isExternal ? `${post.date} · external` : post.date}
         icon
         external={isExternal}
         onClick={

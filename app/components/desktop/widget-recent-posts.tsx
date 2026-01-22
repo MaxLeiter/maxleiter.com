@@ -20,29 +20,52 @@ export function WidgetRecentPosts({
   onPostHover,
   onPostHoverEnd,
 }: WidgetRecentPostsProps) {
+  // Filter out external posts from popular (they use hrefs as slugs)
   const popularPosts = POPULAR_SLUGS.map((slug) =>
-    posts.find((p) => p.slug === slug),
+    posts.find((p) => p.slug === slug && !p.isThirdParty),
   ).filter((p): p is BlogPost => p !== undefined)
 
   const recentPosts = posts
-    .filter((p) => !POPULAR_SLUGS.includes(p.slug))
+    .filter((p) => !POPULAR_SLUGS.includes(p.slug) || p.isThirdParty)
     .slice(0, recentLimit)
 
   const renderPost = (post: BlogPost) => {
+    const isExternal = post.isThirdParty
+    const href = isExternal && post.href ? post.href : `/blog/${post.slug}`
+
     const content = (
       <>
         <h3 className="text-sm 3xl:text-base font-mono text-[var(--fg)] group-hover:text-[var(--gray)] transition-colors mb-1">
           {post.title}
         </h3>
-        <p className="text-xs 3xl:text-sm text-[var(--gray)]">{post.date}</p>
+        <p className="text-xs 3xl:text-sm text-[var(--gray)]">
+          {post.date}
+          {isExternal && <span className="ml-2 opacity-50">· external</span>}
+        </p>
       </>
     )
+
+    // External posts should open in new tab
+    if (isExternal) {
+      return (
+        <li key={post.slug}>
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group"
+          >
+            {content}
+          </a>
+        </li>
+      )
+    }
 
     if (onPostClick) {
       return (
         <li key={post.slug}>
           <Link
-            href={`/blog/${post.slug}`}
+            href={href}
             onClick={(e) => {
               e.preventDefault()
               onPostClick(post.slug)
@@ -61,7 +84,7 @@ export function WidgetRecentPosts({
     return (
       <li key={post.slug}>
         <Link
-          href={`/blog/${post.slug}`}
+          href={href}
           className="block px-4 3xl:px-5 py-3 3xl:py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group"
           prefetch
         >
