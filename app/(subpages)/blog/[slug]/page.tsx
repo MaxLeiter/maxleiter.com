@@ -40,7 +40,6 @@ export default async function PostPage(props: {
   }>
 }) {
   const params = await props.params
-  console.log('Params:', params) // Debug log to check params
   const post = await getPost(params.slug)
 
   if (!post) return notFound()

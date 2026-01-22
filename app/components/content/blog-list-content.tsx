@@ -21,26 +21,32 @@ export function BlogListContent({
     posts.find((p) => p.slug === slug),
   ).filter((p): p is BlogPost => p !== undefined)
 
-  const renderPost = (post: BlogPost) => (
-    <ListCard
-      key={post.slug}
-      href={`/blog/${post.slug}`}
-      title={post.title}
-      description={post.excerpt}
-      meta={post.date}
-      icon
-      onClick={
-        onPostClick
-          ? (e) => {
-              e.preventDefault()
-              onPostClick(post.slug)
-            }
-          : undefined
-      }
-      onMouseEnter={() => onPostHover?.(post.slug)}
-      onMouseLeave={onPostHoverEnd}
-    />
-  )
+  const renderPost = (post: BlogPost) => {
+    const isExternal = post.isThirdParty
+    const href = isExternal && post.href ? post.href : `/blog/${post.slug}`
+
+    return (
+      <ListCard
+        key={post.slug}
+        href={href}
+        title={post.title}
+        description={post.excerpt}
+        meta={post.date}
+        icon
+        external={isExternal}
+        onClick={
+          !isExternal && onPostClick
+            ? (e) => {
+                e.preventDefault()
+                onPostClick(post.slug)
+              }
+            : undefined
+        }
+        onMouseEnter={!isExternal ? () => onPostHover?.(post.slug) : undefined}
+        onMouseLeave={!isExternal ? onPostHoverEnd : undefined}
+      />
+    )
+  }
 
   return (
     <div className="max-w-3xl">

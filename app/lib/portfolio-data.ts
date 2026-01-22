@@ -8,6 +8,8 @@ export interface BlogPost {
   date: string
   excerpt: string
   content: string
+  href?: string
+  isThirdParty?: boolean
 }
 
 export interface Project {
@@ -19,15 +21,22 @@ export interface Project {
   content: string
 }
 
-function convertToBlogPost(post: Post, includeContent: boolean = false): BlogPost | null {
-  if (!post.slug) return null
+function convertToBlogPost(
+  post: Post,
+  includeContent: boolean = false,
+): BlogPost | null {
+  // For third-party posts, use the href as a pseudo-slug for identification
+  const slug = post.slug || (post.isThirdParty && post.href ? post.href : '')
+  if (!slug) return null
 
   return {
-    slug: post.slug,
+    slug,
     title: post.title,
     date: post.date,
     excerpt: post.description,
     content: includeContent ? post.body : '',
+    href: post.href,
+    isThirdParty: post.isThirdParty,
   }
 }
 
@@ -42,32 +51,32 @@ function convertToProject(project: ProjectType, index: number): Project {
   }
 }
 
-export async function getBlogPosts(opts?: { includeContent?: boolean }): Promise<BlogPost[]> {
-  const posts = await getPosts(false)
+export async function getBlogPosts(opts?: {
+  includeContent?: boolean
+}): Promise<BlogPost[]> {
+  const posts = await getPosts(true) // Include third-party posts
   const includeContent = opts?.includeContent ?? false
   return posts
-    .map(post => convertToBlogPost(post, includeContent))
+    .map((post) => convertToBlogPost(post, includeContent))
     .filter((post): post is BlogPost => post !== null)
 }
 
 export async function getProjectsData(): Promise<Project[]> {
   const projects = await getProjects()
-  return projects
-    .map(convertToProject)
-    .sort((a, b) => {
-      // Get the most recent year from each project
-      const getLatestYear = (tech: string[]) => {
-        if (tech.includes('present')) return Infinity
-        const years = tech.map(y => parseInt(y)).filter(y => !isNaN(y))
-        return years.length > 0 ? Math.max(...years) : 0
-      }
+  return projects.map(convertToProject).sort((a, b) => {
+    // Get the most recent year from each project
+    const getLatestYear = (tech: string[]) => {
+      if (tech.includes('present')) return Infinity
+      const years = tech.map((y) => parseInt(y)).filter((y) => !isNaN(y))
+      return years.length > 0 ? Math.max(...years) : 0
+    }
 
-      const yearA = getLatestYear(a.tech)
-      const yearB = getLatestYear(b.tech)
+    const yearA = getLatestYear(a.tech)
+    const yearB = getLatestYear(b.tech)
 
-      // Sort descending (newest first)
-      return yearB - yearA
-    })
+    // Sort descending (newest first)
+    return yearB - yearA
+  })
 }
 
 export { ABOUT_CONTENT } from './about-content'

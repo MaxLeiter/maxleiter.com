@@ -20,6 +20,7 @@ import { Window } from '@components/desktop/window'
 import { TerminalContent } from '@components/desktop/terminal-content'
 import { WidgetRecentPosts } from '@components/desktop/widget-recent-posts'
 import { WidgetTopProjects } from '@components/desktop/widget-top-projects'
+
 import {
   AboutContentClient,
   ProjectsContentClient,
@@ -713,7 +714,7 @@ export function DesktopClient({
       </header>
 
       <main className="flex-1 p-8 3xl:p-12 overflow-auto relative">
-        <div className="flex flex-col lg:flex-row gap-8 3xl:gap-12">
+        <div className="flex flex-col lg:flex-row gap-8 3xl:gap-12 relative z-10">
           <nav className="shrink-0" aria-label="Desktop applications">
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-8 3xl:gap-12 w-fit">
               {desktopItems.map((item) => (

@@ -3,9 +3,10 @@ import type { Post } from './types'
 export const externalPosts: Post[] = [
   {
     title: 'How we made v0 an effective coding agent',
-    description: 'Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.',
+    description:
+      'Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.',
     body: '',
-    date: '2026-01-07T10:00:00.000Z',
+    date: 'Jan 7, 2026',
     slug: '',
     tags: [],
     lastModified: 0,
@@ -17,7 +18,7 @@ export const externalPosts: Post[] = [
     title: 'Introducing the v0 composite model family',
     description: 'Introducing the v0 composite model family.',
     body: '',
-    date: '2025-06-01T10:00:00.000Z',
+    date: 'Jun 1, 2025',
     slug: '',
     tags: [],
     lastModified: 0,
@@ -30,7 +31,7 @@ export const externalPosts: Post[] = [
     description:
       'Stream React Components from LLMs to deliver richer user experiences.',
     body: '',
-    date: '2024-03-01T10:00:00.000Z',
+    date: 'Mar 1, 2024',
     slug: '',
     tags: [],
     lastModified: 0,
@@ -43,7 +44,7 @@ export const externalPosts: Post[] = [
     description:
       'An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.',
     body: '',
-    date: '2023-06-15T13:00:00.000Z',
+    date: 'Jun 15, 2023',
     slug: '',
     tags: [],
     lastModified: 0,
@@ -56,7 +57,7 @@ export const externalPosts: Post[] = [
     description:
       "We've made some improvements to the accessibility of our Next.js site. Here's how we did it.",
     body: '',
-    date: '2022-09-30T13:00:00.000Z',
+    date: 'Sep 30, 2022',
     slug: '',
     tags: [],
     lastModified: 0,
@@ -68,7 +69,7 @@ export const externalPosts: Post[] = [
     title: 'New edge dev infrastructure',
     description: 'New edge dev infrastructure.',
     body: '',
-    date: '2020-07-21T10:00:00.000Z',
+    date: 'Jul 21, 2020',
     slug: '',
     tags: [],
     lastModified: 0,
