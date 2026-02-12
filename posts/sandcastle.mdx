@@ -185,7 +185,7 @@ The fix Claude and I devised is a Python daemon that claims three bus names on a
 </li>
 
   <li>
-    <code>org.freedesktop.portal.Desktop</code>: exposes the color-scheme setting so GTK4/libadwaita apps can read
+    <code>org.freedesktop.portal.Desktop</code>: exposes the color scheme setting so GTK4/libadwaita apps can read
     (and react to) dark/light mode without a full <code>xdg-desktop-portal</code>
     <ul>
       <li>
@@ -235,7 +235,7 @@ I used OpenCode with the Vercel AI Gateway (primarily for Opus 4.6 and Kimi K2.5
 but I feel like Codex is the smartest-but-slowest model.
 So I often have Codex review code and generate plans, then hand its plans off to other models for implementation.
 
-One thing that let me iterate quickly here was the Sandbox CLI. My agents were able to spin up sandboxes, mess around with the underlying linux box, and use that knowledge in their code.
+One thing that let me iterate quickly here was the [Sandbox CLI](https://vercel.com/changelog/vercel-sandbox-cli-is-now-available). My agents were able to spin up sandboxes, mess around with the underlying linux box, and use that knowledge in their code.
 This let them figure out things like what Vercel Sandboxes have by default, whether the python bridge was working, and xpra's CLI arguments.
 
 After one agent spent time figuring out how the Sandbox CLI worked, I had it write a skill for other agents to use,
