@@ -25,3 +25,6 @@ yalc.lock
 analyze/
 .env*.local
 tsconfig.tsbuildinfo
+
+.opencode
+.claude

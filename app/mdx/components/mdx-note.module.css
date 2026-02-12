@@ -6,7 +6,7 @@
   background: var(--lightest-gray);
   padding: var(--gap-half);
   color: var(--article-color);
-  margin: var(--gap-half) 0;
+  margin: var(--gap) 0;
 }
 
 .note .icon {
