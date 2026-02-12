@@ -62,12 +62,12 @@ So that kind of covers the client (more below), but what's the server here?
 # The servers
 
 With the rise of AI agents that can make stupid and dangerous actions, [plenty](https://www.daytona.io/) [of](https://e2b.dev/) [companies](https://sandbox.cloudflare.com/) [are](https://modal.com/) [launching](https://sprites.dev/) [sandboxes](https://vercel.com/docs/vercel-sandbox).
-I built this on Vercel Sandbox, but any sandbox provider or Linux machine can host the same.
+I built this on Vercel Sandbox, but theoretically any Linux machine can host the same.
 
-There's a lot to like about sandboxes, but what I love is their ephemeral nature and ability to scale.
-I can spin up as many sandboxes as I want, wallet permitting.
+There's a lot to like about sandboxes, but what I love is their ephemeral nature and ability to scale. [Fluid Compute](https://vercel.com/blog/introducing-fluid-compute) lets me worry less about cost, and [snapshots](https://vercel.com/docs/vercel-sandbox/concepts/snapshots) let me not worry about keeping them running forever.
+I can spin up as many sandboxes as I need.
 
-I also love running agents (_also_ wallet permitting). But I hate having to manually approve their `npm` commands or reviewing the scripts
+I also love running agents. But I hate having to manually approve their `npm` commands or reviewing the scripts
 they are about to run.
 
 Plenty of people have tweeted about how they're running agents on their VPSs or Mac Minis. But the way they remote into them feels archaic.
@@ -224,6 +224,23 @@ But on smaller screens, it turns into more of a tiling window manager.
 
 "Great question!", I'd respond. On mobile, when you click the keyboard icon rendered on each window, there is a hidden `<input>` field
 that passes its contents to the underlying app. There are also buttons for keys like ctrl, alt, etc. GIMP on a phone? It sucks to use, but it does work!
+
+# Vibecoding takeaways
+
+This is generally what my IDE looked like while working on this:
+
+![A screenshot of VS Code with 6 terminals open: one for the dev server, one for Codex, four for OpenCode](/blog/sandcastle/ide.png)
+
+I used OpenCode with the Vercel AI Gateway (primarily for Opus 4.6 and Kimi K2.5) and Codex. Kimi and Opus are great for product work,
+but I feel like Codex is the smartest-but-slowest model.
+So I often have Codex review code and generate plans, then hand its plans off to other models for implementation.
+
+One thing that let me iterate quickly here was the Sandbox CLI. My agents were able to spin up sandboxes, mess around with the underlying linux box, and use that knowledge in their code.
+This let them figure out things like what Vercel Sandboxes have by default, whether the python bridge was working, and xpra's CLI arguments.
+
+After one agent spent time figuring out how the Sandbox CLI worked, I had it write a skill for other agents to use,
+and also had it draft an integration test. The test is just a simple script that spawns a sandbox, sets up Sandcastle, and validates all the files and functionality works as expected.
+Letting the agents experiment in the VM and having a simple test saved me countless hours of waiting for them to read docs and trial-by-error.
 
 # Wrapping up
 
