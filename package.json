@@ -31,7 +31,7 @@
     "htmlparser2": "10.0.0",
     "lodash.debounce": "4.0.8",
     "next": "16.1.1-canary.21",
-    "next-mdx-remote": "5.0.0",
+    "next-mdx-remote": "6.0.0",
     "next-remote-watch": "2.0.0",
     "next-themes": "0.4.6",
     "postcss": "8.5.6",
