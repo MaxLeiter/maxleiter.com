@@ -68,7 +68,8 @@ There's a lot to like about sandboxes, but what I love is their ephemeral nature
 I can spin up as many sandboxes as I need.
 
 I also love running agents. But I hate having to manually approve their `npm` commands or reviewing the scripts
-they are about to run.
+they are about to run. Sandboxes don't prevent agents from being tricked, but they do limit the blast radius.
+If you get prompt injected with a malicious agent skill or npm package, the damage should be self-contained.
 
 Plenty of people have tweeted about how they're running agents on their VPSs or Mac Minis. But the way they remote into them feels archaic.
 I love CLI agents as much as the next nerd but they are not ideal for mobile.
