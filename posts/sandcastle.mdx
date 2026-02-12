@@ -167,7 +167,7 @@ On a normal Linux desktop, applications don't talk to each other directly. They 
 When Firefox finishes a download and shows a notification, it's sending a message over dbus to the notification daemon.
 When a video player tells the OS not to activate the screensaver, that's dbus too.
 Sandcastle doesn't have a real desktop environment running inside the VM,
-so none of these services exist by default.
+so none of these services are present.
 
 Without them, programs like [notify-send](https://man.archlinux.org/man/notify-send.1.en) fail and GTK4 apps can't read the system theme.
 The fix Claude and I devised is a Python daemon that claims three bus names on a shared D-Bus session bus:
