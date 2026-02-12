@@ -200,7 +200,7 @@ The fix Claude and I devised is a Python daemon that claims three bus names on a
       <li>
         The same JSON file is how theme syncing works in reverse: when you toggle dark mode in the browser, it
         POSTs the new color-scheme to the Node.js service, which writes it to the JSON file, which the Python daemon
-        reads. When the value changes, it emits a <code>SettingChanged</code> D-Bus signal, and GTK4 apps
+        reads. When the value changes, it emits a <code>SettingChanged</code> D-Bus signal, and GTK apps
         pick up the theme change in real-time.
       </li>
     </ul>
