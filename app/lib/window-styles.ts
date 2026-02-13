@@ -1,6 +1,6 @@
 export const windowStyles = {
   translucentBg: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'var(--bg-alpha)',
     backdropFilter: 'blur(12px)',
   },
   header: 'h-8 border-b border-[var(--border-color)] flex items-center justify-between px-3 rounded-t-lg select-none',
