@@ -23,7 +23,7 @@ export default async function (): Promise<ImageResponse> {
           alignItems: 'center',
           letterSpacing: '-.02em',
           fontWeight: 700,
-          background: '#000',
+          background: '#0a0a0f',
           flexDirection: 'column',
         }}
       >
@@ -40,8 +40,8 @@ export default async function (): Promise<ImageResponse> {
             style={{
               fontSize: 25,
               fontWeight: 700,
-              background: 'white',
-              color: 'black',
+              background: '#64d2be',
+              color: '#0a0a0f',
               padding: '4px 10px',
             }}
           >
@@ -56,7 +56,7 @@ export default async function (): Promise<ImageResponse> {
             justifyContent: 'center',
             width: '100%',
             padding: '0 50px',
-            color: 'white',
+            color: '#e0ddd5',
             textAlign: 'center',
             height: 630 - 50 - 50,
             maxWidth: 1000,

@@ -8,14 +8,14 @@
   }
 
   body {
-    @apply bg-black text-white/90 antialiased;
+    @apply bg-[#0a0a0f] text-[#e0ddd5]/90 antialiased;
     font-family: var(--font-sans);
   }
 }
 
 /* Override some variables for desktop mode */
 :root {
-  --desktop-bg: #000000;
-  --desktop-fg: #ffffff;
+  --desktop-bg: #0a0a0f;
+  --desktop-fg: #e0ddd5;
   --desktop-header-height: 40px;
 }
