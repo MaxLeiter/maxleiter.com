@@ -28,29 +28,29 @@
   --transition-slow: 0.3s ease-in-out;
 
   /* Dark Mode Colors */
-  --bg: #000000;
-  --bg-alpha: hsla(0, 0%, 0%, 0.9);
-  --bg-window-alpha: rgba(0, 0, 0, 0.75);
-  --bg-widget: rgba(0, 0, 0, 0.3);
-  --fg: #e5e5e5;
-  --gray: #999;
-  --light-gray: #444;
-  --lighter-gray: #222;
-  --lightest-gray: #1a1a1a;
-  --article-color: #eaeaea;
-  --gray-alpha: rgba(255, 255, 255, 0.5);
-  --selection: rgba(255, 255, 255, 0.88);
-  --link: #579dff;
-  --green: #2ecc71;
-  --red: #e74c3c;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --bg: #0a0a0f;
+  --bg-alpha: hsla(240, 20%, 3%, 0.92);
+  --bg-window-alpha: rgba(10, 10, 15, 0.78);
+  --bg-widget: rgba(10, 10, 15, 0.35);
+  --fg: #e0ddd5;
+  --gray: #8a8680;
+  --light-gray: #3d3a36;
+  --lighter-gray: #1e1c1a;
+  --lightest-gray: #151413;
+  --article-color: #e8e4dc;
+  --gray-alpha: rgba(255, 252, 245, 0.5);
+  --selection: rgba(100, 210, 190, 0.35);
+  --link: #64d2be;
+  --green: #5fcfa0;
+  --red: #e8695a;
+  --border-color: rgba(255, 252, 245, 0.08);
 
   /* Syntax Highlighting */
-  --token: #999;
-  --comment: #999;
-  --keyword: #fff;
-  --name: #fff;
-  --highlight: #2e2e2e;
+  --token: #8a8680;
+  --comment: #6b6660;
+  --keyword: #e0ddd5;
+  --name: #d4cfc6;
+  --highlight: #1e1c1a;
 
   /* Fading */
   --timing: 0.3s;
@@ -58,80 +58,80 @@
 
   /* shadcn/ui theme variables - Dark mode */
   --radius: 0.5rem;
-  --background: 0 0% 7%;
-  --foreground: 0 0% 98%;
-  --card: 0 0% 7%;
-  --card-foreground: 0 0% 98%;
-  --popover: 0 0% 7%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 98%;
-  --primary-foreground: 0 0% 7%;
-  --secondary: 0 0% 13%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 0 0% 13%;
-  --muted-foreground: 0 0% 60%;
-  --accent: 0 0% 13%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 13%;
-  --input: 0 0% 13%;
-  --ring: 0 0% 83.1%;
-  --chart-1: 220 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
+  --background: 240 20% 4%;
+  --foreground: 40 12% 88%;
+  --card: 240 12% 6%;
+  --card-foreground: 40 12% 88%;
+  --popover: 240 12% 6%;
+  --popover-foreground: 40 12% 88%;
+  --primary: 168 52% 61%;
+  --primary-foreground: 240 20% 4%;
+  --secondary: 30 6% 12%;
+  --secondary-foreground: 40 12% 88%;
+  --muted: 30 6% 12%;
+  --muted-foreground: 30 6% 52%;
+  --accent: 30 6% 12%;
+  --accent-foreground: 40 12% 88%;
+  --destructive: 6 72% 51%;
+  --destructive-foreground: 40 12% 95%;
+  --border: 30 6% 14%;
+  --input: 30 6% 14%;
+  --ring: 168 52% 61%;
+  --chart-1: 168 52% 61%;
+  --chart-2: 150 45% 50%;
+  --chart-3: 35 75% 55%;
+  --chart-4: 280 50% 55%;
+  --chart-5: 6 72% 55%;
 }
 
 [data-theme='light'] {
-  --bg: #fff;
-  --bg-alpha: hsla(0, 0%, 100%, 0.9);
-  --bg-window-alpha: rgba(255, 255, 255, 0.75);
-  --bg-widget: rgba(255, 255, 255, 0.5);
-  --fg: #444;
-  --gray: rgb(100, 100, 100);
-  --light-gray: rgb(222, 222, 222);
-  --lighter-gray: rgb(240, 240, 240);
-  --lightest-gray: rgb(245, 245, 245);
-  --article-color: #212121;
-  --header-bg: rgba(255, 255, 255, 0.8);
-  --gray-alpha: rgba(19, 20, 21, 0.5);
-  --selection: rgba(0, 0, 0, 0.99);
-  --link: #6669ff;
-  --border-color: rgba(0, 0, 0, 0.1);
+  --bg: #faf8f5;
+  --bg-alpha: hsla(35, 25%, 97%, 0.92);
+  --bg-window-alpha: rgba(250, 248, 245, 0.78);
+  --bg-widget: rgba(250, 248, 245, 0.55);
+  --fg: #2c2a26;
+  --gray: rgb(120, 115, 108);
+  --light-gray: rgb(215, 210, 202);
+  --lighter-gray: rgb(238, 234, 228);
+  --lightest-gray: rgb(244, 241, 236);
+  --article-color: #1e1c18;
+  --header-bg: rgba(250, 248, 245, 0.85);
+  --gray-alpha: rgba(30, 28, 24, 0.5);
+  --selection: rgba(50, 160, 140, 0.25);
+  --link: #1a8a75;
+  --border-color: rgba(30, 28, 24, 0.08);
 
-  --token: #666;
-  --comment: #999;
-  --keyword: #000;
-  --name: #333;
-  --highlight: #eaeaea;
+  --token: #6b665e;
+  --comment: #9a958d;
+  --keyword: #1e1c18;
+  --name: #37342e;
+  --highlight: #edeae4;
 
   /* shadcn/ui theme variables - Light mode */
-  --background: 0 0% 100%;
-  --foreground: 0 0% 3.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 3.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 3.9%;
-  --primary: 0 0% 9%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 0 0% 96.1%;
-  --secondary-foreground: 0 0% 9%;
-  --muted: 0 0% 96.1%;
-  --muted-foreground: 0 0% 45.1%;
-  --accent: 0 0% 96.1%;
-  --accent-foreground: 0 0% 9%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 89.8%;
-  --input: 0 0% 89.8%;
-  --ring: 0 0% 3.9%;
-  --chart-1: 12 76% 61%;
-  --chart-2: 173 58% 39%;
-  --chart-3: 197 37% 24%;
-  --chart-4: 43 74% 66%;
-  --chart-5: 27 87% 67%;
+  --background: 35 25% 97%;
+  --foreground: 40 6% 16%;
+  --card: 35 25% 97%;
+  --card-foreground: 40 6% 16%;
+  --popover: 35 25% 97%;
+  --popover-foreground: 40 6% 16%;
+  --primary: 168 67% 32%;
+  --primary-foreground: 35 25% 97%;
+  --secondary: 35 15% 92%;
+  --secondary-foreground: 40 6% 16%;
+  --muted: 35 15% 92%;
+  --muted-foreground: 30 6% 45%;
+  --accent: 35 15% 92%;
+  --accent-foreground: 40 6% 16%;
+  --destructive: 6 72% 51%;
+  --destructive-foreground: 35 25% 97%;
+  --border: 35 12% 88%;
+  --input: 35 12% 88%;
+  --ring: 168 67% 32%;
+  --chart-1: 168 67% 32%;
+  --chart-2: 150 45% 40%;
+  --chart-3: 35 65% 50%;
+  --chart-4: 280 40% 50%;
+  --chart-5: 6 65% 50%;
 }
 
 * {
@@ -225,20 +225,20 @@ th {
 
 @media print {
   :root {
-    --bg: #fff;
-    --fg: #000;
-    --gray: #888;
-    --light-gray: #dedede;
-    --lighter-gray: #f5f5f5;
-    --lightest-gray: #fafafa;
-    --article-color: #212121;
-    --gray-alpha: rgba(19, 20, 21, 0.5);
-    --selection: rgba(0, 0, 0, 0.99);
+    --bg: #faf8f5;
+    --fg: #1e1c18;
+    --gray: #78736c;
+    --light-gray: #d7d2ca;
+    --lighter-gray: #eeeae4;
+    --lightest-gray: #f4f1ec;
+    --article-color: #1e1c18;
+    --gray-alpha: rgba(30, 28, 24, 0.5);
+    --selection: rgba(50, 160, 140, 0.25);
 
-    --token: #666;
-    --comment: #999;
-    --keyword: #000;
-    --name: #333;
-    --highlight: #eaeaea;
+    --token: #6b665e;
+    --comment: #9a958d;
+    --keyword: #1e1c18;
+    --name: #37342e;
+    --highlight: #edeae4;
   }
 }
