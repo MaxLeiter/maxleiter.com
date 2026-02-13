@@ -44,7 +44,7 @@ export default async function ({
           alignItems: 'center',
           letterSpacing: '-.02em',
           fontWeight: 700,
-          background: '#000',
+          background: '#0a0f0d',
           flexDirection: 'column',
         }}
       >
@@ -61,8 +61,8 @@ export default async function ({
             style={{
               fontSize: 25,
               fontWeight: 700,
-              background: 'white',
-              color: 'black',
+              background: '#5ed3ac',
+              color: '#0a0f0d',
               padding: '4px 10px',
             }}
           >
@@ -72,8 +72,8 @@ export default async function ({
             <div
               style={{
                 fontSize: 25,
-                background: 'white',
-                color: 'black',
+                background: '#5ed3ac',
+                color: '#0a0f0d',
                 padding: '4px 10px',
               }}
             >
@@ -89,7 +89,7 @@ export default async function ({
             justifyContent: 'center',
             width: '100%',
             padding: '0 50px',
-            color: 'white',
+            color: '#e0e6e3',
             textAlign: 'center',
             height: 630 - 50 - 50,
             maxWidth: 1000,
