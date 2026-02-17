@@ -39,12 +39,20 @@ const LABS: Lab[] = [
     description: 'A key-value store backed by a git repository',
     url: 'https://github.com/MaxLeiter/gitkv',
   },
+  {
+    id: 'gboy-ts',
+    name: 'gboy.ts',
+    description: 'A GameBoy emulator written in TypeScript',
+    url: 'https://gboy-ts.vercel.app/',
+  },
 ]
 
 export function LabsContent() {
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">labs/</h1>
+      <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
+        labs/
+      </h1>
 
       <ul className="space-y-2">
         {LABS.map((lab) => (

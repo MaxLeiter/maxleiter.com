@@ -102,7 +102,7 @@ export function WidgetRecentPosts({
       {/* Main title */}
       <div className="border-b border-[var(--border-color)] px-4 3xl:px-5 py-3 3xl:py-4">
         <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-[var(--fg)] uppercase">
-          Recent Posts
+          Posts
         </h2>
       </div>
 
