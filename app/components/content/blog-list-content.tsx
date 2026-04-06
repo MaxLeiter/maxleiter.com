@@ -23,7 +23,12 @@ export function BlogListContent({
 
   const renderPost = (post: BlogPost) => {
     const isExternal = post.isThirdParty
-    const href = isExternal && post.href ? post.href : `/blog/${post.slug}`
+    const isNote = post.type === 'note'
+    const href = isExternal && post.href
+      ? post.href
+      : isNote
+        ? `/notes/${post.slug}`
+        : `/blog/${post.slug}`
 
     return (
       <ListCard
@@ -31,7 +36,7 @@ export function BlogListContent({
         href={href}
         title={post.title}
         description={post.excerpt}
-        meta={isExternal ? `${post.date} · external` : post.date}
+        meta={isExternal ? `${post.date} · external` : isNote ? `${post.date} · note` : post.date}
         icon
         external={isExternal}
         onClick={
@@ -54,7 +59,7 @@ export function BlogListContent({
         className="text-3xl font-mono font-bold mb-8"
         style={{ color: 'var(--article-color)' }}
       >
-        blog/
+        writing/
       </h1>
 
       {popularPosts.length > 0 && (

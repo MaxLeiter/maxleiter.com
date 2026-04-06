@@ -27,7 +27,7 @@ export function CommandPalette({
       type: 'blog' as const,
       slug: p.slug,
       title: p.title,
-      href: `/blog/${p.slug}`,
+      href: p.type === 'note' ? `/notes/${p.slug}` : `/blog/${p.slug}`,
     })),
     ...projects.map((p) => ({
       type: 'project' as const,

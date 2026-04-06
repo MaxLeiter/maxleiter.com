@@ -31,7 +31,11 @@ export function WidgetRecentPosts({
 
   const renderPost = (post: BlogPost) => {
     const isExternal = post.isThirdParty
-    const href = isExternal && post.href ? post.href : `/blog/${post.slug}`
+    const href = isExternal && post.href
+      ? post.href
+      : post.type === 'note'
+        ? `/notes/${post.slug}`
+        : `/blog/${post.slug}`
 
     const content = (
       <>
@@ -41,6 +45,7 @@ export function WidgetRecentPosts({
         <p className="text-xs 3xl:text-sm text-[var(--gray)]">
           {post.date}
           {isExternal && <span className="ml-2 opacity-50">· external</span>}
+          {post.type === 'note' && <span className="ml-2 opacity-50">· note</span>}
         </p>
       </>
     )
@@ -102,7 +107,7 @@ export function WidgetRecentPosts({
       {/* Main title */}
       <div className="border-b border-[var(--border-color)] px-4 3xl:px-5 py-3 3xl:py-4">
         <h2 className="text-xs 3xl:text-sm font-mono font-semibold text-[var(--fg)] uppercase">
-          Posts
+          Writing
         </h2>
       </div>
 

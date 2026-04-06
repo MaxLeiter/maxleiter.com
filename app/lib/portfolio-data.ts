@@ -1,6 +1,7 @@
 import { getPosts } from './get-posts'
+import getNotes from './get-notes'
 import { getProjects } from './projects'
-import type { Post, Project as ProjectType } from './types'
+import type { Post, Note, Project as ProjectType } from './types'
 
 export interface BlogPost {
   slug: string
@@ -10,6 +11,7 @@ export interface BlogPost {
   content: string
   href?: string
   isThirdParty?: boolean
+  type: 'post' | 'note'
 }
 
 export interface Project {
@@ -37,6 +39,21 @@ function convertToBlogPost(
     content: includeContent ? post.body : '',
     href: post.href,
     isThirdParty: post.isThirdParty,
+    type: 'post',
+  }
+}
+
+function convertNoteToBlogPost(
+  note: Note,
+  includeContent: boolean = false,
+): BlogPost {
+  return {
+    slug: note.slug,
+    title: note.title,
+    date: note.date,
+    excerpt: note.description,
+    content: includeContent ? note.body : '',
+    type: 'note',
   }
 }
 
@@ -54,11 +71,20 @@ function convertToProject(project: ProjectType, index: number): Project {
 export async function getBlogPosts(opts?: {
   includeContent?: boolean
 }): Promise<BlogPost[]> {
-  const posts = await getPosts(true) // Include third-party posts
   const includeContent = opts?.includeContent ?? false
-  return posts
+  const [posts, notes] = await Promise.all([getPosts(true), getNotes()])
+
+  const blogPosts = posts
     .map((post) => convertToBlogPost(post, includeContent))
     .filter((post): post is BlogPost => post !== null)
+
+  const notePosts = notes.map((note) =>
+    convertNoteToBlogPost(note, includeContent),
+  )
+
+  return [...blogPosts, ...notePosts].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  )
 }
 
 export async function getProjectsData(): Promise<Project[]> {
