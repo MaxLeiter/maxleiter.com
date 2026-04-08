@@ -789,7 +789,7 @@ export function DesktopClient({
           defaultHeight={600}
           defaultX={150}
           defaultY={80}
-          blogSlug={windowState.blogPostSlug}
+          postHref={getBlogPostHref(currentBlogPost)}
           zIndex={getZIndex(`blog-post-${windowState.blogPostSlug}`)}
           onFocus={() =>
             dispatch({

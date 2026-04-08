@@ -13,7 +13,7 @@ interface WindowProps {
   defaultHeight?: number
   defaultX?: number
   defaultY?: number
-  blogSlug?: string
+  postHref?: string
   pageType?: 'blog' | 'projects' | 'about' | 'labs' | 'talks' | null
   zIndex?: number
   onFocus?: () => void
@@ -29,7 +29,7 @@ export function Window({
   defaultHeight = 400,
   defaultX = 100,
   defaultY = 100,
-  blogSlug,
+  postHref,
   pageType = null,
   zIndex = 50,
   onFocus,
@@ -203,11 +203,10 @@ export function Window({
 
   const toggleFullscreen = () => {
     // If this is a blog post window, navigate with View Transitions
-    if (blogSlug) {
+    if (postHref) {
       if (!isFullscreen) {
-        // Going fullscreen - navigate to blog post page
         startTransition(() => {
-          router.push(`/blog/${blogSlug}`)
+          router.push(postHref)
         })
       } else {
         // Exiting fullscreen - navigate back to homepage
