@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { type BlogPost, type Project, getBlogPostHref } from '@lib/portfolio-data'
+import { type BlogPost, type Project, getBlogPostHref } from '@lib/blog-post'
 
 interface CommandPaletteProps {
   blogPosts: BlogPost[]

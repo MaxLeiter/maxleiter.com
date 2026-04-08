@@ -1,7 +1,7 @@
 'use client'
 
 import { ListCard } from '@components/desktop/list-card'
-import { type BlogPost, getBlogPostHref } from '@lib/portfolio-data'
+import { type BlogPost, getBlogPostHref } from '@lib/blog-post'
 import { POPULAR_SLUGS } from '@lib/popular-posts'
 
 interface BlogListContentProps {

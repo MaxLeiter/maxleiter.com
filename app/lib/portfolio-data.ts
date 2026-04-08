@@ -3,25 +3,10 @@ import getNotes from './get-notes'
 import { getProjects } from './projects'
 import type { Post, Note, Project as ProjectType } from './types'
 
-export interface BlogPost {
-  slug: string
-  title: string
-  date: string
-  excerpt: string
-  content: string
-  href?: string
-  isThirdParty?: boolean
-  type: 'post' | 'note'
-}
+export type { BlogPost, Project } from './blog-post'
+export { getBlogPostHref } from './blog-post'
 
-export interface Project {
-  id: string
-  name: string
-  description: string
-  link: string
-  tech: string[]
-  content: string
-}
+import type { BlogPost, Project } from './blog-post'
 
 function convertToBlogPost(
   post: Post,
@@ -103,11 +88,6 @@ export async function getProjectsData(): Promise<Project[]> {
     // Sort descending (newest first)
     return yearB - yearA
   })
-}
-
-export function getBlogPostHref(post: BlogPost): string {
-  if (post.isThirdParty && post.href) return post.href
-  return post.type === 'note' ? `/notes/${post.slug}` : `/blog/${post.slug}`
 }
 
 export { ABOUT_CONTENT } from './about-content'

@@ -29,7 +29,7 @@ import {
   TalksContentClient,
   NotesContentClient,
 } from '@components/page-content-client'
-import { type BlogPost, type Project, getBlogPostHref } from '@lib/portfolio-data'
+import { type BlogPost, type Project, getBlogPostHref } from '@lib/blog-post'
 import type { Note } from '@lib/types'
 import { ABOUT_CONTENT } from '@lib/about-content'
 import { useIsMobile } from './use-is-mobile'

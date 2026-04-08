@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { track } from '@vercel/analytics'
-import { type BlogPost, getBlogPostHref } from '@lib/portfolio-data'
+import { type BlogPost, getBlogPostHref } from '@lib/blog-post'
 import { POPULAR_SLUGS } from '@lib/popular-posts'
 
 interface WidgetRecentPostsProps {
