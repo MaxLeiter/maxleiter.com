@@ -57,7 +57,7 @@ function convertNoteToBlogPost(
   }
 }
 
-function convertToProject(project: ProjectType, index: number): Project {
+function convertToProject(project: ProjectType): Project {
   return {
     id: project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     name: project.title,
@@ -103,6 +103,11 @@ export async function getProjectsData(): Promise<Project[]> {
     // Sort descending (newest first)
     return yearB - yearA
   })
+}
+
+export function getBlogPostHref(post: BlogPost): string {
+  if (post.isThirdParty && post.href) return post.href
+  return post.type === 'note' ? `/notes/${post.slug}` : `/blog/${post.slug}`
 }
 
 export { ABOUT_CONTENT } from './about-content'

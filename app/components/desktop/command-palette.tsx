@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { BlogPost, Project } from '@lib/portfolio-data'
+import { type BlogPost, type Project, getBlogPostHref } from '@lib/portfolio-data'
 
 interface CommandPaletteProps {
   blogPosts: BlogPost[]
@@ -27,7 +27,7 @@ export function CommandPalette({
       type: 'blog' as const,
       slug: p.slug,
       title: p.title,
-      href: p.type === 'note' ? `/notes/${p.slug}` : `/blog/${p.slug}`,
+      href: getBlogPostHref(p),
     })),
     ...projects.map((p) => ({
       type: 'project' as const,

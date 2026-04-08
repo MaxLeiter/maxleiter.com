@@ -1,7 +1,7 @@
 'use client'
 
 import { ListCard } from '@components/desktop/list-card'
-import type { BlogPost } from '@lib/portfolio-data'
+import { type BlogPost, getBlogPostHref } from '@lib/portfolio-data'
 import { POPULAR_SLUGS } from '@lib/popular-posts'
 
 interface BlogListContentProps {
@@ -24,11 +24,7 @@ export function BlogListContent({
   const renderPost = (post: BlogPost) => {
     const isExternal = post.isThirdParty
     const isNote = post.type === 'note'
-    const href = isExternal && post.href
-      ? post.href
-      : isNote
-        ? `/notes/${post.slug}`
-        : `/blog/${post.slug}`
+    const href = getBlogPostHref(post)
 
     return (
       <ListCard

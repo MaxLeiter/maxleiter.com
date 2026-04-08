@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { track } from '@vercel/analytics'
-import type { BlogPost } from '@lib/portfolio-data'
+import { type BlogPost, getBlogPostHref } from '@lib/portfolio-data'
 import { POPULAR_SLUGS } from '@lib/popular-posts'
 
 interface WidgetRecentPostsProps {
@@ -31,11 +31,7 @@ export function WidgetRecentPosts({
 
   const renderPost = (post: BlogPost) => {
     const isExternal = post.isThirdParty
-    const href = isExternal && post.href
-      ? post.href
-      : post.type === 'note'
-        ? `/notes/${post.slug}`
-        : `/blog/${post.slug}`
+    const href = getBlogPostHref(post)
 
     const content = (
       <>

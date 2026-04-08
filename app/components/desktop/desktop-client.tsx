@@ -29,7 +29,7 @@ import {
   TalksContentClient,
   NotesContentClient,
 } from '@components/page-content-client'
-import type { BlogPost, Project } from '@lib/portfolio-data'
+import { type BlogPost, type Project, getBlogPostHref } from '@lib/portfolio-data'
 import type { Note } from '@lib/types'
 import { ABOUT_CONTENT } from '@lib/about-content'
 import { useIsMobile } from './use-is-mobile'
@@ -507,15 +507,18 @@ export function DesktopClient({
     (slug: string) => {
       track('blog_click', { slug })
       if (isMobile) {
-        startTransition(() => {
-          router.push(`/blog/${slug}`)
-        })
+        const post = blogPosts.find((p) => p.slug === slug)
+        if (post) {
+          startTransition(() => {
+            router.push(getBlogPostHref(post))
+          })
+        }
       } else {
         dispatch({ type: 'OPEN_BLOG_POST', slug })
         setPreloadedPost(null)
       }
     },
-    [isMobile, router],
+    [isMobile, router, blogPosts],
   )
 
   const handlePostHover = useCallback(
@@ -739,7 +742,7 @@ export function DesktopClient({
       {/* Hidden preload iframe */}
       {preloadedPost && (
         <iframe
-          src={`/blog/${preloadedPost}?embed=true`}
+          src={`${getBlogPostHref(blogPosts.find((p) => p.slug === preloadedPost)!)}?embed=true`}
           className="hidden"
           aria-hidden="true"
         />
@@ -797,7 +800,7 @@ export function DesktopClient({
         >
           <ViewTransition name={`blog-post-${windowState.blogPostSlug}`}>
             <iframe
-              src={`/blog/${windowState.blogPostSlug}?embed=true`}
+              src={`${getBlogPostHref(currentBlogPost!)}?embed=true`}
               className="w-full h-full border-0"
               title={currentBlogPost.title}
             />
