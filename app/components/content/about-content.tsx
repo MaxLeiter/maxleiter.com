@@ -12,7 +12,7 @@ export function AboutContent({ content }: AboutContentProps) {
   const aboutData = content || {
     bio: {
       content:
-        "I'm currently building v0 at Vercel. I'm interested in politics, tech, and building a fast, accessible web.",
+        "I'm currently working on Claude Code at Anthropic. Previously, I helped start v0 and the AI SDK at Vercel. I'm interested in politics, tech, and building a fast, accessible web.",
       title: 'About',
       links: [
         { text: 'v0.app', url: 'https://v0.app' },
