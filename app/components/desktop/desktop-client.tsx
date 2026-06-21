@@ -669,23 +669,6 @@ export function DesktopClient({
         href: 'https://twitter.com/maxleiter',
         external: true,
       },
-      {
-        id: 'v0',
-        name: 'v0',
-        type: 'app',
-        icon: <V0Icon />,
-        href: 'https://v0.app',
-        external: true,
-      },
-      {
-        id: 'ai-sdk',
-        name: 'AI SDK',
-        type: 'app',
-        icon: <AIIcon />,
-        href: 'https://sdk.vercel.ai',
-        external: true,
-        className: 'hidden sm:block',
-      },
     ],
     [isMobile, router],
   )
