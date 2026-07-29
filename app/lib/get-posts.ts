@@ -18,7 +18,7 @@ export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
         const postContent = await fs.readFile(filePath, 'utf8')
         const { data, content } = matter(postContent)
 
-        if (data.published === false) {
+        if (data.published === false || !data.slug) {
           return null
         }
 

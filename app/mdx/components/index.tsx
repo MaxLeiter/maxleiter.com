@@ -4,6 +4,7 @@ import Link from '@components/link'
 import { MDXNote } from './mdx-note'
 import { Code } from 'bright'
 import { MDXImage } from './mdx-image'
+import { ShotGrid, Shot } from './shot-grid'
 import Info from '@components/icons/info'
 import { FileTree, File, Folder } from '@components/file-tree'
 import Home from '@components/icons/home'
@@ -105,4 +106,6 @@ export const mdxComponents: MDXComponents = {
   ),
   TweetThread,
   MinecraftInventory: MinecraftInventoryFromDir,
+  ShotGrid,
+  Shot,
 }
