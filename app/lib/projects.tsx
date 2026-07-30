@@ -103,10 +103,16 @@ const Projects: Project[] = [
 ]
 
 export const getProjects = cache(async (): Promise<Project[]> => {
-  if (process.env.NODE_ENV === 'production' && !process.env.GITHUB_TOKEN) {
-    throw new Error(
-      'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.',
-    )
+  if (!process.env.GITHUB_TOKEN) {
+    if (process.env.VERCEL) {
+      throw new Error(
+        'No GITHUB_TOKEN provided. Generate a personal use token on GitHub.',
+      )
+    }
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('No GITHUB_TOKEN provided; skipping GitHub star counts.')
+      return Projects
+    }
   }
 
   const withStars = unstable_cache(

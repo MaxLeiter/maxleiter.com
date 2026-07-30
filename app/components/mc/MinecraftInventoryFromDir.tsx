@@ -3,9 +3,11 @@ import path from 'path'
 import { MinecraftItem } from './MinecraftInventory'
 import MinecraftInventory from './MinecraftInventory'
 
+// Statically scoped so Turbopack traces only this directory into the server
+// output instead of the whole project.
+const IMAGES_DIR = path.join(process.cwd(), 'app/components/mc/images')
+
 interface InventoryFromDirProps {
-  /** Absolute or project-root–relative path to directory containing images. */
-  dir: string
   /** Grid columns (default 9) */
   columns?: number
   /** Slot size (default 36) */
@@ -21,11 +23,9 @@ interface InventoryFromDirProps {
  *   ─ The file name (without extension) becomes the block/item display name.
  */
 export default function MinecraftInventoryFromDir({
-  dir,
   columns,
   slotSize,
 }: InventoryFromDirProps) {
-  const absDir = path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir)
   const items: MinecraftItem[] = []
 
   function walk(current: string, relModPath = '') {
@@ -50,7 +50,7 @@ export default function MinecraftInventoryFromDir({
     })
   }
 
-  walk(absDir)
+  walk(IMAGES_DIR)
 
   return (
     <MinecraftInventory items={items} columns={columns} slotSize={slotSize} />
