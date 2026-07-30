@@ -11,7 +11,11 @@ I own the hardware. I should control the software. And for _reasons_, Apple make
 
 I've been bitter for a long time. Six years ago, when I should’ve been studying for finals, I [ported X11](https://maxleiter.com/x11) to my jailbroken iPad because I wanted to try using it as a "real" personal computer:
 
-<Image src="/blog/xios/og.png" width="500" height="500" />
+<Image
+  src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/og.png"
+  width="500"
+  height="500"
+/>
 
 That first version worked, but also sucked: the X server ran on the iPad, but I used a VNC client to interact with it and a lot of
 software did not compile. I was using vim and xterm and it looked like something from the 90s.
@@ -24,23 +28,27 @@ Some screenshots:
 
 <ShotGrid>
   <Shot
-    src="/blog/xios/plasma.png"
+    src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/plasma.png"
     alt=""
     caption="KDE Plasma with Kate, Konsole, and Dolphin running"
   />
   <Shot
-    src="/blog/xios/opencode-kgx.jpg"
+    src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/opencode-kgx.jpg"
     width={1500}
     height={1104}
     alt=""
     caption="opencode, in GNOME Console on iosc"
   />
   <Shot
-    src="/blog/xios/native-switch.webm"
+    src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/native-switch.webm"
     alt=""
     caption="Native mode: switching between GNOME Calculator and Terminal"
   />
-  <Shot src="/blog/xios/gnome.webm" alt="" caption="GNOME Desktop" />
+  <Shot
+    src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/gnome.webm"
+    alt=""
+    caption="GNOME Desktop"
+  />
 </ShotGrid>
 
 ### X11
@@ -73,7 +81,7 @@ It sucked and I’m not happy with old-Max.
 Thankfully, a little while after my ill-fated exploration, the folks at [Procursus](https://github.com/ProcursusTeam) built a apt packaging system and some X/linux-y packages.
 I used procursus to bootstrap my work, then I sent a looped army of LLMs at it.
 
-After a few days of hitting enter and tab (and some occasional manual direction/reminders), I have:
+After a few ~days~ weeks of hitting enter and tab (and some occasional manual direction/reminders), and after building/porting over [500 packages](https://repo.maxleiter.com/#xios), I have:
 
 <br />
 
@@ -88,7 +96,11 @@ After a few days of hitting enter and tab (and some occasional manual direction/
 - Bun with JIT support, letting you run webservers, Node applications, and tools like OpenCode
 - A successful [LadyBird](https://ladybird.org/) side-quest:
 
-<img src="/blog/xios/ladybird.png" width="300px" height="auto" />
+<img
+  src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/ladybird.png"
+  width="300px"
+  height="auto"
+/>
 
 Some items above work better than others, but its all definitely functional.
 
@@ -98,7 +110,10 @@ You can use the xios app to have a proper desktop display.
 But you can also run individual desktop app instances in their own pacakged apps so they appear on your homescreen and have their own display.
 
 <video controls height="400" width="300">
-  <source src="/blog/xios/native-switch.webm" type="video/webm" />
+  <source
+    src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/native-switch.webm"
+    type="video/webm"
+  />
 </video>
 
 <figcaption>
