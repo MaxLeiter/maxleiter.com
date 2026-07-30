@@ -142,7 +142,17 @@ and
 > - try again
 > - try again, but less wrong
 
-Claude also wrote some tools like
+Claude also wrote some tools for itself along the way. The most useful one is [`xios-device`](https://github.com/MaxLeiter/jailbreak/blob/main/x11/bin/xios-device), a wrapper around ssh and rsync:
+
+```bash
+xios-device doctor           # host tools, SSH, on-device helpers
+xios-device session gnome    # start a session
+xios-device app kgx          # launch a client into it
+xios-device input click 400 300
+xios-device shot             # screenshot + logs, into artifacts/
+```
+
+Whenever an agent struggled to debug something, it added the necessary tools and debugging logic.
 
 ### Isn't jailbreaking dead?
 
