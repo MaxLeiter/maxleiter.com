@@ -7,13 +7,13 @@ date: July 30, 2022
 
 I recently published a [small npm package](https://github.com/maxleiter/sortablejs-vue3) containing a Vue library. The package is written in TypeScript powered by Vite, which I (wrongly) assumed would mediate most of my woes. 
 
-![Obi Wan gif of him sarcastically saying "Oh, this is going to be easy"](/blog/node-tooling/obiwan.gif)
+![Obi Wan gif of him sarcastically saying "Oh, this is going to be easy"](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/node-tooling/obiwan.gif)
 
 First, I used Vite to build a small front-end site to demonstrate the library. This let me test the component and demonstrate usage in the same repository. Getting this working was fairly straight forward for someone with experience wrangling TypeScript configurations, but I imagine for a less experienced developer it could've been a daunting task. I ended up with two tsconfigs, \`tsconfig.node.json\` and \`tsconfig.site.json\`, had to figure out module resolution, realized I needed \`vue-tsc\`, and had a multitude of other minor roadblocks. The nicest thing about Vite is it is *fast*, which made working on this manageable.
 
 Second, I had to figure out how to publish a library. After lots of research (AKA reading Reddit threads and blog posts), I figured out the proper incantation of \`tsc\` parameters, \`package.json\` options, and tsconfigs to get something almost functional by channeling the Unix Magic wizard:
 
-<img src="/blog/node-tooling/unix-poster.jpg" alt="Unix Magic poster, a wizard crafting a potion surrounded by ingredients named after Unix tools" height="500" />
+<img src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/node-tooling/unix-poster.jpg" alt="Unix Magic poster, a wizard crafting a potion surrounded by ingredients named after Unix tools" height="500" />
 
  I added a \*third\* tsconfig, \`tsconfig.dist.json\` (that also extends \`tsconfig.node.json\`), added a new \`vite.config.ts\` for distribution (which required special options for passing to rollup), and I added something like the following to my package.json:
 

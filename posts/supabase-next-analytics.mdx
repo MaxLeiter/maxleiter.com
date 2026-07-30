@@ -31,8 +31,8 @@ Coincidentally, Supabase [announced their Series B](https://techcrunch.com/2022/
 So far, I love everything about it except the dashboard: everything is _so slow_. Creating a new, unnamed SQL query can take 5 seconds:
 
 <video controls={true}>
-  <source src="/blog/supabase/slow.webm" type="video/webm" />
-  <source src="/blog/supabase/slow.mp4" type="video/mp4" />
+  <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/slow.webm" type="video/webm" />
+  <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/slow.mp4" type="video/mp4" />
 </video>
 
 Dashboard slowness aside, this tutorial will walk you through using Supabase and Next.js middleware to have live-updating view counts and server-side analytics.
@@ -46,14 +46,14 @@ Note that this tutorial expects you to already have a Next.js project. If you do
 1. Register an account with Supabase here: https://app.supabase.io/
 2. Create a Supabase project and fill out the new project form.
 
-   ![A screenshot of the Supabase page with the New Project button clicked](/blog/supabase/signup.png?width=500&height=300)
+   ![A screenshot of the Supabase page with the New Project button clicked](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/signup.png?width=500&height=300)
 
    > If the above step confuses you, you need to click your organization in the dropdown of the 'new project' button. That took me a little too long to figure out...
 
-   ![A screenshot of the Supabase new project page](/blog/supabase/create-project.png)
+   ![A screenshot of the Supabase new project page](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/create-project.png)
 
 3. Navigate to the \`Table Editor\` in the left nav bar and click new table. Fill it out to match below, and be sure to click the gear icon to deselect allowing null:
-   ![A screenshot of the new table field showing 4 columns: an int8 ID, a text slug, an int8 views with a default value of 1, and an updated_at date column with a default value of "now()".](/blog/supabase/create-table.png?width=600&height=495)
+   ![A screenshot of the new table field showing 4 columns: an int8 ID, a text slug, an int8 views with a default value of 1, and an updated_at date column with a default value of "now()".](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/create-table.png?width=600&height=495)
    Alternatively, if you're comfortable with SQL, you can write and save a SQL query that you can use again in the future. It may look something like this:
 
    ```sql
@@ -71,7 +71,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
 
    <img
      alt="A screenshot showing the functions menu item location in the sidebar"
-     src="/blog/supabase/sidebar-functions.png"
+     src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/sidebar-functions.png"
      height="450px"
      style={{ margin: 'var(--gap)' }}
    />
@@ -79,7 +79,7 @@ Note that this tutorial expects you to already have a Next.js project. If you do
    > Note that Supabase offers Database Functions and Edge Functions &mdash; we're using Database Functions!
 
 5. Click \`Create a new Function\` in the top right and and fill the settings out to match below. We're establishing a name we can use to reference the function, the schema (AKA what tables it has access to), the return value (\`void\` in this case), and a single argument that is the page path.
-   ![A screenshot of the function creation view](/blog/supabase/create-function.png?width=600&height=495)
+   ![A screenshot of the function creation view](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/create-function.png?width=600&height=495)
 
    The query is as follows:
 
@@ -101,10 +101,10 @@ Note that this tutorial expects you to already have a Next.js project. If you do
    P.S. I believe I found this query somewhere online but now I can't find the original source &mdash; if you recognize it please let me know so I can provide credit!
 
 6. Now we need to enable [Realtime](https://github.com/supabase/realtime) so Supabase broadcasts our changes when we subscribe. Navigate to the \`Database\` item in the navigation bar and select \`Replication\` in the side menu. You should see the following page:
-   ![A screenshot of the empty replication page, showing prepopulated a \`supabase_realtime\` row](/blog/supabase/replication.png?width=600&height=450)
+   ![A screenshot of the empty replication page, showing prepopulated a \`supabase_realtime\` row](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/replication.png?width=600&height=450)
 
 7. Click the \`0 tables\` button the \`Source\` column and toggle the new table you created (I called mine \`analytics\`):
-   ![The analytics table has been enabled in the replication page](/blog/supabase/enable-replication.png?width=600&height=450)
+   ![The analytics table has been enabled in the replication page](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/enable-replication.png?width=600&height=450)
 
 8. Finally, navigate to the \`Settings\` at the bottom of the navigation and select the \`API\` submenu. Copy down the \`anon public\` API key, the \`service_role\` API key, and the project URL in the \`Configuration\` box: we'll need them in the next section.
 

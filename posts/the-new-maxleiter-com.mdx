@@ -22,7 +22,7 @@ Going into this I had some constraints:
 - Must work without JavaScript enabled
 - Uses new web platform features
 
-![maxleiter.com screenshot](/blog/2025-redesign/homepage.png?w=800)
+![maxleiter.com screenshot](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/homepage.png?w=800)
 
 ### Table of Contents
 
@@ -85,8 +85,8 @@ If you open a blog post, it opens a window with the iframe technique described a
 to the actual blog post page. In supported browsers, this transition is animated:
 
 <video controls={true}>
-  <source src="/blog/2025-redesign/view-transition.webm" type="video/webm" />
-  <source src="/blog/2025-redesign/view-transition.mp4" type="video/mp4" />
+  <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/view-transition.webm" type="video/webm" />
+  <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/view-transition.mp4" type="video/mp4" />
 </video>
 
 I use Firefox, so I can't see this in action. But it works great in Chromium-based browsers.
@@ -97,8 +97,8 @@ If JavaScript is disabled or slow to load, the site still works. The windows are
 but they instantly navigate you to the corresponding page. Here's how links work instantly, even before the client code loads:
 
 <video controls={true}>
-  <source src="/blog/2025-redesign/nojs.webm" type="video/webm" />
-  <source src="/blog/2025-redesign/nojs.mp4" type="video/mp4" />
+  <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/nojs.webm" type="video/webm" />
+  <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/nojs.mp4" type="video/mp4" />
 </video>
 
 This is accomplished by wrapping the apps in Next.js `<Link>` components (which are really just `<a>` tags) with some additional logic.

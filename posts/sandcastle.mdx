@@ -5,7 +5,7 @@ slug: sandcastle
 date: Feb 11, 2026
 ---
 
-![](/blog/sandcastle/header.png)
+![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/header.png)
 
 Six years ago, while I should have been studying for finals, I patched and compiled X11 (and all its dependencies)
 to [run on a jailbroken iPad](https://maxleiter.com/blog/X11). I wanted to run real applications on my tablet.
@@ -40,11 +40,11 @@ Each environment has its own software stack and configs; some are tiling and min
 
 Here's [KDE](https://kde.org):
 
-![](/blog/sandcastle/kde.png)
+![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/kde.png)
 
 Here's [Sway](https://swaywm.org/):
 
-![](/blog/sandcastle/sway.png)
+![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/sway.png)
 
 <figcaption>
   Sway is a tiling window manager: you don't really drag windows around, you use
@@ -53,7 +53,7 @@ Here's [Sway](https://swaywm.org/):
 
 And here's Sandcastle:
 
-![A screenshot of Sandcastle showing xeyes, GIMP, and a file explorer](/blog/sandcastle/sandcastle.png)
+![A screenshot of Sandcastle showing xeyes, GIMP, and a file explorer](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/sandcastle.png)
 
 <figcaption>
   [xeyes](https://www.reddit.com/r/linuxquestions/comments/1aur066/what_is_the_purpose_of_xeyes/),
@@ -86,11 +86,11 @@ You can think of Sandcastle as a web interface to interact with the underlying L
 The Files app is a React component running entirely in the browser.
 It uses some API routes that speak to the Linux machine to list the available files:
 
-![](/blog/sandcastle/files.png)
+![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/files.png)
 
 But it also runs X11 applications and streams them to the browser:
 
-![](/blog/sandcastle/x11-apps.png?w=800)
+![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/x11-apps.png?w=800)
 
 <figcaption>
   GIMP, gnome-calculator, Firefox, and a system monitor running
@@ -153,7 +153,7 @@ this was the perfect opportunity.
 
 Early on, I encountered a fun problem where X11 apps rendered their own window decorations (the traffic light icons for closing and the window title, mainly):
 
-![A screenshot of gnome-calculator with two stacked window decorations: mine and GNOME's](/blog/sandcastle/double-dec.png?w=200)
+![A screenshot of gnome-calculator with two stacked window decorations: mine and GNOME's](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/double-dec.png?w=200)
 
 To fix this for most applications, I (AKA Claude) was able to write a system init script that does the following:
 
@@ -219,7 +219,7 @@ On desktops, you get a fairly familiar desktop environment: draggable windows, a
 But on smaller screens, it turns into more of a tiling window manager.
 
 <video controls height="400" width="600">
-  <source src="/blog/sandcastle/responsive.webm" type="video/webm" />
+  <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/responsive.webm" type="video/webm" />
 </video>
 <figcaption>
   Ignore the busted terminal after resizing. I did say this was vibecoded.
@@ -234,7 +234,7 @@ that passes its contents to the underlying app. There are also buttons for keys 
 
 This is generally what my IDE looked like while working on this:
 
-![A screenshot of VS Code with 6 terminals open: one for the dev server, one for Codex, four for OpenCode](/blog/sandcastle/ide.png)
+![A screenshot of VS Code with 6 terminals open: one for the dev server, one for Codex, four for OpenCode](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/ide.png)
 
 I used OpenCode with the Vercel AI Gateway (primarily for Opus 4.6 and Kimi K2.5) and Codex. Kimi and Opus are great for product work,
 but I feel like Codex is the smartest-but-slowest model.

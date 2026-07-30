@@ -4,17 +4,18 @@ import withBundleAnalyzer from '@next/bundle-analyzer'
 const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
-    localPatterns: [
-      {
-        pathname: '/blog/**',
-      },
-    ],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'pbs.twimg.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tddeuevmbjbaaeoi.public.blob.vercel-storage.com',
+        port: '',
+        pathname: '/blog/**',
       },
     ],
   },
