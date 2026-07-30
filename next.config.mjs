@@ -23,7 +23,8 @@ const nextConfig = {
   pageExtensions: ['md', 'tsx', 'ts', 'jsx', 'js', 'md', 'mdx'],
   experimental: {
     mdxRs: true,
-    viewTransition: true,
+    // viewTransition was removed in 16.3 - ViewTransition is always available
+    // in the App Router's bundled React canary now.
     inlineCss: true,
   },
   async redirects() {

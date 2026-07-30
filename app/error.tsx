@@ -4,16 +4,18 @@ import Button from '@components/button'
 
 export default function ErrorPage({
   error,
-  reset,
+  retry,
 }: {
   error: Error
-  reset: () => void
+  // 16.3 made `retry` stable: unlike `reset`, it refreshes the boundary's
+  // server data instead of only clearing local error state.
+  retry: () => void
 }) {
   return (
     <article>
       <h1>Something went wrong</h1>
       <p>
-        <Button onClick={reset}>Try again</Button>
+        <Button onClick={() => retry()}>Try again</Button>
       </p>
 
       <pre>{error.message}</pre>

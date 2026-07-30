@@ -126,24 +126,32 @@ export const getProjects = cache(async (): Promise<Project[]> => {
               process.env.NODE_ENV === 'production'
                 ? `https://api.github.com/repos/${user}/${repo}`
                 : 'http://localhost:3000/mock-stars-response.json'
-            const { stargazers_count, message } = await (
-              await fetch(fetchUrl, {
-                headers: {
-                  Authorization: process.env.GITHUB_TOKEN ?? '',
-                },
-                cache: 'force-cache',
-              })
-            ).json()
+            try {
+              const { stargazers_count, message } = await (
+                await fetch(fetchUrl, {
+                  headers: {
+                    Authorization: process.env.GITHUB_TOKEN ?? '',
+                  },
+                  cache: 'force-cache',
+                })
+              ).json()
 
-            // rate limited
-            if (!stargazers_count && message) {
-              console.warn(`Rate limited or error: ${message}`)
+              // rate limited
+              if (!stargazers_count && message) {
+                console.warn(`Rate limited or error: ${message}`)
+                return proj
+              }
+
+              return {
+                ...proj,
+                stars: stargazers_count,
+              }
+            } catch (error) {
+              // A non-JSON response (GitHub outage, or a dev server that isn't
+              // on port 3000) shouldn't take down every page that renders the
+              // project list.
+              console.warn(`Could not fetch stars for ${user}/${repo}:`, error)
               return proj
-            }
-
-            return {
-              ...proj,
-              stars: stargazers_count,
             }
           }
           return proj
