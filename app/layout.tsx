@@ -8,6 +8,7 @@ import { Viewport } from 'next'
 import { getBlogPosts, getProjectsData } from '@lib/portfolio-data'
 import { GlobalKeyboardHandler } from '@components/desktop/global-keyboard-handler'
 import { EffectsProvider } from '@components/desktop/effects-context'
+import { PageTransition } from '@components/page-transition'
 
 export const dynamic = 'force-static'
 
@@ -79,7 +80,7 @@ export default async function RootLayout({
       <body>
         <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem>
           <EffectsProvider>
-            {children}
+            <PageTransition>{children}</PageTransition>
             <GlobalKeyboardHandler blogPosts={blogPosts} projects={projects} />
             <Analytics />
           </EffectsProvider>

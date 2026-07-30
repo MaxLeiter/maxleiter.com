@@ -14,6 +14,11 @@ export function PostBody({ children }: { children: string }) {
     <MDXRemote
       source={children}
       options={{
+        // next-mdx-remote 6 strips every JSX attribute expression by default,
+        // which silently drops props like `width={600}` or `style={{...}}`.
+        // Posts are first-party and committed to this repo, so keep them.
+        // `blockDangerousJS` stays on as a backstop.
+        blockJS: false,
         mdxOptions: {
           remarkPlugins: [
             remarkGfm,
