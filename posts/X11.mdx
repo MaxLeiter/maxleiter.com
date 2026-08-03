@@ -5,14 +5,21 @@ date: Dec 15, 2019
 slug: X11
 ---
 
-<Details summary={"Please read"}>
-    While the content below may be useful to some, the Cydia repository is no longer available due to the maintaince overhead and my loss of interest. If you still want X11 on iOS/iPadOS, check out the <a href="https://github.com/ProcursusTeam/Procursus">Procursus project</a>.
+<Details summary={'Please read'}>
+  This work has been picked back up recently, with KDE, GNOME, Wayland, and
+  more. Read about it here: https://maxleiter.com/blog/xios
 </Details>
 
 I'm excited to announce that X11 is coming soon to iOS. Most (see below) packages and dependencies for a fully functioning X11 desktop system have been compiled and are available on Cydia for iOS 11+. All packages have been compiled for arm64 and have been tested on iOS 12.4 and iOS 13.1. This requires a jailbroken device.
 
-<Image src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/X11/x11.png" alt="Image of X11 on iOS" width={600} height={400} />
-[Image of programs running on device.](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/X11/onipad.jpg)
+<Image
+  src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/X11/x11.png"
+  alt="Image of X11 on iOS"
+  width={600}
+  height={400}
+/>
+[Image of programs running on
+device.](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/X11/onipad.jpg)
 
 This site will serve largely as documentation for building yourself. ~You can add the Cydia repo below for the deb packages. Please let me know if you run across any issues with the debs; it's likely I messed up including a library or something like that. (These aren't done just yet.)~
 
@@ -25,43 +32,46 @@ At the moment, a virtual screen is accessed via a VNC client to an Xvnc instance
 Largely just because I can. Also, I want to turn my iPad into a proper development environment, and a windowing system helps with that. It's a powerful machine with a Unix-like OS, so X11 seemed like a reasonable project. X11 allows running arbirtary applications like browsers and IDEs, assuming you can make them compile.
 
 ## Current Features
- - X11 on iOS via Xvnc
- - Working window managers (jwm / twm / fluxbox)
- - Text editor (adie)
- - Image editor (azpainter)
- - OpenGL (via Mesa)
- - Loads of other libraries, tools, and applications.
+
+- X11 on iOS via Xvnc
+- Working window managers (jwm / twm / fluxbox)
+- Text editor (adie)
+- Image editor (azpainter)
+- OpenGL (via Mesa)
+- Loads of other libraries, tools, and applications.
 
 ## Building instructions
+
 Before you start, be sure to have an iOS SDK located at \`/usr/share/iPhoneOS.sdk\` for sbingner's llvm-10 to function. You can get the SDKs from theos.
 
-The following tools/libraries are required to build the packages (unless you choose to build these yourself): 
+The following tools/libraries are required to build the packages (unless you choose to build these yourself):
 
 From MCApollo's repository:
- - Gettext
- - Glib
- - libffi
- - libxml2
- - m4
- - OpenSSL
- - perl
- - PkgConfig
- - libiconv
- - Python @ 3.7
- - readline
- - zlib
- - clang-10
- - Darwin CC Tools
- - Bison
- - Flex
- - libstdc++ (C++ Standard Library symlink)
- - automake
- - autoconf
- - ninja
- - libpng
- - gperf
 
- In general, you can follow the instructions from [Beyond LinuxFromScratch](http://www.linuxfromscratch.org/blfs/). This project is based on 9.0, with version differences or code modications marked with ⚠️ below. Applications and libs marked with ❗️ means unavailable on iOS or I was unable to build them. Empty notes means compiles and works as-is from BLFS. Additionally, all of the packages are available (generally as dylibs) on the Cydia repo linked above.
+- Gettext
+- Glib
+- libffi
+- libxml2
+- m4
+- OpenSSL
+- perl
+- PkgConfig
+- libiconv
+- Python @ 3.7
+- readline
+- zlib
+- clang-10
+- Darwin CC Tools
+- Bison
+- Flex
+- libstdc++ (C++ Standard Library symlink)
+- automake
+- autoconf
+- ninja
+- libpng
+- gperf
+
+In general, you can follow the instructions from [Beyond LinuxFromScratch](http://www.linuxfromscratch.org/blfs/). This project is based on 9.0, with version differences or code modications marked with ⚠️ below. Applications and libs marked with ❗️ means unavailable on iOS or I was unable to build them. Empty notes means compiles and works as-is from BLFS. Additionally, all of the packages are available (generally as dylibs) on the Cydia repo linked above.
 
 <table>
     <thead>
@@ -551,4 +561,5 @@ From MCApollo's repository:
 </table>
 
 ---
-*This post was originally written on the old maxleiter.com, and formatting has slightly adjusted
+
+\*This post was originally written on the old maxleiter.com, and formatting has slightly adjusted
