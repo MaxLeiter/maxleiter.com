@@ -74,7 +74,8 @@ const TALKS: Talk[] = [
   },
   {
     id: 'NqKyHEJe9_w',
-    title: "Yesterday's Computer of Tomorrow: The Xerox Alto | Smalltalk-76 Demo",
+    title:
+      "Yesterday's Computer of Tomorrow: The Xerox Alto | Smalltalk-76 Demo",
     channel: 'Computer History Museum',
     duration: '16:48',
     videoId: 'NqKyHEJe9_w',
@@ -130,7 +131,8 @@ const TALKS: Talk[] = [
   },
   {
     id: 'wo84LFzx5nI',
-    title: 'The Big OOPs: Anatomy of a Thirty-five-year Mistake - Casey Muratori',
+    title:
+      'The Big OOPs: Anatomy of a Thirty-five-year Mistake - Casey Muratori',
     channel: 'Better Software Conference',
     duration: '2:27:34',
     videoId: 'wo84LFzx5nI',
@@ -140,7 +142,9 @@ const TALKS: Talk[] = [
 export function TalksContent() {
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">talks/</h1>
+      <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
+        talks/
+      </h1>
 
       <ul className="space-y-2">
         {TALKS.map((talk) => (

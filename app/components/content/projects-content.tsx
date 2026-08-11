@@ -8,7 +8,10 @@ interface ProjectsContentProps {
 export function ProjectsContent({ projects }: ProjectsContentProps) {
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8" style={{ color: 'var(--fg)' }}>
+      <h1
+        className="text-3xl font-mono font-bold mb-8"
+        style={{ color: 'var(--fg)' }}
+      >
         projects/
       </h1>
 

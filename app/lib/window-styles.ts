@@ -3,9 +3,12 @@ export const windowStyles = {
     backgroundColor: 'var(--bg-window-alpha)',
     backdropFilter: 'blur(12px)',
   },
-  header: 'h-8 border-b border-[var(--border-color)] flex items-center justify-between px-3 rounded-t-lg select-none',
-  toolbar: 'h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10',
-  button: 'text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors',
+  header:
+    'h-8 border-b border-[var(--border-color)] flex items-center justify-between px-3 rounded-t-lg select-none',
+  toolbar:
+    'h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10',
+  button:
+    'text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors',
   title: 'text-[var(--gray)] text-xs font-normal',
 } as const
 

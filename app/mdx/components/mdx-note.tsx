@@ -11,7 +11,7 @@ export function MDXNote({
         <Info />
       </div>
       <div className={styles.content}>
-        <b>{title ? title : "Note:"}</b>
+        <b>{title ? title : 'Note:'}</b>
         {children}
       </div>
     </aside>

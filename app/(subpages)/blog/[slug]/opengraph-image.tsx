@@ -35,81 +35,79 @@ export default async function ({
   )
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        alignItems: 'center',
+        letterSpacing: '-.02em',
+        fontWeight: 700,
+        background: '#000',
+        flexDirection: 'column',
+      }}
+    >
       <div
         style={{
           display: 'flex',
-          height: '100%',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
           width: '100%',
-          alignItems: 'center',
-          letterSpacing: '-.02em',
-          fontWeight: 700,
-          background: '#000',
-          flexDirection: 'column',
+          padding: '10px 50px',
         }}
       >
-        <div
+        <span
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            width: '100%',
-            padding: '10px 50px',
+            fontSize: 25,
+            fontWeight: 700,
+            background: 'white',
+            color: 'black',
+            padding: '4px 10px',
           }}
         >
-          <span
+          maxleiter.com
+        </span>
+        {date && (
+          <div
             style={{
               fontSize: 25,
-              fontWeight: 700,
               background: 'white',
               color: 'black',
               padding: '4px 10px',
             }}
           >
-            maxleiter.com
-          </span>
-          {date && (
-            <div
-              style={{
-                fontSize: 25,
-                background: 'white',
-                color: 'black',
-                padding: '4px 10px',
-              }}
-            >
-              {date}
-            </div>
-          )}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            padding: '0 50px',
-            color: 'white',
-            textAlign: 'center',
-            height: 630 - 50 - 50,
-            maxWidth: 1000,
-          }}
-        >
-          {title && (
-            <div
-              style={{
-                fontSize: 65,
-                fontWeight: 900,
-                marginBottom: 40,
-                lineHeight: 1.1,
-              }}
-            >
-              {title}
-            </div>
-          )}
-        </div>
+            {date}
+          </div>
+        )}
       </div>
-    ),
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          padding: '0 50px',
+          color: 'white',
+          textAlign: 'center',
+          height: 630 - 50 - 50,
+          maxWidth: 1000,
+        }}
+      >
+        {title && (
+          <div
+            style={{
+              fontSize: 65,
+              fontWeight: 900,
+              marginBottom: 40,
+              lineHeight: 1.1,
+            }}
+          >
+            {title}
+          </div>
+        )}
+      </div>
+    </div>,
     {
       fonts: [
         {

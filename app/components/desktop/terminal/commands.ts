@@ -103,12 +103,20 @@ export function parseArgs(tokens: string[], command: Command): ParseResult {
       const [name, value] = flagName.split('=')
 
       if (!command.flags) {
-        return { success: false, error: `${command.name}: unsupported argument '${token}'` }
+        return {
+          success: false,
+          error: `${command.name}: unsupported argument '${token}'`,
+        }
       }
 
-      const flagDef = Object.entries(command.flags).find(([_, def]) => def.long === name)
+      const flagDef = Object.entries(command.flags).find(
+        ([_, def]) => def.long === name,
+      )
       if (!flagDef) {
-        return { success: false, error: `${command.name}: unknown flag '${token}'` }
+        return {
+          success: false,
+          error: `${command.name}: unknown flag '${token}'`,
+        }
       }
 
       const [flagKey, def] = flagDef
@@ -119,22 +127,33 @@ export function parseArgs(tokens: string[], command: Command): ParseResult {
       } else if (i + 1 < tokens.length && !tokens[i + 1].startsWith('-')) {
         flags[flagKey] = tokens[++i]
       } else {
-        return { success: false, error: `${command.name}: flag '${token}' requires a value` }
+        return {
+          success: false,
+          error: `${command.name}: flag '${token}' requires a value`,
+        }
       }
     } else if (token.startsWith('-') && token.length > 1) {
       // Short flag(s)
       const flagChars = token.slice(1)
 
       if (!command.flags) {
-        return { success: false, error: `${command.name}: unsupported argument '${token}'` }
+        return {
+          success: false,
+          error: `${command.name}: unsupported argument '${token}'`,
+        }
       }
 
       for (let j = 0; j < flagChars.length; j++) {
         const char = flagChars[j]
-        const flagDef = Object.entries(command.flags).find(([_, def]) => def.short === char)
+        const flagDef = Object.entries(command.flags).find(
+          ([_, def]) => def.short === char,
+        )
 
         if (!flagDef) {
-          return { success: false, error: `${command.name}: unknown flag '-${char}'` }
+          return {
+            success: false,
+            error: `${command.name}: unknown flag '-${char}'`,
+          }
         }
 
         const [flagKey, def] = flagDef
@@ -145,10 +164,16 @@ export function parseArgs(tokens: string[], command: Command): ParseResult {
           if (i + 1 < tokens.length && !tokens[i + 1].startsWith('-')) {
             flags[flagKey] = tokens[++i]
           } else {
-            return { success: false, error: `${command.name}: flag '-${char}' requires a value` }
+            return {
+              success: false,
+              error: `${command.name}: flag '-${char}' requires a value`,
+            }
           }
         } else {
-          return { success: false, error: `${command.name}: flag '-${char}' requires a value` }
+          return {
+            success: false,
+            error: `${command.name}: flag '-${char}' requires a value`,
+          }
         }
       }
     } else {
@@ -363,7 +388,7 @@ export function findCommand(name: string): Command | undefined {
   return commands.find(
     (cmd) =>
       cmd.name === lowerName ||
-      cmd.aliases?.some((alias) => alias === lowerName)
+      cmd.aliases?.some((alias) => alias === lowerName),
   )
 }
 
@@ -375,7 +400,7 @@ export function getCommandNames(): string[] {
 // Get autocompletions for a partial command
 export function getCompletions(
   partial: string,
-  context: CommandContext
+  context: CommandContext,
 ): string[] {
   const trimmed = partial.trim()
   const parts = trimmed.split(' ')

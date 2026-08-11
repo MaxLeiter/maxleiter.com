@@ -28,7 +28,7 @@ const Link = ({
   const className = clsx(
     styles.link,
     underline && styles.underline,
-    classNameProp
+    classNameProp,
   )
 
   if (external) {

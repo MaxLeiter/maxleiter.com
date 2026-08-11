@@ -29,7 +29,7 @@ const Diff = dynamic(() => import('./mdx-diff'), {
 // Dynamically import MinecraftInventoryFromDir to avoid bundling 'fs' on client
 const MinecraftInventoryFromDir = dynamic(
   () => import('@components/mc').then((mod) => mod.MinecraftInventoryFromDir),
-  { ssr: true }
+  { ssr: true },
 )
 
 Code.theme = {

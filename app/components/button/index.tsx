@@ -40,7 +40,7 @@ const Button = forwardRef<HTMLButtonElement, Props>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <button
@@ -81,7 +81,7 @@ const Button = forwardRef<HTMLButtonElement, Props>(
         )}
       </button>
     )
-  }
+  },
 )
 
 export default Button

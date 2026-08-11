@@ -1,5 +1,18 @@
 {
-  "extends": ["plugin:mdx/recommended"],
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "react",
+    "react-perf",
+    "jsx-a11y",
+    "nextjs",
+    "import"
+  ],
+  "categories": {
+    "correctness": "error"
+  },
   "rules": {
     "prefer-const": "error",
     "no-var": "error",
@@ -11,11 +24,8 @@
     "no-empty-function": "error",
     "no-empty-pattern": "error",
     "no-lone-blocks": "error",
-    "no-multi-spaces": "error",
-    "no-trailing-spaces": "error",
     "no-unneeded-ternary": "error",
     "no-useless-return": "error",
-    "no-whitespace-before-property": "error",
     "object-shorthand": ["error", "always"],
     "no-unsafe-optional-chaining": "error",
     "no-unused-expressions": [
@@ -23,7 +33,14 @@
       { "allowShortCircuit": true, "allowTernary": true }
     ]
   },
-  "settings": {
-    "mdx/code-blocks": true
-  }
+  "env": {
+    "builtin": true
+  },
+  "ignorePatterns": [
+    ".next/**",
+    "out/**",
+    "build/**",
+    "public/**",
+    "next-env.d.ts"
+  ]
 }

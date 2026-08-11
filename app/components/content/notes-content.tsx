@@ -14,11 +14,16 @@ export function NotesContent({
   notes,
   onNoteClick,
   onNoteHover,
-  onNoteHoverEnd
+  onNoteHoverEnd,
 }: NotesContentProps) {
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8" style={{ color: 'var(--article-color)' }}>notes/</h1>
+      <h1
+        className="text-3xl font-mono font-bold mb-8"
+        style={{ color: 'var(--article-color)' }}
+      >
+        notes/
+      </h1>
 
       <ul className="space-y-2">
         {notes.map((note) => (

@@ -41,7 +41,9 @@ export function WidgetRecentPosts({
         <p className="text-xs 3xl:text-sm text-[var(--gray)]">
           {post.date}
           {isExternal && <span className="ml-2 opacity-50">· external</span>}
-          {post.type === 'note' && <span className="ml-2 opacity-50">· note</span>}
+          {post.type === 'note' && (
+            <span className="ml-2 opacity-50">· note</span>
+          )}
         </p>
       </>
     )

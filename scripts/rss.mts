@@ -3,30 +3,30 @@ import RSS from 'rss'
 import path from 'path'
 import { marked } from 'marked'
 import matter from 'gray-matter'
-import { Note, Post } from '../app/lib/types'
-import { externalPosts } from '../app/lib/external-posts'
+import type { Note, Post } from '../app/lib/types'
+import { externalPosts } from '../app/lib/external-posts.ts'
 
 const posts = fs
-  .readdirSync(path.resolve(__dirname, '../posts'))
+  .readdirSync(path.resolve(import.meta.dirname, '../posts'))
   .filter(
     (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx',
   )
   .map((file) => {
     const markdown = fs.readFileSync(
-      path.resolve(__dirname, '../posts', file),
+      path.resolve(import.meta.dirname, '../posts', file),
       'utf-8',
     )
     const { data, content }: { data: any; content: string } = matter(markdown)
     return { ...data, body: content, type: 'post' }
   })
 const notes = fs
-  .readdirSync(path.resolve(__dirname, '../notes'))
+  .readdirSync(path.resolve(import.meta.dirname, '../notes'))
   .filter(
     (file) => path.extname(file) === '.md' || path.extname(file) === '.mdx',
   )
   .map((file) => {
     const markdown = fs.readFileSync(
-      path.resolve(__dirname, '../notes', file),
+      path.resolve(import.meta.dirname, '../notes', file),
       'utf-8',
     )
     const { data, content }: { data: any; content: string } = matter(markdown)
@@ -91,7 +91,7 @@ const main = () => {
   })
 
   const rss = feed.xml({ indent: true })
-  fs.writeFileSync(path.join(__dirname, '../public/feed.xml'), rss)
+  fs.writeFileSync(path.join(import.meta.dirname, '../public/feed.xml'), rss)
 }
 
 main()

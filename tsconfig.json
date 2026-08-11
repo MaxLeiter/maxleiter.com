@@ -8,7 +8,6 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "target": "ES2017",
     "lib": [
       "dom",

@@ -85,7 +85,14 @@ export function EffectsProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <EffectsContext.Provider
-      value={{ juiceMode, crtMode, toggleJuice, toggleCrt, showCommandPalette, setShowCommandPalette }}
+      value={{
+        juiceMode,
+        crtMode,
+        toggleJuice,
+        toggleCrt,
+        showCommandPalette,
+        setShowCommandPalette,
+      }}
     >
       {children}
     </EffectsContext.Provider>

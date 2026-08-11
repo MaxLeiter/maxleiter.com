@@ -17,11 +17,7 @@ declare global {
   }
 }
 
-export function NotePageClient({
-  slug,
-  title,
-  children,
-}: NotePageClientProps) {
+export function NotePageClient({ slug, title, children }: NotePageClientProps) {
   const router = useRouter()
 
   const [isEmbed] = useState(() => {

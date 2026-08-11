@@ -1,6 +1,6 @@
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ path: string[] }> }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await params
   const packagePath = path.join('/')

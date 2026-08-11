@@ -25,7 +25,8 @@ export function TweetThread({ ids }: TweetThreadProps) {
 
   // Hide header and "replying to" for non-first tweets in thread
   const getHeaderClass = (index: number) => {
-    if (!isFirst(index)) return '[&_[class*=header]]:hidden! [&_[class*=tweet-in-reply-to]]:hidden!'
+    if (!isFirst(index))
+      return '[&_[class*=header]]:hidden! [&_[class*=tweet-in-reply-to]]:hidden!'
     return ''
   }
 

@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm analyze` - Analyze bundle size with webpack-bundle-analyzer
 
 ### Content Management
-- RSS feed generation: `npx ts-node scripts/rss` (uses node.tsconfig.json)
+- RSS feed generation: `node scripts/rss.mts` (runs on Node's native TypeScript support)
 - Blog posts: Add markdown/MDX files to `/posts/` directory
 - Notes: Add markdown/MDX files to `/notes/` directory
 - External posts are configured in `app/lib/external-posts.ts`

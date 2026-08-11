@@ -32,7 +32,13 @@ export function BlogListContent({
         href={href}
         title={post.title}
         description={post.excerpt}
-        meta={isExternal ? `${post.date} · external` : isNote ? `${post.date} · note` : post.date}
+        meta={
+          isExternal
+            ? `${post.date} · external`
+            : isNote
+              ? `${post.date} · note`
+              : post.date
+        }
         icon
         external={isExternal}
         onClick={

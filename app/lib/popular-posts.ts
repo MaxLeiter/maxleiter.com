@@ -1,1 +1,1 @@
-export const POPULAR_SLUGS = ['formatting', 'X11', 'rewrite-your-prompts']
+export const POPULAR_SLUGS = ['weights', 'xios', 'formatting']

@@ -15,7 +15,7 @@ const Projects: Project[] = [
   {
     title: 'Drift',
     description:
-      'A self-hostable and open-source alternative to GitHub Gist and Pastebin. Made as a testbed for the Next.js App Router and React Server Components.',
+      'A self-hostable and open-source alternative to GitHub Gist and Pastebin.',
     href: 'https://github.com/maxleiter/drift',
     role: 'Creator',
     years: ['2022', '2023'],
@@ -35,7 +35,7 @@ const Projects: Project[] = [
     description: 'A TypeScript wrapper for SortableJS built for Vue 3.',
     href: 'https://github.com/maxleiter/sortablejs-vue3/',
     role: 'Creator',
-    years: ['2022', 'present'],
+    years: ['2022', '2026'],
     type: 'project',
   },
   {
@@ -44,7 +44,7 @@ const Projects: Project[] = [
       'Open-source unix-like operating system for z80-based calculators written entirely in z80 asm. I wrote a significant portion of the libc and contribued to system libraries.',
     href: 'https://github.com/knightos/knightos',
     role: 'Maintainer',
-    years: ['2017', 'present'],
+    years: ['2017', '2019'],
     type: 'project',
   },
   {
@@ -84,7 +84,7 @@ const Projects: Project[] = [
   {
     title: 'AI SDK',
     description:
-      'I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK. I implemented the Stream Data protocol for multiplexing streams to the client, added server-side function calling support, and generally helped maintain the library.',
+      'I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK.',
     href: 'https://github.com/vercel/ai',
     role: 'Developer',
     years: ['2023', '2024'],
