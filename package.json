@@ -12,6 +12,7 @@
   },
   "pre-commit": "lint",
   "license": "MIT",
+  "browserslist": ["chrome 111", "edge 111", "firefox 111", "safari 16.4"],
   "dependencies": {
     "@fec/remark-a11y-emoji": "4.0.2",
     "@mdx-js/loader": "3.1.1",
