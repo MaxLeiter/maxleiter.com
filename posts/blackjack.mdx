@@ -1,0 +1,79 @@
+---
+title: Friends don't let friends play bad blackjack
+description:
+slug: blackjack
+date: Aug 9, 2026
+---
+
+If you're reading this, it's likely because you and I talked about playing Blackjack.
+I hate seeing friends lose money, but I can't help with that if you're gambling, but I can maybe help you lose _less_ money.
+If you want to actually win money, you need to learn perfect strategy and start [card counting](https://www.blackjackapprenticeship.com/how-to-count-cards/), which is not what this post is about.
+
+The first and most important thing to understand is Blackjack is a **solved game**.
+The optimal move for every combination of your cards, the dealer's up card, and the table rules (more on this below) has been known since [1956](https://web.williams.edu/Mathematics/sjmiller/public_html/341Fa09/handouts/Baldwin_OptimalStrategyBlackjack.pdf).
+If you have some math-related background, the paper is pretty accessible and I recommend checking it out, but for those who are lazy, this is part of "The Book" - the guide of what to do when:
+
+Legend: **H** hit ,**S** stand, **D** double (hit if not allowed)
+
+| Hand | 2   | 3   | 4   | 5   | 6   | 7   | 8   | 9   | 10  | A   |
+| ---- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 8    | H   | H   | H   | H   | H   | H   | H   | H   | H   | H   |
+| 9    | H   | D   | D   | D   | D   | H   | H   | H   | H   | H   |
+| 10   | D   | D   | D   | D   | D   | D   | D   | D   | H   | H   |
+| 11   | D   | D   | D   | D   | D   | D   | D   | D   | D   | H   |
+| 12   | H   | H   | S   | S   | S   | H   | H   | H   | H   | H   |
+| 13   | S   | S   | S   | S   | S   | H   | H   | H   | H   | H   |
+| 14   | S   | S   | S   | S   | S   | H   | H   | H   | H   | H   |
+| 15   | S   | S   | S   | S   | S   | H   | H   | H   | H   | H   |
+| 16   | S   | S   | S   | S   | S   | H   | H   | H   | H   | H   |
+| 17+  | S   | S   | S   | S   | S   | S   | S   | S   | S   | S   |
+
+It can look a bit scary, and there are a few other tables (one for if you have a pair, one for if you have an ace), and varying table rules can slightly change some cells.
+But you don't need to memorize it!
+It is completely legal to have a physical copy with you while you play, and it's pretty easy to pick up 90% of it once you catch the patterns.
+But this post will _not_ be about the book or memorizing it - it's about the rules _not_ related to the book.
+Follow the book at a reasonable table and the casino will have a ~0.35-0.5% <abbr title='expected value'>EV</abbr> edge.
+This means that for every $100 you bet, you can expect to lose 35-50¢ over time.
+
+Note:
+A lot of people ask their dealer what the book says, and dealers will often give confident answers.
+They can be wrong! Especially with tricky hands. Dealers do _not_ need to be good at a game to deal it, so take their advice with a grain of salt.
+Just print the card!
+
+## Rule 1: Never play 6:5
+
+Say it with me - Don't Play 6:5 Blackjack. Now repeat it a couple dozen times.
+
+Every blackjack table has something like "Pays 6:5" or "Pays 3:2" written on it. This is, by far, the most important thing to look for when looking for a game.
+
+When you get a Blackjack, you get paid a multiple of your bet - 6:5 or 3:2. This only applies to a blackjack (all other hands are "even money", 1:1).On a $10 bet, a blackjack pays you $15 at a 3:2 table and only $12 at 6:5. Over time, that adds up. Above, I mentioned the house may have a 0.5% edge at a good table. 6:5 is 4x worse, pushing it to roughly 1.9%. A good table costs you about 50¢ per $100 bet; 6:5 costs $1.90. If I see only 6:5 tables, I am walking out, and you should too. 6:5 is a fairly recent tragic phenomenon, gaining popularity sometime in the 2000s, and everyone needs to stop playing it.
+
+## Rule 2: No sidebets or insurance
+
+### Sidebets
+
+A lot of blackjack tables will have sidebets you can make. These let you bet money that is not related to your cards beating the dealer. Bets like "2:1 payout on dealer bust" and "1000:1 payout if your hand and dealers top card are all the same rank and suit."
+
+Don't play them\*. They have horrendous odds.
+
+\*Sometimes I play them if I'm up because I'm weak and they're fun
+
+### Insurance
+
+Insurance is a special sidebet.
+
+If the dealer's upcard is an ace, the player can bet a new sum of half their bet with a 2:1 payout if the dealer has a 10 hiding. Insurance is not worth taking; it's a _completely independent bet unrelated to what you already have down on the table_. Insurance (usually) pays 2:1, but it only pays out ~30.8% of the time, and you need it to hit 33% of the time to result in positive EV.
+
+Some casinos will offer "even money" if you have a blackjack, which guarantees a 1:1 payout, meaning you keep your bet but lose the chance at the 3:2 payout (because you're definitely not playing at a 6:5 table, right?). Don't do it! Even money is still insurance, and you shouldn't take insurance.
+
+## Rule 3: No variants
+
+There are many 'variants' to your standard blackjack that casinos will have. Two popular examples are Spanish 21 (no 10 cards) and Free Bet (free splits and doubles, but dealer 22 pushes (meaning if they get 22 it's not a bust; you get your bet back))
+
+In general, unless you have a book prepared for the particular variant you are playing and you know the EV, it's not worth playing variants. Stick to as simple a game of blackjack as possible.
+
+## Rule 4: Other players' mistakes do not affect your game
+
+The first time I played blackjack, I split 10s on a dealer bustcard. The guy next to me loudly got up and left to another table and complained about me about being an idiot. I was being an idiot, but it only affected my play, not his.
+
+A lot of blackjack players will get frustrated when someone at the table isn't playing by the book (or how they would play). I've had plenty of dealers tell me I should have left once I saw what people were doing. Over enough hands, another player's misplay is just as likely to help you as to hurt you.

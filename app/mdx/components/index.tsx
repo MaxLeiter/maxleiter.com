@@ -67,6 +67,11 @@ export const mdxComponents: MDXComponents = {
   },
   img: MDXImage as any,
   Image: NextImage as any,
+  table: ({ children, ...props }) => (
+    <div className="table-wrapper">
+      <table {...props}>{children}</table>
+    </div>
+  ),
   Details: ({
     children,
     summary,

@@ -215,12 +215,29 @@ details {
 }
 
 table {
-  border: 1px solid gray;
+  border-collapse: collapse;
+  width: 100%;
 }
 
 td,
 th {
-  border: 1px solid gray;
+  border: 1px solid var(--light-gray);
+  padding: 0.4rem 0.75rem;
+  text-align: left;
+}
+
+th {
+  background: var(--lightest-gray);
+  font-weight: 600;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.table-wrapper table {
+  margin: 0;
 }
 
 @media print {
