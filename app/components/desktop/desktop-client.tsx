@@ -17,7 +17,6 @@ import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.
 import { track } from '@vercel/analytics'
 import dynamic from 'next/dynamic'
 import { Window } from '@components/desktop/window'
-import { TerminalContent } from '@components/desktop/terminal-content'
 import { WidgetRecentPosts } from '@components/desktop/widget-recent-posts'
 import { WidgetTopProjects } from '@components/desktop/widget-top-projects'
 
@@ -31,7 +30,6 @@ import {
 } from '@components/page-content-client'
 import { type BlogPost, type Project, getBlogPostHref } from '@lib/blog-post'
 import type { Note } from '@lib/types'
-import { ABOUT_CONTENT } from '@lib/about-content'
 import { useIsMobile } from './use-is-mobile'
 import { useEffects } from '@components/desktop/effects-context'
 import { ThemeToggle } from '@components/theme-toggle'
@@ -72,25 +70,6 @@ export function FolderIconDefault({ className }: { className?: string }) {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M14.5 7.5V12.5C14.5 13.0523 14.0523 13.5 13.5 13.5H2.5C1.94772 13.5 1.5 13.0523 1.5 12.5V7.5H14.5ZM14.5 6V4H8.83333C8.29241 4 7.76607 3.82456 7.33333 3.5L6 2.5H1.5V6H14.5ZM0 1H1.5H6.16667C6.38304 1 6.59357 1.07018 6.76667 1.2L8.23333 2.3C8.40643 2.42982 8.61696 2.5 8.83333 2.5H14.5H16V4V12.5C16 13.8807 14.8807 15 13.5 15H2.5C1.11929 15 0 13.8807 0 12.5V2.5V1Z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-function TerminalIconDefault() {
-  return (
-    <svg
-      height="48"
-      strokeLinejoin="round"
-      viewBox="0 0 16 16"
-      width="48"
-      className="text-foreground"
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M1.53035 12.7804L1.00002 13.3108L-0.0606384 12.2501L0.469692 11.7198L4.18936 8.00011L0.469692 4.28044L-0.0606384 3.75011L1.00002 2.68945L1.53035 3.21978L5.60358 7.29301C5.9941 7.68353 5.9941 8.3167 5.60357 8.70722L1.53035 12.7804ZM8.75002 12.5001H8.00002V14.0001H8.75002H15.25H16V12.5001H15.25H8.75002Z"
         fill="currentColor"
       />
     </svg>
@@ -250,7 +229,6 @@ declare global {
 }
 
 type WindowId =
-  | 'terminal'
   | 'calculator'
   | 'about'
   | 'projects'
@@ -586,10 +564,6 @@ export function DesktopClient({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 't') {
-        e.preventDefault()
-        dispatch({ type: 'OPEN_WINDOW', id: 'terminal' })
-      }
       // Ctrl+W to close focused window (not Cmd since browser intercepts it)
       if (e.ctrlKey && !e.metaKey && e.key === 'w') {
         const focused = windowState.focusedWindow
@@ -626,15 +600,6 @@ export function DesktopClient({
         ),
       })),
       // Local apps
-      {
-        id: 'terminal',
-        name: 'terminal',
-        type: 'app',
-        icon: <TerminalIconDefault />,
-        onClick: () => {
-          dispatch({ type: 'OPEN_WINDOW', id: 'terminal' })
-        },
-      },
       {
         id: 'calculator',
         name: 'calc',
@@ -729,24 +694,6 @@ export function DesktopClient({
           className="hidden"
           aria-hidden="true"
         />
-      )}
-
-      {isOpen('terminal') && (
-        <Window
-          title="terminal"
-          onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'terminal' })}
-          defaultWidth={600}
-          defaultHeight={400}
-          zIndex={getZIndex('terminal')}
-          onFocus={() => dispatch({ type: 'FOCUS', id: 'terminal' })}
-        >
-          <TerminalContent
-            blogPosts={blogPosts}
-            projects={projects}
-            aboutContent={ABOUT_CONTENT}
-            onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'terminal' })}
-          />
-        </Window>
       )}
 
       {isOpen('calculator') && (

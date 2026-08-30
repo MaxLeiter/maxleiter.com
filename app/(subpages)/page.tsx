@@ -1,9 +1,5 @@
 import { DesktopClient } from '@components/desktop/desktop-client'
-import {
-  getBlogPosts,
-  getProjectsData,
-  ABOUT_CONTENT,
-} from '@lib/portfolio-data'
+import { getBlogPosts, getProjectsData } from '@lib/portfolio-data'
 import getNotes from '@lib/get-notes'
 
 function ClockInitScript() {
