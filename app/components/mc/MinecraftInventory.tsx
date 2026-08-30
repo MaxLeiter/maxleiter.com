@@ -41,7 +41,6 @@ export default function MinecraftInventory({
   columns,
   slotSize = 36,
 }: MinecraftInventoryProps) {
-  const [hovered, setHovered] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [dynamicCols, setDynamicCols] = useState<number>(columns ?? maxColumns)
 
@@ -77,12 +76,7 @@ export default function MinecraftInventory({
       }}
     >
       {items.map((item, idx) => (
-        <div
-          key={`${item.name}-${idx}`}
-          className={styles.slot}
-          onMouseEnter={() => setHovered(idx)}
-          onMouseLeave={() => setHovered(null)}
-        >
+        <div key={`${item.name}-${idx}`} className={styles.slot}>
           <Image
             src={item.src}
             alt={item.name}
@@ -91,12 +85,10 @@ export default function MinecraftInventory({
             unoptimized
             style={{ imageRendering: 'pixelated' }}
           />
-          {hovered === idx && (
-            <div className={styles.tooltip}>
-              <div>{item.name}</div>
-              <div className={styles.mod}>{item.mod}</div>
-            </div>
-          )}
+          <div className={styles.tooltip}>
+            <div>{item.name}</div>
+            <div className={styles.mod}>{item.mod}</div>
+          </div>
         </div>
       ))}
     </div>

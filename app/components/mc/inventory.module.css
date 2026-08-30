@@ -70,21 +70,17 @@
   /* Center horizontally and appear above the slot */
   left: 50%;
   top: 0;
-  transform: translate(-50%, -110%);
+  transform: translate(-50%, -90%) scale(0.95);
   outline: 1px solid var(--light-gray);
   opacity: 0;
-  animation: fadeIn 120ms ease-out forwards;
+  visibility: hidden;
+  transition: opacity 120ms ease-out, transform 120ms ease-out, visibility 120ms;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -90%) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -110%) scale(1);
-  }
+.slot:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -110%) scale(1);
 }
 
 .mod {

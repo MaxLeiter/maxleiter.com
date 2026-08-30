@@ -124,24 +124,15 @@ export function CommandPalette({
                   onNavigate(item.href, Boolean(item.href.startsWith('http')))
                   onClose()
                 }}
-                className="w-full text-left px-4 py-3 rounded transition-colors font-mono"
+                className={`w-full text-left px-4 py-3 rounded transition-colors font-mono ${
+                  idx === selectedIndex ? '' : 'hover:bg-white/[0.08]'
+                }`}
                 style={{
                   backgroundColor:
                     idx === selectedIndex
                       ? 'rgba(255, 255, 255, 0.15)'
                       : 'transparent',
                   color: 'var(--fg)',
-                }}
-                onMouseEnter={(e) => {
-                  if (idx !== selectedIndex) {
-                    e.currentTarget.style.backgroundColor =
-                      'rgba(255, 255, 255, 0.08)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (idx !== selectedIndex) {
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                  }
                 }}
               >
                 <div
