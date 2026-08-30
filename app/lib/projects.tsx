@@ -27,7 +27,7 @@ const Projects: Project[] = [
       'Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.',
     href: 'https://github.com/thelounge/thelounge',
     role: 'Maintainer',
-    years: ['2016', '2024'],
+    years: ['2016', 'present'],
     type: 'project',
   },
   {

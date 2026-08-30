@@ -81,12 +81,16 @@ export async function getProjectsData(): Promise<Project[]> {
       const years = tech.map((y) => parseInt(y)).filter((y) => !isNaN(y))
       return years.length > 0 ? Math.max(...years) : 0
     }
+    const getEarliestYear = (tech: string[]) => {
+      const years = tech.map((y) => parseInt(y)).filter((y) => !isNaN(y))
+      return years.length > 0 ? Math.min(...years) : 0
+    }
 
     const yearA = getLatestYear(a.tech)
     const yearB = getLatestYear(b.tech)
 
-    // Sort descending (newest first)
-    return yearB - yearA
+    // Sort descending (newest first); break ties by which project started more recently
+    return yearB - yearA || getEarliestYear(b.tech) - getEarliestYear(a.tech)
   })
 }
 
