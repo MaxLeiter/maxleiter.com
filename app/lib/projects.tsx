@@ -78,7 +78,7 @@ const Projects: Project[] = [
       'I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.',
     href: 'https://v0.app',
     role: 'Developer',
-    years: ['2023', 'present'],
+    years: ['2023', '2026'],
     type: 'project',
   },
   {
