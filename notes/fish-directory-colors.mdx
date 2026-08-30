@@ -35,7 +35,9 @@ It also skips VS Code's integrated terminal because I generally know what projec
 Full code:
 
 <details>
-<summary> Click to expand </summary>
+<summary>Click to expand</summary>
+
+```fish
 function _claude_color_for_dir
     # Skip in VS Code's integrated terminal
     if test "$TERM_PROGRAM" = vscode
@@ -79,4 +81,6 @@ function _claude_color_for_dir
 
     printf '\e]11;#%02x%02x%02x\a' $ri $gi $bi
 end
+```
+
 </details>
