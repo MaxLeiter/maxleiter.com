@@ -1,20 +1,18 @@
 'use client'
 
 import { useEffect } from 'react'
-import { CommandPalette } from '@components/desktop/command-palette'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
-import type { BlogPost, Project } from '@lib/portfolio-data'
 import { useEffects } from '@components/desktop/effects-context'
 
-interface GlobalKeyboardHandlerProps {
-  blogPosts: BlogPost[]
-  projects: Project[]
-}
+// The palette (and the search index it fetches) only load on first open.
+const CommandPalette = dynamic(
+  () =>
+    import('@components/desktop/command-palette').then((m) => m.CommandPalette),
+  { ssr: false },
+)
 
-export function GlobalKeyboardHandler({
-  blogPosts,
-  projects,
-}: GlobalKeyboardHandlerProps) {
+export function GlobalKeyboardHandler() {
   const { showCommandPalette, setShowCommandPalette } = useEffects()
   const router = useRouter()
 
@@ -34,8 +32,6 @@ export function GlobalKeyboardHandler({
 
   return (
     <CommandPalette
-      blogPosts={blogPosts}
-      projects={projects}
       onClose={() => setShowCommandPalette(false)}
       onNavigate={(path, external) =>
         external

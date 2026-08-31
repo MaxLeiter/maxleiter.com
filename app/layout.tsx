@@ -5,7 +5,6 @@ import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from 'next-themes'
 import { Viewport } from 'next'
-import { getBlogPosts, getProjectsData } from '@lib/portfolio-data'
 import { GlobalKeyboardHandler } from '@components/desktop/global-keyboard-handler'
 import { EffectsProvider } from '@components/desktop/effects-context'
 import { PageTransition } from '@components/page-transition'
@@ -61,16 +60,11 @@ export const viewport: Viewport = {
   themeColor: '#000000',
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const [blogPosts, projects] = await Promise.all([
-    getBlogPosts(),
-    getProjectsData(),
-  ])
-
   return (
     <html
       lang="en"
@@ -81,7 +75,7 @@ export default async function RootLayout({
         <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem>
           <EffectsProvider>
             <PageTransition>{children}</PageTransition>
-            <GlobalKeyboardHandler blogPosts={blogPosts} projects={projects} />
+            <GlobalKeyboardHandler />
             <Analytics />
           </EffectsProvider>
         </ThemeProvider>

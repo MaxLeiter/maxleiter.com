@@ -3,9 +3,10 @@ import path from 'path'
 import { MinecraftItem } from './MinecraftInventory'
 import MinecraftInventory from './MinecraftInventory'
 
-// Statically scoped so Turbopack traces only this directory into the server
-// output instead of the whole project.
-const IMAGES_DIR = path.join(process.cwd(), 'app/components/mc/images')
+// Icons live in public/ so they ship as cacheable static files. Inlining them
+// as base64 put ~500KB of data URIs into the page HTML and RSC payload.
+const PUBLIC_DIR = path.join(process.cwd(), 'public')
+const IMAGES_DIR = path.join(PUBLIC_DIR, 'mc/images')
 
 interface InventoryFromDirProps {
   /** Grid columns (default 9) */
@@ -39,13 +40,12 @@ export default function MinecraftInventoryFromDir({
         entry.isFile() &&
         /\.(png|jpe?g|gif|webp)$/i.test(entry.name)
       ) {
-        const fileBuf = fs.readFileSync(entryPath)
-        const base64 = fileBuf.toString('base64')
-        const ext = path.extname(entry.name).slice(1)
-        const dataUri = `data:image/${ext};base64,${base64}`
+        const src = encodeURI(
+          '/' + path.relative(PUBLIC_DIR, entryPath).split(path.sep).join('/'),
+        )
         const displayName = path.parse(entry.name).name.replace(/_/g, ' ')
         const modName = relModPath.split(path.sep).pop() || 'Unknown Mod'
-        items.push({ name: displayName, mod: modName, src: dataUri })
+        items.push({ name: displayName, mod: modName, src })
       }
     })
   }

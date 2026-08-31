@@ -1,35 +1,30 @@
 import { MDXComponents } from 'mdx/types'
 import NextImage from 'next/image'
+import dynamic from 'next/dynamic'
 import Link from '@components/link'
 import { MDXNote } from './mdx-note'
 import { Code } from 'bright'
 import { MDXImage } from './mdx-image'
-import { ShotGrid, Shot } from './shot-grid'
 import Info from '@components/icons/info'
-import { FileTree, File, Folder } from '@components/file-tree'
 import Home from '@components/icons/home'
-import { Tweet } from 'react-tweet'
-import { TweetThread } from './tweet-thread'
-// import Diff from './mdx-diff'
-import dynamic from 'next/dynamic'
+import Diff from './mdx-diff-lazy'
+import { ShotGrid, Shot } from './shot-grid-lazy'
+import { FileTree, File, Folder } from '@components/file-tree/lazy'
 
-const Diff = dynamic(() => import('./mdx-diff'), {
-  loading: () => (
-    <div
-      style={{
-        height: 400,
-        width: '100%',
-        display: 'flex',
-        backgroundColor: 'var(--light-gray)',
-      }}
-    />
-  ),
-})
+// Rarely-used, heavy components are split two ways so posts that don't use
+// them pay nothing:
+//  - Client Components (Diff, ShotGrid, FileTree) go through a 'use client'
+//    wrapper that calls next/dynamic, because a Server Component can't split a
+//    Client Component on its own.
+//  - Server Components (Tweet, MinecraftInventory) use next/dynamic here; that
+//    keeps their CSS and client children out of the base post bundle.
 
-// Dynamically import MinecraftInventoryFromDir to avoid bundling 'fs' on client
-const MinecraftInventoryFromDir = dynamic(
-  () => import('@components/mc').then((mod) => mod.MinecraftInventoryFromDir),
-  { ssr: true },
+const Tweet = dynamic(() => import('./tweet-block'))
+const TweetThread = dynamic(() =>
+  import('./tweet-thread').then((m) => m.TweetThread),
+)
+const MinecraftInventory = dynamic(() =>
+  import('@components/mc').then((m) => m.MinecraftInventoryFromDir),
 )
 
 Code.theme = {
@@ -92,20 +87,9 @@ export const mdxComponents: MDXComponents = {
   FileTree: FileTree as any,
   File: File as any,
   Folder: Folder as any,
-
-  Tweet: (props) => (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Tweet {...props} />
-    </div>
-  ),
+  Tweet,
   TweetThread,
-  MinecraftInventory: MinecraftInventoryFromDir,
+  MinecraftInventory,
   ShotGrid,
   Shot,
 }

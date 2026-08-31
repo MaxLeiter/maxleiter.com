@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build` - Build production-ready app and generate RSS feed (runs both build-next and build-rss in parallel)
 - `pnpm start` - Run production server
 - `pnpm lint` - Run ESLint and Prettier to format code
-- `pnpm analyze` - Analyze bundle size with webpack-bundle-analyzer
+- `pnpm analyze` - Analyze bundle size with the Turbopack bundle analyzer (`next experimental-analyze`)
 
 ### Content Management
 - RSS feed generation: `node scripts/rss.mts` (runs on Node's native TypeScript support)
@@ -34,7 +34,7 @@ This is a Next.js 16 app using the App Router pattern with TypeScript and React 
 
 ### Key Libraries
 - **Styling**: Tailwind CSS 4 with custom theme configuration, CSS custom properties for theming
-- **MDX Processing**: @next/mdx with remark-gfm, rehype plugins for syntax highlighting (bright)
+- **MDX Processing**: next-mdx-remote (RSC) with remark-gfm, rehype plugins, and bright for syntax highlighting. Heavy MDX components are lazy-loaded through wrappers in `app/mdx/components/` so they only ship on posts that use them
 - **UI Components**: Radix UI for accessible components, custom desktop-style window system
 - **Theme**: next-themes for dark/light mode switching (default: dark)
 

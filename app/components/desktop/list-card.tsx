@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ExternalLinkIcon, FolderIconDefault } from './desktop-client'
+import { ExternalLinkIcon } from './icons'
 
 interface ListCardProps {
   href: string

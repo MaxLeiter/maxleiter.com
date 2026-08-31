@@ -1,48 +1,74 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { type BlogPost, type Project, getBlogPostHref } from '@lib/blog-post'
+import type { SearchIndexItem } from '@api/search-index/route'
+
+interface PaletteItem {
+  type: 'nav' | SearchIndexItem['type']
+  title: string
+  href: string
+  external: boolean
+}
 
 interface CommandPaletteProps {
-  blogPosts: BlogPost[]
-  projects: Project[]
   onClose: () => void
   onNavigate: (path: string, external: boolean) => void
 }
 
-export function CommandPalette({
-  blogPosts,
-  projects,
-  onClose,
-  onNavigate,
-}: CommandPaletteProps) {
+const NAV_ITEMS: PaletteItem[] = [
+  { type: 'nav', title: 'Blog', href: '/blog', external: false },
+  { type: 'nav', title: 'Projects', href: '/projects', external: false },
+  { type: 'nav', title: 'About', href: '/about', external: false },
+]
+
+const TYPE_LABELS: Record<PaletteItem['type'], string> = {
+  nav: 'Navigation',
+  blog: 'Blog Post',
+  note: 'Note',
+  project: 'Project',
+}
+
+// The post/project index is a static JSON file prerendered at build time. It's
+// fetched once per page load, on first open, instead of being serialized into
+// every page's RSC payload.
+let indexPromise: Promise<SearchIndexItem[]> | null = null
+
+export function loadSearchIndex(): Promise<SearchIndexItem[]> {
+  if (!indexPromise) {
+    indexPromise = fetch('/api/search-index')
+      .then((res) => {
+        if (!res.ok) throw new Error(`search index: ${res.status}`)
+        return res.json() as Promise<SearchIndexItem[]>
+      })
+      .catch((err) => {
+        // Let the next open retry instead of caching the failure.
+        indexPromise = null
+        console.error(err)
+        return []
+      })
+  }
+  return indexPromise
+}
+
+export function CommandPalette({ onClose, onNavigate }: CommandPaletteProps) {
   const [search, setSearch] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [items, setItems] = useState<PaletteItem[]>(NAV_ITEMS)
 
-  const allItems = [
-    { type: 'nav' as const, title: 'Blog', href: '/blog' },
-    { type: 'nav' as const, title: 'Projects', href: '/projects' },
-    { type: 'nav' as const, title: 'About', href: '/about' },
-    ...blogPosts.map((p) => ({
-      type: 'blog' as const,
-      slug: p.slug,
-      title: p.title,
-      href: getBlogPostHref(p),
-    })),
-    ...projects.map((p) => ({
-      type: 'project' as const,
-      id: p.id,
-      title: p.name,
-      href: p.link || '/projects',
-      external: Boolean(p.link),
-    })),
-  ]
+  useEffect(() => {
+    let cancelled = false
+    loadSearchIndex().then((index) => {
+      if (!cancelled) setItems([...NAV_ITEMS, ...index])
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
-  const filtered = search
-    ? allItems.filter((item) =>
-        item.title.toLowerCase().includes(search.toLowerCase()),
-      )
-    : allItems
+  const query = search.trim().toLowerCase()
+  const filtered = query
+    ? items.filter((item) => item.title.toLowerCase().includes(query))
+    : items
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -60,7 +86,7 @@ export function CommandPalette({
       if (e.key === 'Enter') {
         const item = filtered[selectedIndex]
         if (item) {
-          onNavigate(item.href, Boolean(item.href.startsWith('http')))
+          onNavigate(item.href, item.external)
           onClose()
         }
       }
@@ -118,15 +144,12 @@ export function CommandPalette({
           ) : (
             filtered.map((item, idx) => (
               <button
-                // @ts-expect-error - TODO: strict typing
-                key={`${item.type}-${item.slug || item.id || item.title}`}
+                key={`${item.type}-${item.href}`}
                 onClick={() => {
-                  onNavigate(item.href, Boolean(item.href.startsWith('http')))
+                  onNavigate(item.href, item.external)
                   onClose()
                 }}
-                className={`w-full text-left px-4 py-3 rounded transition-colors font-mono ${
-                  idx === selectedIndex ? '' : 'hover:bg-white/[0.08]'
-                }`}
+                className="w-full text-left px-4 py-3 rounded transition-colors font-mono"
                 style={{
                   backgroundColor:
                     idx === selectedIndex
@@ -134,16 +157,23 @@ export function CommandPalette({
                       : 'transparent',
                   color: 'var(--fg)',
                 }}
+                onMouseEnter={(e) => {
+                  if (idx !== selectedIndex) {
+                    e.currentTarget.style.backgroundColor =
+                      'rgba(255, 255, 255, 0.08)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (idx !== selectedIndex) {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }
+                }}
               >
                 <div
                   className="text-xs font-mono uppercase mb-1"
                   style={{ color: 'var(--gray)' }}
                 >
-                  {item.type === 'blog'
-                    ? 'Blog Post'
-                    : item.type === 'project'
-                      ? 'Project'
-                      : 'Navigation'}
+                  {TYPE_LABELS[item.type]}
                 </div>
                 <div style={{ color: 'var(--fg)', opacity: 0.9 }}>
                   {item.title}
