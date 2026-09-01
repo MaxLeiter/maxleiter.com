@@ -37,7 +37,7 @@ export function FileIcon({ className }: { className?: string }) {
     >
       <path d="M9.5 1H3.5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V5L9.5 1Z" />
       <path d="M9.5 1v4h4" />
-      <path d="M5 8.5h6M5 11h6" />
+      <path d="M5 8.5h6M5 11h6" strokeWidth="1" />
     </svg>
   )
 }
