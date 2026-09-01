@@ -1,8 +1,0 @@
-{
-  "blocks": [
-    "xios-device doctor # host tools, SSH, on-device helpers\nxios-device session gnome # start a session\nxios-device app kgx # launch a client into it\nxios-device input click 400 300\nxios-device shot # screenshot + logs, into artifacts/"
-  ],
-  "occurrences": [
-    2
-  ]
-}

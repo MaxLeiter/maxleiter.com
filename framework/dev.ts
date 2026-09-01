@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { contentTypeFor, resolveRequest } from './routing'
+import { contentTypeFor, resolveRequest } from './shared/routing'
 
 /**
  * The dev server: watch, rebuild, serve, reload.
@@ -11,10 +11,10 @@ import { contentTypeFor, resolveRequest } from './routing'
  * This is the only file allowed to use `Bun.*` APIs; everything in the build
  * path stays runtime-agnostic so `vercel build` can run it under node.
  *
- * There is no Fast Refresh and no error overlay. Editing a component reloads
- * the page and loses component state; the honest accounting is in
- * `docs/rewrite/04-architecture-design.md` section 2.13. The content-hash
- * caches in `.cache/` keep an incremental rebuild to a few hundred ms.
+ * There is no Fast Refresh and no error overlay: editing a component reloads
+ * the page and loses component state. The content-hash caches in `.cache/`
+ * keep an incremental rebuild to a few hundred ms, which is what makes that
+ * trade bearable.
  */
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
@@ -88,7 +88,7 @@ async function rebuild(): Promise<void> {
   notifyClients()
 }
 
-/** The file `framework/routing.ts` resolves this URL to, if it exists. */
+/** The file `framework/shared/routing.ts` resolves this URL to, if it exists. */
 async function resolveFile(relative: string): Promise<string | null> {
   const candidate = path.join(STATIC, relative)
   // `..` in a request path must not escape the output tree.
@@ -122,9 +122,7 @@ async function start(): Promise<void> {
   for (const dir of WATCHED) {
     const target = path.join(ROOT, dir)
     if (!fs.existsSync(target)) continue
-    fs.watch(target, { recursive: true }, (_event, filename) => {
-      // The build writes .d.ts files next to CSS modules; ignore its own output.
-      if (filename && filename.endsWith('.d.ts')) return
+    fs.watch(target, { recursive: true }, () => {
       // One editor save emits both `rename` and `change` on macOS, and the
       // in-flight guard queues the second one into a whole extra build.
       clearTimeout(pending)

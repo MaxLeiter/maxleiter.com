@@ -1,5 +1,5 @@
-import type { BlogPost, Project } from '@lib/blog-post'
-import { Island } from '../../framework/islands'
+import type { ListEntry, ProjectCard } from '@lib/types'
+import { Island } from '@framework/render/islands'
 import { DesktopChrome } from '../islands/desktop/chrome'
 import type { DesktopPost, DesktopProject } from '../islands/desktop/data'
 import { CommandPalette } from './shell'
@@ -32,7 +32,7 @@ const CLOCK_SCRIPT =
  * here, and island props are serialized into the HTML alongside the markup that
  * already carries them.
  */
-function toDesktopPost(post: BlogPost): DesktopPost {
+function toDesktopPost(post: ListEntry): DesktopPost {
   return {
     slug: post.slug,
     title: post.title,
@@ -43,7 +43,7 @@ function toDesktopPost(post: BlogPost): DesktopPost {
   }
 }
 
-function toDesktopProject(project: Project): DesktopProject {
+function toDesktopProject(project: ProjectCard): DesktopProject {
   return {
     id: project.id,
     name: project.name,
@@ -54,8 +54,8 @@ function toDesktopProject(project: Project): DesktopProject {
 }
 
 export interface HomePageProps {
-  posts: BlogPost[]
-  projects: Project[]
+  posts: ListEntry[]
+  projects: ProjectCard[]
 }
 
 export function HomePage({ posts, projects }: HomePageProps) {

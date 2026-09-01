@@ -1,0 +1,66 @@
+/* The MDX <FileTree>. Rendered at build from app/mdx/island-components.tsx and
+   again on the client by app/islands/file-tree.tsx, so the class names are
+   written scoped and both sides use the same literals. */
+
+.tree-wrapper {
+  width: 100%;
+  position: relative;
+  overflow-x: scroll;
+}
+
+.tree-list,
+.tree-list ul {
+  list-style: none;
+  width: 100%;
+}
+
+.tree-list a {
+  text-decoration: none;
+  color: var(--fg);
+}
+
+.tree-list a:hover {
+  color: var(--fg);
+}
+
+.tree-file,
+.tree-folder {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--gap-half);
+  height: 2.5rem;
+  padding: var(--gap-half);
+  font-family: monospace;
+}
+
+.tree-folder {
+  cursor: pointer;
+  /* To avoid highlighting on double clicking */
+  user-select: none;
+}
+
+.tree-folder-children {
+  margin-left: 1rem;
+}
+
+.tree-file-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1rem;
+}
+
+.tree-file:hover,
+.tree-folder:hover {
+  background-color: var(--lighter-gray);
+}
+
+.tree-note {
+  color: var(--gray);
+  margin-left: var(--gap-half);
+}
+
+.tree-focused {
+  background-color: var(--lighter-gray);
+}

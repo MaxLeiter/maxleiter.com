@@ -1,0 +1,31 @@
+/* The MDX <Note> aside. The `p` rule targets MDX-generated paragraphs. */
+
+.mdx-note {
+  position: relative;
+  border: 1px solid var(--lighter-gray);
+  background: var(--lightest-gray);
+  padding: var(--gap-half);
+  color: var(--article-color);
+  margin: var(--gap) 0;
+}
+
+.mdx-note-icon {
+  --info-stroke-circle-color: var(--light-gray);
+  --info-stroke-color: var(--fg);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  transform: translate(-50%, -50%);
+  background: var(--bg);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+}
+
+.mdx-note-content {
+  padding-left: var(--gap);
+}
+
+.mdx-note-content p {
+  margin: 0;
+}

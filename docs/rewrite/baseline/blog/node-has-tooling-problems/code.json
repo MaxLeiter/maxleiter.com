@@ -1,8 +1,0 @@
-{
-  "blocks": [
-    "\"types\": \"./dist/types/main.d.ts\",\n\"files\": [\n\"dist\"\n],\n\"main\": \"./dist/sortablejs-vue3.umd.js\",\n\"module\": \"./dist/sortablejs-vue3.es.js\",\n\"exports\": {\n\".\": {\n\"import\": \"./dist/sortablejs-vue3.es.js\",\n\"require\": \"./dist/sortablejs-vue3.umd.js\"\n}\n},"
-  ],
-  "occurrences": [
-    2
-  ]
-}

@@ -5,7 +5,8 @@ This isn't a framework. It's a build script with opinions.
 [`build.ts`](../build.ts) reads my posts, renders every page with React on the
 server, writes HTML files, and exits. No server. No code runs when you request
 a page. A blog post ships about 1 KB of JavaScript. The homepage, which has a
-draggable window manager on it, ships about 15 KB. The whole site builds in
+draggable window manager on it, ships about 17 KB, none of it before first
+paint. The whole site builds in
 about half a second. Output is a
 [Vercel Build Output](https://vercel.com/docs/build-output-api/v3) directory,
 which is just static files plus a routing table.
@@ -18,39 +19,43 @@ thousand lines that build one website. That's the point.
 
 [`build.ts`](../build.ts) runs these steps. The independent ones overlap.
 
-1. [`content.ts`](./content.ts) reads `posts/` and `notes/`, parses
+1. [`content/index.ts`](./content/index.ts) reads `posts/` and `notes/`, parses
    frontmatter, throws out anything with `published: false`, and sorts by date.
    That plus the project list is the `BuildContext` every later step gets.
 
-2. esbuild bundles [`entry-server.ts`](./entry-server.ts) and everything it
-   imports into one module. Path aliases, JSX and CSS modules all resolve here,
-   once. This is why the build produces identical bytes under Bun and Node.
+2. esbuild bundles [`render/index.ts`](./render/index.ts) and everything it
+   imports into one module. Path aliases and JSX all resolve here, once. This
+   is why the build produces identical bytes under Bun and Node.
 
-3. [`mdx.ts`](./mdx.ts) compiles each MDX file once and caches by content hash.
-   [`highlight.ts`](./highlight.ts) runs Shiki with two themes and emits CSS
+3. [`render/mdx.ts`](./render/mdx.ts) compiles each MDX file once and caches by
+   content hash. [`render/highlight.ts`](./render/highlight.ts) runs Shiki with two themes and emits CSS
    variables instead of fixed colors, so switching light and dark is a CSS
    selector and costs zero client JS.
 
-4. [`routes.ts`](./routes.ts) lists every route. [`render.tsx`](./render.tsx)
-   renders each with `renderToStaticMarkup` and wraps it in the document shell:
+4. [`render/pages.ts`](./render/pages.ts) lists every route.
+   [`render/shell.tsx`](./render/shell.tsx) renders each with `renderToStaticMarkup` and wraps it in the document shell:
    head tags, the inlined stylesheet, and a small blocking script that applies
    the saved theme before first paint.
 
-5. [`css.ts`](./css.ts) runs the Tailwind CLI over `app/styles/`. Each CSS
-   module becomes a fragment keyed on the class names it exports. A page gets a
-   fragment only if its markup uses one of those classes. There's no list of
-   optional styles to maintain. If a module can't be gated, because it styles a
-   bare element or `:root`, it goes in the base sheet and the build logs it.
+5. [`assets/css.ts`](./assets/css.ts) runs the Tailwind CLI over `app/styles/`
+   for the base sheet. Every other stylesheet is a fragment with a marker: a
+   page gets it only if its markup carries that class prefix. Class names are
+   written already scoped, so there's no CSS-module compiler and no generated
+   `.d.ts` files. Adding a sheet means adding a line to `PLAIN_SHEETS` in
+   [`build.ts`](../build.ts); a sheet without one ships nowhere.
 
-6. [`client.ts`](./client.ts) bundles the runtime and one module per island,
+6. [`assets/client.ts`](./assets/client.ts) bundles the runtime and one module
+   per island,
    with `react` and `react-dom` aliased to Preact's compat layer. Output lands
    in `/_assets/` with a content hash.
 
-7. [`platform.ts`](./platform.ts) runs the parts that talk to Vercel rather than
-   React: Open Graph images ([`og.ts`](./og.ts)), the feed, sitemap, robots file
-   and search index ([`feeds.ts`](./feeds.ts)), and the routing config
-   ([`vercel.ts`](./vercel.ts)). [`fonts.ts`](./fonts.ts) subsets the fonts first
-   because the shell needs the `@font-face` rules. If any of this fails, the
+7. [`platform/index.ts`](./platform/index.ts) runs the parts that talk to Vercel rather than
+   React: Open Graph images ([`og.ts`](./platform/og.ts)), the feed, sitemap,
+   robots file and search index ([`feeds.ts`](./platform/feeds.ts)), and the
+   routing config ([`vercel.ts`](./platform/vercel.ts)). They run together in
+   one `Promise.all` because they write disjoint files.
+   [`assets/fonts.ts`](./assets/fonts.ts) subsets the fonts first because the shell
+   needs the `@font-face` rules. If any of this fails, the
    build fails. A site with no feed and no routing table shouldn't exit 0.
 
 8. The build writes into a scratch directory named after its own PID and
@@ -65,20 +70,22 @@ Everything else stays inert markup.
 You declare one by wrapping server-rendered children:
 
 ```tsx
-<Island name="file-tree" on="visible" props={{ tree, classes }}>
-  <FileTree tree={tree} classes={classes} />
+<Island name="file-tree" on="visible" props={{ tree }}>
+  <FileTree tree={tree} />
 </Island>
 ```
 
-[`islands.tsx`](./islands.tsx) turns that into a `<div>` with the island's name,
+[`render/islands.tsx`](./render/islands.tsx) turns that into a `<div>` with the island's name,
 trigger, and props as JSON. The children are real markup, so the page works
 without JavaScript, and the client hydrates the same component over them
 instead of replacing them.
 
-Four triggers. `load` mounts immediately. `idle` waits for the browser to be
-free. `visible` waits until the island is near the viewport. `interaction`
-waits for a pointer or focus. All `visible` islands on a page share one
-IntersectionObserver.
+Two triggers. `load` mounts after the first paint. `visible` waits until the
+island is near the viewport; all `visible` islands on a page share one
+IntersectionObserver. There used to be four. `idle` was the default nothing
+asked for, and `interaction` had one user, the command palette, which renders
+`hidden` where a pointer listener can never fire. The palette is mounted by
+name instead, from `openPalette()`.
 
 [`client/runtime.ts`](./client/runtime.ts) does the scheduling. It also handles
 the stuff that doesn't need an island: the theme toggle, Cmd/Ctrl+K,
@@ -130,8 +137,8 @@ That's it. Add a file and you get the route, an embed variant at
 entry, and a card on the index page.
 
 Images and tweets get resolved once and committed to git. Image dimensions go
-in `app/data/image-dimensions.json` ([`image-dims.ts`](./image-dims.ts)). Tweet
-payloads go in `app/data/tweets/<id>.json` ([`tweets.ts`](./tweets.ts)). Normal
+in `app/data/image-dimensions.json` ([`content/dimensions.ts`](./content/dimensions.ts)). Tweet
+payloads go in `app/data/tweets/<id>.json` ([`content/tweets.ts`](./content/tweets.ts)). Normal
 builds read from the repo and never hit the network. Only a new image or tweet
 triggers a fetch. A missing tweet fails the build because a broken tweet card
 would ship silently. A missing image measurement just warns because the image
@@ -150,23 +157,23 @@ matching island in `app/islands/`.
 | `pnpm build:bun` | Same build under Bun. Faster locally, identical output. |
 | `pnpm check` | `tsc --noEmit`. |
 | `pnpm lint` | oxlint and oxfmt. |
-| `pnpm gate` | Build, snapshot, diff against the committed baseline. |
+| `pnpm test` | The platform check ([`platform/test.ts`](./platform/test.ts)). `bun run`, never `bun test`. |
+| `pnpm gate` | Build, then diff the output against `docs/snapshot.json`. |
+| `pnpm snapshot` | Rewrite `docs/snapshot.json`. |
 
-The gate is a parity harness. [`tools/snapshot.ts`](../tools/snapshot.ts)
-normalizes built pages by stripping hashes and timestamps, and
-[`tools/diff-html.ts`](../tools/diff-html.ts) compares head tags, prose, code
-blocks and generated files against `docs/rewrite/baseline/`, which is what the
-old Next.js site produced. This is how I knew the rewrite didn't break
-anything.
+The gate is a self-comparison. [`tools/snapshot.ts`](../tools/snapshot.ts)
+writes one row per route — title, description, canonical, OG image, noindex,
+the size of the partial, and hashes of the prose and the code blocks — and
+diffs it against `docs/snapshot.json`. It used to diff against a committed copy
+of the old Next.js output, which was how I knew the rewrite didn't break
+anything. That baseline is gone, and the question the gate answers now is the
+one I actually have: did anything change since the last output I looked at.
 
-Adding a post doesn't fail the gate. New routes get reported. Two things are
-fatal: a route that used to exist and doesn't anymore, and a page in the output
-that the route registry never declared. Re-baseline only when you mean to
-change the output:
-
-```
-pnpm snapshot --dir .vercel/output/static --out docs/rewrite/baseline
-```
+Adding a post doesn't fail the gate. New routes get reported. Three things are
+fatal: a route that used to exist and doesn't anymore, a changed field or hash,
+and a page in the output the route registry never declared. Re-baseline only
+when you mean to change the output, with `pnpm snapshot`, and read the diff —
+it's written to be readable.
 
 ## Deploying
 

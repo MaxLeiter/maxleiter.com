@@ -1,8 +1,0 @@
-{
-  "blocks": [
-    "{\n\"dependencies\": {\n\"react\": \"17.0.2\", // installs react@17.0.2 exactly. I recommend this.\n\"react\": \"^17.0.2\", // installs the latest minor version after .0 (so 17.*.*)\n\"react\": \"~17.0.2\" // installs the latest patch after .2 (so 17.0.*)\n}\n}"
-  ],
-  "occurrences": [
-    2
-  ]
-}

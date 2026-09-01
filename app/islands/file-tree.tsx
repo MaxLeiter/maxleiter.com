@@ -13,11 +13,10 @@ import LayoutIcon from '@components/icons/layout'
  * screen. Both take the same serializable `tree`, so the fallback and the first
  * client render are identical and hydration patches nothing.
  *
- * Two things arrive as props rather than as imports. The tree, because MDX
- * children are React elements and `data-props` has to be JSON. The class names,
- * because the CSS modules are compiled by framework/css.ts with lightningcss
- * and the client bundle has no equivalent plugin: importing the stylesheet here
- * would mint a second, different set of scoped names.
+ * The tree arrives as a prop rather than as an import because MDX children are
+ * React elements and `data-props` has to be JSON. The class names are literals
+ * from app/components/file-tree/file-tree.css, a plain sheet whose scoping is
+ * written into the names, so the build and the client agree without a plugin.
  */
 
 export interface FileNode {
@@ -39,23 +38,8 @@ export interface FolderNode {
 
 export type TreeNode = FileNode | FolderNode
 
-/** Scoped class names, resolved on the server from the CSS module. */
-export interface FileTreeClasses {
-  wrapper: string
-  fileTree: string
-  file: string
-  folder: string
-  folderChildren: string
-  fileName: string
-  note: string
-  focused: string
-  /** `link.module.css`'s `.link`, for the external-file anchors. */
-  link: string
-}
-
 export interface FileTreeProps {
   tree: TreeNode[]
-  classes: FileTreeClasses
 }
 
 function icon(type: string) {
@@ -69,13 +53,13 @@ function icon(type: string) {
   }
 }
 
-function File({ node, classes }: { node: FileNode; classes: FileTreeClasses }) {
+function File({ node }: { node: FileNode }) {
   const [focused, setFocused] = useState(false)
 
   const label = (
-    <span className={classes.fileName}>
+    <span className="tree-file-name">
       {node.name}
-      <span className={classes.note}>{node.note}</span>
+      <span className="tree-note">{node.note}</span>
     </span>
   )
 
@@ -84,22 +68,22 @@ function File({ node, classes }: { node: FileNode; classes: FileTreeClasses }) {
       role="treeitem"
       aria-selected={focused}
       onFocus={(event) => {
-        event.currentTarget.classList.add(classes.focused)
+        event.currentTarget.classList.add('tree-focused')
         setFocused(true)
       }}
       onBlur={(event) => {
-        event.currentTarget.classList.remove(classes.focused)
+        event.currentTarget.classList.remove('tree-focused')
         setFocused(false)
       }}
     >
-      <div className={classes.file} tabIndex={0}>
+      <div className="tree-file" tabIndex={0}>
         {icon(node.type)}
         {node.url ? (
           <a
             href={node.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={classes.link}
+            className="link"
             tabIndex={0}
           >
             <span className="sr-only">{node.type} file:</span>
@@ -113,13 +97,7 @@ function File({ node, classes }: { node: FileNode; classes: FileTreeClasses }) {
   )
 }
 
-function Folder({
-  node,
-  classes,
-}: {
-  node: FolderNode
-  classes: FileTreeClasses
-}) {
+function Folder({ node }: { node: FolderNode }) {
   const [open, setOpen] = useState(node.open)
   const [focused, setFocused] = useState(false)
 
@@ -148,11 +126,11 @@ function Folder({
       <a
         onClick={() => setOpen((previous) => !previous)}
         onFocus={(event) => {
-          event.currentTarget.classList.add(classes.focused)
+          event.currentTarget.classList.add('tree-focused')
           setFocused(true)
         }}
         onBlur={(event) => {
-          event.currentTarget.classList.remove(classes.focused)
+          event.currentTarget.classList.remove('tree-focused')
           setFocused(false)
         }}
         role="button"
@@ -161,7 +139,7 @@ function Folder({
           open ? `Collapse ${node.name} folder` : `Expand ${node.name} folder`
         }
       >
-        <div className={classes.folder}>
+        <div className="tree-folder">
           {open ? (
             <FolderMinus color="var(--fg)" fill="none" />
           ) : (
@@ -170,44 +148,38 @@ function Folder({
           <span>
             {node.name}
             <span className="sr-only">, {open ? 'open' : 'closed'} folder</span>
-            <span className={classes.note}>{node.note}</span>
+            <span className="tree-note">{node.note}</span>
           </span>
         </div>
       </a>
       {open && (
-        <ul className={classes.folderChildren} role="group">
-          <Nodes nodes={node.children} classes={classes} />
+        <ul className="tree-folder-children" role="group">
+          <Nodes nodes={node.children} />
         </ul>
       )}
     </li>
   )
 }
 
-function Nodes({
-  nodes,
-  classes,
-}: {
-  nodes: TreeNode[]
-  classes: FileTreeClasses
-}) {
+function Nodes({ nodes }: { nodes: TreeNode[] }) {
   return (
     <>
       {nodes.map((node, index) =>
         node.kind === 'folder' ? (
-          <Folder key={index} node={node} classes={classes} />
+          <Folder key={index} node={node} />
         ) : (
-          <File key={index} node={node} classes={classes} />
+          <File key={index} node={node} />
         ),
       )}
     </>
   )
 }
 
-export default function FileTree({ tree, classes }: FileTreeProps) {
+export default function FileTree({ tree }: FileTreeProps) {
   return (
-    <div className={classes.wrapper}>
-      <ul className={classes.fileTree} role="tree">
-        <Nodes nodes={tree} classes={classes} />
+    <div className="tree-wrapper">
+      <ul className="tree-list" role="tree">
+        <Nodes nodes={tree} />
       </ul>
     </div>
   )

@@ -8,8 +8,7 @@ import {
   ThemeToggle,
   TwitterIcon,
 } from '@components/static/desktop-icons'
-import { entryHref } from '@lib/blog-post'
-import { POPULAR_SLUGS } from '@lib/popular-posts'
+import { entryHref, POPULAR_SLUGS } from '@lib/types'
 import { windowStyles } from '@lib/window-styles'
 import {
   FOLDERS,

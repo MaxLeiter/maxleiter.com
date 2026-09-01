@@ -1,13 +1,155 @@
 /*
  * `source(none)` turns OFF Tailwind's automatic source detection. The build
- * entry (framework/css.ts) declares `@source` for `app/` and `framework/`
+ * entry (framework/assets/css.ts) declares `@source` for `app/` and `framework/`
  * explicitly, and automatic detection additionally walks the repo root, where
  * it picked up the parity harness's stored HTML snapshots and minted utilities
  * for classes the site stopped rendering. That made the stylesheet depend on
  * .gitignore.
  */
-@import 'tailwindcss' source(none);
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
 @import './markdown.css';
+
+/*
+ * Tailwind's preflight, minus the two thirds of it this site has no elements
+ * for. Importing `tailwindcss` whole would pull the full 8.4 KB file; keeping
+ * only these rules is 845 B brotli off EVERY page, which is more than the whole
+ * first-party stylesheet set put together.
+ *
+ * What is gone: every date/time input pseudo-element, the file-selector button,
+ * the search and spinner pseudo-elements, `optgroup`, `progress`, `textarea`
+ * and the Firefox `:invalid` and focusring fixes. A census of the built output
+ * says the site renders no `textarea`, `select`, `progress`, `optgroup`,
+ * `menu`, `kbd`, `samp` or `sub`. The `hr` rules are gone too, because the
+ * block further down redefines that element completely.
+ *
+ * Everything below IS load-bearing, and the first rule most of all: Tailwind's
+ * `border-*` utilities set only a width and a colour, so they need `border: 0
+ * solid` underneath them to do anything at all.
+ *
+ * This is the one file in the repo that has to be rechecked on a Tailwind
+ * major upgrade: diff it against `node_modules/tailwindcss/preflight.css`.
+ */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+
+  html {
+    tab-size: 4;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Headings are styled by utilities and markdown.css, never by the UA. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
+  }
+
+  b,
+  strong {
+    font-weight: bolder;
+  }
+
+  code,
+  pre {
+    font-family: var(--font-mono);
+    font-size: 1em;
+  }
+
+  small {
+    font-size: 80%;
+  }
+
+  sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+    top: -0.5em;
+  }
+
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+  }
+
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+
+  /* The MDX <Details> component. */
+  summary {
+    display: list-item;
+  }
+
+  ol,
+  ul {
+    list-style: none;
+  }
+
+  img,
+  svg,
+  video,
+  canvas,
+  iframe {
+    display: block;
+    vertical-align: middle;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* The command palette's input, and every button in the desktop chrome. */
+  button,
+  input {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+
+  button {
+    appearance: button;
+  }
+
+  ::placeholder {
+    opacity: 1;
+    color: color-mix(in oklab, currentcolor 50%, transparent);
+  }
+
+  /* The command palette's shell renders hidden until the runtime mounts it. */
+  [hidden]:where(:not([hidden='until-found'])) {
+    display: none !important;
+  }
+}
 
 /*
  * `3xl:` is used throughout the desktop chrome to scale type and padding up on

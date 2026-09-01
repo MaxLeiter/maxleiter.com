@@ -55,7 +55,7 @@ const HOVER_BG = 'rgba(255, 255, 255, 0.08)'
 /**
  * The search index is a module-scoped store, not component state.
  *
- * `/search-index.json` is a static file written by framework/feeds.ts with the
+ * `/search-index.json` is a static file written by framework/platform/feeds.ts with the
  * same shape the Next `/api/search-index` route returned. This island is
  * `on="interaction"`, so its chunk is only fetched when the palette opens:
  * starting the request at module scope is the same moment a mount effect would

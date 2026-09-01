@@ -2,15 +2,11 @@ import fs from 'node:fs'
 import path from 'node:path'
 import React from 'react'
 import type { ReactElement, ReactNode } from 'react'
-import fileTreeStyles from '@components/file-tree/file-tree.module.css'
-import linkStyles from '@components/link/link.module.css'
-import shotStyles from '@mdx/components/shot-grid.module.css'
-import inventoryStyles from '@components/mc/inventory.module.css'
 import FileTreeIsland from '@islands/file-tree'
-import type { FileTreeClasses, TreeNode } from '@islands/file-tree'
-import type { ShotGridClasses, ShotItem } from '@islands/shot-grid'
-import { Island } from '../../framework/islands'
-import { optimizedUrl } from '../../framework/images'
+import type { TreeNode } from '@islands/file-tree'
+import type { ShotItem } from '@islands/shot-grid'
+import { Island } from '@framework/render/islands'
+import { optimizedUrl } from '@framework/render/images'
 
 /**
  * The MDX components that hydrate: the file tree, the shot grid and the
@@ -59,23 +55,6 @@ export function flattenText(node: ReactNode): string {
 }
 
 /* ----------------------------------------------------------- file tree -- */
-
-/**
- * The scoped names lightningcss minted for the two stylesheets the tree uses.
- * They travel to the island as props: the client bundle has no CSS-module
- * plugin, so importing the stylesheets there would mint a second, different set.
- */
-const FILE_TREE_CLASSES: FileTreeClasses = {
-  wrapper: fileTreeStyles.wrapper,
-  fileTree: fileTreeStyles.fileTree,
-  file: fileTreeStyles.file,
-  folder: fileTreeStyles.folder,
-  folderChildren: fileTreeStyles['folder-children'],
-  fileName: fileTreeStyles['file-name'],
-  note: fileTreeStyles.note,
-  focused: fileTreeStyles.focused,
-  link: linkStyles.link,
-}
 
 interface FileProps {
   type: string
@@ -134,12 +113,8 @@ function toTreeNodes(children: ReactNode): TreeNode[] {
 function FileTree({ children }: { children?: ReactNode }) {
   const tree = toTreeNodes(children)
   return (
-    <Island
-      name="file-tree"
-      on="visible"
-      props={{ tree, classes: FILE_TREE_CLASSES }}
-    >
-      <FileTreeIsland tree={tree} classes={FILE_TREE_CLASSES} />
+    <Island name="file-tree" on="visible" props={{ tree }}>
+      <FileTreeIsland tree={tree} />
     </Island>
   )
 }
@@ -208,25 +183,12 @@ function makeShot(Image: ArticleImageComponent) {
     )
 
     return (
-      <figure className={shotStyles.shot}>
+      <figure className="shot-figure">
         {media}
         {caption ? <figcaption>{caption}</figcaption> : null}
       </figure>
     )
   }
-}
-
-const SHOT_GRID_CLASSES: ShotGridClasses = {
-  trigger: shotStyles.trigger,
-  lightbox: shotStyles.lightbox,
-  lightboxFigure: shotStyles.lightboxFigure,
-  lightboxMedia: shotStyles.lightboxMedia,
-  lightboxCaption: shotStyles.lightboxCaption,
-  counter: shotStyles.counter,
-  control: shotStyles.control,
-  close: shotStyles.close,
-  prev: shotStyles.prev,
-  next: shotStyles.next,
 }
 
 /** The optimizer width the lightbox opens at. Must be in IMAGE_WIDTHS. */
@@ -271,15 +233,11 @@ function ShotGrid({ children }: { children?: ReactNode }) {
   const items = toShotItems(children)
   return (
     <>
-      <div className={shotStyles.grid} data-shot-grid>
+      <div className="shot-grid" data-shot-grid>
         {children}
       </div>
       {items.length > 0 ? (
-        <Island
-          name="shot-grid"
-          on="visible"
-          props={{ items, classes: SHOT_GRID_CLASSES }}
-        >
+        <Island name="shot-grid" on="visible" props={{ items }}>
           {null}
         </Island>
       ) : null}
@@ -360,7 +318,7 @@ function makeMinecraftInventory(root: string) {
     // so that listener bought a grid of 53 icons nothing at all.
     return (
       <div
-        className={inventoryStyles.container}
+        className="mc-inventory"
         style={
           {
             '--slot-size': `${slotSize}px`,
@@ -369,7 +327,7 @@ function makeMinecraftInventory(root: string) {
         }
       >
         {items.map((item, index) => (
-          <div key={`${item.name}-${index}`} className={inventoryStyles.slot}>
+          <div key={`${item.name}-${index}`} className="mc-slot">
             {/* 32px pixel-art icons rendered at 32px. Sending them through the
                 optimizer would cost 53 billable transformations to produce the
                 bytes we already have, and resampling would blur them. */}
@@ -383,9 +341,9 @@ function makeMinecraftInventory(root: string) {
               decoding="async"
               style={{ imageRendering: 'pixelated' }}
             />
-            <div className={inventoryStyles.tooltip}>
+            <div className="mc-tooltip">
               <div>{item.name}</div>
-              <div className={inventoryStyles.mod}>{item.mod}</div>
+              <div className="mc-mod">{item.mod}</div>
             </div>
           </div>
         ))}

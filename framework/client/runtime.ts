@@ -13,7 +13,7 @@
  * writing `textContent` behind preact's back is one owner too many.
  */
 
-import { isNameLive, transitionNameForUrl } from '../transitions'
+import { isNameLive, transitionNameForUrl } from '../shared/transitions'
 
 /** The generated island entry returns its own teardown. */
 type Mount = (el: HTMLElement, props: unknown) => void | (() => void)
@@ -96,13 +96,21 @@ function mountOnInteraction(el: HTMLElement): void {
   }
 }
 
+/**
+ * An island with no `data-on` is mounted by name instead: the command palette
+ * renders `hidden`, so no trigger listener on it could ever fire, and
+ * `openPalette()` below is its only path in.
+ */
 function schedule(el: HTMLElement): void {
-  const on = el.dataset.on || 'idle'
+  const on = el.dataset.on
   if (on === 'load') {
-    void mount(el)
-    return
-  }
-  if (on === 'visible') {
+    // After first paint, not during it. This runtime is an inline module, so
+    // it runs before the browser has painted anything; starting the desktop's
+    // 48 KB import here put all of it on the homepage's critical path, for an
+    // island whose markup is already server-rendered and already reads as
+    // links. rAF fires before the paint, the `setTimeout` after it.
+    requestAnimationFrame(() => setTimeout(() => void mount(el), 0))
+  } else if (on === 'visible') {
     observeForVisibility(el)
     // Belt and braces. `mount` is idempotent, so an island the observer never
     // reports -- a tab that is never painted, a fallback the layout gives no
@@ -110,16 +118,7 @@ function schedule(el: HTMLElement): void {
     // island whose fallback has area; the shot grid's is empty by design, and
     // the observer is its only path.
     mountOnInteraction(el)
-    return
   }
-  if (on === 'interaction') {
-    mountOnInteraction(el)
-    return
-  }
-  const idle =
-    window.requestIdleCallback ||
-    ((fn: () => void) => window.setTimeout(fn, 200))
-  idle(() => void mount(el))
 }
 
 function scheduleIslands(): void {
@@ -276,21 +275,67 @@ addEventListener('pageswap', (event) => {
  * a same-document swap, which at least removes the browser's loading indicator
  * and the mobile blank-page flash.
  *
- * Both checks are capability checks. `supports('speculationrules')` says the
- * prerender rules will be honoured; `PageRevealEvent` says the inbound half of
- * a cross-document view transition exists. Neither asks who the browser is:
- * a browser that ships both tomorrow gets the native path with no code change.
+ * All three checks are capability checks, and the middle one is load-bearing.
+ * WebKit hardcodes `supports('speculationrules')` to true for its prefetch-only
+ * support, so iOS Safari claimed the native path, never installed the router,
+ * and showed its loading bar on every navigation. `document.prerendering` is
+ * the property the prerendering spec actually defines, and WebKit does not
+ * have it. `PageRevealEvent` says the inbound half of a cross-document view
+ * transition exists. None of the three asks who the browser is: one that ships
+ * all three tomorrow gets the native path with no code change.
  */
 const nativeInstantNav =
   HTMLScriptElement.supports?.('speculationrules') === true &&
+  'prerendering' in document &&
   'PageRevealEvent' in window
 
 if (!nativeInstantNav) {
+  /**
+   * Holds a click that lands before the router chunk arrives.
+   *
+   * The import is lazy on purpose, so there is a window -- a slow connection,
+   * a tap on a link the moment the page paints -- where a click would have
+   * been a real navigation with the loading indicator the router exists to
+   * remove. This holds one, and hands it to the router the instant it loads.
+   *
+   * The eligibility rules are the conservative half of the router's own
+   * `routableLink`: anything this misses stays a real navigation, which is
+   * where it would have gone anyway.
+   */
+  let pending: { href: string; source: Element } | null = null
+
+  const hold = (event: MouseEvent) => {
+    if (event.defaultPrevented || event.button !== 0) return
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    const target = event.target instanceof Element ? event.target : null
+    const link = target?.closest<HTMLAnchorElement>('a[href]')
+    if (!link || (link.target && link.target !== '_self')) return
+    if (link.hasAttribute('download') || link.closest('[data-no-router]'))
+      return
+    const url = new URL(link.href, location.href)
+    if (url.origin !== location.origin || url.hash) return
+    event.preventDefault()
+    pending = { href: url.href, source: link }
+  }
+
+  // Capture phase, so it runs before any handler that might act on the click.
+  document.addEventListener('click', hold, true)
+
   void import('./router')
     .then((router) => {
+      document.removeEventListener('click', hold, true)
       router.installRouter({ teardown: unmountIslands, setup: adoptIslands })
+      if (pending) {
+        void router.navigate(pending.href, {
+          push: true,
+          source: pending.source,
+        })
+      }
     })
     .catch(() => {
-      // No router means plain cross-document navigation, which always works.
+      // No router means plain cross-document navigation, which always works --
+      // but a click this held has to go somewhere, or it is simply lost.
+      document.removeEventListener('click', hold, true)
+      if (pending) location.href = pending.href
     })
 }

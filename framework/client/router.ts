@@ -12,7 +12,7 @@
  * real navigation rather than guessing.
  */
 
-import { isNameLive, transitionNameForUrl } from '../transitions'
+import { isNameLive, transitionNameForUrl } from '../shared/transitions'
 
 export interface IslandHooks {
   /** Unmount every hydrated island. Runs BEFORE the body is replaced. */

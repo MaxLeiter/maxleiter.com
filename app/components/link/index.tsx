@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 
-import styles from './link.module.css'
+// Class names from ./link.css, which is a pre-scoped plain sheet rather than a
+// CSS module: the file-tree island needs `link` as a literal too.
 
 type Props = React.ComponentProps<'a'> & {
   external?: boolean
@@ -22,11 +23,7 @@ const Link = ({
   tabIndex = 0,
   ...props
 }: Props) => {
-  const className = clsx(
-    styles.link,
-    underline && styles.underline,
-    classNameProp,
-  )
+  const className = clsx('link', underline && 'link-underline', classNameProp)
 
   if (external) {
     return (

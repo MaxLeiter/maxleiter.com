@@ -4,15 +4,18 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import zlib from 'node:zlib'
 import * as esbuild from 'esbuild'
-import { transform as lightning } from 'lightningcss'
-import { createBuildContext } from './framework/content'
-import { buildCss } from './framework/css'
-import { buildClient } from './framework/client'
-import { prepareFonts } from './framework/fonts'
-import { formatPlatformResult, runPlatformSteps } from './framework/platform'
-import { staticPathFor } from './framework/routing'
-import type { BuildContext, RouteInfo, RouteManifest } from './framework/types'
-import type { RenderedPage, WrapOptions } from './framework/entry-server'
+import { createBuildContext } from '@framework/content'
+import { buildCss } from '@framework/assets/css'
+import { buildClient } from '@framework/assets/client'
+import { prepareFonts } from '@framework/assets/fonts'
+import { formatPlatformResult, runPlatformSteps } from '@framework/platform'
+import { staticPathFor } from '@framework/shared/routing'
+import type {
+  BuildContext,
+  RouteInfo,
+  RouteManifest,
+} from '@framework/shared/types'
+import type { RenderedPage, WrapOptions } from '@framework/render'
 
 /**
  * The whole build.
@@ -52,7 +55,10 @@ const CACHE = path.join(ROOT, '.cache')
  * entry point, plugins and log level.
  */
 const NODE_BUNDLE = JSON.parse(
-  await fs.readFile(path.join(ROOT, 'framework', 'node-bundle.json'), 'utf8'),
+  await fs.readFile(
+    path.join(ROOT, 'framework', 'assets', 'node-bundle.json'),
+    'utf8',
+  ),
 ) as esbuild.BuildOptions
 
 /* ---------------------------------------------------------- timing ------ */
@@ -71,18 +77,7 @@ async function step<T>(name: string, fn: () => Promise<T> | T): Promise<T> {
   return result
 }
 
-/* ------------------------------------------------- esbuild css modules -- */
-
-/**
- * Scoped CSS from every `*.module.css` the server bundle imported, keyed by
- * absolute path.
- *
- * A Map rather than an array because esbuild runs `onLoad` callbacks
- * concurrently and completion order differs between node and bun, which made
- * the concatenated sheet -- and therefore every HTML file -- differ by runtime
- * at identical byte length. Emitted sorted by path.
- */
-const moduleCss = new Map<string, { css: string; classes: string[] }>()
+/* ---------------------------------------------------- css fragments ----- */
 
 /** A slice of the stylesheet plus what proves a page needs it. */
 interface Fragment {
@@ -92,10 +87,6 @@ interface Fragment {
   test: RegExp
   /** Sorted on before `name`, so a sheet a fragment builds on comes first. */
   order: number
-}
-
-function moduleEntries(): [string, { css: string; classes: string[] }][] {
-  return [...moduleCss.entries()].sort(([a], [b]) => a.localeCompare(b))
 }
 
 const escapeRe = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -115,155 +106,69 @@ function fragment(
 }
 
 /**
- * At-rules whose braces hold declarations or keyframe stops rather than
- * selectors. `0%` inside `@keyframes` is not a selector, and reading it as one
- * would condemn the whole module to the base sheet.
- */
-const OPAQUE_AT_RULE =
-  /^@(-\w+-)?(keyframes|font-face|property|counter-style|page|font-feature-values)\b/
-
-/**
- * The first selector in a sheet that is not anchored to one of `classes`, or
- * null when every rule is.
+ * Fragments are committed as readable stylesheets and minified here.
  *
- * A module can only be gated on its own scoped class names if dropping the
- * module could only ever drop rules those names select. One bare `:root`,
- * element or `html[data-theme]` selector and it has to ship on every page.
- * Rules nested inside another style rule are already constrained by their
- * ancestor, so only the outermost selector of each rule is checked.
+ * esbuild is already in the graph and the whole set costs about a millisecond,
+ * which is a better trade than committing pre-minified CSS nobody can read or
+ * shipping the readable form to every visitor.
  */
-function unanchoredSelector(css: string, classes: string[]): string | null {
-  if (classes.length === 0) return 'no exported class names'
-  const stack: ('group' | 'opaque' | 'style')[] = []
-  let start = 0
-  for (let i = 0; i < css.length; i++) {
-    const char = css[i]
-    if (char === '{') {
-      const prelude = css.slice(start, i).trim()
-      const kind = !prelude.startsWith('@')
-        ? 'style'
-        : OPAQUE_AT_RULE.test(prelude)
-          ? 'opaque'
-          : 'group'
-      if (
-        kind === 'style' &&
-        !stack.includes('style') &&
-        !stack.includes('opaque') &&
-        !classes.some((name) => prelude.includes(name))
-      ) {
-        return prelude
-      }
-      stack.push(kind)
-      start = i + 1
-    } else if (char === '}') {
-      stack.pop()
-      start = i + 1
-    } else if (char === ';') {
-      start = i + 1
-    }
-  }
-  return null
-}
-
-/**
- * Every CSS module is its own conditional fragment, keyed by the scoped class
- * names lightningcss already returns, so a page carries a module's rules only
- * when its markup mentions one of them.
- *
- * There is deliberately no list of which modules count as "features":
- * react-tweet's theme plus ten CSS modules on all 78 pages for the sake of one
- * post was the largest per-page regression in Phase 1, and a hand-maintained
- * list is exactly how the next one gets in. What cannot be gated falls back to
- * the base sheet, loudly.
- */
-function splitModules(): { base: string; fragments: Fragment[] } {
-  const base: string[] = []
-  const fragments: Fragment[] = []
-  for (const [file, mod] of moduleEntries()) {
-    // pnpm's store path is most of a vendor module's name and none of its
-    // meaning, so the report says `react-tweet/dist/...` rather than the store.
-    const marker = 'node_modules/'
-    const name = file.includes(marker)
-      ? file.slice(file.lastIndexOf(marker) + marker.length)
-      : path.relative(ROOT, file)
-    const unanchored = unanchoredSelector(mod.css, mod.classes)
-    if (unanchored === null) {
-      fragments.push(fragment(name, mod.css, mod.classes))
-      continue
-    }
-    console.log(
-      `  ${name} ships on every page: ` +
-        `\`${unanchored}\` is not one of its own scoped classes`,
-    )
-    base.push(mod.css)
-  }
-  return { base: base.join('\n'), fragments }
+async function minifyCss(css: string): Promise<string> {
+  const { code } = await esbuild.transform(css, { loader: 'css', minify: true })
+  return code.trim()
 }
 
 /* ------------------------------------------------------ server bundle --- */
 
 /**
- * Bundles `framework/entry-server.ts` for node. Everything the pages import --
- * path aliases, CSS modules, JSX -- is resolved here, once, so bun and node
- * behave the same.
+ * Bundles `framework/render/index.ts` for node. Everything the pages import --
+ * path aliases, JSX, react-tweet's CSS modules -- is resolved here, once, so
+ * bun and node behave the same.
  */
 async function buildServer(): Promise<string> {
   const outfile = path.join(CACHE, 'server', 'entry.mjs')
   await esbuild.build({
     ...NODE_BUNDLE,
-    entryPoints: [path.join(ROOT, 'framework', 'entry-server.ts')],
+    entryPoints: [path.join(ROOT, 'framework', 'render', 'index.ts')],
     outfile,
     absWorkingDir: ROOT,
     tsconfig: path.join(ROOT, 'tsconfig.json'),
-    plugins: [cssModulePlugin()],
+    plugins: [reactTweetPlugin()],
     logLevel: 'silent',
   })
   return outfile
 }
 
 /**
- * `*.module.css` -> a JS object of scoped class names, with the scoped CSS
- * collected for the site sheet.
+ * react-tweet's CSS modules, resolved to the class names its committed sheet
+ * already carries.
  *
- * Three of the modules open with `@reference "tailwindcss"`, which
- * lightningcss passes through as an unknown at-rule. None of them uses
- * `@apply`, so those lines are vestigial and get stripped here.
+ * The package is the only CSS-module consumer left in the graph. Its styling is
+ * pre-scoped into `app/styles/fragments/react-tweet.css` by
+ * `scripts/react-tweet-css.ts`, so all this has to do is hand each component
+ * back the same `.rt-<module>-<class>` names that script wrote. Rendering is
+ * build-time only; none of this reaches the client.
  */
-function cssModulePlugin(): esbuild.Plugin {
+function reactTweetPlugin(): esbuild.Plugin {
   return {
-    name: 'css-modules',
+    name: 'react-tweet-css',
     setup(build) {
-      build.onLoad({ filter: /\.module\.css$/ }, async (args) => {
-        const source = await fs.readFile(args.path, 'utf8')
-        const cleaned = source.replace(/^\s*@reference\s+[^;]+;\s*$/gm, '')
-        const { code, exports } = lightning({
-          filename: args.path,
-          code: Buffer.from(cleaned),
-          cssModules: { pattern: '[hash]_[local]' },
-          minify: true,
-        })
-        // Sorted, because lightningcss returns `exports` in an order that
-        // varies between runs. Unsorted, the generated `.d.ts` and the class
-        // map in the bundle both churned on every single build.
-        const names: Record<string, string> = {}
-        for (const [local, value] of Object.entries(exports ?? {}).sort(
-          ([a], [b]) => a.localeCompare(b),
-        )) {
-          names[local] = value.name
+      build.onLoad({ filter: /\.module\.css$/ }, (args) => {
+        if (!args.path.includes('react-tweet')) {
+          throw new Error(
+            `${args.path}: CSS modules are gone; write a pre-scoped .css sheet`,
+          )
         }
-        moduleCss.set(args.path, {
-          css: code.toString(),
-          classes: Object.values(names),
-        })
-        await writeCssModuleTypes(args.path, Object.keys(names))
+        const prefix = reactTweetPrefix(args.path)
         return {
-          contents: `export default ${JSON.stringify(names)}`,
+          contents:
+            'export default new Proxy({}, { get: (_, key) =>' +
+            ` typeof key === 'string' ? ${JSON.stringify(prefix)} + key : undefined })`,
           loader: 'js',
         }
       })
 
       // A plain `.css` import contributes nothing at build time; the sheet is
-      // assembled by framework/css.ts.
+      // assembled by framework/assets/css.ts and the fragments below.
       build.onLoad({ filter: /\.css$/ }, () => ({
         contents: 'export default {}',
         loader: 'js',
@@ -272,50 +177,38 @@ function cssModulePlugin(): esbuild.Plugin {
   }
 }
 
-/** A class name that can be written as a bare property key. */
-const BARE_KEY = /^[A-Za-z_$][\w$]*$/
-
-/**
- * Keeps `tsc --noEmit` happy without the typescript-plugin-css-modules plugin.
- *
- * Keys are emitted the way oxfmt would write them: bare when they are valid
- * identifiers, quoted otherwise. Quoting everything meant the build wrote one
- * form, `pnpm lint` rewrote it to the other, and all five generated files
- * showed up modified after every build-then-lint cycle.
- */
-async function writeCssModuleTypes(
-  file: string,
-  keys: string[],
-): Promise<void> {
-  const declaration = ['declare const styles: {']
-    .concat(
-      keys.map((key) => {
-        const name = BARE_KEY.test(key) ? key : JSON.stringify(key)
-        return `  readonly ${name}: string`
-      }),
-    )
-    .concat(['}', 'export default styles', ''])
-    .join('\n')
-  const target = `${file}.d.ts`
-  try {
-    if ((await fs.readFile(target, 'utf8')) === declaration) return
-  } catch {
-    // Not written yet.
-  }
-  await fs.writeFile(target, declaration)
+/** Must match `prefixFor` in scripts/react-tweet-css.ts. */
+function reactTweetPrefix(file: string): string {
+  const stem = path.basename(file).replace(/\.module\.css$/, '')
+  return `rt-${stem.replace(/^quoted-tweet-/, 'quoted-').replace(/^tweet-/, '')}-`
 }
 
 /* ------------------------------------------------------- plain sheets --- */
 
 /**
- * The fragments that are plain stylesheets rather than CSS modules, so they
- * have no scoped class names to be keyed on.
+ * Every conditional slice of the stylesheet, with the markup that proves a page
+ * needs it.
  *
- * Their markers are declared here, and are attribute-shaped on purpose: the
- * bare word `shiki` also appears in prose, and `react-tweet-theme` appears in
- * the base sheet, so either would gate a page in on a false positive.
+ * Each sheet is written with its scoping already in the class names -- `.tree-`,
+ * `.shot-`, `.mc-`, `.rt-` -- so the marker is just that prefix as it appears in
+ * an attribute. Attribute-shaped on purpose: the bare word `shiki` also turns up
+ * in prose, and `react-tweet-theme` appears in the base sheet, so either would
+ * gate a page in on a false positive.
+ *
+ * Gating is worth roughly 3.5 KB brotli on the median page. The risk of a
+ * hand-maintained list is that a new sheet gets forgotten; the check is that a
+ * sheet with no entry here never ships at all, which is loud rather than silent.
  */
 const PLAIN_SHEETS = [
+  {
+    // react-tweet's theme plus its 17 pre-scoped component modules, generated
+    // by scripts/react-tweet-css.ts. Sorts first: the modules read the custom
+    // properties `.react-tweet-theme` defines.
+    name: 'react-tweet',
+    file: 'app/styles/fragments/react-tweet.css',
+    markers: ['class="react-tweet-theme'],
+    order: 0,
+  },
   {
     name: 'mdx-diff',
     file: 'app/styles/fragments/mdx-diff.css',
@@ -323,37 +216,48 @@ const PLAIN_SHEETS = [
     order: 1,
   },
   {
-    // react-tweet's own theme sheet, which its CSS modules build on, so it
-    // sorts ahead of them.
-    name: 'react-tweet-theme',
-    specifier: 'react-tweet/theme.css',
-    markers: ['class="react-tweet-theme'],
-    order: 0,
+    name: 'file-tree',
+    file: 'app/components/file-tree/file-tree.css',
+    markers: ['class="tree-'],
+    order: 1,
+  },
+  {
+    // Also the file-tree island's external-file anchors, which is why its
+    // marker has to match a bare `class="link"` as well as `link-underline`.
+    name: 'link',
+    file: 'app/components/link/link.css',
+    markers: ['class="link'],
+    order: 1,
+  },
+  {
+    name: 'mc-inventory',
+    file: 'app/components/mc/inventory.css',
+    markers: ['class="mc-'],
+    order: 1,
+  },
+  {
+    name: 'mdx-note',
+    file: 'app/mdx/components/mdx-note.css',
+    markers: ['class="mdx-note'],
+    order: 1,
+  },
+  {
+    // The grid wrapper always renders, so `.shot-trigger` -- minted by the
+    // island at runtime and in no markup anywhere -- is covered by it.
+    name: 'shot-grid',
+    file: 'app/mdx/components/shot-grid.css',
+    markers: ['class="shot-'],
+    order: 1,
   },
 ] as const
 
-async function readSheet(relative: string): Promise<string> {
-  try {
-    return await fs.readFile(path.join(ROOT, relative), 'utf8')
-  } catch {
-    return ''
-  }
-}
-
 /**
- * `theme.css` is a public export of react-tweet rather than a deep import; its
- * per-component CSS modules already flow through the server bundle's
- * lightningcss plugin.
+ * Loud on a missing file. A fragment that silently resolves to the empty string
+ * ships a page with its styling quietly gone, which looks like a CSS bug rather
+ * than a build one.
  */
-async function readPackageSheet(specifier: string): Promise<string> {
-  const { createRequire } = await import('node:module')
-  const require_ = createRequire(path.join(ROOT, 'package.json'))
-  try {
-    return await fs.readFile(require_.resolve(specifier), 'utf8')
-  } catch (error) {
-    console.warn(`  ${specifier}: ${(error as Error).message}`)
-    return ''
-  }
+async function readSheet(relative: string): Promise<string> {
+  return await fs.readFile(path.join(ROOT, relative), 'utf8')
 }
 
 /* --------------------------------------------------------------- output -- */
@@ -556,7 +460,10 @@ async function main(): Promise<void> {
   const entryFile = await step('server bundle', buildServer)
   const server = (await import(`${entryFile}?t=${Date.now()}`)) as {
     renderAll: (ctx: BuildContext) => Promise<RenderedPage[]>
-    wrapPage: (page: RenderedPage, options: WrapOptions) => string
+    wrapPage: (
+      page: RenderedPage,
+      options: WrapOptions & { runtime: string },
+    ) => string
     wrapPartial: (page: RenderedPage, options: WrapOptions) => string
     islandManifest: () => string[]
     highlightCss: () => string
@@ -566,12 +473,10 @@ async function main(): Promise<void> {
     ) => Promise<string>
   }
 
-  // Everything the stylesheet needs is known once the server bundle has run
-  // its CSS-module plugin, and `buildCss` shells out to the Tailwind CLI, so
-  // it runs while the main thread renders. Their two step times overlap.
-  const modules = splitModules()
+  // `buildCss` shells out to the Tailwind CLI, so it runs while the main
+  // thread renders. Their two step times overlap.
   const cssPromise = step('css', () =>
-    buildCss({ root: ROOT, cacheDir: CACHE, moduleCss: modules.base }),
+    buildCss({ root: ROOT, cacheDir: CACHE }),
   )
   const pages = await step('render', () => server.renderAll(ctx))
   const css = await cssPromise
@@ -583,7 +488,6 @@ async function main(): Promise<void> {
       buildClient({
         root: ROOT,
         staticDir: ctx.staticDir,
-        cacheDir: CACHE,
         islands: server.islandManifest(),
       }),
     ),
@@ -592,19 +496,16 @@ async function main(): Promise<void> {
   Object.assign(ctx.assets, client.assets)
 
   const fragments = await step('css fragments', async () => {
-    const all = [...modules.fragments]
+    const all: Fragment[] = []
     for (const sheet of PLAIN_SHEETS) {
-      const text =
-        'file' in sheet
-          ? await readSheet(sheet.file)
-          : await readPackageSheet(sheet.specifier)
-      if (text) {
-        all.push(fragment(sheet.name, text, sheet.markers, sheet.order))
-      }
+      const text = await minifyCss(await readSheet(sheet.file))
+      all.push(fragment(sheet.name, text, sheet.markers, sheet.order))
     }
     // shiki's rules key on the class its transformer puts on every `<pre>`.
     const highlight = server.highlightCss()
-    if (highlight) all.push(fragment('shiki', highlight, ['class="shiki']))
+    if (highlight) {
+      all.push(fragment('shiki', await minifyCss(highlight), ['class="shiki']))
+    }
     return all.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name))
   })
 
@@ -646,7 +547,6 @@ async function main(): Promise<void> {
       const markup = server.wrapPage(page, {
         css: sheet.css,
         fonts,
-        assets: ctx.assets,
         siteUrl: ctx.site.url,
         runtime: client.runtime,
         // Only this page's islands, so a content page does not carry a map
@@ -668,7 +568,6 @@ async function main(): Promise<void> {
       const partial = server.wrapPartial(page, {
         css: sheet.css,
         fonts,
-        assets: ctx.assets,
         siteUrl: ctx.site.url,
         islands: Object.fromEntries(
           page.islands
@@ -747,10 +646,7 @@ async function main(): Promise<void> {
     const nameWidth = Math.max(...fragments.map((item) => item.name.length), 8)
     console.log('\ncss bytes')
     console.log(
-      `  ${'tailwind'.padEnd(nameWidth)}  ${String(css.tailwindBytes).padStart(8)}`,
-    )
-    console.log(
-      `  ${'base'.padEnd(nameWidth)}  ${String(css.moduleBytes).padStart(8)}`,
+      `  ${'base (tailwind)'.padEnd(nameWidth)}  ${String(css.tailwindBytes).padStart(8)}`,
     )
     for (const item of fragments) {
       const bytes = String(Buffer.byteLength(item.css)).padStart(8)

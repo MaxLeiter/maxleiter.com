@@ -15,7 +15,7 @@ const outfile = path.join(root, '.cache', 'build', 'build.mjs')
 // node, so importing a .ts factory would need the type stripping it exists to
 // avoid. build.ts is JSX-free today, but anything it reaches may not be.
 const shared = JSON.parse(
-  await readFile(path.join(root, 'framework', 'node-bundle.json'), 'utf8'),
+  await readFile(path.join(root, 'framework', 'assets', 'node-bundle.json'), 'utf8'),
 )
 
 await mkdir(path.dirname(outfile), { recursive: true })

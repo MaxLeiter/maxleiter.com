@@ -1,0 +1,10 @@
+/* app/components/link, and the external-file anchors in the file-tree island. */
+
+.link {
+  text-decoration: none;
+  color: var(--link);
+}
+
+.link.link-underline:hover {
+  text-decoration: underline;
+}

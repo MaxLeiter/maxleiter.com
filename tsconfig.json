@@ -23,6 +23,9 @@
     "incremental": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
+      "@framework/*": [
+        "./framework/*"
+      ],
       "@*": [
         "./app/*"
       ]

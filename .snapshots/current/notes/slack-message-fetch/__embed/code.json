@@ -1,8 +1,0 @@
-{
-  "blocks": [
-    "const res = await fetch('https://slack.com/api/chat.postMessage', {\nmethod: 'POST',\nheaders: {\n// IMPORTANT! You need to set the charset to utf-8\n'Content-Type': 'application/json; charset=utf-8',\n// Create an app: https://api.slack.com/apps\nAuthorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,\n},\nbody: Message()\n// Get this from Slack or the channel URL.\n// Be sure to invite the bot to the channel.\n.channel('C1234567890')\n.blocks(Blocks.Section().text('*Error:* ' + error), Blocks.Divider())\n.buildToJSON(),\n})"
-  ],
-  "occurrences": [
-    1
-  ]
-}

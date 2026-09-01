@@ -1,11 +1,10 @@
 'use client'
 
 import { ListCard } from '@components/desktop/list-card'
-import { type BlogPost, entryHref } from '@lib/blog-post'
-import { POPULAR_SLUGS } from '@lib/popular-posts'
+import { entryHref, type ListEntry, POPULAR_SLUGS } from '@lib/types'
 
 interface BlogListContentProps {
-  posts: BlogPost[]
+  posts: ListEntry[]
   onPostClick?: (slug: string) => void
   onPostHover?: (slug: string) => void
   onPostHoverEnd?: () => void
@@ -19,9 +18,9 @@ export function BlogListContent({
 }: BlogListContentProps) {
   const popularPosts = POPULAR_SLUGS.map((slug) =>
     posts.find((p) => p.slug === slug),
-  ).filter((p): p is BlogPost => p !== undefined)
+  ).filter((p): p is ListEntry => p !== undefined)
 
-  const renderPost = (post: BlogPost) => {
+  const renderPost = (post: ListEntry) => {
     const isExternal = post.isThirdParty
     const isNote = post.type === 'note'
     const href = entryHref(post)

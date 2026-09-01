@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { WindowToolbar } from '@components/static/window-toolbar'
 import Palette from '@islands/palette'
-import { Island } from '../../framework/islands'
+import { Island } from '@framework/render/islands'
 
 /**
  * The frame every non-homepage route renders inside: toolbar, main region and
@@ -39,7 +39,7 @@ export interface PageShellProps {
  */
 export function CommandPalette() {
   return (
-    <Island name="palette" on="interaction" hidden>
+    <Island name="palette" hidden>
       <Palette />
     </Island>
   )

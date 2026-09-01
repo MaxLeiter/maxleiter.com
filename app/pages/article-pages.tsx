@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { transitionName } from '../../framework/transitions'
+import { transitionName } from '@framework/shared/transitions'
 import { PageShell } from './shell'
 
 /**

@@ -5,9 +5,9 @@ import Info from '@components/icons/info'
 import Home from '@components/icons/home'
 import { MDXNote } from './components/mdx-note'
 import { createIslandComponents, flattenText } from './island-components'
-import { Img, urlDims } from '../../framework/images'
-import type { TweetMap } from '../../framework/tweets'
-import type { DimensionMap } from '../../framework/image-dims'
+import { Img, urlDims } from '@framework/render/images'
+import type { TweetMap } from '@framework/content/tweets'
+import type { DimensionMap } from '@framework/content/dimensions'
 // Deep import on purpose; see the note on makeTweet below.
 import { EmbeddedTweet } from '../../node_modules/react-tweet/dist/twitter-theme/embedded-tweet.js'
 
@@ -167,9 +167,10 @@ function Diff({ children }: { children?: ReactNode }) {
  * replies link, with no data fetching and no swr. Importing it by file path
  * rather than by package specifier is deliberate: `packages: 'external'` in the
  * server bundle would otherwise leave it unbundled, and its CSS modules have to
- * go through the build's own lightningcss plugin so their scoped class names
- * match the emitted stylesheet. `react-tweet` is pinned to 3.3.1 because this
- * is a deep import into `dist/`, not a public export.
+ * go through the build's `react-tweet-css` plugin so the class names it hands
+ * the components match `app/styles/fragments/react-tweet.css`. `react-tweet` is
+ * pinned to 3.3.1 because this is a deep import into `dist/`, not a public
+ * export, and because that sheet is generated from this exact version.
  */
 function makeTweet(tweets: TweetMap) {
   return function TweetBlock({ id }: { id: string }) {

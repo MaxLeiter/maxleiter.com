@@ -4,11 +4,11 @@ import { TalksContent } from '@components/content/talks-content'
 import { ProjectsContent } from '@components/content/projects-content'
 import { BlogListContent } from '@components/content/blog-list-content'
 import { NotesContent } from '@components/content/notes-content'
-import type { BlogPost, Project } from '@lib/blog-post'
+import type { ListEntry, ProjectCard } from '@lib/types'
 import type { ComponentType } from 'react'
-import type { Note } from '../../framework/types'
+import type { Note } from '@framework/shared/types'
 import { PageShell } from './shell'
-import { transitionName } from '../../framework/transitions'
+import { transitionName } from '@framework/shared/transitions'
 
 /**
  * The six list-and-prose routes.
@@ -55,7 +55,7 @@ export const TalksPage = sectionPage('talks', TalksContent)
 export function ProjectsPage({
   projects,
   toolbar,
-}: ContentPageProps & { projects: Project[] }) {
+}: ContentPageProps & { projects: ProjectCard[] }) {
   return (
     <PageShell
       toolbar={toolbar}
@@ -71,7 +71,7 @@ export function ProjectsPage({
 export function BlogIndexPage({
   posts,
   toolbar,
-}: ContentPageProps & { posts: BlogPost[] }) {
+}: ContentPageProps & { posts: ListEntry[] }) {
   return (
     <PageShell
       toolbar={toolbar}

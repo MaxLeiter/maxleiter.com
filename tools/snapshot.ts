@@ -1,770 +1,296 @@
 /**
- * Snapshot every route of a maxleiter.com build.
+ * The regression gate: one row per route, compared against `docs/snapshot.json`.
  *
- * Two sources, same output format:
+ * This replaced a 2,200-line harness that diffed the output against a committed
+ * copy of the old Next build. That reference could no longer be regenerated, and
+ * its ignore file had become a changelog of deliberate improvements, so the gate
+ * had stopped answering a question anyone was asking.
  *
- *   # a running server (the Next baseline)
- *   bun run tools/snapshot.ts --base http://localhost:3457 \
- *     --out docs/rewrite/baseline --raw .cache/baseline-raw
+ * What it answers now is "did anything change since the last output I accepted".
+ * Head fields stay in plaintext so `git diff` reads like prose; the prose and
+ * code bodies are hashed, because a per-route diff of 78 documents is noise. An
+ * intended change is a reviewed one-line diff plus `pnpm snapshot`, rather than
+ * a new ignore rule with a paragraph justifying it.
  *
- *   # a static build product (the bespoke build)
- *   bun run tools/snapshot.ts --dir .vercel/output/static \
- *     --out .cache/snapshot-current --raw .cache/current-raw
+ *   bun run tools/snapshot.ts            compare, exit 1 on a difference
+ *   bun run tools/snapshot.ts --write    re-baseline
  *
- * `--dir` reads `.vercel/output/static` the way Vercel serves it, which
- * avoids depending on a dev server and the live-reload script it injects.
- *
- * Writes, per HTML route, `<out>/<route>/index.html` (normalized),
- * `head.json` and `text.txt`; raw responses go to `<raw>/` (gitignored).
- * Also writes `routes.json` and `view-transition-names.json` at the root.
- *
- * Route discovery in `--dir` mode reads the build's own route manifest at
- * `.vercel/output/routes.json`, so every route the build emits is snapshotted,
- * including the ones no sitemap lists. `--base` has no manifest to read and
- * falls back to `/sitemap.xml` plus the top-level pages that sitemap omitted.
- *
- * URL-to-file resolution is `framework/routing.ts`, the same module that
- * generates config.json, so the harness cannot end up checking a routing table
- * that production does not run.
- *
- * Runs under bun, or node >= 23.6 (ESM, global fetch, and type stripping for
- * the `.ts` imports; no runtime-specific APIs).
+ * Both expect `.vercel/output` to be a fresh build; `pnpm gate` and
+ * `pnpm snapshot` run one first.
  */
-
-import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
-import { dirname, join, resolve } from 'node:path'
-import { maskUrl, normalizeHtml } from './normalize-html.ts'
-import type { HeadRecord, ViewTransitionRecord } from './normalize-html.ts'
-import {
-  contentTypeFor,
-  EMBED_SECTIONS,
-  resolveRequest,
-  staticPathFor,
-} from '../framework/routing.ts'
-import type { RouteInfo, RouteManifest } from '../framework/types.ts'
-import { readHeader } from '../framework/image-dims.ts'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { staticPathFor } from '../framework/shared/routing.ts'
+import type { RouteManifest } from '../framework/shared/types.ts'
 
-/**
- * Top-level pages the Next sitemap omitted.
- *
- * Only `--base` needs this list. `--dir` reads the build's own route manifest,
- * so a route the bespoke build adds is discovered rather than transcribed.
- */
-const EXTRA_PAGES = [
-  '/',
-  '/about',
-  '/blog',
-  '/notes',
-  '/labs',
-  '/projects',
-  '/talks',
-]
+const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
+const OUTPUT = path.join(ROOT, '.vercel', 'output')
+const STATIC = path.join(OUTPUT, 'static')
+const SNAPSHOT = path.join(ROOT, 'docs', 'snapshot.json')
 
-/**
- * Fixed URL used to render the 404 page. It must never match a real route.
- * The bespoke build serves the same body from `static/404/index.html`.
- */
-const NOT_FOUND_PROBE = '/__snapshot_probe_404'
-
-const TEXT_FILES = [
-  { path: '/sitemap.xml', file: 'sitemap.xml' },
-  { path: '/robots.txt', file: 'robots.txt' },
-  { path: '/feed.xml', file: 'feed.xml' },
-  { path: '/api/search-index', file: 'search-index.json' },
-]
-
-/**
- * URLs the baseline used that the bespoke build no longer serves at that
- * address. They are aliases for the HARNESS only, so the committed baseline
- * keeps addressing every route by its ORIGINAL URL and the diff compares
- * content instead of reporting one big rename. Nothing here is production
- * routing; that all lives in `framework/routing.ts`.
- */
-function baselineAlias(
-  pathname: string,
-): { file: string; status: number } | null {
-  // The 404 body is served for anything the filesystem does not match.
-  if (pathname === NOT_FOUND_PROBE) {
-    return { file: '404/index.html', status: 404 }
-  }
-  // The search index moved from a Next route handler to a root JSON file.
-  if (pathname === '/api/search-index') {
-    return { file: 'search-index.json', status: 200 }
-  }
-  // Metadata images are real files now, not generated routes.
-  if (pathname.endsWith('/opengraph-image')) {
-    return { file: `${pathname.replace(/^\//, '')}.png`, status: 200 }
-  }
-  return null
-}
-
-/**
- * URL -> file inside `.vercel/output/static`, the way Vercel serves the tree.
- *
- * The rules come from `framework/routing.ts`, the same module that generates
- * config.json, so the harness cannot check a routing table that does not
- * exist. It used to rewrite `?embed` on ANY path, while production rewrites it
- * only under /blog and /notes.
- */
-export function staticFileForPath(urlPath: string): {
-  file: string
-  status: number
-} {
-  const [pathname, query] = urlPath.split('?')
-  const alias = baselineAlias(pathname)
-  if (alias) return alias
-
-  const resolved = resolveRequest(pathname, query ?? '')
-  // A redirect has no body to snapshot; record the target's file instead.
-  const file = resolved.redirect
-    ? staticPathFor(resolved.redirect)
-    : (resolved.file ?? staticPathFor(pathname))
-  return { file, status: 200 }
-}
-
-interface FetchResult {
-  status: number
-  contentType: string
-  body: Uint8Array
-}
-
-/** Reads a route from either a live server or a static build directory. */
-type Fetcher = (urlPath: string) => Promise<FetchResult>
-
-function httpFetcher(base: string): Fetcher {
-  return async (urlPath) => {
-    const res = await fetch(`${base}${urlPath}`, { redirect: 'manual' })
-    return {
-      status: res.status,
-      contentType: res.headers.get('content-type') ?? '',
-      body: new Uint8Array(await res.arrayBuffer()),
-    }
-  }
-}
-
-function dirFetcher(staticDir: string): Fetcher {
-  return async (urlPath) => {
-    const { file, status } = staticFileForPath(urlPath)
-    try {
-      const body = await readFile(join(staticDir, file))
-      return {
-        status,
-        contentType: contentTypeFor(file),
-        body: new Uint8Array(body),
-      }
-    } catch {
-      // Missing file: Vercel would fall through to the 404 page. Report the
-      // miss instead, so a route the build forgot shows up as a failure.
-      return { status: 404, contentType: 'text/plain', body: new Uint8Array() }
-    }
-  }
-}
-
-export type RouteKind = 'page' | 'embed' | 'file' | 'binary'
-
-export interface RouteRecord {
-  /** URL path as requested, including any query string. */
+interface RouteRow {
   path: string
-  kind: RouteKind
-  /** Directory under the snapshot root, relative and slash-separated. */
-  dir: string
-  status: number
-  contentType: string
-  bytes: number
-  sha256: string
-  /** Pages only. */
-  title?: string | null
-  description?: string
-  canonical?: string
-  og?: Record<string, string>
-  twitter?: Record<string, string>
+  title: string
+  description: string
+  canonical: string
+  ogImage: string
+  noindex: boolean
+  /** sha256 of the visible prose, with `<pre>`, script and style removed. */
+  textHash: string
+  /** sha256 of every `<pre>`'s text, in document order. */
+  codeHash: string
+  /** The soft-navigation document. 0 when the route has none. */
+  partialBytes: number
+}
+
+interface Snapshot {
   /**
-   * Total bytes of inline <style> on the page. Provenance only: head.json
-   * deliberately does not record it, because it drifts on every build.
+   * The inline pre-paint theme script. Pinned because it runs before anything
+   * else on every page, and a change there is a flash-of-wrong-theme bug that
+   * no other field would show.
    */
-  cssBytes?: number
-  /** Binary images only. */
-  width?: number
-  height?: number
-  /** Set when an embed variant is byte-identical to its canonical route. */
-  identicalTo?: string
-  /**
-   * Discovered from the build's own route manifest, so the build meant to
-   * emit it. diff-html.ts reports such a route as added rather than failing:
-   * publishing a post cannot be a gate failure.
-   */
-  intended?: boolean
-  error?: string
+  themeScript: string
+  routes: RouteRow[]
 }
 
-export interface SnapshotManifest {
-  base: string
-  generatedAt: string
-  routes: RouteRecord[]
-  /**
-   * `--dir` mode only: HTML the build emitted that no snapshotted route
-   * covers, plus any alias file a route declares and the build did not write.
-   * Discovery reads the route manifest, so this catches what arrives another
-   * way: a page copied in from `public/`, or a missing `/404.html`.
-   * diff-html.ts reports these as route issues.
-   */
-  uncovered?: string[]
+const sha = (value: string) =>
+  createHash('sha256').update(value).digest('hex').slice(0, 16)
+
+const ENTITIES: Record<string, string> = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
 }
 
-interface Args {
-  base: string
-  /** When set, read this static build directory instead of `base`. */
-  dir: string | null
-  out: string
-  raw: string
-  concurrency: number
-  only: string | null
-  /** `all` probes every per-post OG image, `one` just the first, `none` skips. */
-  og: 'all' | 'one' | 'none'
-}
-
-/** The parsed flags plus the reader `main()` resolved from `dir` or `base`. */
-interface Run extends Args {
-  fetch: Fetcher
-}
-
-const DEFAULT_BASE = 'http://localhost:3457'
-
-function parseArgs(argv: string[]): Args {
-  const args: Args = {
-    base: DEFAULT_BASE,
-    dir: null,
-    out: 'docs/rewrite/baseline',
-    raw: '.cache/baseline-raw',
-    concurrency: 8,
-    only: null,
-    og: 'all',
-  }
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i]
-    const next = (): string => {
-      const v = argv[++i]
-      if (v === undefined) throw new Error(`${a} needs a value`)
-      return v
-    }
-    if (a === '--base') args.base = next().replace(/\/$/, '')
-    else if (a === '--dir') args.dir = next()
-    else if (a === '--out') args.out = next()
-    else if (a === '--raw') args.raw = next()
-    else if (a === '--concurrency') args.concurrency = Number(next())
-    else if (a === '--only') args.only = next()
-    else if (a === '--og') {
-      const v = next()
-      if (v !== 'all' && v !== 'one' && v !== 'none') {
-        throw new Error('--og must be all, one or none')
+function decode(html: string): string {
+  return html.replace(
+    /&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g,
+    (whole, body: string) => {
+      if (body.startsWith('#x') || body.startsWith('#X')) {
+        return String.fromCodePoint(parseInt(body.slice(2), 16))
       }
-      args.og = v
-    } else if (a === '--help' || a === '-h') {
-      process.stdout.write(
-        'usage: snapshot.ts [--base URL | --dir STATIC_DIR] [--out DIR] ' +
-          '[--raw DIR] [--concurrency N] [--only SUBSTRING] ' +
-          '[--og all|one|none]\n',
-      )
-      process.exit(0)
-    } else throw new Error(`unknown flag: ${a}`)
-  }
-  return args
-}
-
-/** URL path -> snapshot directory. `/` is `root`; `?embed=true` is `__embed`. */
-function dirForPath(path: string): string {
-  const [pathname, query] = path.split('?')
-  const base =
-    pathname === '/' ? 'root' : pathname.replace(/^\//, '').replace(/\/$/, '')
-  if (query === 'embed=true') return `${base}/__embed`
-  return base
-}
-
-function sha256(data: Uint8Array | string): string {
-  return createHash('sha256').update(data).digest('hex')
-}
-
-/**
- * Intrinsic size of a snapshotted image. `framework/image-dims.ts` already
- * reads these headers for the build, so the harness borrows its reader rather
- * than keeping a second, PNG-only copy.
- */
-function imageSize(
-  bytes: Uint8Array,
-): { width: number; height: number } | null {
-  // A view over the same memory, not a copy.
-  return readHeader(
-    Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength),
-  )
-}
-
-async function writeFileEnsuring(
-  path: string,
-  data: string | Uint8Array,
-): Promise<void> {
-  await mkdir(dirname(path), { recursive: true })
-  await writeFile(path, data)
-}
-
-async function fetchSitemapPaths(fetcher: Fetcher): Promise<string[]> {
-  const res = await fetcher('/sitemap.xml')
-  if (res.status !== 200) {
-    throw new Error(`sitemap.xml returned ${res.status}`)
-  }
-  const xml = new TextDecoder().decode(res.body)
-  const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
-  const paths = locs.map((u) => {
-    const url = new URL(u)
-    return url.pathname === '' ? '/' : url.pathname
-  })
-  return [...new Set(paths)]
-}
-
-function pickMeta(head: HeadRecord, prefix: string): Record<string, string> {
-  const out: Record<string, string> = {}
-  for (const tag of head.tags) {
-    if (tag.tag !== 'meta') continue
-    const key = tag.attrs.property ?? tag.attrs.name
-    if (key?.startsWith(prefix)) out[key] = tag.attrs.content ?? ''
-  }
-  return out
-}
-
-function findMeta(head: HeadRecord, key: string): string | undefined {
-  for (const tag of head.tags) {
-    if (tag.tag !== 'meta') continue
-    if (tag.attrs.name === key || tag.attrs.property === key)
-      return tag.attrs.content
-  }
-  return undefined
-}
-
-function findLink(head: HeadRecord, rel: string): string | undefined {
-  for (const tag of head.tags) {
-    if (tag.tag === 'link' && tag.attrs.rel === rel) return tag.attrs.href
-  }
-  return undefined
-}
-
-interface PageResult {
-  record: RouteRecord
-  vts: ViewTransitionRecord[]
-  /** Raw og:image URL before hash masking, used to find the OG endpoint. */
-  rawOgImage?: string
-  normalizedHtml: string
-}
-
-async function snapshotPage(
-  args: Run,
-  path: string,
-  kind: 'page' | 'embed',
-  expectStatus = 200,
-): Promise<PageResult> {
-  const res = await args.fetch(path)
-  const raw = new TextDecoder().decode(res.body)
-  const dir = dirForPath(path)
-
-  await writeFileEnsuring(join(args.raw, dir, 'index.html'), raw)
-
-  const record: RouteRecord = {
-    path,
-    kind,
-    dir,
-    status: res.status,
-    contentType: res.contentType,
-    bytes: Buffer.byteLength(raw),
-    sha256: sha256(raw),
-  }
-
-  // The 404 page is a real page with a deliberately non-200 status, so
-  // normalize on the expected status rather than on `res.ok`.
-  if (res.status !== expectStatus) {
-    record.error = `HTTP ${res.status} (expected ${expectStatus})`
-    return { record, vts: [], normalizedHtml: '' }
-  }
-
-  const rawOgImage = /<meta property="og:image" content="([^"]+)"/.exec(
-    raw,
-  )?.[1]
-  const norm = normalizeHtml(raw)
-
-  const outDir = join(args.out, dir)
-  await writeFileEnsuring(join(outDir, 'index.html'), norm.html)
-  await writeFileEnsuring(join(outDir, 'text.txt'), norm.text)
-  await writeFileEnsuring(
-    join(outDir, 'head.json'),
-    `${JSON.stringify(norm.head, null, 2)}\n`,
-  )
-  // Only pages with fences get a code.json, so most routes stay two files.
-  if (norm.code.blocks.length > 0) {
-    await writeFileEnsuring(
-      join(outDir, 'code.json'),
-      `${JSON.stringify(norm.code, null, 2)}\n`,
-    )
-  }
-  // CSS is reference material, not a diff target: keep it out of the tree.
-  await writeFileEnsuring(join(args.raw, dir, 'styles.css'), norm.css)
-
-  record.title = norm.head.title
-  record.description = findMeta(norm.head, 'description')
-  record.canonical = findLink(norm.head, 'canonical')
-  record.og = pickMeta(norm.head, 'og:')
-  record.twitter = pickMeta(norm.head, 'twitter:')
-  record.cssBytes = Buffer.byteLength(norm.css)
-
-  return {
-    record,
-    vts: norm.viewTransitions,
-    ...(rawOgImage === undefined ? {} : { rawOgImage }),
-    normalizedHtml: norm.html,
-  }
-}
-
-async function snapshotTextFile(
-  args: Run,
-  path: string,
-  file: string,
-): Promise<RouteRecord> {
-  const res = await args.fetch(path)
-  const body = new TextDecoder().decode(res.body)
-  const dir = dirForPath(path)
-  await writeFileEnsuring(join(args.raw, dir, file), body)
-
-  const record: RouteRecord = {
-    path,
-    kind: 'file',
-    dir,
-    status: res.status,
-    contentType: res.contentType,
-    bytes: Buffer.byteLength(body),
-    sha256: sha256(body),
-  }
-  if (res.status !== 200) {
-    record.error = `HTTP ${res.status}`
-    return record
-  }
-
-  // Pretty-print JSON so the committed copy diffs line by line.
-  let stored = body
-  if (file.endsWith('.json')) {
-    stored = `${JSON.stringify(JSON.parse(body), null, 2)}\n`
-  }
-  await writeFileEnsuring(join(args.out, dir, file), stored)
-  return record
-}
-
-async function snapshotBinary(args: Run, path: string): Promise<RouteRecord> {
-  const res = await args.fetch(path)
-  const buf = res.body
-  // The requested URL carries Next's per-build metadata hash; the record keys
-  // on the masked form so routes.json is stable across builds.
-  const stable = maskUrl(path)
-  const dir = dirForPath(stable)
-  const record: RouteRecord = {
-    path: stable,
-    kind: 'binary',
-    dir,
-    status: res.status,
-    contentType: res.contentType,
-    bytes: buf.byteLength,
-    sha256: sha256(buf),
-  }
-  if (res.status !== 200) {
-    record.error = `HTTP ${res.status}`
-    return record
-  }
-  const size = imageSize(buf)
-  if (size) {
-    record.width = size.width
-    record.height = size.height
-  }
-  await writeFileEnsuring(join(args.raw, dir, 'image.png'), buf)
-  return record
-}
-
-async function pool<T, R>(
-  items: T[],
-  limit: number,
-  fn: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const results: R[] = Array.from({ length: items.length })
-  let cursor = 0
-  const workers = Array.from(
-    { length: Math.min(limit, items.length) },
-    async () => {
-      for (;;) {
-        const i = cursor++
-        if (i >= items.length) return
-        results[i] = await fn(items[i])
+      if (body.startsWith('#')) {
+        return String.fromCodePoint(Number(body.slice(1)))
       }
+      return ENTITIES[body] ?? whole
     },
   )
-  await Promise.all(workers)
-  return results
+}
+
+/** The first capture of `pattern`, decoded, or the empty string. */
+function attr(html: string, pattern: RegExp): string {
+  return decode(pattern.exec(html)?.[1] ?? '').trim()
+}
+
+const stripTags = (html: string) => decode(html.replace(/<[^>]*>/g, ' '))
+const collapse = (text: string) => text.replace(/\s+/g, ' ').trim()
+
+function bodyOf(html: string): string {
+  return /<body[^>]*>([\s\S]*)<\/body>/.exec(html)?.[1] ?? html
 }
 
 /**
- * Every `index.html` the build emitted that no snapshotted route resolves to,
- * plus any declared alias file that is missing.
+ * Everything a reader sees, minus code blocks.
  *
- * Discovery reads the route manifest, so this should now be empty for anything
- * the build generates. It still bites for files that arrive another way: a
- * page copied in from `public/`, or an alias like `/404.html` that the write
- * loop failed to produce.
+ * `<script>` goes first, which is what keeps island `data-props` out of the
+ * hash: those are a serialization detail, and trimming one should not read as a
+ * content change. Code blocks get their own hash so a re-lineation in the
+ * highlighter cannot hide behind a prose diff -- the distinction the old
+ * harness needed two streams and a paragraph of explanation to make.
  */
-async function findUncovered(
-  staticDir: string,
-  records: RouteRecord[],
-  routes: RouteInfo[] | null,
-): Promise<string[]> {
-  const covered = new Set<string>()
-  for (const r of records) {
-    covered.add(staticFileForPath(r.path).file)
-  }
+function prose(html: string): string {
+  const stripped = bodyOf(html)
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<pre[\s\S]*?<\/pre>/gi, ' ')
+  return collapse(stripTags(stripped))
+}
 
-  const missingAliases: string[] = []
-  for (const route of routes ?? []) {
-    for (const alias of route.aliases ?? []) {
-      const file = staticPathFor(alias)
-      covered.add(file)
-      try {
-        await readFile(join(staticDir, file))
-      } catch {
-        missingAliases.push(`${alias} (declared by ${route.path})`)
+function code(html: string): string {
+  const blocks = bodyOf(html).match(/<pre[\s\S]*?<\/pre>/gi) ?? []
+  return blocks.map((block) => collapse(stripTags(block))).join('\n')
+}
+
+async function rowFor(route: { path: string }): Promise<RouteRow> {
+  const file = path.join(STATIC, staticPathFor(route.path))
+  const html = await fs.readFile(file, 'utf8')
+  const head = /<head[^>]*>([\s\S]*?)<\/head>/.exec(html)?.[1] ?? ''
+  let partialBytes = 0
+  if (file.endsWith(`${path.sep}index.html`)) {
+    const partial = file.replace(/index\.html$/, 'index.partial.html')
+    partialBytes = await fs
+      .stat(partial)
+      .then((stats) => stats.size)
+      .catch(() => 0)
+  }
+  return {
+    path: route.path,
+    title: attr(head, /<title>([\s\S]*?)<\/title>/),
+    description: attr(head, /<meta name="description" content="([^"]*)"/),
+    canonical: attr(head, /<link rel="canonical" href="([^"]*)"/),
+    ogImage: attr(head, /<meta property="og:image" content="([^"]*)"/),
+    noindex: /<meta name="robots" content="[^"]*noindex/.test(head),
+    textHash: sha(prose(html)),
+    codeHash: sha(code(html)),
+    partialBytes,
+  }
+}
+
+/** Every `*.html` under `dir`, relative and slash-separated. */
+async function htmlFiles(dir: string): Promise<string[]> {
+  const found: string[] = []
+  const walk = async (current: string): Promise<void> => {
+    let entries
+    try {
+      entries = await fs.readdir(current, { withFileTypes: true })
+    } catch {
+      return
+    }
+    for (const entry of entries) {
+      const full = path.join(current, entry.name)
+      if (entry.isDirectory()) {
+        await walk(full)
+      } else if (
+        entry.name.endsWith('.html') &&
+        !entry.name.endsWith('.partial.html')
+      ) {
+        found.push(path.relative(dir, full).split(path.sep).join('/'))
       }
     }
   }
-
-  const built: string[] = []
-  const walk = async (dir: string, prefix: string): Promise<void> => {
-    const entries = await readdir(dir, { withFileTypes: true })
-    for (const e of entries) {
-      const rel = prefix ? `${prefix}/${e.name}` : e.name
-      if (e.isDirectory()) await walk(join(dir, e.name), rel)
-      else if (e.name === 'index.html') built.push(rel)
-    }
-  }
-  await walk(staticDir, '')
-
-  return [
-    ...built
-      .filter((f) => !covered.has(f))
-      .map(
-        (f) =>
-          `/${f.replace(/(^|\/)index\.html$/, '')}`.replace(/\/$/, '') || '/',
-      ),
-    ...missingAliases,
-  ].sort()
+  await walk(dir)
+  return found.sort()
 }
 
 /**
- * The build's route manifest, which sits beside `static/` rather than in it.
- * Absent for `--base`, and for any build older than the manifest.
+ * Documents in the output that the route manifest never declared.
+ *
+ * The one invariant worth keeping from the old harness: a page is only
+ * deployed, redirected to or listed in the sitemap if it is in the manifest, so
+ * an undeclared file is a page nothing will ever route to. Hand-written HTML in
+ * `public/` is copied verbatim and is not a route, so it is subtracted first.
  */
-async function readRouteManifest(
-  staticDir: string,
-): Promise<RouteInfo[] | null> {
+async function uncovered(declared: Set<string>): Promise<string[]> {
+  const copied = new Set(await htmlFiles(path.join(ROOT, 'public')))
+  return (await htmlFiles(STATIC)).filter(
+    (rel) => !declared.has(rel) && !copied.has(rel),
+  )
+}
+
+async function collect(): Promise<Snapshot> {
+  const manifest = JSON.parse(
+    await fs.readFile(path.join(OUTPUT, 'routes.json'), 'utf8'),
+  ) as RouteManifest
+
+  const declared = new Set<string>()
+  for (const route of manifest.routes) {
+    for (const target of [route.path, ...(route.aliases ?? [])]) {
+      declared.add(staticPathFor(target))
+    }
+  }
+  const extra = await uncovered(declared)
+  if (extra.length > 0) {
+    throw new Error(
+      `documents the route manifest never declared:\n  ${extra.join('\n  ')}`,
+    )
+  }
+
+  const first = manifest.routes[0]
+  if (!first) throw new Error('routes.json declares no routes')
+  const home = await fs.readFile(
+    path.join(STATIC, staticPathFor(first.path)),
+    'utf8',
+  )
+
+  const routes = await Promise.all(
+    [...manifest.routes]
+      .sort((a, b) => a.path.localeCompare(b.path))
+      .map(rowFor),
+  )
+  return {
+    themeScript: sha(/<script>([\s\S]*?)<\/script>/.exec(home)?.[1] ?? ''),
+    routes,
+  }
+}
+
+/** Every field of one route that differs, as `field: before -> after`. */
+function diffRow(before: RouteRow, after: RouteRow): string[] {
+  const keys = Object.keys(before) as (keyof RouteRow)[]
+  return keys
+    .filter((key) => key !== 'path' && before[key] !== after[key])
+    .map((key) => `    ${key}: ${String(before[key])} -> ${String(after[key])}`)
+}
+
+async function check(fresh: Snapshot): Promise<number> {
+  let committed: Snapshot
   try {
-    const raw = await readFile(join(staticDir, '..', 'routes.json'), 'utf8')
-    return (JSON.parse(raw) as RouteManifest).routes
+    committed = JSON.parse(await fs.readFile(SNAPSHOT, 'utf8')) as Snapshot
   } catch {
-    return null
-  }
-}
-
-/**
- * The URL to snapshot an embed variant at.
- *
- * Content embeds are addressed as `?embed=true`, which is both the URL the
- * baseline used and a real production rewrite. The list-page embeds never had
- * a query form, so they are addressed by their own path.
- */
-function embedUrl(route: RouteInfo): string {
-  const parent = route.variantOf ?? route.path.replace(/\/embed$/, '')
-  // The rewrite is `/<section>/<slug>`, so `/blog` itself is not eligible.
-  const [, section = '', slug = ''] = parent.split('/')
-  return slug && (EMBED_SECTIONS as readonly string[]).includes(section)
-    ? `${parent}?embed=true`
-    : route.path
-}
-
-export async function snapshot(args: Run): Promise<SnapshotManifest> {
-  const routes =
-    args.dir === null ? null : await readRouteManifest(resolve(args.dir))
-
-  let pagePaths: string[]
-  let embedPaths: string[]
-  if (routes) {
-    // Driven by what the build says it emitted. The prefix filter this
-    // replaces never reached the six list-page embeds, so they were diffed by
-    // nothing at all.
-    pagePaths = routes
-      .filter((route) => route.kind === 'page' && !route.noindex)
-      .map((route) => route.path)
-      .sort()
-    embedPaths = routes
-      .filter((route) => route.kind === 'embed')
-      .map(embedUrl)
-      .sort()
-  } else {
-    const sitemapPaths = await fetchSitemapPaths(args.fetch)
-    pagePaths = [...new Set([...EXTRA_PAGES, ...sitemapPaths])].sort()
-    embedPaths = pagePaths
-      .filter((p) => p.startsWith('/blog/') || p.startsWith('/notes/'))
-      .map((p) => `${p}?embed=true`)
+    console.error(
+      `no ${path.relative(ROOT, SNAPSHOT)}; seed it with \`pnpm snapshot\``,
+    )
+    return 1
   }
 
-  const selected = (p: string): boolean =>
-    args.only === null || p.includes(args.only)
+  const before = new Map(committed.routes.map((row) => [row.path, row]))
+  const after = new Map(fresh.routes.map((row) => [row.path, row]))
+  const problems: string[] = []
 
-  await rm(args.out, { recursive: true, force: true })
-  await mkdir(args.out, { recursive: true })
-
-  // Only what the manifest listed. A path that came from the sitemap or the
-  // fixed fallback list is not evidence that the build intended it.
-  const intended = new Set(routes ? [...pagePaths, ...embedPaths] : [])
-
-  const records: RouteRecord[] = []
-  const vtMap: Record<string, ViewTransitionRecord[]> = {}
-  const pageHtml = new Map<string, string>()
-
-  const pageResults = await pool(
-    pagePaths.filter(selected),
-    args.concurrency,
-    (p) => snapshotPage(args, p, 'page'),
-  )
-  const postOgImages: string[] = []
-  for (const r of pageResults) {
-    if (intended.has(r.record.path)) r.record.intended = true
-    records.push(r.record)
-    if (r.vts.length > 0) vtMap[r.record.path] = r.vts
-    pageHtml.set(r.record.path, r.normalizedHtml)
-    if (r.record.path.startsWith('/blog/') && r.rawOgImage) {
-      const u = new URL(r.rawOgImage)
-      if (u.pathname.includes('/opengraph-image')) {
-        postOgImages.push(`${u.pathname}${u.search}`)
-      }
-    }
-    process.stdout.write(`  ${r.record.status} ${r.record.path}\n`)
-  }
-
-  // The 404 body is a page the bespoke build must reproduce (as
-  // `static/404/index.html`), so capture it under a fixed probe URL.
-  if (selected(NOT_FOUND_PROBE)) {
-    const nf = await snapshotPage(args, NOT_FOUND_PROBE, 'page', 404)
-    records.push(nf.record)
-    if (nf.vts.length > 0) vtMap[nf.record.path] = nf.vts
-    process.stdout.write(`  ${nf.record.status} ${nf.record.path} (404 page)\n`)
-  }
-
-  const embedResults = await pool(
-    embedPaths.filter(selected),
-    args.concurrency,
-    (p) => snapshotPage(args, p, 'embed'),
-  )
-  for (const r of embedResults) {
-    const canonical = r.record.path.replace('?embed=true', '')
-    if (pageHtml.get(canonical) === r.normalizedHtml) {
-      r.record.identicalTo = canonical
-      // `?embed=true` is handled by a client script, so the server HTML is
-      // byte-identical to the canonical route. Storing a second copy for all
-      // 32 content routes would add ~370 KB of pure duplication to the
-      // committed baseline; diff-html.ts follows `identicalTo` instead.
-      await rm(join(args.out, r.record.dir), { recursive: true, force: true })
-    }
-    if (intended.has(r.record.path)) r.record.intended = true
-    records.push(r.record)
-    if (r.vts.length > 0) vtMap[r.record.path] = r.vts
-    process.stdout.write(
-      `  ${r.record.status} ${r.record.path}` +
-        `${r.record.identicalTo ? ' (identical to canonical)' : ''}\n`,
+  if (committed.themeScript !== fresh.themeScript) {
+    problems.push(
+      `  theme script: ${committed.themeScript} -> ${fresh.themeScript}`,
     )
   }
 
-  for (const f of TEXT_FILES) {
-    if (!selected(f.path)) continue
-    const rec = await snapshotTextFile(args, f.path, f.file)
-    records.push(rec)
-    process.stdout.write(`  ${rec.status} ${rec.path}\n`)
+  const removed = committed.routes.filter((row) => !after.has(row.path))
+  for (const row of removed) problems.push(`  route removed: ${row.path}`)
+
+  let changed = 0
+  for (const row of fresh.routes) {
+    const previous = before.get(row.path)
+    if (!previous) continue
+    const fields = diffRow(previous, row)
+    if (fields.length === 0) continue
+    changed += 1
+    problems.push(`  ${row.path}\n${fields.join('\n')}`)
   }
 
-  const perPost =
-    args.og === 'none'
-      ? []
-      : args.og === 'one'
-        ? postOgImages.slice(0, 1)
-        : postOgImages
-  const binaryPaths = ['/opengraph-image', ...perPost].filter(selected)
-  const binaryRecords = await pool(binaryPaths, args.concurrency, (p) =>
-    snapshotBinary(args, p),
-  )
-  for (const rec of binaryRecords) {
-    records.push(rec)
-    process.stdout.write(
-      `  ${rec.status} ${rec.path} (${rec.bytes} B` +
-        `${rec.width ? `, ${rec.width}x${rec.height}` : ''})\n`,
+  const added = fresh.routes.filter((row) => !before.has(row.path))
+  if (added.length > 0) {
+    console.log(`added routes (informational): ${added.length}`)
+    for (const row of added) console.log(`  + ${row.path}`)
+  }
+
+  if (problems.length === 0) {
+    console.log(
+      `OK: ${fresh.routes.length} routes match ${path.relative(ROOT, SNAPSHOT)}`,
     )
+    return 0
   }
 
-  records.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
-
-  const manifest: SnapshotManifest = {
-    base: args.dir === null ? args.base : args.dir,
-    generatedAt: new Date().toISOString(),
-    routes: records,
-  }
-
-  if (args.dir !== null) {
-    const uncovered = await findUncovered(args.dir, records, routes)
-    if (uncovered.length > 0) {
-      manifest.uncovered = uncovered
-      process.stdout.write(
-        `\n${uncovered.length} built pages not covered by any route:\n`,
-      )
-      for (const p of uncovered) process.stdout.write(`  ${p}\n`)
-    }
-  }
-
-  await writeFileEnsuring(
-    join(args.out, 'routes.json'),
-    `${JSON.stringify(manifest, null, 2)}\n`,
+  console.error(
+    `\n${changed} route(s) changed, ${removed.length} removed:\n` +
+      `${problems.join('\n')}\n\n` +
+      'If every line above is intended, re-baseline with `pnpm snapshot`' +
+      ' and review the diff.',
   )
-  await writeFileEnsuring(
-    join(args.out, 'view-transition-names.json'),
-    `${JSON.stringify(vtMap, null, 2)}\n`,
-  )
-
-  return manifest
+  return 1
 }
 
-async function main(): Promise<void> {
-  const flags = parseArgs(process.argv.slice(2))
-  const source = flags.dir === null ? flags.base : resolve(flags.dir)
-  const args: Run = {
-    ...flags,
-    out: resolve(flags.out),
-    raw: resolve(flags.raw),
-    fetch: flags.dir === null ? httpFetcher(flags.base) : dirFetcher(source),
-  }
-  process.stdout.write(`snapshotting ${source} -> ${args.out}\n`)
-  const manifest = await snapshot(args)
-  const failed = manifest.routes.filter((r) => r.error)
-  const hard = failed.filter((r) => r.kind === 'page' || r.kind === 'embed')
-  process.stdout.write(
-    `\n${manifest.routes.length} routes, ${failed.length} non-200 ` +
-      `(${hard.length} of them pages)\n`,
-  )
-  for (const f of failed) {
-    process.stdout.write(
-      `  ${hard.includes(f) ? 'FAIL' : 'warn'} ${f.path}: ${f.error}\n`,
-    )
-  }
-  // A broken asset route is recorded, not fatal: the baseline has real ones.
-  if (hard.length > 0) process.exitCode = 1
-}
+const fresh = await collect()
 
-const entry = process.argv[1] ?? ''
-if (entry.endsWith('snapshot.ts') || entry.endsWith('snapshot.js')) {
-  await main()
+if (process.argv.includes('--write')) {
+  await fs.mkdir(path.dirname(SNAPSHOT), { recursive: true })
+  await fs.writeFile(SNAPSHOT, `${JSON.stringify(fresh, null, 2)}\n`)
+  console.log(
+    `wrote ${path.relative(ROOT, SNAPSHOT)}: ${fresh.routes.length} routes`,
+  )
+} else {
+  process.exitCode = await check(fresh)
 }

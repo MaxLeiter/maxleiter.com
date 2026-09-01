@@ -24,19 +24,25 @@ overrides the dev server's default of 3000.
   - `build:bun`: the same build under Bun, faster locally, identical output
   - `check`: typecheck with `tsc --noEmit`
   - `lint`: lint with oxlint and format with oxfmt
-  - `gate`: build, then diff the output against the committed parity baseline
-  - `snapshot` / `verify`: the two halves of `gate`, separately
+  - `test`: the platform check (feeds, OG images, font subsets, vercel.json)
+  - `gate`: build, then diff the output against the committed snapshot
+  - `snapshot`: rewrite that snapshot, when you mean to change the output
 
 ### Directory structure
 
 - `build.ts`: the whole build
-- `framework/`: content loading, MDX, syntax highlighting, rendering, CSS, client bundles, islands, routes, and the platform steps (OG images, feeds, sitemap, Vercel config, fonts)
+- `framework/shared/`: types, URL routing rules, view-transition names
+- `framework/content/`: posts, notes, projects, committed tweets and image sizes
+- `framework/render/`: the route registry, the HTML shell, MDX, highlighting, islands
+- `framework/assets/`: the Tailwind sheet, the client bundles, the font subsets
+- `framework/platform/`: OG images, feeds, sitemap, Vercel config
+- `framework/client/`: the runtime and the same-document router
 - `app/pages/`: page components; `app/islands/`: the interactive ones
 - `app/components/`, `app/mdx/`, `app/styles/`: shared components, the MDX component maps, and global styles
 - `posts/`, `notes/`: MDX content rendered at build time
 - `public/`: favicons, blog images, and the KnightOS emulator, copied verbatim
-- `tools/`: the snapshot and HTML-diff parity harness
-- `docs/rewrite/`: design docs and the committed output baseline
+- `tools/snapshot.ts`: the regression gate
+- `docs/`: [`ARCHITECTURE.md`](docs/ARCHITECTURE.md), and the snapshot the gate compares against
 
 Output is the [Vercel Build Output API](https://vercel.com/docs/build-output-api/v3):
 static files plus a route table in `.vercel/output/`.

@@ -1,8 +1,8 @@
 import { ListCard } from '@components/desktop/list-card'
-import type { Project } from '@lib/blog-post'
+import type { ProjectCard } from '@lib/types'
 
 interface ProjectsContentProps {
-  projects: Project[]
+  projects: ProjectCard[]
 }
 
 export function ProjectsContent({ projects }: ProjectsContentProps) {

@@ -1,16 +1,15 @@
 import Info from '@components/icons/info'
-import styles from './mdx-note.module.css'
 export function MDXNote({
   children,
   title,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <aside {...props} className={styles.note}>
-      <div className={styles.icon}>
+    <aside {...props} className="mdx-note">
+      <div className="mdx-note-icon">
         <Info />
       </div>
-      <div className={styles.content}>
+      <div className="mdx-note-content">
         <b>{title ? title : 'Note:'}</b>
         {children}
       </div>

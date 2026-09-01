@@ -1,0 +1,229 @@
+/* The MDX <ShotGrid>. The grid and its figures are static markup; the lightbox
+   below is rendered by app/islands/shot-grid.tsx, which also mints
+   `.shot-trigger` buttons at runtime. Both sides use these literals. */
+
+.shot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--gap);
+  margin: var(--gap) 0;
+}
+
+/* Once there's room, break out past the article column so the shots are
+   actually legible. `100%` is the article width, whatever it happens to be. */
+@media (min-width: 60rem) {
+  .shot-grid {
+    --breakout: calc((min(64rem, 100vw - 3rem) - 100%) / 2);
+    margin-left: calc(-1 * var(--breakout));
+    margin-right: calc(-1 * var(--breakout));
+  }
+}
+
+@media (max-width: 600px) {
+  .shot-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.shot-figure {
+  margin: 0;
+  min-width: 0;
+}
+
+/* override the article img/video margin so the grid controls spacing */
+.shot-figure :is(img, video) {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: var(--inline-radius);
+  border: 1px solid var(--lighter-gray);
+  background: var(--lightest-gray);
+}
+
+/* Portrait clips would otherwise run ~2x the height of a landscape screenshot
+   and swamp their row, so cap the height and centre what's left. */
+.shot-figure video {
+  width: auto;
+  max-width: 100%;
+  max-height: 24rem;
+  margin-inline: auto;
+}
+
+.shot-trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  border-radius: var(--inline-radius);
+  color: inherit;
+  font: inherit;
+}
+
+.shot-trigger img {
+  transition: opacity var(--transition);
+}
+
+.shot-trigger:hover img {
+  opacity: 0.85;
+}
+
+.shot-trigger:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 3px;
+}
+
+.shot-figure figcaption {
+  margin-top: var(--gap-quarter);
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--gray);
+}
+
+/* Lightbox */
+
+.shot-lightbox {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+  background: transparent;
+  color: var(--fg);
+}
+
+.shot-lightbox::backdrop {
+  background: rgb(0 0 0 / 0.82);
+}
+
+.shot-lightbox[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: shot-lightbox-in 0.15s ease-out;
+}
+
+@keyframes shot-lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot-lightbox[open] {
+    animation: none;
+  }
+
+  .shot-trigger img {
+    transition: none;
+  }
+}
+
+.shot-lightbox-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-half);
+  margin: 0;
+  padding: var(--gap);
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 0;
+}
+
+.shot-lightbox-media {
+  display: block;
+  margin: 0;
+  max-width: min(100%, 90rem);
+  /* leave room for the caption */
+  max-height: calc(100dvh - 6rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--inline-radius);
+}
+
+.shot-lightbox-caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--gap-half);
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #fff;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.6);
+}
+
+.shot-counter {
+  color: rgb(255 255 255 / 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.shot-control {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.45);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.shot-control:hover {
+  background: rgb(0 0 0 / 0.75);
+}
+
+.shot-control:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.shot-control svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shot-close {
+  top: var(--gap);
+  right: var(--gap);
+}
+
+.shot-prev {
+  left: var(--gap);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.shot-next {
+  right: var(--gap);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 600px) {
+  .shot-prev,
+  .shot-next {
+    top: auto;
+    bottom: var(--gap);
+    transform: none;
+  }
+}

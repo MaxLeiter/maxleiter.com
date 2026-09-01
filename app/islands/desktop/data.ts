@@ -7,8 +7,8 @@
  * into the HTML twice over (once as markup, once as the island's props JSON).
  */
 
-import { entryHref } from '@lib/blog-post'
-import { transitionName } from '../../../framework/transitions'
+import { entryHref } from '@lib/types'
+import { transitionName } from '@framework/shared/transitions'
 
 export type WindowId =
   | 'calculator'

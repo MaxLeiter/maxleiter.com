@@ -9,7 +9,7 @@ import {
   useSyncExternalStore,
 } from 'react'
 import { flushSync } from 'react-dom'
-import { entryHref } from '@lib/blog-post'
+import { entryHref } from '@lib/types'
 import { DesktopChrome, type ChromeHandlers } from './desktop/chrome'
 import { Window } from './desktop/window'
 import {

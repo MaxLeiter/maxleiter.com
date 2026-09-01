@@ -26,22 +26,8 @@ export interface ShotItem {
   caption?: string
 }
 
-export interface ShotGridClasses {
-  trigger: string
-  lightbox: string
-  lightboxFigure: string
-  lightboxMedia: string
-  lightboxCaption: string
-  counter: string
-  control: string
-  close: string
-  prev: string
-  next: string
-}
-
 export interface ShotGridProps {
   items: ShotItem[]
-  classes: ShotGridClasses
 }
 
 /**
@@ -65,7 +51,7 @@ function findGrid(anchor: Element | null): HTMLElement | null {
  * imperative calls each cause live in the handler rather than in an effect
  * watching a boolean derived from `index`. `showModal()` blocks interaction but
  * not scrolling, hence the body lock; pure CSS via `body:has(dialog[open])` is
- * not an option, because the esbuild target in framework/client.ts includes
+ * not an option, because the esbuild target in framework/assets/client.ts includes
  * firefox111 and Firefox only got `:has` in 121.
  */
 function openLightbox(
@@ -103,7 +89,6 @@ function closeLightbox(
 function useGridTriggers(
   dialogRef: RefObject<HTMLDialogElement | null>,
   items: ShotItem[],
-  triggerClass: string,
   setIndex: Dispatch<SetStateAction<number | null>>,
 ): void {
   useEffect(() => {
@@ -122,7 +107,7 @@ function useGridTriggers(
 
       const button = document.createElement('button')
       button.type = 'button'
-      button.className = triggerClass
+      button.className = 'shot-trigger'
       button.dataset.shotIndex = String(at)
       button.setAttribute(
         'aria-label',
@@ -150,14 +135,14 @@ function useGridTriggers(
         if (image) button.replaceWith(image)
       }
     }
-  }, [dialogRef, items, triggerClass, setIndex])
+  }, [dialogRef, items, setIndex])
 }
 
-export default function ShotGrid({ items, classes }: ShotGridProps) {
+export default function ShotGrid({ items }: ShotGridProps) {
   const [index, setIndex] = useState<number | null>(null)
   const dialogRef = useRef<HTMLDialogElement>(null)
 
-  useGridTriggers(dialogRef, items, classes.trigger, setIndex)
+  useGridTriggers(dialogRef, items, setIndex)
 
   const close = () => closeLightbox(dialogRef.current, setIndex)
 
@@ -179,7 +164,7 @@ export default function ShotGrid({ items, classes }: ShotGridProps) {
     // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <dialog
       ref={dialogRef}
-      className={classes.lightbox}
+      className="shot-lightbox"
       // `close` fires on close(); `cancel` on the platform's own Escape. Both
       // are fallbacks for the keydown handler below, and both are idempotent.
       onClose={close}
@@ -209,7 +194,7 @@ export default function ShotGrid({ items, classes }: ShotGridProps) {
         <>
           <button
             type="button"
-            className={`${classes.control} ${classes.close}`}
+            className="shot-control shot-close"
             onClick={close}
             aria-label="Close"
           >
@@ -221,7 +206,7 @@ export default function ShotGrid({ items, classes }: ShotGridProps) {
           {items.length > 1 ? (
             <button
               type="button"
-              className={`${classes.control} ${classes.prev}`}
+              className="shot-control shot-prev"
               onClick={() => step(-1)}
               aria-label="Previous image"
             >
@@ -231,17 +216,17 @@ export default function ShotGrid({ items, classes }: ShotGridProps) {
             </button>
           ) : null}
 
-          <figure className={classes.lightboxFigure}>
+          <figure className="shot-lightbox-figure">
             <img
-              className={classes.lightboxMedia}
+              className="shot-lightbox-media"
               src={item.full}
               alt={item.alt}
             />
             {item.caption ? (
-              <figcaption className={classes.lightboxCaption}>
+              <figcaption className="shot-lightbox-caption">
                 {item.caption}
                 {items.length > 1 ? (
-                  <span className={classes.counter}>
+                  <span className="shot-counter">
                     {index + 1} / {items.length}
                   </span>
                 ) : null}
@@ -252,7 +237,7 @@ export default function ShotGrid({ items, classes }: ShotGridProps) {
           {items.length > 1 ? (
             <button
               type="button"
-              className={`${classes.control} ${classes.next}`}
+              className="shot-control shot-next"
               onClick={() => step(1)}
               aria-label="Next image"
             >
