@@ -1,0 +1,101 @@
+---
+title: Thank U, Next
+description: Replacing Next.js with a vibe-coded "framework"
+slug: thank-u-next
+date: Sept 1, 2026
+type: post
+---
+
+![The cover of Ariana Grande's album Thank U, Next: the title repeated in many fonts on a pink background](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/thank-u-next/thank-u-next.png)
+
+<figcaption>
+  If you're wondering about this post's title:
+  https://en.wikipedia.org/wiki/Thank_U,_Next
+</figcaption>
+
+There's been a lot of talk about custom / personal software lately. I've been a huge fan -- I'm writing this in a [markdown editor](https://github.com/MaxLeiter/md-viewer) I made for myself. And lately I've been toying with thoughts about the future of frameworks. A nice intersection of the two seemed like a personal framework.
+
+So as of September 1st, this website is no longer running on Next.js. Instead, it's built by a bespoke custom framework that Fable architected and Opus implemented. If this were a commercial project, I'd probably stay on Next[^1], but it's not, so 🤷
+
+This site is overall [pretty simple](/blog/build-a-blog-with-nextjs-13) - it's fully static and compiled to HTML at build time. But it has a lot of React and non-trivial build-time processing like [MDX](https://mdxjs.com/). I gave Fable 5 (in the claude code CLI) the following:
+
+> i am curious about on-demand coding with AI -- can claude theroetically make an on-demand bespoke "web framework" that is _faster_ than nextjs specifically for this site? can it support the same features we need? can it still deploy to vercel? scope it out for me here and if its feasible we'll ship it - youll coordinate opus subagents. use opus for anysubagents as you are a fantastic AGI-like-but-expensive model. be thorough withit [sic]
+
+~3 hours of work later I had something to look at.
+
+I'll let the numbers speak for themselves:
+
+## Before and after
+
+|                               | Next.js                           | Bespoke                                                                                                                                                              |
+| ----------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Homepage**                  |                                   |                                                                                                                                                                      |
+| HTML                          | 24.7 KB                           | 16.3 KB                                                                                                                                                              |
+| JavaScript, eager             | 208 KB in 11 files                | 2.3 KB (1 KB inline runtime + analytics)                                                                                                                             |
+| JavaScript, after first paint | none, all eager                   | 10.6 KB (desktop window manager)                                                                                                                                     |
+| JavaScript, on demand         |                                   | 1.8 KB (command palette, first Cmd+K)                                                                                                                                |
+| Lighthouse mobile             | 98, LCP 2.4 s, 1,153 KB weight    | 100, LCP 1.3 s, 78 KB weight                                                                                                                                         |
+| **Blog post**                 |                                   |                                                                                                                                                                      |
+| HTML                          | 20.6 KB                           | 11.6 KB                                                                                                                                                              |
+| JavaScript                    | 200 KB in 11 files                | 2.3 KB                                                                                                                                                               |
+| Lighthouse mobile             | 99, LCP 2.2 s, 405 KB weight      | 100, LCP 1.1 s, 57 KB weight                                                                                                                                         |
+| Soft navigation payload       | RSC flight, 0.7 to 29 KB per link | 3 KB partial (Safari/Firefox) or [prerendered page](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/speculationrules) (Chrome/Edge) |
+| **Build and repo**            |                                   |                                                                                                                                                                      |
+| Warm full build               | 2.4 s                             | 0.5 s                                                                                                                                                                |
+| Packages in lockfile          | 706                               | 550                                                                                                                                                                  |
+
+And here's the session stats (a lot of the walltime/duration was my laptop being asleep):
+
+```
+Total cost:            $669.45
+Total duration (API):  8h 27m 17s
+Total duration (wall): 1d 1h 34m
+Total code changes:    20914 lines added, 2022 lines removed
+Usage by model:
+    claude-haiku-4-5:  272.7k input, 12.8k output, 0 cache read, 0 cache write, 5 web search ($0.3869)
+      claude-fable-5:  57.4k input, 165.3k output, 66.8m cache read, 2.8m cache write ($131.09)
+       claude-opus-5:  547.6k input, 2.0m output, 562.9m cache read, 32.5m cache write ($537.98)
+Prompt cache (main):   195 requests · 95% of input tokens from cache · 6 misses (last 16s ago, 2.5m tokens re-cached) · warm (1h TTL, last activity 16s ago)
+```
+
+It used ~10% of my Claude Code 20x subscription.
+
+Note that I've made some minor changes/improvements since those stats were recorded, but I'd estimate those stats covered 95% of the work.
+
+You can try the Next.js version of this site at next.maxleiter.com.
+
+## How it works
+
+Mostly written by Claude, edited by me:
+
+- It's more of a build script than a framework. `build.ts` reads `posts/`, renders every route to a static index.html with React (on the server), and writes a [Vercel Build Output](https://vercel.com/docs/build-output-api) directory. Build time is ~half a second warm on my M2 MBP.
+- MDX compiled once per file at build with the same remark and rehype plugins as before. Syntax highlighting runs at build with shiki, emitting both themes into the HTML so theme switching needs no JavaScript.
+- Zero JavaScript on blog/content pages except a 2 KB inline script that handles the theme toggle, Cmd+K, and lazy island loading.
+- [Islands](https://docs.astro.build/en/concepts/islands/) for interactivity. The desktop window manager and the command palette are Preact components that hydrate over server-rendered markup, loaded only on the pages that use them. The palette loads on first Cmd+K. Preact via its React compatibility layer is 7 KB instead of React's 52 KB.
+- Image optimization, immutable asset caching, redirects, and analytics all come from the Build Output API's config and Vercel.
+- Claude wrote a "parity harness." It snapshotted all 101 routes of the Next site and diffed head tags, visible prose, and code blocks against the new build on every change. It found (and fixed) eight unpublished posts leaking into the RSS feed and a 404ing OG image too.
+
+## Why do this?
+
+A bunch of reasons. For one, you could recursively run a loop like this and replace most/all of your dependencies, eliminating a host of [supply chain attacks](/blog/pin-dependencies). You vendor exactly what you need and nothing else, which is what this framework is — the parts of Next.js this site actually uses. Two, the framework is 5,000 lines; easily reviewable by human and model alike. Next.js and React are hundreds of thousands.
+
+Now, there's something to be said that this could all be a lot simpler if I chose a simpler static site generator, switched to python, whatever. Those are all (mostly) true but this is just a demonstration of the future of software, not just static sites.
+
+## Cons
+
+There are many.
+
+1. I'm sure there are hundreds-to-thousands of minor optimizations and fixes that Next.js handles that the LLM does not know about / cannot reproduce
+2. There are also many intentionally-omitted features, like no framework MCP for agents. Claude-in-Chrome is good enough for me.
+3. Depending on what you replace, you may have stale security issues that would be fixed upstream. That doesn't apply here since this is a static site.
+4. You own it now. Bugs, security issues, and feature requests are now yours to deal with.
+
+## What does this mean?
+
+I think its fruitless to try reading tea leaves about software engineering. Who knows where models will be in six months, much less two or three years. But I'll try a bit anyways: I think we'll see an increase in vendoring and in-house agentic-rewrites ("slop forks"[^2]). The security and performance benefits outweigh the costs, which are decreasing rapidly: as agents take on more of the SDLC automonously, they can maintain the software.
+
+---
+
+[^1]: for now, who knows what my opinion will be/where models will be a year from now
+
+[^2]: https://web.archive.org/web/20260228224244/https://slopforks.com/
