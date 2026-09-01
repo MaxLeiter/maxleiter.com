@@ -80,6 +80,12 @@ article li + li {
   margin-top: 0.5em;
 }
 
+/* A list a sentence introduces hugs that sentence at the items' own rhythm. */
+article p + ul,
+article p + ol {
+  margin-top: 0.5em;
+}
+
 article li::marker {
   color: var(--gray);
 }
