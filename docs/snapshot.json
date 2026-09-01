@@ -8,9 +8,9 @@
       "canonical": "https://maxleiter.com",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "b3ff6b9d73185379",
+      "textHash": "62d866a99e8ac898",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 44982
+      "partialBytes": 45071
     },
     {
       "path": "/404",
@@ -52,9 +52,9 @@
       "canonical": "https://maxleiter.com/blog",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "2240a11a646539dd",
+      "textHash": "a74eb3ac32cbb24b",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 49410
+      "partialBytes": 50366
     },
     {
       "path": "/blog/build-a-blog-with-nextjs-13",
@@ -129,9 +129,9 @@
       "canonical": "https://maxleiter.com/blog",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "1884535b54315b18",
+      "textHash": "a7a379e6566a2745",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 46274
+      "partialBytes": 47230
     },
     {
       "path": "/blog/formatting",
@@ -484,6 +484,28 @@
       "textHash": "ab519dbe33f7c648",
       "codeHash": "cfd8a8bd5929e315",
       "partialBytes": 49449
+    },
+    {
+      "path": "/blog/thank-u-next",
+      "title": "thank u, next | Max Leiter",
+      "description": "Replacing Next.js with a vibe-coded \"framework\"",
+      "canonical": "https://maxleiter.com/blog/thank-u-next",
+      "ogImage": "https://maxleiter.com/blog/thank-u-next/opengraph-image.png",
+      "noindex": false,
+      "textHash": "96bc5eec0e6047ba",
+      "codeHash": "6e1d1614777e5aa9",
+      "partialBytes": 23931
+    },
+    {
+      "path": "/blog/thank-u-next/embed",
+      "title": "thank u, next | Max Leiter",
+      "description": "Replacing Next.js with a vibe-coded \"framework\"",
+      "canonical": "https://maxleiter.com/blog/thank-u-next",
+      "ogImage": "https://maxleiter.com/blog/thank-u-next/opengraph-image.png",
+      "noindex": true,
+      "textHash": "0ac81ec7a39274d2",
+      "codeHash": "6e1d1614777e5aa9",
+      "partialBytes": 20232
     },
     {
       "path": "/blog/the-new-maxleiter-com",
