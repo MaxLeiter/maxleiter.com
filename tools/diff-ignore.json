@@ -176,5 +176,18 @@
     }
   ],
   "allowMissingRoutes": [],
-  "allowNewRoutes": []
+
+  "$allowNewRoutesComment": [
+    "Matched against 'route added by new build' and against built pages that",
+    "route discovery never reached. Anything not listed here fails, so a page",
+    "appearing out of nowhere cannot go unnoticed.",
+    "Checked before allowlisting: the six list-page embeds strip the toolbar,",
+    "carry the right titles, and are noindex,nofollow. /knightos/ is the",
+    "KnightOS emulator, copied verbatim out of public/ with its own index.html,",
+    "so it is an asset rather than a route the site generates."
+  ],
+  "allowNewRoutes": [
+    "re:^/(about|blog|labs|notes|projects|talks)/embed$",
+    "re:^/knightos/"
+  ]
 }

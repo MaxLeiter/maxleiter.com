@@ -215,39 +215,3 @@ article details {
 .react-tweet-theme {
   max-height: 600px;
 }
-
-/* Build-time <Diff>: react-diff-viewer rendered this client-side through
-   emotion; the diff is computed by the `diff` package at build now, so this is
-   the only styling it needs. */
-.mdx-diff {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  table-layout: fixed;
-}
-
-.mdx-diff th {
-  text-align: left;
-  padding: 0.5rem;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--gray);
-  font-weight: 500;
-}
-
-.mdx-diff td {
-  padding: 0.15rem 0.5rem;
-  vertical-align: top;
-  word-break: break-word;
-  border-bottom: 1px solid var(--lighter-gray);
-}
-
-.mdx-diff tr[data-diff='changed'] td:first-child,
-.mdx-diff tr[data-diff='removed'] td:first-child {
-  background-color: color-mix(in srgb, var(--red) 18%, transparent);
-}
-
-.mdx-diff tr[data-diff='changed'] td:last-child,
-.mdx-diff tr[data-diff='added'] td:last-child {
-  background-color: color-mix(in srgb, var(--green) 18%, transparent);
-}

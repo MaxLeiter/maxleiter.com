@@ -155,7 +155,14 @@ function withTransition(update: () => void): void {
     update()
     return
   }
-  document.startViewTransition(() => flushSync(update))
+  const transition = document.startViewTransition(() => flushSync(update))
+  // A transition the browser skips -- a background tab, a second transition
+  // starting on top of this one -- rejects these. The window still opens,
+  // because the update callback runs either way, so the rejection is noise.
+  const ignore = () => undefined
+  transition.ready.catch(ignore)
+  transition.finished.catch(ignore)
+  transition.updateCallbackDone.catch(ignore)
 }
 
 /* -------------------------------------------------------------- island -- */

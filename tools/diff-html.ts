@@ -276,6 +276,7 @@ interface RoutesManifest {
     identicalTo?: string
     error?: string
   }[]
+  uncovered?: string[]
 }
 
 interface RouteReport {
@@ -347,6 +348,12 @@ export async function diffSnapshots(
       if (basePaths.has(p)) continue
       if (allowNew.some((m) => m.test(p))) continue
       routeIssues.push(`route added by new build: ${p}`)
+    }
+    // Pages the build emitted that route discovery never reached. Without
+    // this the harness would report a clean run while ignoring them entirely.
+    for (const p of currManifest.uncovered ?? []) {
+      if (allowNew.some((m) => m.test(p))) continue
+      routeIssues.push(`built page not covered by any snapshotted route: ${p}`)
     }
   }
 

@@ -7,11 +7,13 @@ import { promisify } from 'node:util'
 const run = promisify(execFile)
 
 /**
- * One stylesheet for the whole site, inlined into every `<head>`.
+ * The base stylesheet, inlined into every `<head>`: the Tailwind build over
+ * `app/styles/`, plus the scoped output of the CSS modules every page needs.
  *
- * Three sources, in cascade order: the Tailwind build over `app/styles/`, the
- * scoped output of every `*.module.css` the server bundle imported, and the
- * shiki theme rules plus the classes `transformerStyleToClass` minted.
+ * Feature-specific slices (react-tweet's theme, the shot grid, the file tree,
+ * the Minecraft inventory, the diff table, the shiki rules) are composed on top
+ * per page by `build.ts`, which only appends the ones that page's markup
+ * actually references.
  *
  * Inlining matches `experimental.inlineCss` and costs no render-blocking
  * request, which is the right trade for a site whose typical visit is a single
@@ -19,11 +21,10 @@ const run = promisify(execFile)
  */
 
 export interface CssResult {
+  /** Tailwind plus the CSS modules every page needs. */
   css: string
   tailwindBytes: number
   moduleBytes: number
-  highlightBytes: number
-  vendorBytes: number
 }
 
 function tailwindBin(root: string): string {
@@ -71,12 +72,8 @@ export async function buildCss(options: {
   cacheDir: string
   /** Concatenated output of the CSS-module plugin, already scoped. */
   moduleCss: string
-  /** Shiki theme rules plus the style-to-class table. */
-  highlightCss: string
-  /** Third-party sheets that are not CSS modules, e.g. react-tweet's theme. */
-  vendorCss?: string
 }): Promise<CssResult> {
-  const { root, cacheDir, moduleCss, highlightCss, vendorCss = '' } = options
+  const { root, cacheDir, moduleCss } = options
   const entry = await writeTailwindEntry(root, cacheDir)
   const output = path.join(cacheDir, 'tailwind-output.css')
 
@@ -88,12 +85,8 @@ export async function buildCss(options: {
   const tailwind = await fs.readFile(output, 'utf8')
 
   return {
-    css: [tailwind, vendorCss, moduleCss, highlightCss]
-      .filter(Boolean)
-      .join('\n'),
+    css: [tailwind, moduleCss].filter(Boolean).join('\n'),
     tailwindBytes: Buffer.byteLength(tailwind),
     moduleBytes: Buffer.byteLength(moduleCss),
-    highlightBytes: Buffer.byteLength(highlightCss),
-    vendorBytes: Buffer.byteLength(vendorCss),
   }
 }

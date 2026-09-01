@@ -16,6 +16,7 @@ import type { ShotGridClasses, ShotItem } from '@islands/shot-grid'
 import { Island } from '../../framework/islands'
 import { Img, optimizedUrl } from '../../framework/images'
 import type { TweetMap } from '../../framework/tweets'
+import type { DimensionMap } from '../../framework/image-dims'
 // Deep import on purpose; see the note on makeTweet below.
 import { EmbeddedTweet } from '../../node_modules/react-tweet/dist/twitter-theme/embedded-tweet.js'
 
@@ -32,6 +33,8 @@ export interface MdxComponentOptions {
   root: string
   /** Tweet id -> the payload committed under `app/data/tweets/`. */
   tweets: TweetMap
+  /** Image URL -> measured intrinsic size, committed under `app/data/`. */
+  dimensions: DimensionMap
 }
 
 /* -------------------------------------------------------------- images -- */
@@ -52,9 +55,29 @@ export function resetArticleImages(): void {
 }
 
 /**
+ * Measured intrinsic sizes, so an image with no `?w=`/`?h=` hint reserves a box
+ * with the right aspect ratio instead of `<Img>`'s 550x450 default. 25 of the
+ * 42 blob-hosted images have no hint.
+ */
+let imageDimensions: DimensionMap = {}
+
+/**
  * `<Img>` reads intrinsic dimensions off the `?w=`/`?h=` URL convention itself
  * (`parseDimsFromUrl`, 550x450 default), so callers need only supply an alt.
  */
+/** Only when the author gave both sides; a lone `?w=` is not enough. */
+function statedDims(src: string): { width: number; height: number } | null {
+  const params = new URL(src, 'https://maxleiter.com').searchParams
+  const w = params.get('w') ?? params.get('width')
+  const h = params.get('h') ?? params.get('height')
+  if (!w || !h) return null
+  const width = Number.parseInt(w, 10)
+  const height = Number.parseInt(h, 10)
+  if (!Number.isFinite(width) || !Number.isFinite(height)) return null
+  if (width <= 0 || height <= 0) return null
+  return { width, height }
+}
+
 function ArticleImage({
   src,
   alt,
@@ -68,12 +91,18 @@ function ArticleImage({
 }) {
   const isFirst = articleImageCount === 0
   articleImageCount += 1
+  // Precedence: an explicit prop, then a complete `?width=&height=` pair the
+  // author wrote, then the measured size. A URL carrying only `?w=` is a
+  // half-hint whose missing side would fall back to a guessed 450, so the
+  // measurement wins there.
+  const stated = statedDims(src)
+  const measured = imageDimensions[src]
   return (
     <Img
       src={src}
       alt={alt ?? ''}
-      width={width}
-      height={height}
+      width={width ?? stated?.width ?? measured?.width}
+      height={height ?? stated?.height ?? measured?.height}
       priority={isFirst}
     />
   )
@@ -522,6 +551,7 @@ function makeTweet(tweets: TweetMap) {
 /* ----------------------------------------------------------------- map -- */
 
 export function createMdxComponents(options: MdxComponentOptions) {
+  imageDimensions = options.dimensions
   return {
     a: ({
       children,

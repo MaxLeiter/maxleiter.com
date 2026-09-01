@@ -69,13 +69,56 @@ async function step<T>(name: string, fn: () => Promise<T> | T): Promise<T> {
  * the concatenated sheet -- and therefore every HTML file -- differ by runtime
  * at identical byte length. Emitted sorted by path.
  */
-const moduleCss = new Map<string, string>()
+const moduleCss = new Map<string, { css: string; classes: string[] }>()
 
-function collectedModuleCss(): string {
-  return [...moduleCss.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, css]) => css)
+/**
+ * Which conditional fragment a CSS module belongs to, or `base` for the ones
+ * every page needs.
+ *
+ * react-tweet's theme is 4.7KB plus ten CSS modules, for one post. Shipping it
+ * on all 78 pages was the largest per-page regression in Phase 1.
+ */
+function featureOf(file: string): string {
+  if (file.includes(`${path.sep}react-tweet${path.sep}`)) return 'tweet'
+  if (file.endsWith('shot-grid.module.css')) return 'shot-grid'
+  if (file.endsWith('file-tree.module.css')) return 'file-tree'
+  if (file.endsWith('inventory.module.css')) return 'minecraft'
+  return 'base'
+}
+
+/** A slice of the stylesheet plus the strings that prove a page needs it. */
+interface Fragment {
+  css: string
+  markers: string[]
+}
+
+function moduleEntries(): [string, { css: string; classes: string[] }][] {
+  return [...moduleCss.entries()].sort(([a], [b]) => a.localeCompare(b))
+}
+
+function baseModuleCss(): string {
+  return moduleEntries()
+    .filter(([file]) => featureOf(file) === 'base')
+    .map(([, mod]) => mod.css)
     .join('\n')
+}
+
+/**
+ * Fragments keyed by feature. A page gets one when its markup contains any of
+ * that feature's scoped class names, which needs no cooperation from the
+ * components themselves.
+ */
+function moduleFragments(): Map<string, Fragment> {
+  const out = new Map<string, Fragment>()
+  for (const [file, mod] of moduleEntries()) {
+    const feature = featureOf(file)
+    if (feature === 'base') continue
+    const existing = out.get(feature) ?? { css: '', markers: [] }
+    existing.css = existing.css ? `${existing.css}\n${mod.css}` : mod.css
+    existing.markers.push(...mod.classes)
+    out.set(feature, existing)
+  }
+  return out
 }
 
 /**
@@ -99,12 +142,14 @@ function cssModulePlugin(): esbuild.Plugin {
           cssModules: { pattern: '[hash]_[local]' },
           minify: true,
         })
-        moduleCss.set(args.path, code.toString())
-
         const names: Record<string, string> = {}
         for (const [local, value] of Object.entries(exports ?? {})) {
           names[local] = value.name
         }
+        moduleCss.set(args.path, {
+          css: code.toString(),
+          classes: Object.values(names),
+        })
         await writeCssModuleTypes(args.path, Object.keys(names))
         return {
           contents: `export default ${JSON.stringify(names)}`,
@@ -300,6 +345,14 @@ interface PlatformModule {
 /** Opaque here; `framework/platform.ts` owns the shape. */
 type PlatformResult = Record<string, unknown>
 
+async function readFragment(relative: string): Promise<string> {
+  try {
+    return await fs.readFile(path.join(ROOT, relative), 'utf8')
+  } catch {
+    return ''
+  }
+}
+
 /**
  * react-tweet's theme sheet. Its per-component CSS modules already flow through
  * the server bundle's lightningcss plugin; this is the one plain stylesheet the
@@ -429,27 +482,52 @@ async function main(): Promise<void> {
     return mod.prepareFonts(ctx)
   })
 
-  const css = await step('css', async () =>
-    buildCss({
-      root: ROOT,
-      cacheDir: CACHE,
-      moduleCss: collectedModuleCss(),
-      highlightCss: server.highlightCss(),
-      vendorCss: await vendorCss(),
-    }),
+  const css = await step('css', () =>
+    buildCss({ root: ROOT, cacheDir: CACHE, moduleCss: baseModuleCss() }),
   )
 
-  const wrapOptions: WrapOptions = {
-    css: css.css,
-    fonts,
-    assets: ctx.assets,
-    islands: client.islands,
+  const fragments = await step('css fragments', async () => {
+    const map = moduleFragments()
+
+    // react-tweet's theme rides along with its CSS modules.
+    const theme = await vendorCss()
+    if (theme) {
+      const tweet = map.get('tweet') ?? { css: '', markers: [] }
+      tweet.css = `${theme}\n${tweet.css}`
+      map.set('tweet', tweet)
+    }
+
+    // Two fragments are plain sheets rather than CSS modules, so they carry
+    // hand-written markers instead of scoped class names.
+    const diff = await readFragment('app/styles/fragments/mdx-diff.css')
+    if (diff) map.set('diff', { css: diff, markers: ['mdx-diff'] })
+
+    const highlight = server.highlightCss()
+    if (highlight) map.set('highlight', { css: highlight, markers: ['shiki'] })
+
+    return map
+  })
+
+  /** Base sheet plus only the fragments this page's markup references. */
+  const cssFor = (body: string): string => {
+    const used = [...fragments.entries()]
+      .filter(([, fragment]) =>
+        fragment.markers.some((marker) => body.includes(marker)),
+      )
+      .sort(([a_], [b_]) => a_.localeCompare(b_))
+      .map(([, fragment]) => fragment.css)
+    return [css.css, ...used].join('\n')
   }
 
   const html = new Map<string, string>()
   await step('write html', async () => {
     for (const page of pages) {
-      const markup = server.wrapPage(page, wrapOptions)
+      const markup = server.wrapPage(page, {
+        css: cssFor(page.body),
+        fonts,
+        assets: ctx.assets,
+        islands: client.islands,
+      })
       html.set(page.path, markup)
       const file = outputFile(ctx.staticDir, page.path)
       await fs.mkdir(path.dirname(file), { recursive: true })
@@ -501,8 +579,14 @@ async function main(): Promise<void> {
   console.log('\ncss bytes')
   console.log(`  tailwind   ${padStart(String(css.tailwindBytes), 8)}`)
   console.log(`  modules    ${padStart(String(css.moduleBytes), 8)}`)
-  console.log(`  highlight  ${padStart(String(css.highlightBytes), 8)}`)
-  console.log(`  vendor     ${padStart(String(css.vendorBytes), 8)}`)
+  for (const [name, fragment] of [...fragments].sort()) {
+    const pages_ = [...html.values()].filter((markup) =>
+      markup.includes(fragment.css.slice(0, 40)),
+    ).length
+    console.log(
+      `  ${pad(`+${name}`, 9)}  ${padStart(String(Buffer.byteLength(fragment.css)), 8)}  on ${pages_} pages`,
+    )
+  }
 
   if (client.outputs.length > 0) {
     console.log('\nclient bytes')

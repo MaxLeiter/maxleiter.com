@@ -132,6 +132,10 @@ function Folder({
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
+          // Tree items nest, and every ancestor folder carries this same
+          // handler. Without this, one Enter on a leaf folder collapsed the
+          // whole chain above it, which is what the pre-island component did.
+          event.stopPropagation()
           setOpen((previous) => !previous)
         }
       }}

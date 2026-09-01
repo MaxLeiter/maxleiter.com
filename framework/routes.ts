@@ -4,6 +4,7 @@ import { buildEntries, toProjectCard, type ListEntry } from './content'
 import { collectLanguages, getHighlighter } from './highlight'
 import { createMdxCompiler } from './mdx'
 import { collectTweetIds, loadTweets } from './tweets'
+import { collectImageUrls, loadImageDimensions } from './image-dims'
 import { ogImageUrl } from './og'
 import { createMdxComponents } from '../app/mdx/static-components'
 import { HomePage } from '../app/pages/home'
@@ -55,12 +56,17 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
   ]
 
   const cacheDir = `${ctx.root}/.cache`
-  const [highlighter, tweets] = await Promise.all([
+  const [highlighter, tweets, dimensions] = await Promise.all([
     getHighlighter(collectLanguages(bodies)),
     loadTweets(ctx.root, collectTweetIds(bodies)),
+    loadImageDimensions(ctx.root, collectImageUrls(bodies)),
   ])
   const mdx = await createMdxCompiler(cacheDir, highlighter)
-  const components = createMdxComponents({ root: ctx.root, tweets })
+  const components = createMdxComponents({
+    root: ctx.root,
+    tweets,
+    dimensions,
+  })
 
   const entries = buildEntries(ctx)
   const listPosts = entries.map(toBlogPost)

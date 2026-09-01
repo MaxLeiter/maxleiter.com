@@ -145,14 +145,23 @@ export default function ShotGrid({ items, classes }: ShotGridProps) {
     <dialog
       ref={dialogRef}
       className={classes.lightbox}
-      // fires on Escape and on close()
+      // `close` fires on close(); `cancel` on the platform's own Escape. Both
+      // are fallbacks for the keydown handler below, and both are idempotent.
       onClose={close}
+      onCancel={close}
       onClick={(event) => {
         // the dialog element itself is the backdrop around the figure
         if (event.target === dialogRef.current) close()
       }}
       onKeyDown={(event) => {
-        if (event.key === 'ArrowRight') {
+        if (event.key === 'Escape') {
+          // Handled here rather than left to the platform. The browser's own
+          // Escape dismissal closes the element without the `close` event
+          // reaching this component reliably, which left `index` set and the
+          // body scroll-locked after the lightbox had visibly gone away.
+          event.preventDefault()
+          close()
+        } else if (event.key === 'ArrowRight') {
           event.preventDefault()
           step(1)
         } else if (event.key === 'ArrowLeft') {

@@ -1,6 +1,6 @@
 {
   "base": ".vercel/output/static",
-  "generatedAt": "2026-08-31T07:14:33.395Z",
+  "generatedAt": "2026-08-31T07:25:28.568Z",
   "routes": [
     {
       "path": "/",
@@ -8,8 +8,8 @@
       "dir": "root",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 100400,
-      "sha256": "7e98e84d9e4f935cf889c67a0f841b5ce2ae5913c70516aac9e88d4cc3a1fa34",
+      "bytes": 77203,
+      "sha256": "f5d74a6b98afb6fa5f44403b464534abbafb94428edb7faf23544aa63f736fb3",
       "title": "Max Leiter",
       "description": "A website by Max Leiter.",
       "canonical": "https://maxleiter.com",
@@ -36,7 +36,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/__snapshot_probe_404",
@@ -44,8 +44,8 @@
       "dir": "__snapshot_probe_404",
       "status": 404,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 60818,
-      "sha256": "6e8fbbd78de12d1d39b0cbfc4f3e3a32dd95fb459a7f8d9884b20f80e9495347",
+      "bytes": 37621,
+      "sha256": "e5dbdbe3f16518e91d986820581a5bb9bcef04872d420e7fb949e23432eef023",
       "title": "404 | Max Leiter",
       "description": "Page not found.",
       "canonical": "https://maxleiter.com/404",
@@ -72,7 +72,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/about",
@@ -80,8 +80,8 @@
       "dir": "about",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 62899,
-      "sha256": "3ec106df11024d39c5e7c2b18f0c5aad56fb50ecb58b825a8fac120880d70bdb",
+      "bytes": 39702,
+      "sha256": "d52ffaf45ec5aab5c5fed8c96f781b65f32ddcabab7ffa683bcdedc82b69d6d4",
       "title": "About | Max Leiter",
       "description": "About this website.",
       "canonical": "https://maxleiter.com/about",
@@ -108,7 +108,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/api/search-index",
@@ -125,8 +125,8 @@
       "dir": "blog",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 105030,
-      "sha256": "651b41a4efda73994fa897818dbfad29ccf26072e5b05c14f20258adefb7889f",
+      "bytes": 81833,
+      "sha256": "792d96959552cc7d4395ca114d95c6d32dbdcb4f67bbfd64a7dbb61cbf04b7ce",
       "title": "Blog | Max Leiter",
       "description": "My blog posts",
       "canonical": "https://maxleiter.com/blog",
@@ -153,7 +153,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/HFSViewer",
@@ -161,8 +161,8 @@
       "dir": "blog/HFSViewer",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 67698,
-      "sha256": "567cdcbbcb38beb65ff54922623e425fa848c2e3dfa2f6d9c1274be308691e4f",
+      "bytes": 44505,
+      "sha256": "b7e71b519eb14c6fdc9d587f6a564076cf48c9ed4072cee38eef9b4ccdcc38ea",
       "title": "Introducing HFSViewer | Max Leiter",
       "description": "View and modify HFS partitions on modern macOS versions",
       "canonical": "https://maxleiter.com/blog/HFSViewer",
@@ -187,7 +187,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/HFSViewer/opengraph-image",
@@ -206,8 +206,8 @@
       "dir": "blog/HFSViewer/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 64106,
-      "sha256": "b26d8f8096d0d1d0e8f9b7219c92d2237ef207935feffd64c861183b35e6df39",
+      "bytes": 40913,
+      "sha256": "2a816eb0b2d9827589058c49f32d1f3d38f270cc8665fa73c33e90667fed744b",
       "title": "Introducing HFSViewer | Max Leiter",
       "description": "View and modify HFS partitions on modern macOS versions",
       "canonical": "https://maxleiter.com/blog/HFSViewer",
@@ -232,7 +232,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/MSHW0184",
@@ -240,8 +240,8 @@
       "dir": "blog/MSHW0184",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 75601,
-      "sha256": "912cc0f696e03339234c65a193c615dc0a613bf9451ea971a19030349b8e4360",
+      "bytes": 54753,
+      "sha256": "ec95593e7d30a437fd760bff9ae7a8705d041f60bf573d2a1d38271b7df1203f",
       "title": "Adding ambient light support to Linux and GNOME | Max Leiter",
       "description": "A quick dive into Linux kernel drivers",
       "canonical": "https://maxleiter.com/blog/MSHW0184",
@@ -266,7 +266,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/MSHW0184/opengraph-image",
@@ -285,8 +285,8 @@
       "dir": "blog/MSHW0184/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 71986,
-      "sha256": "cec8d96eefe0c4353910a5ae237f28b576437a09740b16d87fbff7803ca27f91",
+      "bytes": 51138,
+      "sha256": "12955ec399cea6360028d517a13d3c513ed921d86337b2405dde55f702142a8c",
       "title": "Adding ambient light support to Linux and GNOME | Max Leiter",
       "description": "A quick dive into Linux kernel drivers",
       "canonical": "https://maxleiter.com/blog/MSHW0184",
@@ -311,7 +311,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/X11",
@@ -319,8 +319,8 @@
       "dir": "blog/X11",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 75488,
-      "sha256": "394ab15bc08e05636d8569473af208ec4f73eadb08bdb202cb4e995e5748b495",
+      "bytes": 52291,
+      "sha256": "97ad4f94b24d94d576c45d86ef3bf57ec2e09ae1b8b6009453b894f0f25c5402",
       "title": "X11 on iOS | Max Leiter",
       "description": "A guide on how to compile the X Window System for iOS",
       "canonical": "https://maxleiter.com/blog/X11",
@@ -345,7 +345,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/X11/opengraph-image",
@@ -364,8 +364,8 @@
       "dir": "blog/X11/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 71925,
-      "sha256": "65d78ac1784c9bcf7a0d62608b071367ddb3e6e40589e3f6aaf6ef5b18e52e59",
+      "bytes": 48728,
+      "sha256": "f07c3f4b194cff3da97a25eb80396f350cb7c3c4ffe05d84ee04ad36a02f86d6",
       "title": "X11 on iOS | Max Leiter",
       "description": "A guide on how to compile the X Window System for iOS",
       "canonical": "https://maxleiter.com/blog/X11",
@@ -390,7 +390,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/build-a-blog-with-nextjs-13",
@@ -398,8 +398,8 @@
       "dir": "blog/build-a-blog-with-nextjs-13",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 153468,
-      "sha256": "8c8ab580b66c87555f6a4963e8192f257ce8e687fdb3854cfe7a6e2ee54c1135",
+      "bytes": 133417,
+      "sha256": "51cd31366d4feb446740ee084b9b443e162248ae78d778b210243db92cded911",
       "title": "Building a blog with Next.js 15 and React Server Components | Max Leiter",
       "description": "Use MDX, RSC, and Bright to build a blog with Next.js 15.",
       "canonical": "https://maxleiter.com/blog/build-a-blog-with-nextjs-13",
@@ -424,7 +424,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34813
     },
     {
       "path": "/blog/build-a-blog-with-nextjs-13/opengraph-image",
@@ -443,8 +443,8 @@
       "dir": "blog/build-a-blog-with-nextjs-13/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 149784,
-      "sha256": "948950741e3b82a999a34f903a73d0ff272657e22950b23554d1aedfddbd95cd",
+      "bytes": 129733,
+      "sha256": "0716db0eeb0bf62518e3e3604fabcb7ba8b69b93395a500b479f281a7b9e2a67",
       "title": "Building a blog with Next.js 15 and React Server Components | Max Leiter",
       "description": "Use MDX, RSC, and Bright to build a blog with Next.js 15.",
       "canonical": "https://maxleiter.com/blog/build-a-blog-with-nextjs-13",
@@ -469,7 +469,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34813
     },
     {
       "path": "/blog/contributing-to-oss",
@@ -477,8 +477,8 @@
       "dir": "blog/contributing-to-oss",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 74132,
-      "sha256": "0c4a3815dfecce59c39398e329b5ae82437516026dc0f3dfaffb960f317f4aea",
+      "bytes": 50937,
+      "sha256": "1dc2e8779729dcdaeaa88082da6eea528133a6ab2a6efbaa3ba195c66c78ff4d",
       "title": "How to start contributing to open-source projects | Max Leiter",
       "description": "A small guide to finding projects and contributing changes",
       "canonical": "https://maxleiter.com/blog/contributing-to-oss",
@@ -503,7 +503,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/contributing-to-oss/opengraph-image",
@@ -522,8 +522,8 @@
       "dir": "blog/contributing-to-oss/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 70482,
-      "sha256": "ae01de99f8b3121668d5e2d392f86116add7cb1961874656e732f233b9b3b0aa",
+      "bytes": 47287,
+      "sha256": "096e19ad7ccbb574cdefc6b48e95e0633c1bb732bd490a0e1bfbdb646c67ae83",
       "title": "How to start contributing to open-source projects | Max Leiter",
       "description": "A small guide to finding projects and contributing changes",
       "canonical": "https://maxleiter.com/blog/contributing-to-oss",
@@ -548,7 +548,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/easy-site-improvements",
@@ -556,8 +556,8 @@
       "dir": "blog/easy-site-improvements",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 72324,
-      "sha256": "6a6ddf668cc5e205553dc884b95238f29bd67e7dd380f7524c5483421718b35e",
+      "bytes": 49129,
+      "sha256": "22b6d89040ca700a948b160a2a5bf526be23620c815bc61c5a828a385bfb9ada",
       "title": "Easy ways to improve your websites accessibility and performance | Max Leiter",
       "description": "A list of simple tips for developing a more accessible and user-friendly web.",
       "canonical": "https://maxleiter.com/blog/easy-site-improvements",
@@ -582,7 +582,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/easy-site-improvements/opengraph-image",
@@ -601,8 +601,8 @@
       "dir": "blog/easy-site-improvements/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 68650,
-      "sha256": "618bd711dd664c7b26ba5e3a0da3022d67df990868236ff4d967730caad37474",
+      "bytes": 45455,
+      "sha256": "b96da9162afd0df074c2877004efa46c0c6cf7bfe92874281fe0c154f3fa0d43",
       "title": "Easy ways to improve your websites accessibility and performance | Max Leiter",
       "description": "A list of simple tips for developing a more accessible and user-friendly web.",
       "canonical": "https://maxleiter.com/blog/easy-site-improvements",
@@ -627,7 +627,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/formatting",
@@ -635,8 +635,8 @@
       "dir": "blog/formatting",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 72083,
-      "sha256": "973ea8a573d53377e03260e854cc546da9be1726dfd8b14bd4f146b3c231d53a",
+      "bytes": 48889,
+      "sha256": "afeb69a9215071972e3859c2db29d8311b75b82ed180fc7e270c95fee2a8fb07",
       "title": "Formatting code should be unnecessary | Max Leiter",
       "description": "and we knew this back in the 80s",
       "canonical": "https://maxleiter.com/blog/formatting",
@@ -661,7 +661,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/formatting/opengraph-image",
@@ -680,8 +680,8 @@
       "dir": "blog/formatting/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 68472,
-      "sha256": "063994666a918e60fd3a825afd2277f5d9e2a472aada73a2d10298634a233f10",
+      "bytes": 45278,
+      "sha256": "eae308ef65e0527638bc9ad25d7069f2d31b3b3f80c99a071b0a287eed445e70",
       "title": "Formatting code should be unnecessary | Max Leiter",
       "description": "and we knew this back in the 80s",
       "canonical": "https://maxleiter.com/blog/formatting",
@@ -706,7 +706,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/framework",
@@ -714,8 +714,8 @@
       "dir": "blog/framework",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 69873,
-      "sha256": "0d1e2fb4dce04f4d1e73656150c8bc43ce2bdb75191670e8de64141813c9165d",
+      "bytes": 46680,
+      "sha256": "b2a170d24f6a2226be61c10d27e41015820e8940acc83d88ae5c9716d8a738a3",
       "title": "Impressions of the Framework Laptop | Max Leiter",
       "description": "My thoughts on the Framework Laptop's hardware",
       "canonical": "https://maxleiter.com/blog/framework",
@@ -740,7 +740,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/framework/opengraph-image",
@@ -759,8 +759,8 @@
       "dir": "blog/framework/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 66267,
-      "sha256": "855bbd3930551551f452468c99ea8fe76dfded431cda02012281864c3f2c84b2",
+      "bytes": 43074,
+      "sha256": "db300cc3f9dea956ca953038f93e80f8d1ad9a17bb3411328a2b7b9c4cec769b",
       "title": "Impressions of the Framework Laptop | Max Leiter",
       "description": "My thoughts on the Framework Laptop's hardware",
       "canonical": "https://maxleiter.com/blog/framework",
@@ -785,7 +785,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/hacker-sites",
@@ -793,8 +793,8 @@
       "dir": "blog/hacker-sites",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 66845,
-      "sha256": "3ec7901a2e2ac30b24aad0f6fd304178903ac586969dbea3c9abb7bde0edd162",
+      "bytes": 43648,
+      "sha256": "0ee3312bba2cecec4d3c9ac6770ab09bd891a369d44b4ed9bb453e971d713b40",
       "title": "How hackers* run their sites | Max Leiter",
       "description": "An analysis based on 700 personal websites",
       "canonical": "https://maxleiter.com/blog/hacker-sites",
@@ -819,7 +819,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/hacker-sites/opengraph-image",
@@ -838,8 +838,8 @@
       "dir": "blog/hacker-sites/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 63237,
-      "sha256": "273260d4f302a7b0763631b105e3abf213c44cc45341e6ba273921c6660e1524",
+      "bytes": 40040,
+      "sha256": "461cd4e73896aaa5260734ec583de025456486117f60bf16d65b5aa1ceacb182",
       "title": "How hackers* run their sites | Max Leiter",
       "description": "An analysis based on 700 personal websites",
       "canonical": "https://maxleiter.com/blog/hacker-sites",
@@ -864,7 +864,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/introducing-drift",
@@ -872,8 +872,8 @@
       "dir": "blog/introducing-drift",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 69530,
-      "sha256": "f108082497782ed0651bdb744413909414352c75027e00828a4c9f17cdcffd16",
+      "bytes": 46337,
+      "sha256": "5bb49dc8a371eb491cca23b3e3f6db3d6281bbe8d0fb51aade3cd4b4be7e592b",
       "title": "Introducing Drift | Max Leiter",
       "description": "A self-hostable alternative to GitHub Gist and Pastebin",
       "canonical": "https://maxleiter.com/blog/introducing-drift",
@@ -898,7 +898,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/introducing-drift/opengraph-image",
@@ -917,8 +917,8 @@
       "dir": "blog/introducing-drift/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 65918,
-      "sha256": "028b2c58d51066d31f078c062604cccd79149e34ed4f8554c0d1a0c5fc7cb79a",
+      "bytes": 42725,
+      "sha256": "99cc692cc0c3756b4c4dc077d8fd595cda23c31a3b296ca0145ed752193fd574",
       "title": "Introducing Drift | Max Leiter",
       "description": "A self-hostable alternative to GitHub Gist and Pastebin",
       "canonical": "https://maxleiter.com/blog/introducing-drift",
@@ -943,7 +943,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/mobile-browsers-resizing-font",
@@ -951,8 +951,8 @@
       "dir": "blog/mobile-browsers-resizing-font",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 66692,
-      "sha256": "15e5bea2763e5e842833591ee231a1cde5964e57eda9bf06355c81fb8b6595e3",
+      "bytes": 45845,
+      "sha256": "2c7609d534795f2e13c5af0e502b6012a58ed1359977f27f163584a26dcc29c2",
       "title": "Why your website's fonts might be larger than intended | Max Leiter",
       "description": "A well-meaning mobile browser feature can be problematic",
       "canonical": "https://maxleiter.com/blog/mobile-browsers-resizing-font",
@@ -977,7 +977,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/mobile-browsers-resizing-font/opengraph-image",
@@ -996,8 +996,8 @@
       "dir": "blog/mobile-browsers-resizing-font/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 63002,
-      "sha256": "c6c995d2c6d31cacbce9dd829efef2e97dd12735d2567d900511fec08ebd8a2f",
+      "bytes": 42155,
+      "sha256": "d96faa2ccf1c9c052d08fc4df6384a0d520cd2e7265a067d73f233d593460164",
       "title": "Why your website's fonts might be larger than intended | Max Leiter",
       "description": "A well-meaning mobile browser feature can be problematic",
       "canonical": "https://maxleiter.com/blog/mobile-browsers-resizing-font",
@@ -1022,7 +1022,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/nintype",
@@ -1030,8 +1030,8 @@
       "dir": "blog/nintype",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 70305,
-      "sha256": "ce053600c178d140d3d8940c8b33a1562106393720b13af10052edd9d4126735",
+      "bytes": 47113,
+      "sha256": "42e1bf8f816438c2f2bb3611d5019115083d7d1b8982cf3cfcbfb78e88fc6834",
       "title": "Nintype is still the best iOS keyboard | Max Leiter",
       "canonical": "https://maxleiter.com/blog/nintype",
       "og": {
@@ -1053,7 +1053,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/nintype/opengraph-image",
@@ -1072,8 +1072,8 @@
       "dir": "blog/nintype/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 66702,
-      "sha256": "9cef84ace3d8787070aaf22524679a4efe718d83f50614522615df73364e1700",
+      "bytes": 43510,
+      "sha256": "7c1ef6aad6307335aa4d7dd5a96ef74170c098ab58ebe53cc9fe9bd71a2c0c46",
       "title": "Nintype is still the best iOS keyboard | Max Leiter",
       "canonical": "https://maxleiter.com/blog/nintype",
       "og": {
@@ -1095,7 +1095,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/node-has-tooling-problems",
@@ -1103,8 +1103,8 @@
       "dir": "blog/node-has-tooling-problems",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 71034,
-      "sha256": "5100d6a765159d7a35dfe695ffdf96a220c5b510d5c9a8f96ac0cc5efced70f5",
+      "bytes": 50187,
+      "sha256": "d593fbe5ead8d7d20ae349ced2e5c6875b883dce6f2f968447db2e2a2f1acb43",
       "title": "The Node ecosystem (still) has tooling problems | Max Leiter",
       "description": "It shouldn't take this much work to publish a small library",
       "canonical": "https://maxleiter.com/blog/node-has-tooling-problems",
@@ -1129,7 +1129,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/node-has-tooling-problems/opengraph-image",
@@ -1148,8 +1148,8 @@
       "dir": "blog/node-has-tooling-problems/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 67368,
-      "sha256": "36ae066505256fea3d1aa8f149116c198bf7d750c1653a50ddc6fa818d4ff72f",
+      "bytes": 46521,
+      "sha256": "70149a9738a178ed23b64050782b4bc428eea24786c53f5acdf049349a3635b1",
       "title": "The Node ecosystem (still) has tooling problems | Max Leiter",
       "description": "It shouldn't take this much work to publish a small library",
       "canonical": "https://maxleiter.com/blog/node-has-tooling-problems",
@@ -1174,7 +1174,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/pin-dependencies",
@@ -1182,8 +1182,8 @@
       "dir": "blog/pin-dependencies",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 69197,
-      "sha256": "bec4acb26cffbff062dc265d9a167a749101f2651659a8eb4472645b79d8edf4",
+      "bytes": 48349,
+      "sha256": "edc0df8fd47343b6bf330fa0b9b536b5b30759157b9060c40112ab7f061e24bc",
       "title": "Pin your npm/yarn dependencies | Max Leiter",
       "description": "A guide on how to pin your dependencies and why you may want to",
       "canonical": "https://maxleiter.com/blog/pin-dependencies",
@@ -1208,7 +1208,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/pin-dependencies/opengraph-image",
@@ -1227,8 +1227,8 @@
       "dir": "blog/pin-dependencies/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 65575,
-      "sha256": "c940ae31036dca869ae4f98919bb2ea3c0c5414084883b700c7af87446004fe1",
+      "bytes": 44727,
+      "sha256": "bd23372a27f639b40a9bc282f1a8eaa42df8c6cf8ea7814a3b2960e215291e40",
       "title": "Pin your npm/yarn dependencies | Max Leiter",
       "description": "A guide on how to pin your dependencies and why you may want to",
       "canonical": "https://maxleiter.com/blog/pin-dependencies",
@@ -1253,7 +1253,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/rewrite-your-prompts",
@@ -1261,8 +1261,8 @@
       "dir": "blog/rewrite-your-prompts",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 73073,
-      "sha256": "aa9743caaa0fcaa53e1fa52563cd80be783fc461496a5d6ebf6c0c2b5f10ff6e",
+      "bytes": 49878,
+      "sha256": "521fc5e0a09343f4c2efaafd3ab6cf02e0b531dafaf681876145ea670167a12e",
       "title": "You should be rewriting your prompts | Max Leiter",
       "description": "We talk about overfitting models but never overfitting prompts to models",
       "canonical": "https://maxleiter.com/blog/rewrite-your-prompts",
@@ -1287,7 +1287,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/rewrite-your-prompts/opengraph-image",
@@ -1306,8 +1306,8 @@
       "dir": "blog/rewrite-your-prompts/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 69433,
-      "sha256": "63c55d03e6081c1b108b424be6011b9839dece5c15ebe8a684898f9329581157",
+      "bytes": 46238,
+      "sha256": "b2408a5ec9bc8097a6bdd3f40be63be009f8c0c5b380491d70fcc7ac75ec5534",
       "title": "You should be rewriting your prompts | Max Leiter",
       "description": "We talk about overfitting models but never overfitting prompts to models",
       "canonical": "https://maxleiter.com/blog/rewrite-your-prompts",
@@ -1332,7 +1332,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/sandcastle",
@@ -1340,8 +1340,8 @@
       "dir": "blog/sandcastle",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 93911,
-      "sha256": "0e1270dfdacbda97b0a14044b5e17f30d628b5935bea14e49c9f4ab7ca8db194",
+      "bytes": 73078,
+      "sha256": "b9d023223999d9b7b6f9eb4b194012261e8921ca150ed4a6d666965cc19ee9b5",
       "title": "Sandcastle: A web-based Linux desktop environment | Max Leiter",
       "canonical": "https://maxleiter.com/blog/sandcastle",
       "og": {
@@ -1363,7 +1363,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/sandcastle/opengraph-image",
@@ -1382,8 +1382,8 @@
       "dir": "blog/sandcastle/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 90288,
-      "sha256": "23163d3108c6a1581b8978908d36086f45693ab315d0e45ff2d0b654e88ad5d4",
+      "bytes": 69455,
+      "sha256": "45f8523ffbf685b37c070a7431e428481946694fbc627342560844943ddeb78b",
       "title": "Sandcastle: A web-based Linux desktop environment | Max Leiter",
       "canonical": "https://maxleiter.com/blog/sandcastle",
       "og": {
@@ -1405,7 +1405,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/seeing-the-future",
@@ -1413,8 +1413,8 @@
       "dir": "blog/seeing-the-future",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 72824,
-      "sha256": "ed3320602502edaeaa7e46556851268cc2d42f67f790ce3d9b5b4181c9705160",
+      "bytes": 64373,
+      "sha256": "4baf298824074e9cec112b8a37795f59bd08533d2d0b8cbb3da13e6902668452",
       "title": "I have seen the future through AR glasses | Max Leiter",
       "description": "My experience with the XReal One Pros",
       "canonical": "https://maxleiter.com/blog/seeing-the-future",
@@ -1439,7 +1439,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 46413
     },
     {
       "path": "/blog/seeing-the-future/opengraph-image",
@@ -1458,8 +1458,8 @@
       "dir": "blog/seeing-the-future/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 69188,
-      "sha256": "3f9b67e7c683dc900ebb289fe94bfa73ea0504bba1c4b580e849af9d7d4adb6a",
+      "bytes": 60737,
+      "sha256": "ddf218ea988f6c04fc4960f5bfe8b45e917953459f9d94b534ecee7b1f3c10a1",
       "title": "I have seen the future through AR glasses | Max Leiter",
       "description": "My experience with the XReal One Pros",
       "canonical": "https://maxleiter.com/blog/seeing-the-future",
@@ -1484,7 +1484,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 46413
     },
     {
       "path": "/blog/ship-every-day",
@@ -1492,8 +1492,8 @@
       "dir": "blog/ship-every-day",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 64499,
-      "sha256": "a6c7734336b7224fcc21f816b931bc9d7d45db072ab04fc7e42481e9d3eaf236",
+      "bytes": 41302,
+      "sha256": "3678313bdb6d50d9a4e66cda5d1b44dbaff7f92cba26d7167a76e37ae610e282",
       "title": "Ship something every day | Max Leiter",
       "canonical": "https://maxleiter.com/blog/ship-every-day",
       "og": {
@@ -1515,7 +1515,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/ship-every-day/opengraph-image",
@@ -1534,8 +1534,8 @@
       "dir": "blog/ship-every-day/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 60889,
-      "sha256": "6d3731ea91c55698946b71b90cc326bc53917ad901b007d84b53f8e85fc0af78",
+      "bytes": 37692,
+      "sha256": "688111d26dab5652bddc320c7b0355f018816edb997d9bf7532cd14ec8802a37",
       "title": "Ship something every day | Max Leiter",
       "canonical": "https://maxleiter.com/blog/ship-every-day",
       "og": {
@@ -1557,7 +1557,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/sluggified-urls",
@@ -1565,8 +1565,8 @@
       "dir": "blog/sluggified-urls",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 79770,
-      "sha256": "ed8bf318bd92278518f770ec6cc1509171006d74c8f05078b79e93e2b0d800fc",
+      "bytes": 58922,
+      "sha256": "fdfedd944ef8a8912b6c4625a36abe30241c1223861f72dc7d90301843e10561",
       "title": "Implementing Notion style URLs | Max Leiter",
       "description": "Create /some-title-here-{id} URLs for recognizable links in Next.js",
       "canonical": "https://maxleiter.com/blog/sluggified-urls",
@@ -1591,7 +1591,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/sluggified-urls/opengraph-image",
@@ -1610,8 +1610,8 @@
       "dir": "blog/sluggified-urls/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 76151,
-      "sha256": "43c66da1ceecc42ce9090c335db175e14c36369a6e6dd1c697fd20a51e147827",
+      "bytes": 55303,
+      "sha256": "8b5cc9504951bd042ca21c4126f583602e09213261e868d6a42c8aaaa19cfd97",
       "title": "Implementing Notion style URLs | Max Leiter",
       "description": "Create /some-title-here-{id} URLs for recognizable links in Next.js",
       "canonical": "https://maxleiter.com/blog/sluggified-urls",
@@ -1636,7 +1636,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/supabase-next-analytics",
@@ -1644,8 +1644,8 @@
       "dir": "blog/supabase-next-analytics",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 106559,
-      "sha256": "e53a039906873425a679f88b0d595ae72ca3a93a2d07ed63381b1513793679f2",
+      "bytes": 85713,
+      "sha256": "3559071583cf6d5ce55f5efdd1a48b4d56f5e3772abf3a78d25b02c1edd5443c",
       "title": "Live updating page views with Supabase and Next.js | Max Leiter",
       "description": "A step-by-step guide to page views and server analytics",
       "canonical": "https://maxleiter.com/blog/supabase-next-analytics",
@@ -1670,7 +1670,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/supabase-next-analytics/opengraph-image",
@@ -1689,8 +1689,8 @@
       "dir": "blog/supabase-next-analytics/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 102896,
-      "sha256": "93f96df0225afa94026886e3c76eecaaead068b859e2dacc71f82859b17911de",
+      "bytes": 82050,
+      "sha256": "d623afae95ccad64ec574f59746035d72ce8ea33feec1bb474e2955586de14f2",
       "title": "Live updating page views with Supabase and Next.js | Max Leiter",
       "description": "A step-by-step guide to page views and server analytics",
       "canonical": "https://maxleiter.com/blog/supabase-next-analytics",
@@ -1715,7 +1715,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/the-new-maxleiter-com",
@@ -1723,8 +1723,8 @@
       "dir": "blog/the-new-maxleiter-com",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 83400,
-      "sha256": "7ed92a8ba6b38bef116dabfb8e49eeb23ca1abaff744672453610dd49f45bb21",
+      "bytes": 62554,
+      "sha256": "88cafb463213398d7567941d705dd4604920fd17ddd2540272f3f05c3ac22cf1",
       "title": "The new maxleiter.com | Max Leiter",
       "description": "iframes, view transitions, progressive enhancement, and React Server Components",
       "canonical": "https://maxleiter.com/blog/the-new-maxleiter-com",
@@ -1749,7 +1749,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/the-new-maxleiter-com/opengraph-image",
@@ -1768,8 +1768,8 @@
       "dir": "blog/the-new-maxleiter-com/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 79772,
-      "sha256": "5a68bf22743e369733a278be8bdc63b6021f93edfa0999200860423f6c605085",
+      "bytes": 58926,
+      "sha256": "d35d826059a07afff5a44c1b71671b643b43fb318daabba51f999d73adb3f560",
       "title": "The new maxleiter.com | Max Leiter",
       "description": "iframes, view transitions, progressive enhancement, and React Server Components",
       "canonical": "https://maxleiter.com/blog/the-new-maxleiter-com",
@@ -1794,7 +1794,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/blog/vibecoding-minecraft-mods",
@@ -1802,8 +1802,8 @@
       "dir": "blog/vibecoding-minecraft-mods",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 91736,
-      "sha256": "8abc9ccdd0f6259eba286edb322d5b4fa021db65993fcfbe0d669f14932ac126",
+      "bytes": 69906,
+      "sha256": "e3866b7968124de259cf2e36a69eef509175fea0d14ce4924f810ac673a711d5",
       "title": "Vibe-coding Minecraft mods | Max Leiter",
       "description": "and the lessons learned",
       "canonical": "https://maxleiter.com/blog/vibecoding-minecraft-mods",
@@ -1828,7 +1828,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 33034
     },
     {
       "path": "/blog/vibecoding-minecraft-mods/opengraph-image",
@@ -1847,8 +1847,8 @@
       "dir": "blog/vibecoding-minecraft-mods/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 88091,
-      "sha256": "81fc70289d44a3884ebb187a95c439cf73544b9eb395142128512cfef24472d9",
+      "bytes": 66261,
+      "sha256": "7124b8e9416aa0254e0b26840058f221294994ca90e4b942b2aee944e88c1241",
       "title": "Vibe-coding Minecraft mods | Max Leiter",
       "description": "and the lessons learned",
       "canonical": "https://maxleiter.com/blog/vibecoding-minecraft-mods",
@@ -1873,7 +1873,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 33034
     },
     {
       "path": "/blog/weights",
@@ -1881,8 +1881,8 @@
       "dir": "blog/weights",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 66314,
-      "sha256": "137fe47b6872dbb4e1cbd2be6dfd62a81f636d353f453b7296d4ceba09367e28",
+      "bytes": 43117,
+      "sha256": "992acfaa05d773c634c4db103dd82fa2cf13a0f70b0331ebda443d01805a24d0",
       "title": "They're Made Out of Weights | Max Leiter",
       "description": "with apologies to Terry Bisson",
       "canonical": "https://maxleiter.com/blog/weights",
@@ -1907,7 +1907,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/weights/opengraph-image",
@@ -1926,8 +1926,8 @@
       "dir": "blog/weights/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 62717,
-      "sha256": "b818fe033384f6063a004c6fbc79686357e307fe6b3e06fe887e18e279289665",
+      "bytes": 39520,
+      "sha256": "e12868642430ee95caaed3af24218d91c1bb5db2de6478ba1889f06bbb6020d9",
       "title": "They're Made Out of Weights | Max Leiter",
       "description": "with apologies to Terry Bisson",
       "canonical": "https://maxleiter.com/blog/weights",
@@ -1952,7 +1952,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/blog/xios",
@@ -1960,8 +1960,8 @@
       "dir": "blog/xios",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 81298,
-      "sha256": "363fad8232830409629e1180d58ceaccd983545704d0489eb24d624405f296c5",
+      "bytes": 63418,
+      "sha256": "e81cb2b84457c54c4f1951fa5bee71b65b58c7f79ef189e5c2b63de56019f91e",
       "title": "Running Wayland, X11, GNOME, and KDE natively on an iPad | Max Leiter",
       "description": "X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition",
       "canonical": "https://maxleiter.com/blog/xios",
@@ -1986,7 +1986,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 36981
     },
     {
       "path": "/blog/xios/opengraph-image",
@@ -2005,8 +2005,8 @@
       "dir": "blog/xios/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 77686,
-      "sha256": "699ba6f9c154c80249317e096c125ab2c6716da34fb4b913f6606cb38bcc46dc",
+      "bytes": 59806,
+      "sha256": "ec769141908ee0538a3a8afb63786e89287ba8a085f568318ca99d4126ff3d31",
       "title": "Running Wayland, X11, GNOME, and KDE natively on an iPad | Max Leiter",
       "description": "X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition",
       "canonical": "https://maxleiter.com/blog/xios",
@@ -2031,7 +2031,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 36981
     },
     {
       "path": "/feed.xml",
@@ -2048,8 +2048,8 @@
       "dir": "labs",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 68157,
-      "sha256": "39a15017a7114b394b0a80a42f865b3be01c45e5be796bde0cc0d08108ed766f",
+      "bytes": 44960,
+      "sha256": "17781d93d431247f21731f954fee598f14cd553c537bb3d7f05b10c97f960ec2",
       "title": "Labs | Max Leiter",
       "description": "Experimental projects and playthings",
       "canonical": "https://maxleiter.com/labs",
@@ -2076,7 +2076,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/notes",
@@ -2084,8 +2084,8 @@
       "dir": "notes",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 68435,
-      "sha256": "b2af6a76e7f62676be85a82284ad94bfbf7ed650786ad8340151ff80b15b4cbc",
+      "bytes": 45238,
+      "sha256": "8909f799272a0632706e937f84b9d02ed1a5573acaf93ca28c069ed048d24aeb",
       "title": "Notes | Max Leiter",
       "description": "Short-form thoughts, code snippets, and tips.",
       "canonical": "https://maxleiter.com/notes",
@@ -2112,7 +2112,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/notes/fish-directory-colors",
@@ -2120,8 +2120,8 @@
       "dir": "notes/fish-directory-colors",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 76357,
-      "sha256": "0d0104dfa61ad6705f1c813ea1028e5935f15f84b1b5d20d80386419d4029798",
+      "bytes": 55509,
+      "sha256": "6d58f1a95334bf2eb26ff8882169d8a00889f7d3d58ac46f7d721cd5ae830302",
       "title": "Per-directory terminal colors in fish shell | Max Leiter",
       "description": "Short-form thoughts, code snippets, and tips.",
       "canonical": "https://maxleiter.com/notes/fish-directory-colors",
@@ -2148,7 +2148,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/fish-directory-colors?embed=true",
@@ -2156,8 +2156,8 @@
       "dir": "notes/fish-directory-colors/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 72704,
-      "sha256": "a8a8997ea54aecd0b7cc277b07411c567f6b4f6436f8a9f44d6d78aaa7c05c8f",
+      "bytes": 51856,
+      "sha256": "4dc15c36bc3a4561d62798e81144bc55cc8fd7e9c597787954eccc4a60dd4515",
       "title": "Per-directory terminal colors in fish shell | Max Leiter",
       "description": "Short-form thoughts, code snippets, and tips.",
       "canonical": "https://maxleiter.com/notes/fish-directory-colors",
@@ -2184,7 +2184,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/gemini-script",
@@ -2192,8 +2192,8 @@
       "dir": "notes/gemini-script",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 78935,
-      "sha256": "a37a4bc91ee7dc9762b80647a80e524488e281d98c780da905389898eba66e35",
+      "bytes": 58087,
+      "sha256": "94012c802d6659b216a9d8aed2340576adb03a87b18fb3b00b7dd5cf96cccfad",
       "title": "gemini.sh script | Max Leiter",
       "description": "A script for concatenating files in a directory for copying to an LLM",
       "canonical": "https://maxleiter.com/notes/gemini-script",
@@ -2220,7 +2220,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/gemini-script?embed=true",
@@ -2228,8 +2228,8 @@
       "dir": "notes/gemini-script/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 75333,
-      "sha256": "c6c4efc46da16d49bdf847f99e610a8295ffc9d3e1a9f1e842df6bb3f7aa3b27",
+      "bytes": 54485,
+      "sha256": "4eefa8f07e600e67733f4ffbf420b401a109819138aa9faeb72bceac6b5741a6",
       "title": "gemini.sh script | Max Leiter",
       "description": "A script for concatenating files in a directory for copying to an LLM",
       "canonical": "https://maxleiter.com/notes/gemini-script",
@@ -2256,7 +2256,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/git-checkout-script",
@@ -2264,8 +2264,8 @@
       "dir": "notes/git-checkout-script",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 65373,
-      "sha256": "a709ebc4a4e5d07ae27965aa2bcdfe3ca9b148d9690bb08eb647bac6548e26a7",
+      "bytes": 44525,
+      "sha256": "af401db781f5c1d7605b71dc2841f8af6c94ac44e592c0ca72ce08485c575366",
       "title": "Never think about branch names again | Max Leiter",
       "description": "a bash script for generating branch names",
       "canonical": "https://maxleiter.com/notes/git-checkout-script",
@@ -2292,7 +2292,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/git-checkout-script?embed=true",
@@ -2300,8 +2300,8 @@
       "dir": "notes/git-checkout-script/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 61733,
-      "sha256": "8b3b7adae42608cfcb05204b70a4f2e71d004fa87ab415a8f5dcd881b1807199",
+      "bytes": 40885,
+      "sha256": "5e7989003d99661a700e1d5f8fa12bf4729c21c68d13915d25d69a4a646283ea",
       "title": "Never think about branch names again | Max Leiter",
       "description": "a bash script for generating branch names",
       "canonical": "https://maxleiter.com/notes/git-checkout-script",
@@ -2328,7 +2328,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/slack-message-fetch",
@@ -2336,8 +2336,8 @@
       "dir": "notes/slack-message-fetch",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 66859,
-      "sha256": "ffcbdee08dd44c0f1d1c5b587a412b736ee8971b88f1363ac954adc4bbcf64e8",
+      "bytes": 46011,
+      "sha256": "855504374931cd02fd6f90e625d1ee25516535c171cc5c8dfbd51cb7100cd150",
       "title": "Sending a Slack message with fetch | Max Leiter",
       "description": "Short-form thoughts, code snippets, and tips.",
       "canonical": "https://maxleiter.com/notes/slack-message-fetch",
@@ -2364,7 +2364,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/slack-message-fetch?embed=true",
@@ -2372,8 +2372,8 @@
       "dir": "notes/slack-message-fetch/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 63221,
-      "sha256": "5330dec420a92937a5f6c5b3980618359d5c40cf1da9996a8deaaa6bb82e11be",
+      "bytes": 42373,
+      "sha256": "f82e0a185e0f6bd5d4c08753d3dabf80110cba8eea02e5320146fda9392313f5",
       "title": "Sending a Slack message with fetch | Max Leiter",
       "description": "Short-form thoughts, code snippets, and tips.",
       "canonical": "https://maxleiter.com/notes/slack-message-fetch",
@@ -2400,7 +2400,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/swr-state",
@@ -2408,8 +2408,8 @@
       "dir": "notes/swr-state",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 68463,
-      "sha256": "1e4b5caf146b1c6c1e306043e6fc6afbe49473637e333ec59005c6e0885b1df5",
+      "bytes": 47615,
+      "sha256": "f5bcb0aa4eb239955c52fbbbdfbab55409d1d490b083b697673f584300d6f678",
       "title": "SWR for more than fetching | Max Leiter",
       "description": "SWR for state management",
       "canonical": "https://maxleiter.com/notes/swr-state",
@@ -2436,7 +2436,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/swr-state?embed=true",
@@ -2444,8 +2444,8 @@
       "dir": "notes/swr-state/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 64863,
-      "sha256": "8dcbe7abcdf5ba2e1fc76f23be465c14d0879e0d027192914e0ec28c5037038e",
+      "bytes": 44015,
+      "sha256": "65a425b5e0a9ebbbb032d7f80e946d5cfc5f66b6475892c9ae3a597998f8e0bc",
       "title": "SWR for more than fetching | Max Leiter",
       "description": "SWR for state management",
       "canonical": "https://maxleiter.com/notes/swr-state",
@@ -2472,7 +2472,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/updating-jsonb-drizzle",
@@ -2480,8 +2480,8 @@
       "dir": "notes/updating-jsonb-drizzle",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 66170,
-      "sha256": "d0f48f68508d33fe2b232d4da9c7aa0ab3547d0d56a7efb4fdcbb37d147bc4b3",
+      "bytes": 45322,
+      "sha256": "5b2c9531fe4bdb5272f6644022943d453415a8da07c1fc31b9b69249db273530",
       "title": "Updating JSONB fields with Drizzle | Max Leiter",
       "description": "hint: just use `sql` and COALESCE.",
       "canonical": "https://maxleiter.com/notes/updating-jsonb-drizzle",
@@ -2508,7 +2508,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/updating-jsonb-drizzle?embed=true",
@@ -2516,8 +2516,8 @@
       "dir": "notes/updating-jsonb-drizzle/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 62523,
-      "sha256": "67c96607ded4e9b61793a2c9d3ea0d335985cf8faf34e13453a6736495855180",
+      "bytes": 41675,
+      "sha256": "44b99e7e4c4bebd9edc5e33e85364fa33d68e7d46a1efe9ccb7e85a1ec8b5a54",
       "title": "Updating JSONB fields with Drizzle | Max Leiter",
       "description": "hint: just use `sql` and COALESCE.",
       "canonical": "https://maxleiter.com/notes/updating-jsonb-drizzle",
@@ -2544,7 +2544,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/vscode-default-dir",
@@ -2552,8 +2552,8 @@
       "dir": "notes/vscode-default-dir",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 64886,
-      "sha256": "74d8836922fac1ee3dddd59dc9ef66f4458b80c36e4645639dfc712e7c4a9d13",
+      "bytes": 41690,
+      "sha256": "3c69434c16dd26750d794b62e78ccd4c6671704f8aa2c1460cb197b78203b320",
       "title": "Set your default directory in VS Code's open dialog | Max Leiter",
       "description": "Short-form thoughts, code snippets, and tips.",
       "canonical": "https://maxleiter.com/notes/vscode-default-dir",
@@ -2580,7 +2580,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/notes/vscode-default-dir?embed=true",
@@ -2588,8 +2588,8 @@
       "dir": "notes/vscode-default-dir/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 61229,
-      "sha256": "dd326bdffdd08acc0e6c2fcd5d916cc29ceffa071194c6dc3abf95dca036e876",
+      "bytes": 38033,
+      "sha256": "f4c35f57125a2ba1093e31c5192dab1fd55402c724630484dd0d04ba8d0c4564",
       "title": "Set your default directory in VS Code's open dialog | Max Leiter",
       "description": "Short-form thoughts, code snippets, and tips.",
       "canonical": "https://maxleiter.com/notes/vscode-default-dir",
@@ -2616,7 +2616,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/notes/wasm-edge-and-node",
@@ -2624,8 +2624,8 @@
       "dir": "notes/wasm-edge-and-node",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 67514,
-      "sha256": "9eaee314af6a09cb1e3fdab858731d05a9ab1e4e1152773548add89098b1d77d",
+      "bytes": 46666,
+      "sha256": "6e664b9607876974fa20a607efdd5a0f0a52add64e26efe5a174dc2570589f91",
       "title": "Loading wasm files on Vercel Edge and Node.js runtimes | Max Leiter",
       "description": "Short-form thoughts, code snippets, and tips.",
       "canonical": "https://maxleiter.com/notes/wasm-edge-and-node",
@@ -2652,7 +2652,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/notes/wasm-edge-and-node?embed=true",
@@ -2660,8 +2660,8 @@
       "dir": "notes/wasm-edge-and-node/__embed",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 63859,
-      "sha256": "b0d1eeec574672734c92d84ae72fc4bd02ebfac8ad35e53adad60f53a2dc8c5c",
+      "bytes": 43011,
+      "sha256": "a2d4bac6dfae596e36436b7341545d4295de17ec3089f0d187cb76a914675787",
       "title": "Loading wasm files on Vercel Edge and Node.js runtimes | Max Leiter",
       "description": "Short-form thoughts, code snippets, and tips.",
       "canonical": "https://maxleiter.com/notes/wasm-edge-and-node",
@@ -2688,7 +2688,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 34016
     },
     {
       "path": "/opengraph-image",
@@ -2707,8 +2707,8 @@
       "dir": "projects",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 77729,
-      "sha256": "6f762c2beb9350e0be202a7cf04a601364ae3ee00116406dfd509c868e176bef",
+      "bytes": 54532,
+      "sha256": "2975b62f925b776fa2403ece1ae2a9210e5792bdc5c5924ecf128c48820c158c",
       "title": "Projects | Max Leiter",
       "description": "Most of my projects",
       "canonical": "https://maxleiter.com/projects",
@@ -2735,7 +2735,7 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     },
     {
       "path": "/robots.txt",
@@ -2761,8 +2761,8 @@
       "dir": "talks",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "bytes": 83098,
-      "sha256": "35ea2cb248469e1d4a93da3033fd059ca7e796faa36678310fda9ed56d867b64",
+      "bytes": 59901,
+      "sha256": "0ee418b14139c810437a21c1248eade74908604b0bae4cede190c2d1297ff7bc",
       "title": "Talks | Max Leiter",
       "description": "Tech talks I enjoy from around the web",
       "canonical": "https://maxleiter.com/talks",
@@ -2789,7 +2789,16 @@
         "twitter:image:width": "1200",
         "twitter:image:height": "630"
       },
-      "cssBytes": 54864
+      "cssBytes": 31667
     }
+  ],
+  "uncovered": [
+    "/about/embed",
+    "/blog/embed",
+    "/knightos/OpenTI/webui",
+    "/labs/embed",
+    "/notes/embed",
+    "/projects/embed",
+    "/talks/embed"
   ]
 }

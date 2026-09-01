@@ -24,7 +24,7 @@
  * Runs under bun and node >= 20 (global fetch, ESM, no runtime-specific APIs).
  */
 
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import { dirname, extname, join, resolve } from 'node:path'
 import { maskUrl, normalizeHtml } from './normalize-html.ts'
@@ -176,6 +176,13 @@ export interface SnapshotManifest {
   base: string
   generatedAt: string
   routes: RouteRecord[]
+  /**
+   * `--dir` mode only: HTML the build emitted that no snapshotted route
+   * covers. Route discovery starts from the sitemap plus a fixed list, so a
+   * page the build invents on its own would otherwise be looked at by
+   * nothing at all. diff-html.ts reports these as route issues.
+   */
+  uncovered?: string[]
 }
 
 interface Args {
@@ -461,6 +468,41 @@ async function pool<T, R>(
   return results
 }
 
+/**
+ * Every `index.html` the build emitted that no snapshotted route resolves to.
+ * Route discovery is driven by the sitemap plus a fixed list of top-level
+ * pages, so a page the build adds on its own is invisible to the harness
+ * until it shows up here.
+ */
+async function findUncovered(
+  staticDir: string,
+  records: RouteRecord[],
+): Promise<string[]> {
+  const covered = new Set<string>()
+  for (const r of records) {
+    covered.add(staticFileForPath(r.path).file)
+  }
+
+  const built: string[] = []
+  const walk = async (dir: string, prefix: string): Promise<void> => {
+    const entries = await readdir(dir, { withFileTypes: true })
+    for (const e of entries) {
+      const rel = prefix ? `${prefix}/${e.name}` : e.name
+      if (e.isDirectory()) await walk(join(dir, e.name), rel)
+      else if (e.name === 'index.html') built.push(rel)
+    }
+  }
+  await walk(staticDir, '')
+
+  return built
+    .filter((f) => !covered.has(f))
+    .map(
+      (f) =>
+        `/${f.replace(/(^|\/)index\.html$/, '')}`.replace(/\/$/, '') || '/',
+    )
+    .sort()
+}
+
 export async function snapshot(args: Args): Promise<SnapshotManifest> {
   const sitemapPaths = await fetchSitemapPaths(args.fetch)
   const pagePaths = [...new Set([...EXTRA_PAGES, ...sitemapPaths])].sort()
@@ -561,6 +603,17 @@ export async function snapshot(args: Args): Promise<SnapshotManifest> {
     base: args.dir === null ? args.base : args.dir,
     generatedAt: new Date().toISOString(),
     routes: records,
+  }
+
+  if (args.dir !== null) {
+    const uncovered = await findUncovered(args.dir, records)
+    if (uncovered.length > 0) {
+      manifest.uncovered = uncovered
+      process.stdout.write(
+        `\n${uncovered.length} built pages not covered by any route:\n`,
+      )
+      for (const p of uncovered) process.stdout.write(`  ${p}\n`)
+    }
   }
 
   await writeFileEnsuring(
