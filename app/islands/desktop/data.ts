@@ -7,6 +7,9 @@
  * into the HTML twice over (once as markup, once as the island's props JSON).
  */
 
+import { entryHref } from '@lib/blog-post'
+import { transitionName } from '../../../framework/transitions'
+
 export type WindowId =
   | 'calculator'
   | 'about'
@@ -38,13 +41,12 @@ export interface DesktopProps {
   projects: DesktopProject[]
 }
 
-/** Popular slugs pinned above the recent list. Mirrors `@lib/popular-posts`. */
-export const POPULAR_SLUGS = ['weights', 'xios', 'formatting']
-
-export function postHref(post: DesktopPost): string {
-  if (post.isThirdParty && post.href) return post.href
-  return post.type === 'note' ? `/notes/${post.slug}` : `/blog/${post.slug}`
-}
+/**
+ * Below this width the desktop is not a desktop: folder icons and post cards
+ * are plain navigations, no window ever opens, and the embed prefetch in
+ * app/pages/home.tsx is gated on the same number through a `media` query.
+ */
+export const DESKTOP_MIN_WIDTH = 768
 
 /**
  * The chrome-free variant a window iframes. The `?embed=true` handshake it
@@ -53,12 +55,12 @@ export function postHref(post: DesktopPost): string {
  * neither.
  */
 export function embedHref(post: DesktopPost): string {
-  return `${postHref(post)}/embed`
+  return `${entryHref(post)}/embed`
 }
 
 /** Pairs with the `view-transition-name` the article pages put on `<article>`. */
 export function postTransitionName(post: DesktopPost): string {
-  return post.type === 'note' ? `note-${post.slug}` : `blog-post-${post.slug}`
+  return transitionName(post.type === 'note' ? 'note' : 'blog', post.slug)
 }
 
 export interface FolderConfig {
@@ -83,53 +85,25 @@ export interface ContentWindowConfig extends FolderConfig {
   defaultY: number
 }
 
-export const CONTENT_WINDOWS: ContentWindowConfig[] = [
-  {
-    id: 'about',
-    name: 'about',
-    title: 'about',
-    route: '/about',
-    defaultX: 200,
-    defaultY: 100,
-  },
-  {
-    id: 'projects',
-    name: 'projects',
-    title: 'projects',
-    route: '/projects',
-    defaultX: 250,
-    defaultY: 120,
-  },
-  {
-    id: 'blog-list',
-    name: 'blog',
-    title: 'blog',
-    route: '/blog',
-    defaultX: 300,
-    defaultY: 140,
-  },
-  {
-    id: 'notes',
-    name: 'notes',
-    title: 'notes',
-    route: '/notes',
-    defaultX: 325,
-    defaultY: 150,
-  },
-  {
-    id: 'labs',
-    name: 'labs',
-    title: 'labs',
-    route: '/labs',
-    defaultX: 350,
-    defaultY: 160,
-  },
-  {
-    id: 'talks',
-    name: 'talks',
-    title: 'talks',
-    route: '/talks',
-    defaultX: 400,
-    defaultY: 180,
-  },
-]
+/**
+ * Where each folder's window opens, cascaded so a second one is not hidden by
+ * the first. Derived from FOLDERS rather than restated: the id, name and route
+ * were written out twice, so adding a folder to one list and not the other left
+ * an icon whose window silently never opened.
+ */
+const WINDOW_ORIGINS: Record<WindowId, { x: number; y: number }> = {
+  about: { x: 200, y: 100 },
+  projects: { x: 250, y: 120 },
+  'blog-list': { x: 300, y: 140 },
+  notes: { x: 325, y: 150 },
+  labs: { x: 350, y: 160 },
+  talks: { x: 400, y: 180 },
+  calculator: { x: 200, y: 100 },
+}
+
+export const CONTENT_WINDOWS: ContentWindowConfig[] = FOLDERS.map((folder) => ({
+  ...folder,
+  title: folder.name,
+  defaultX: WINDOW_ORIGINS[folder.id].x,
+  defaultY: WINDOW_ORIGINS[folder.id].y,
+}))

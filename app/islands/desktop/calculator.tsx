@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { RefObject } from 'react'
 
 /**
  * The KnightOS TI-84+ SE emulator.
@@ -55,6 +56,13 @@ const SCREEN_HEIGHT = 422
 const KEY_CLASS =
   'bg-[var(--lightest-gray)] hover:bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] rounded active:bg-[var(--gray)]'
 
+/** ENTER and 2nd, which are filled rather than outlined. */
+const SPECIAL_KEY_CLASS =
+  'bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] rounded active:bg-[var(--gray)]'
+
+const ARROW_CLASS = 'font-bold py-2 px-3 text-sm'
+const FUNCTION_CLASS = 'text-xs py-2 px-1'
+
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) {
@@ -70,49 +78,32 @@ function loadScript(src: string): Promise<void> {
   })
 }
 
-export default function Calculator() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+function pressKeyOn(emulator: Emulator | null, keyCode: number): void {
+  const keyboard = emulator?.asic?.hardware?.Keyboard
+  if (!keyboard) return
+  try {
+    keyboard.press(keyCode)
+    setTimeout(() => keyboard.release(keyCode), 100)
+  } catch (error) {
+    console.error('Key press error:', error)
+  }
+}
+
+/**
+ * Boots the emulator into a canvas.
+ *
+ * An effect is unavoidable here, and this is the clearest case of it in the
+ * whole island set: it injects a <script> tag for RequireJS, fetches a ROM, and
+ * hands a live <canvas> node to a constructor that then draws into it on its
+ * own schedule. None of that is expressible as rendering, and the emulator has
+ * to be torn down when the window closes.
+ */
+function useKnightOsEmulator(canvasRef: RefObject<HTMLCanvasElement | null>): {
+  loading: boolean
+  pressKey: (keyCode: number) => void
+} {
   const emulatorRef = useRef<Emulator | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showInfo, setShowInfo] = useState(false)
-  const [showKeyboard, setShowKeyboard] = useState(false)
-  const [scale, setScale] = useState(1)
-
-  const pressKey = (keyCode: number) => {
-    const keyboard = emulatorRef.current?.asic?.hardware?.Keyboard
-    if (!keyboard) return
-    try {
-      keyboard.press(keyCode)
-      setTimeout(() => keyboard.release(keyCode), 100)
-    } catch (error) {
-      console.error('Key press error:', error)
-    }
-  }
-
-  // The emulator is a fixed-size canvas, so it is scaled to fit the window.
-  useEffect(() => {
-    const frame =
-      containerRef.current?.parentElement?.parentElement?.parentElement
-    if (!frame) return
-
-    const updateScale = () => {
-      const available = frame.clientHeight - 450
-      const scaleX = (frame.clientWidth - 80) / SCREEN_WIDTH
-      const scaleY = (available - 80) / SCREEN_HEIGHT
-      setScale(Math.max(Math.min(scaleX, scaleY, 2), 0.4))
-    }
-
-    updateScale()
-    window.addEventListener('resize', updateScale)
-    const observer = new ResizeObserver(updateScale)
-    observer.observe(frame)
-
-    return () => {
-      window.removeEventListener('resize', updateScale)
-      observer.disconnect()
-    }
-  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -121,8 +112,9 @@ export default function Calculator() {
       try {
         const globals = window as unknown as { require?: RequireJs }
         if (!globals.require?.config) {
+          // No sleep afterwards: loadScript resolves on the script's own
+          // `onload`, so `window.require` is already defined here.
           await loadScript('/knightos/require.min.js')
-          await new Promise((resolve) => setTimeout(resolve, 200))
         }
 
         const requireJs = globals.require
@@ -151,7 +143,7 @@ export default function Calculator() {
           emulator.load_rom(rom)
           setLoading(false)
           // Works around an emulation bug that leaves the screen blank.
-          setTimeout(() => pressKey(KEY_CODES['y=']), 2500)
+          setTimeout(() => pressKeyOn(emulator, KEY_CODES['y=']), 2500)
         })
       } catch (error) {
         console.error('Error loading emulator:', error)
@@ -165,13 +157,68 @@ export default function Calculator() {
       cancelled = true
       emulatorRef.current?.cleanup?.()
     }
-  }, [])
+  }, [canvasRef])
 
-  const key = (label: string, code: string, className: string) => (
+  return {
+    loading,
+    pressKey: (keyCode: number) => pressKeyOn(emulatorRef.current, keyCode),
+  }
+}
+
+/**
+ * The emulator is a fixed-size canvas, so it is scaled to fit its window.
+ *
+ * An effect is required: a ResizeObserver is an external subscription. There is
+ * no `window` resize listener beside it, because the observer on the frame
+ * already reports every resize that changes the frame's box.
+ */
+function useScaleToFrame(
+  containerRef: RefObject<HTMLDivElement | null>,
+): number {
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    // `closest` rather than three `parentElement` hops, which broke on any
+    // change to the markup in between.
+    const frame = containerRef.current?.closest<HTMLElement>('[role="dialog"]')
+    if (!frame) return
+
+    const updateScale = () => {
+      const available = frame.clientHeight - 450
+      const scaleX = (frame.clientWidth - 80) / SCREEN_WIDTH
+      const scaleY = (available - 80) / SCREEN_HEIGHT
+      setScale(Math.max(Math.min(scaleX, scaleY, 2), 0.4))
+    }
+
+    updateScale()
+    const observer = new ResizeObserver(updateScale)
+    observer.observe(frame)
+    return () => observer.disconnect()
+  }, [containerRef])
+
+  return scale
+}
+
+export default function Calculator() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [showInfo, setShowInfo] = useState(false)
+  const [showKeyboard, setShowKeyboard] = useState(false)
+
+  const { loading, pressKey } = useKnightOsEmulator(canvasRef)
+  const scale = useScaleToFrame(containerRef)
+
+  const key = (
+    label: string,
+    code: string,
+    extra: string,
+    base = KEY_CLASS,
+  ) => (
     <button
       type="button"
+      key={code}
       onClick={() => pressKey(KEY_CODES[code])}
-      className={className}
+      className={`${base} ${extra}`}
     >
       {label}
     </button>
@@ -270,66 +317,45 @@ export default function Calculator() {
                     style={{ maxWidth: '180px' }}
                   >
                     <div />
-                    {key('↑', 'up', `${KEY_CLASS} font-bold py-2 px-3 text-sm`)}
+                    {key('↑', 'up', ARROW_CLASS)}
                     <div />
-                    {key(
-                      '←',
-                      'left',
-                      `${KEY_CLASS} font-bold py-2 px-3 text-sm`,
-                    )}
+                    {key('←', 'left', ARROW_CLASS)}
                     {key(
                       'ENTER',
                       'enter',
-                      'bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-2 rounded text-xs active:bg-[var(--gray)]',
+                      'font-bold py-2 px-2 text-xs',
+                      SPECIAL_KEY_CLASS,
                     )}
-                    {key(
-                      '→',
-                      'right',
-                      `${KEY_CLASS} font-bold py-2 px-3 text-sm`,
-                    )}
+                    {key('→', 'right', ARROW_CLASS)}
                     <div />
-                    {key(
-                      '↓',
-                      'down',
-                      `${KEY_CLASS} font-bold py-2 px-3 text-sm`,
-                    )}
+                    {key('↓', 'down', ARROW_CLASS)}
                     <div />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-5 gap-1 mb-2">
-                  {key('Y=', 'y=', `${KEY_CLASS} text-xs py-2 px-1`)}
-                  {key('WIN', 'window', `${KEY_CLASS} text-xs py-2 px-1`)}
-                  {key('ZM', 'zoom', `${KEY_CLASS} text-xs py-2 px-1`)}
-                  {key('TRC', 'trace', `${KEY_CLASS} text-xs py-2 px-1`)}
-                  {key('GRF', 'graph', `${KEY_CLASS} text-xs py-2 px-1`)}
+                  {key('Y=', 'y=', FUNCTION_CLASS)}
+                  {key('WIN', 'window', FUNCTION_CLASS)}
+                  {key('ZM', 'zoom', FUNCTION_CLASS)}
+                  {key('TRC', 'trace', FUNCTION_CLASS)}
+                  {key('GRF', 'graph', FUNCTION_CLASS)}
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  {['7', '8', '9', '4', '5', '6', '1', '2', '3'].map((num) => (
-                    <button
-                      type="button"
-                      key={num}
-                      onClick={() => pressKey(KEY_CODES[num])}
-                      className={`${KEY_CLASS} font-bold py-3 px-4`}
-                    >
-                      {num}
-                    </button>
-                  ))}
+                  {['7', '8', '9', '4', '5', '6', '1', '2', '3'].map((num) =>
+                    key(num, num, 'font-bold py-3 px-4'),
+                  )}
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   {key(
                     '2nd',
                     '2nd',
-                    'bg-[var(--gray)] text-[var(--fg)] border border-[var(--border-color)] font-bold py-2 px-3 rounded text-xs active:bg-[var(--gray)]',
+                    'font-bold py-2 px-3 text-xs',
+                    SPECIAL_KEY_CLASS,
                   )}
-                  {key('0', '0', `${KEY_CLASS} font-bold py-2 px-4`)}
-                  {key(
-                    'MODE',
-                    'mode',
-                    `${KEY_CLASS} font-bold py-2 px-3 text-xs`,
-                  )}
+                  {key('0', '0', 'font-bold py-2 px-4')}
+                  {key('MODE', 'mode', 'font-bold py-2 px-3 text-xs')}
                 </div>
               </div>
             </div>

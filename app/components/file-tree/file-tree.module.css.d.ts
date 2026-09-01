@@ -1,12 +1,12 @@
 declare const styles: {
-  readonly 'file-type': string
-  readonly fileTree: string
-  readonly note: string
-  readonly 'folder-children': string
-  readonly 'file-name': string
-  readonly file: string
-  readonly focused: string
-  readonly wrapper: string
-  readonly folder: string
+  readonly "note": string
+  readonly "file-name": string
+  readonly "fileTree": string
+  readonly "folder": string
+  readonly "file": string
+  readonly "file-type": string
+  readonly "focused": string
+  readonly "wrapper": string
+  readonly "folder-children": string
 }
 export default styles

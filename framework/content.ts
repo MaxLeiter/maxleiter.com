@@ -19,8 +19,6 @@ const SITE: Site = {
   author: 'Max Leiter',
 }
 
-export const POPULAR_SLUGS = ['weights', 'xios', 'formatting']
-
 const MARKDOWN = /\.mdx?$/
 
 function toISO(date: string): string {
@@ -38,7 +36,7 @@ function toISO(date: string): string {
  * different feed.xml, sitemap.xml and search-index.json under the two
  * runtimes. Slug breaks the tie.
  */
-function byDateDesc(
+export function byDateDesc(
   a: { date: string; slug?: string },
   b: { date: string; slug?: string },
 ): number {
@@ -54,56 +52,63 @@ async function readDir(dir: string): Promise<string[]> {
   return entries.filter((file) => MARKDOWN.test(path.extname(file))).sort()
 }
 
-export async function loadPosts(root: string): Promise<Post[]> {
-  const dir = path.join(root, 'posts')
-  const files = await readDir(dir)
+/**
+ * Read one content directory: parse frontmatter, drop what `parse` rejects,
+ * sort. `posts` and `notes` differ only in that callback.
+ */
+async function loadCollection<T extends { date: string; slug?: string }>(
+  root: string,
+  dir: string,
+  parse: (data: Record<string, unknown>, body: string) => T | null,
+): Promise<T[]> {
+  const full = path.join(root, dir)
+  const files = await readDir(full)
   const parsed = await Promise.all(
     files.map(async (file) => {
-      const source = await fs.readFile(path.join(dir, file), 'utf8')
+      const source = await fs.readFile(path.join(full, file), 'utf8')
       const { data, content } = matter(source)
-      // Same filter as app/lib/get-posts.ts: unpublished, or no slug, is out.
-      if (data.published === false || !data.slug) return null
-      const date = String(data.date ?? '')
-      return {
-        title: String(data.title ?? ''),
-        // `posts/nintype.mdx` has a bare `description:` line. Empty means
-        // absent: the shell omits the description tags entirely rather than
-        // substituting the site default, which is what Next does.
-        description: String(data.description ?? '').trim(),
-        href: data.href as string | undefined,
-        slug: String(data.slug),
-        date,
-        dateISO: toISO(date),
-        tags: (data.tags as string[] | undefined) ?? [],
-        body: content,
-        type: 'post',
-      } satisfies Post
+      return parse(data, content)
     }),
   )
-  return parsed.filter((post) => post !== null).sort(byDateDesc)
+  return parsed.filter((item) => item !== null).sort(byDateDesc)
 }
 
-export async function loadNotes(root: string): Promise<Note[]> {
-  const dir = path.join(root, 'notes')
-  const files = await readDir(dir)
-  const parsed = await Promise.all(
-    files.map(async (file) => {
-      const source = await fs.readFile(path.join(dir, file), 'utf8')
-      const { data, content } = matter(source)
-      if (data.published === false) return null
-      const date = String(data.date ?? '')
-      return {
-        title: String(data.title ?? ''),
-        description: String(data.description ?? '').trim(),
-        slug: String(data.slug),
-        date,
-        dateISO: toISO(date),
-        body: content,
-        type: (data.type as Note['type']) ?? 'note',
-      } satisfies Note
-    }),
-  )
-  return parsed.filter((note) => note !== null).sort(byDateDesc)
+function loadPosts(root: string): Promise<Post[]> {
+  return loadCollection(root, 'posts', (data, content) => {
+    // Same filter as app/lib/get-posts.ts: unpublished, or no slug, is out.
+    if (data.published === false || !data.slug) return null
+    const date = String(data.date ?? '')
+    return {
+      title: String(data.title ?? ''),
+      // `posts/nintype.mdx` has a bare `description:` line. Empty means
+      // absent: the shell omits the description tags entirely rather than
+      // substituting the site default, which is what Next does.
+      description: String(data.description ?? '').trim(),
+      href: data.href as string | undefined,
+      slug: String(data.slug),
+      date,
+      dateISO: toISO(date),
+      tags: (data.tags as string[] | undefined) ?? [],
+      body: content,
+      type: 'post',
+    } satisfies Post
+  })
+}
+
+function loadNotes(root: string): Promise<Note[]> {
+  return loadCollection(root, 'notes', (data, content) => {
+    if (data.published === false) return null
+    const date = String(data.date ?? '')
+    return {
+      title: String(data.title ?? ''),
+      description: String(data.description ?? '').trim(),
+      slug: String(data.slug),
+      date,
+      dateISO: toISO(date),
+      body: content,
+      type: (data.type as Note['type']) ?? 'note',
+    } satisfies Note
+  })
 }
 
 /** The six hardcoded Vercel posts. No RSS is fetched at build. */
@@ -287,19 +292,22 @@ const PROJECTS: Project[] = [
   },
 ]
 
-const latestYear = (years: string[]): number => {
-  if (years.includes('present')) return Infinity
+const yearBound = (
+  years: string[],
+  pick: (...values: number[]) => number,
+): number => {
   const parsed = years.map((y) => parseInt(y, 10)).filter((y) => !isNaN(y))
-  return parsed.length > 0 ? Math.max(...parsed) : 0
+  return parsed.length > 0 ? pick(...parsed) : 0
 }
 
-const earliestYear = (years: string[]): number => {
-  const parsed = years.map((y) => parseInt(y, 10)).filter((y) => !isNaN(y))
-  return parsed.length > 0 ? Math.min(...parsed) : 0
-}
+/** An in-progress project sorts above every finished one. */
+const latestYear = (years: string[]): number =>
+  years.includes('present') ? Infinity : yearBound(years, Math.max)
+
+const earliestYear = (years: string[]): number => yearBound(years, Math.min)
 
 /** Newest first, ties broken by which project started more recently. */
-export function loadProjects(): Project[] {
+function loadProjects(): Project[] {
   return [...PROJECTS].sort(
     (a, b) =>
       latestYear(b.years) - latestYear(a.years) ||
@@ -308,7 +316,7 @@ export function loadProjects(): Project[] {
 }
 
 /** The `id` used by the projects page and the search index. */
-export function projectId(project: Project): string {
+function projectId(project: Project): string {
   return project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 }
 
@@ -350,11 +358,6 @@ export interface ListEntry {
   noteType?: Note['type']
 }
 
-export function entryHref(entry: ListEntry): string {
-  if (entry.isThirdParty && entry.href) return entry.href
-  return entry.type === 'note' ? `/notes/${entry.slug}` : `/blog/${entry.slug}`
-}
-
 export function buildEntries(ctx: BuildContext): ListEntry[] {
   const posts: ListEntry[] = [...ctx.posts, ...ctx.externalPosts]
     .map((post) => {
@@ -387,6 +390,11 @@ export function buildEntries(ctx: BuildContext): ListEntry[] {
   return [...posts, ...notes].sort(byDateDesc)
 }
 
+/** Absolute URL for a route path. The one place `/` becomes the bare origin. */
+export function absoluteUrl(ctx: BuildContext, routePath: string): string {
+  return routePath === '/' ? ctx.site.url : `${ctx.site.url}${routePath}`
+}
+
 export async function createBuildContext(root: string): Promise<BuildContext> {
   const [posts, notes] = await Promise.all([loadPosts(root), loadNotes(root)])
   const outDir = path.join(root, '.vercel', 'output')
@@ -394,6 +402,7 @@ export async function createBuildContext(root: string): Promise<BuildContext> {
     root,
     outDir,
     staticDir: path.join(outDir, 'static'),
+    cacheDir: path.join(root, '.cache'),
     posts,
     notes,
     projects: loadProjects(),

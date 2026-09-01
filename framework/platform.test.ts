@@ -7,7 +7,9 @@ import { fileURLToPath } from 'node:url'
 import { normalizeRoutes, type RouteInput } from '@vercel/routing-utils'
 import { createBuildContext } from './content'
 import { writeFeeds } from './feeds'
+import { prepareFonts } from './fonts'
 import { formatPlatformResult, runPlatformSteps } from './platform'
+import type { RouteInfo } from './types'
 
 /**
  * Standalone platform check. Run under both runtimes:
@@ -134,6 +136,37 @@ function pngSize(buffer: Buffer): { width: number; height: number } {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) }
 }
 
+/** The seven top-level pages the sitemap must carry. */
+const TOP_LEVEL = [
+  '/',
+  '/about',
+  '/blog',
+  '/notes',
+  '/labs',
+  '/projects',
+  '/talks',
+]
+
+/**
+ * A stand-in for the build's route manifest, which comes from `getPages` and
+ * therefore needs the server bundle.
+ *
+ * This is an INPUT rather than a second transcription of the page registry:
+ * the sitemap assertions below check what `writeSitemap` does with a manifest,
+ * including that it drops a noindex route and an embed variant. Agreement
+ * between the registry and the sitemap is now structural, since the build
+ * feeds this exact list to both.
+ */
+const ROUTES: RouteInfo[] = [
+  ...TOP_LEVEL.map((path_) => ({
+    path: path_,
+    kind: 'page' as const,
+    noindex: false,
+  })),
+  { path: '/404', kind: 'page', title: '404', noindex: true },
+  { path: '/about/embed', kind: 'embed', noindex: true, variantOf: '/about' },
+]
+
 async function main(): Promise<void> {
   const runtime =
     typeof (globalThis as { Bun?: unknown }).Bun === 'undefined'
@@ -148,7 +181,8 @@ async function main(): Promise<void> {
   await fs.mkdir(path.join(ctx.staticDir, '_assets'), { recursive: true })
 
   const started = performance.now()
-  const result = await runPlatformSteps(ctx)
+  const fonts = await prepareFonts(ctx)
+  const result = await runPlatformSteps(ctx, { fonts, routes: ROUTES })
   console.log(formatPlatformResult(result))
   console.log(`  total   ${(performance.now() - started).toFixed(0)}ms\n`)
 
@@ -179,10 +213,16 @@ async function main(): Promise<void> {
     assert.equal(projectConfig.framework, null)
     assert.equal(projectConfig.buildCommand, 'node scripts/build.mjs')
   })
-  check('vercel.json leaves the install command on auto-detect', () => {
-    // An explicit `pnpm install` override selects the OLDEST pnpm in the
-    // build container, which is pnpm 6. Auto-detect reads lockfileVersion.
-    assert.equal(projectConfig.installCommand, undefined)
+  check('vercel.json pins the install command to an exact pnpm', () => {
+    // The dashboard carries a bare `pnpm install` override, which makes the
+    // build container pick the OLDEST pnpm it has, pnpm 6. A per-deployment
+    // value beats the dashboard. `--prod=false` is load-bearing too: every
+    // package the build needs is a devDependency, and pnpm reads
+    // NODE_ENV=production as an implicit `--prod`.
+    assert.equal(
+      projectConfig.installCommand,
+      'npx --yes pnpm@9.15.9 install --frozen-lockfile --prod=false',
+    )
   })
 
   // 2. feed.xml is well formed and leaks no drafts.
@@ -209,16 +249,14 @@ async function main(): Promise<void> {
   for (const file of ['feed.xml', 'sitemap.xml', 'search-index.json']) {
     before.set(file, await readText(file))
   }
-  await writeFeeds(ctx)
+  await writeFeeds(ctx, { routes: ROUTES })
   for (const [file, first] of before) {
-    checks++
-    try {
-      assert.equal(await readText(file), first)
-      console.log(`  ok   ${file} is byte-identical on rebuild`)
-    } catch {
-      failures++
-      console.log(`  FAIL ${file} differs between two builds`)
-    }
+    // Awaited first, so this is `check` like everything else rather than a
+    // hand-inlined copy of its counting and its output format.
+    const after = await readText(file)
+    check(`${file} is byte-identical on rebuild`, () =>
+      assert.equal(after, first),
+    )
   }
 
   // 3. sitemap.xml covers the top-level pages and all content.
@@ -226,25 +264,18 @@ async function main(): Promise<void> {
   check('sitemap.xml is well-formed XML', () =>
     assertWellFormedXml(sitemap, 'sitemap.xml'),
   )
-  const topLevel = [
-    '',
-    '/about',
-    '/blog',
-    '/notes',
-    '/labs',
-    '/projects',
-    '/talks',
-  ]
-  check('sitemap.xml has all 7 top-level paths', () => {
-    for (const route of topLevel) {
-      assert.ok(
-        sitemap.includes(`<loc>https://maxleiter.com${route}</loc>`),
-        `missing ${route || '/'}`,
-      )
+  check(`sitemap.xml has all ${TOP_LEVEL.length} top-level paths`, () => {
+    for (const route of TOP_LEVEL) {
+      const loc = `https://maxleiter.com${route === '/' ? '' : route}`
+      assert.ok(sitemap.includes(`<loc>${loc}</loc>`), `missing ${route}`)
     }
   })
+  check('sitemap.xml drops noindex routes and embed variants', () => {
+    assert.ok(!sitemap.includes('/404<'), '/404 is in the sitemap')
+    assert.ok(!sitemap.includes('/embed<'), 'an embed is in the sitemap')
+  })
   check('sitemap.xml has every post and note', () => {
-    const expected = topLevel.length + ctx.posts.length + ctx.notes.length
+    const expected = TOP_LEVEL.length + ctx.posts.length + ctx.notes.length
     assert.equal(sitemap.split('<url>').length - 1, expected)
   })
 

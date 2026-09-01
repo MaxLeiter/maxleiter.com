@@ -1,5 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
+import { useCallback, useRef, useState, useSyncExternalStore } from 'react'
+import type {
+  CSSProperties,
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+} from 'react'
 
 /**
  * The Cmd/Ctrl+K command palette.
@@ -49,27 +53,42 @@ const SELECTED_BG = 'rgba(255, 255, 255, 0.15)'
 const HOVER_BG = 'rgba(255, 255, 255, 0.08)'
 
 /**
- * Fetched once per page load, on first open. `/search-index.json` is a static
- * file written by framework/feeds.ts with the same shape the Next
- * `/api/search-index` route returned.
+ * The search index is a module-scoped store, not component state.
+ *
+ * `/search-index.json` is a static file written by framework/feeds.ts with the
+ * same shape the Next `/api/search-index` route returned. This island is
+ * `on="interaction"`, so its chunk is only fetched when the palette opens:
+ * starting the request at module scope is the same moment a mount effect would
+ * have started it, and it lets the component read the result through
+ * `useSyncExternalStore` instead of mirroring an async source into `useState`.
  */
-let indexPromise: Promise<SearchIndexItem[]> | null = null
+let index: SearchIndexItem[] = []
+const indexListeners = new Set<() => void>()
 
-export function loadSearchIndex(): Promise<SearchIndexItem[]> {
-  if (!indexPromise) {
-    indexPromise = fetch('/search-index.json')
-      .then((res) => {
-        if (!res.ok) throw new Error(`search index: ${res.status}`)
-        return res.json() as Promise<SearchIndexItem[]>
-      })
-      .catch((error: unknown) => {
-        // Let the next open retry instead of caching the failure.
-        indexPromise = null
-        console.error(error)
-        return [] as SearchIndexItem[]
-      })
+const subscribeToIndex = (onChange: () => void) => {
+  indexListeners.add(onChange)
+  return () => {
+    indexListeners.delete(onChange)
   }
-  return indexPromise
+}
+/** Stable identity while unchanged, which is what useSyncExternalStore needs. */
+const getIndex = () => index
+
+// This module is also imported by the server build to render the SSR shell,
+// where there is no origin to resolve `/search-index.json` against.
+if (typeof document !== 'undefined') {
+  void fetch('/search-index.json')
+    .then((res) => {
+      if (!res.ok) throw new Error(`search index: ${res.status}`)
+      return res.json() as Promise<SearchIndexItem[]>
+    })
+    .then((loaded) => {
+      index = loaded
+      for (const listener of indexListeners) listener()
+    })
+    .catch((error: unknown) => {
+      console.error(error)
+    })
 }
 
 /** The value the visitor typed into the SSR'd input before this module ran. */
@@ -82,27 +101,22 @@ function typedBeforeHydration(): string {
 export default function Palette() {
   const inputRef = useRef<HTMLInputElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
   const [search, setSearch] = useState(typedBeforeHydration)
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [items, setItems] = useState<PaletteItem[]>(NAV_ITEMS)
 
-  // Anything typed between the initializer above and this effect. The window
-  // is a few milliseconds wide, but losing a keystroke here is exactly the
-  // failure this island exists to avoid.
-  useEffect(() => {
-    const value = inputRef.current?.value ?? ''
+  const loaded = useSyncExternalStore(subscribeToIndex, getIndex, getIndex)
+  const items: PaletteItem[] = [...NAV_ITEMS, ...loaded]
+
+  /**
+   * Catches anything typed between the `useState` initializer above and the
+   * moment preact takes the input over. A ref callback runs at commit, which
+   * is earlier than an effect would, so it narrows that window rather than
+   * merely preserving it. The identity is stable so it attaches exactly once.
+   */
+  const attachInput = useCallback((node: HTMLInputElement | null) => {
+    inputRef.current = node
+    const value = node?.value ?? ''
     if (value) setSearch((current) => (current === value ? current : value))
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    void loadSearchIndex().then((index) => {
-      if (!cancelled) setItems([...NAV_ITEMS, ...index])
-    })
-    return () => {
-      cancelled = true
-    }
   }, [])
 
   const query = search.trim().toLowerCase()
@@ -129,69 +143,61 @@ export default function Palette() {
   }
 
   /**
-   * The window listeners below are registered once, so they must not close
-   * over `filtered` or `selectedIndex`. They read this instead, which every
-   * render refreshes. The first version captured them and the first arrow
-   * press after the search index arrived wrapped around the three navigation
-   * entries rather than the fifty-two real ones.
+   * Keys are handled on the overlay, not on `window`. The runtime focuses the
+   * input before this module loads and the input lives inside the overlay, so
+   * the same keys arrive here by bubbling — and this handler is re-created
+   * every render, so it reads the current `filtered` and `selectedIndex`
+   * directly. The earlier window listener registered once and had to read a
+   * ref rewritten during render; the first arrow press after the search index
+   * arrived wrapped around the three navigation entries rather than all
+   * fifty-two. A hidden subtree holds no focus and receives no keydown, so the
+   * old `wrapper.hidden` guard is no longer needed either.
    */
-  const live = useRef({ filtered, selectedIndex })
-  live.current = { filtered, selectedIndex }
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // The runtime unhides the wrapper; while it is hidden the palette is
-      // mounted but not on screen, and must not eat arrow keys.
-      const wrapper = overlayRef.current?.closest<HTMLElement>('[data-island]')
-      if (wrapper?.hidden) return
-
-      if (event.key === 'Escape') {
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      close()
+      return
+    }
+    if (filtered.length === 0) return
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setSelectedIndex((prev) => (prev + 1) % filtered.length)
+      return
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      setSelectedIndex((prev) => (prev - 1 + filtered.length) % filtered.length)
+      return
+    }
+    if (event.key === 'Enter') {
+      const item = filtered[selectedIndex]
+      if (item) {
         event.preventDefault()
-        close()
-        return
-      }
-
-      const { filtered: list, selectedIndex: current } = live.current
-      if (list.length === 0) return
-      if (event.key === 'ArrowDown') {
-        event.preventDefault()
-        setSelectedIndex((prev) => (prev + 1) % list.length)
-        return
-      }
-      if (event.key === 'ArrowUp') {
-        event.preventDefault()
-        setSelectedIndex((prev) => (prev - 1 + list.length) % list.length)
-        return
-      }
-      if (event.key === 'Enter') {
-        const item = list[current]
-        if (item) {
-          event.preventDefault()
-          navigate(item)
-        }
+        navigate(item)
       }
     }
+  }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- reads `live`
-  }, [])
-
-  // Click-outside, on pointerdown rather than click. The runtime opens the
-  // palette from a `click` on `[data-open-palette]`, and a close listener on
-  // the same event would shut it again on the way back up.
-  useEffect(() => {
-    const handlePointerDown = (event: PointerEvent) => {
-      const wrapper = overlayRef.current?.closest<HTMLElement>('[data-island]')
-      if (!wrapper || wrapper.hidden) return
-      const target = event.target as Node | null
-      if (target && !panelRef.current?.contains(target)) close()
+  /**
+   * Click-outside. The overlay is `fixed inset-0`, so "outside the panel" is
+   * exactly "on the overlay itself". `pointerdown` rather than `click`: the
+   * runtime opens the palette from a `click` on `[data-open-palette]`, and a
+   * close listener on the same event would shut it again on the way back up.
+   *
+   * A pointer landing on non-focusable chrome inside the panel would otherwise
+   * move focus to `<body>` and take the key handler above out of the bubble
+   * path, so that case keeps the focus where it is.
+   */
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.target === overlayRef.current) {
+      close()
+      return
     }
-
-    document.addEventListener('pointerdown', handlePointerDown)
-    return () => document.removeEventListener('pointerdown', handlePointerDown)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- refs only
-  }, [])
+    if (!(event.target as Element).closest('input, button, a, textarea')) {
+      event.preventDefault()
+    }
+  }
 
   const activeId =
     filtered.length > 0 && filtered[selectedIndex]
@@ -199,6 +205,10 @@ export default function Palette() {
       : undefined
 
   return (
+    // The overlay IS the backdrop and the input inside it is what holds focus,
+    // so click-to-dismiss and the arrow keys have nowhere else to live. Same
+    // shape as the shot grid's <dialog>.
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       ref={overlayRef}
       className="fixed inset-0 backdrop-blur-sm z-[9999] flex items-start justify-center pt-20 px-4"
@@ -206,9 +216,10 @@ export default function Palette() {
       role="dialog"
       aria-modal="true"
       aria-label="Search"
+      onKeyDown={onKeyDown}
+      onPointerDown={onPointerDown}
     >
       <div
-        ref={panelRef}
         className="w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden"
         style={{
           backgroundColor: 'var(--bg)',
@@ -221,7 +232,7 @@ export default function Palette() {
           style={{ borderColor: 'var(--border-color)' }}
         >
           <input
-            ref={inputRef}
+            ref={attachInput}
             type="text"
             data-palette-input
             value={search}

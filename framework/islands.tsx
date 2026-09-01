@@ -23,16 +23,11 @@ export interface IslandProps {
 
 const used = new Set<string>()
 
-/** Island names seen during this render pass, for the client bundler. */
-export function islandManifest(): string[] {
-  return [...used].sort()
-}
-
-export function resetIslandManifest(): void {
-  used.clear()
-}
-
-/** The names rendered since the last reset, clearing them for the next page. */
+/**
+ * The island names rendered since the last call, clearing them for the next
+ * page. `entry-server.ts` calls it once to discard anything a previous run
+ * left behind, then once per rendered document.
+ */
 export function takeIslandManifest(): string[] {
   const names = [...used].sort()
   used.clear()

@@ -5,8 +5,10 @@ import { ProjectsContent } from '@components/content/projects-content'
 import { BlogListContent } from '@components/content/blog-list-content'
 import { NotesContent } from '@components/content/notes-content'
 import type { BlogPost, Project } from '@lib/blog-post'
+import type { ComponentType } from 'react'
 import type { Note } from '../../framework/types'
 import { PageShell } from './shell'
+import { transitionName } from '../../framework/transitions'
 
 /**
  * The six list-and-prose routes.
@@ -26,44 +28,29 @@ export interface ContentPageProps {
   toolbar?: boolean
 }
 
-export function AboutPage({ toolbar }: ContentPageProps) {
-  return (
-    <PageShell
-      toolbar={toolbar}
-      title="about"
-      segments={[{ name: 'about', href: '/about' }]}
-      vtName="page-about"
-    >
-      <AboutContent />
-    </PageShell>
-  )
+/**
+ * `/about`, `/labs` and `/talks` are the same page three times: the section
+ * name is the title, the only breadcrumb, the route and the transition name.
+ * One function applied three times rather than three copies of eleven lines.
+ */
+function sectionPage(name: string, Content: ComponentType) {
+  return function SectionPage({ toolbar }: ContentPageProps) {
+    return (
+      <PageShell
+        toolbar={toolbar}
+        title={name}
+        segments={[{ name, href: `/${name}` }]}
+        vtName={transitionName('page', name)}
+      >
+        <Content />
+      </PageShell>
+    )
+  }
 }
 
-export function LabsPage({ toolbar }: ContentPageProps) {
-  return (
-    <PageShell
-      toolbar={toolbar}
-      title="labs"
-      segments={[{ name: 'labs', href: '/labs' }]}
-      vtName="page-labs"
-    >
-      <LabsContent />
-    </PageShell>
-  )
-}
-
-export function TalksPage({ toolbar }: ContentPageProps) {
-  return (
-    <PageShell
-      toolbar={toolbar}
-      title="talks"
-      segments={[{ name: 'talks', href: '/talks' }]}
-      vtName="page-talks"
-    >
-      <TalksContent />
-    </PageShell>
-  )
-}
+export const AboutPage = sectionPage('about', AboutContent)
+export const LabsPage = sectionPage('labs', LabsContent)
+export const TalksPage = sectionPage('talks', TalksContent)
 
 export function ProjectsPage({
   projects,
@@ -74,7 +61,7 @@ export function ProjectsPage({
       toolbar={toolbar}
       title="projects"
       segments={[{ name: 'projects', href: '/projects' }]}
-      vtName="page-projects"
+      vtName={transitionName('page', 'projects')}
     >
       <ProjectsContent projects={projects} />
     </PageShell>
@@ -90,7 +77,7 @@ export function BlogIndexPage({
       toolbar={toolbar}
       title="blog"
       segments={[{ name: 'blog', href: '/blog' }]}
-      vtName="page-blog"
+      vtName={transitionName('page', 'blog')}
     >
       <BlogListContent posts={posts} />
     </PageShell>
@@ -106,7 +93,7 @@ export function NotesIndexPage({
       toolbar={toolbar}
       title="notes"
       segments={[{ name: 'notes', href: '/notes' }]}
-      vtName="page-notes"
+      vtName={transitionName('page', 'notes')}
     >
       <NotesContent notes={notes} />
     </PageShell>
@@ -115,7 +102,7 @@ export function NotesIndexPage({
 
 export function NotFoundPage() {
   return (
-    <PageShell title="404" vtName="page-404">
+    <PageShell title="404" vtName={transitionName('page', '404')}>
       <div className="max-w-3xl">
         <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
           404

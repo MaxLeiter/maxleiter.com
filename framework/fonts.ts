@@ -202,5 +202,3 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
 
   return { css, preload, sizes }
 }
-
-export default prepareFonts

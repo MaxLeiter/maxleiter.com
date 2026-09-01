@@ -1,13 +1,19 @@
 /**
  * The whole client runtime for content pages.
  *
- * Island scheduling, the theme toggle, Cmd/Ctrl+K, delegated analytics and the
- * menubar clock. No framework: these are DOM operations, and a component
- * library would cost 7-52KB to do them.
+ * Island scheduling, the theme toggle, Cmd/Ctrl+K, delegated analytics and
+ * outgoing view-transition names. No framework: these are DOM operations, and a
+ * component library would cost 7-52KB to do them.
  *
  * Islands are mounted through a generated wrapper that owns the `hydrate` call,
  * so preact lives in the island's shared chunk and never in this file.
+ *
+ * The menubar clock is NOT here. `#menubar-clock` only exists on the homepage,
+ * where the desktop island hydrates over it and owns it; a second interval
+ * writing `textContent` behind preact's back is one owner too many.
  */
+
+import { transitionNameForUrl } from '../transitions'
 
 type Mount = (el: HTMLElement, props: unknown) => void
 
@@ -37,6 +43,43 @@ async function mount(el: HTMLElement): Promise<void> {
   mod.default(el, props)
 }
 
+/**
+ * One IntersectionObserver for every `visible` island on the page, not one
+ * each. `rootMargin` starts the import before the island reaches the viewport.
+ *
+ * The target is always the island element itself. An earlier version observed
+ * `el.parentElement` whenever the island's rect had zero width or height, on
+ * the belief that a zero-area target never intersects. It does: the spec sets
+ * `isIntersecting` when the target and the root overlap or are edge-adjacent
+ * "even if the intersection has zero area". The workaround's real effect was to
+ * turn `visible` into `load` for the shot grid, whose island is a fragment
+ * sibling of the grid, so its parent spans the entire article.
+ */
+let visibleObserver: IntersectionObserver | null = null
+
+function observeForVisibility(el: HTMLElement): void {
+  visibleObserver ||= new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue
+        visibleObserver?.unobserve(entry.target)
+        void mount(entry.target as HTMLElement)
+      }
+    },
+    { rootMargin: '200px' },
+  )
+  visibleObserver.observe(el)
+}
+
+function mountOnInteraction(el: HTMLElement): void {
+  for (const type of ['pointerenter', 'pointerdown', 'focusin', 'keydown']) {
+    el.addEventListener(type, () => void mount(el), {
+      once: true,
+      passive: true,
+    })
+  }
+}
+
 function schedule(el: HTMLElement): void {
   const on = el.dataset.on || 'idle'
   if (on === 'load') {
@@ -44,33 +87,17 @@ function schedule(el: HTMLElement): void {
     return
   }
   if (on === 'visible') {
-    // An island whose fallback is empty has a zero-area box, and
-    // IntersectionObserver never reports a zero-area element as intersecting,
-    // so it would silently never mount. Watch the parent in that case.
-    const rect = el.getBoundingClientRect()
-    const target =
-      (rect.width === 0 || rect.height === 0) && el.parentElement
-        ? el.parentElement
-        : el
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          io.disconnect()
-          void mount(el)
-        }
-      },
-      { rootMargin: '200px' },
-    )
-    io.observe(target)
+    observeForVisibility(el)
+    // Belt and braces. `mount` is idempotent, so an island the observer never
+    // reports -- a tab that is never painted, a fallback the layout gives no
+    // box -- still mounts the moment someone touches it. Only reachable for an
+    // island whose fallback has area; the shot grid's is empty by design, and
+    // the observer is its only path.
+    mountOnInteraction(el)
     return
   }
   if (on === 'interaction') {
-    for (const type of ['pointerenter', 'pointerdown', 'focusin', 'keydown']) {
-      el.addEventListener(type, () => void mount(el), {
-        once: true,
-        passive: true,
-      })
-    }
+    mountOnInteraction(el)
     return
   }
   const idle =
@@ -101,7 +128,7 @@ addEventListener('keydown', (event) => {
   }
 })
 
-/* --------------------------------------------- theme, analytics, clock -- */
+/* ---------------------------------------------------- theme, analytics -- */
 
 interface VercelAnalytics {
   (event: 'event', payload: { name: string; data?: unknown }): void
@@ -134,61 +161,63 @@ document.addEventListener('click', (event) => {
   // becomes a payload key, camelCased by the dataset API. So `data-section`
   // arrives as `{section}`, while `data-track-section` would arrive as
   // `{trackSection}`. Name payload attributes after the key you want.
+  //
+  // `data-vt-name` is the one exception: it is the view-transition opt-in
+  // below, not analytics data, and post cards carry both attributes.
   const tracked = target.closest<HTMLElement>('[data-track]')
   if (tracked) {
     const va = (window as { va?: VercelAnalytics }).va
     const { track, ...rest } = tracked.dataset
+    delete rest.vtName
     va?.('event', { name: track as string, data: rest })
   }
 })
 
-const clock = document.getElementById('menubar-clock')
-if (clock) {
-  setInterval(() => {
-    clock.textContent = new Date().toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }, 60_000)
-}
-
 /* ----------------------------------------------------- view transitions -- */
 
 /**
- * Narrows the transition name to the card actually clicked, so a cross-document
- * navigation morphs that card into the article. Cards opt in with `data-slug`;
- * pages without them just cross-fade.
+ * The single owner of outgoing `view-transition-name` assignment.
  *
- * The prefix comes from the URL segment. `article-pages.tsx` names a post
- * `blog-post-<slug>` and a note `note-<slug>`, so hardcoding the post prefix
- * meant a note card could never pair with its article.
+ * Elements opt in declaratively with `data-vt-name`, and this handler names at
+ * most one of them: the one matching the name the destination article will
+ * carry. Pages with no candidate just cross-fade.
  *
- * This clears only the element it named last, never every `[data-slug]` on the
- * page. `data-slug` is not exclusive to post cards -- the desktop's window
- * frame carries it too -- and a blanket clear wiped a name another listener had
- * set, which silently degraded the window-to-article morph to a cross-fade.
- * Owning only what it assigned also removes the dependence on listener
- * registration order.
+ * It stands down entirely when something already holds that name as a live
+ * inline style. That is how the desktop's open post window wins over the card
+ * behind it: the window frame renders its own `view-transition-name`, and the
+ * reader is looking at the window, so the window is what should morph. Two
+ * elements holding one name cancels the transition outright, which is why this
+ * has to be a single decision rather than two listeners overwriting each other
+ * in a load-bearing registration order.
+ *
+ * It also clears only the element it named itself, never every candidate on the
+ * page: a blanket clear wipes a name another owner set.
  */
 let namedForTransition: HTMLElement | null = null
 
+function isNameLive(name: string): boolean {
+  for (const el of document.querySelectorAll<HTMLElement>('[style]')) {
+    if (el.style.viewTransitionName === name) return true
+  }
+  return false
+}
+
 addEventListener('pageswap', (event) => {
-  const url = (
-    event as unknown as { activation?: { entry?: { url?: string } } }
-  ).activation?.entry?.url
-  const match = url?.match(/\/(blog|notes)\/([^/?#]+)/)
-  if (!match) return
-  const [, section, slug] = match
-  const name = section === 'notes' ? `note-${slug}` : `blog-post-${slug}`
   if (namedForTransition) {
     namedForTransition.style.viewTransitionName = ''
     namedForTransition = null
   }
-  const card = document.querySelector<HTMLElement>(
-    `[data-slug="${CSS.escape(slug)}"]`,
+
+  const url = (
+    event as unknown as { activation?: { entry?: { url?: string } } }
+  ).activation?.entry?.url
+  const name = url ? transitionNameForUrl(url) : null
+  if (!name || isNameLive(name)) return
+
+  const el = document.querySelector<HTMLElement>(
+    `[data-vt-name="${CSS.escape(name)}"]`,
   )
-  if (card) {
-    card.style.viewTransitionName = name
-    namedForTransition = card
-  }
+  if (!el) return
+  el.style.viewTransitionName = name
+  namedForTransition = el
 })

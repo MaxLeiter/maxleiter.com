@@ -114,7 +114,7 @@ function readHeader(buffer: Buffer): Dimensions | null {
 
 /* ----------------------------------------------------------------- cache -- */
 
-export function dimensionsFile(root: string): string {
+function dimensionsFile(root: string): string {
   return path.join(root, 'app', 'data', 'image-dimensions.json')
 }
 

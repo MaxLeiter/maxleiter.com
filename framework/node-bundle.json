@@ -1,0 +1,9 @@
+{
+  "bundle": true,
+  "platform": "node",
+  "format": "esm",
+  "target": "node20",
+  "packages": "external",
+  "jsx": "automatic",
+  "loader": { ".js": "jsx" }
+}

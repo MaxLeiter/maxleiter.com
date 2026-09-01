@@ -8,11 +8,12 @@ import {
   ThemeToggle,
   TwitterIcon,
 } from '@components/static/desktop-icons'
+import { entryHref } from '@lib/blog-post'
+import { POPULAR_SLUGS } from '@lib/popular-posts'
 import { windowStyles } from '@lib/window-styles'
 import {
   FOLDERS,
-  POPULAR_SLUGS,
-  postHref,
+  postTransitionName,
   type DesktopPost,
   type DesktopProject,
   type WindowId,
@@ -37,6 +38,7 @@ export interface ChromeHandlers {
   onFolder?: (id: WindowId, event: MouseEvent) => void
   onCalculator?: (event: MouseEvent) => void
   onPost?: (post: DesktopPost, event: MouseEvent) => void
+  /** Warms the window's iframe before the reader commits to opening it. */
   onPostHover?: (post: DesktopPost) => void
   onPostHoverEnd?: () => void
   /** Live clock text. The server renders '' and the inline script fills it in. */
@@ -177,7 +179,7 @@ function PostRow({
   handlers: ChromeHandlers
 }) {
   const external = post.isThirdParty
-  const href = postHref(post)
+  const href = entryHref(post)
 
   const body = (
     <>
@@ -216,6 +218,7 @@ function PostRow({
         className={CARD_CLASS}
         data-track="blog_click"
         data-slug={post.slug}
+        data-vt-name={postTransitionName(post)}
         onClick={
           handlers.onPost
             ? (event: MouseEvent) => handlers.onPost?.(post, event)
@@ -305,13 +308,6 @@ function ProjectLinkIcon() {
   )
 }
 
-function formatYears(years: string[]): string {
-  if (years.length === 0) return ''
-  if (years.length === 1) return years[0]
-  const sorted = [...years].sort()
-  return `${sorted[0]}–${sorted[sorted.length - 1]}`
-}
-
 export function WidgetTopProjects({
   projects,
   limit = 5,
@@ -345,9 +341,7 @@ export function WidgetTopProjects({
                       key={tech}
                       className="inline-block px-1.5 3xl:px-2 py-0.5 3xl:py-1 text-xs 3xl:text-sm bg-black/10 dark:bg-white/10 text-[var(--gray)] rounded border border-[var(--border-color)]"
                     >
-                      {formatYears(project.tech) === tech
-                        ? formatYears(project.tech)
-                        : tech}
+                      {tech}
                     </span>
                   ))}
                 </div>
@@ -392,7 +386,7 @@ export interface DesktopChromeProps {
   posts: DesktopPost[]
   projects: DesktopProject[]
   handlers?: ChromeHandlers
-  /** Windows, snap previews and preload iframes. Empty on the server. */
+  /** Windows, snap previews and the preload iframe. Empty on the server. */
   children?: ReactNode
 }
 

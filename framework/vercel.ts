@@ -5,6 +5,13 @@ import {
   normalizeRoutes,
   type Route,
 } from '@vercel/routing-utils'
+import { IMAGE_QUALITY, IMAGE_WIDTHS } from './images'
+import {
+  ASSET_PREFIX,
+  EMBED_SECTIONS,
+  IMMUTABLE_CACHE_CONTROL,
+  REDIRECTS,
+} from './routing'
 import type { BuildContext } from './types'
 
 /**
@@ -20,12 +27,6 @@ import type { BuildContext } from './types'
  * `blog/<slug>/index.html` directories, which the filesystem handler serves
  * at `/blog/<slug>` on its own.
  */
-
-const IMMUTABLE = 'public, max-age=31536000, immutable'
-
-/** Must stay in sync with IMAGE_WIDTHS in framework/images.tsx. */
-const IMAGE_SIZES = [640, 828, 1200, 1920]
-const IMAGE_QUALITIES = [75]
 
 /**
  * `hostname` and `pathname` here are REGULAR EXPRESSIONS, not the glob
@@ -51,16 +52,11 @@ const LOCAL_PATTERNS = [{ pathname: '^/(mc|_assets|favicons)/.*$' }]
 function baseRoutes(): Route[] {
   const { routes, error } = getTransformedRoutes({
     trailingSlash: false,
-    redirects: [
-      { source: '/X11', destination: '/blog/X11', permanent: true },
-      { source: '/atom', destination: '/feed.xml', permanent: true },
-      { source: '/feed', destination: '/feed.xml', permanent: true },
-      { source: '/rss', destination: '/feed.xml', permanent: true },
-    ],
+    redirects: REDIRECTS.map((redirect) => ({ ...redirect, permanent: true })),
     headers: [
       {
-        source: '/_assets/(.*)',
-        headers: [{ key: 'cache-control', value: IMMUTABLE }],
+        source: `${ASSET_PREFIX}(.*)`,
+        headers: [{ key: 'cache-control', value: IMMUTABLE_CACHE_CONTROL }],
       },
     ],
   })
@@ -71,29 +67,23 @@ function baseRoutes(): Route[] {
   return routes ?? []
 }
 
-export function buildRoutes(): Route[] {
+function buildRoutes(): Route[] {
   const routes: Route[] = [
     ...baseRoutes(),
     // Back-compat: /blog/<slug>?embed=true used to render the embed variant
     // inline. It is now its own page, so rewrite the old links onto it.
-    {
-      src: '^/blog/([^/]+)$',
-      has: [{ type: 'query', key: 'embed' }],
-      dest: '/blog/$1/embed',
+    ...EMBED_SECTIONS.map((section) => ({
+      src: `^/${section}/([^/]+)$`,
+      has: [{ type: 'query' as const, key: 'embed' }],
+      dest: `/${section}/$1/embed`,
       continue: false,
-    },
-    {
-      src: '^/notes/([^/]+)$',
-      has: [{ type: 'query', key: 'embed' }],
-      dest: '/notes/$1/embed',
-      continue: false,
-    },
+    })),
     // getTransformedRoutes only emits this marker when `rewrites` is passed.
     { handle: 'filesystem' },
     // A missing hashed asset must not inherit the immutable header above, or
     // a bad deploy poisons every CDN edge for a year.
     {
-      src: '^/_assets/.+',
+      src: `^${ASSET_PREFIX}.+`,
       status: 404,
       headers: { 'cache-control': 'no-store' },
       continue: false,
@@ -111,14 +101,14 @@ export function buildRoutes(): Route[] {
   return routes
 }
 
-export function buildConfig(): Record<string, unknown> {
+function buildConfig(): Record<string, unknown> {
   return {
     version: 3,
     routes: buildRoutes(),
     images: {
-      sizes: IMAGE_SIZES,
+      sizes: [...IMAGE_WIDTHS],
       domains: [],
-      qualities: IMAGE_QUALITIES,
+      qualities: [IMAGE_QUALITY],
       formats: ['image/avif', 'image/webp'],
       minimumCacheTTL: 31536000,
       remotePatterns: REMOTE_PATTERNS,
@@ -185,5 +175,3 @@ export async function writeVercelConfig(
     ms: performance.now() - started,
   }
 }
-
-export default writeVercelConfig

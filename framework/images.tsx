@@ -41,21 +41,27 @@ export interface Dims {
 /**
  * Posts annotate intrinsic dimensions on the image URL itself, as `?w=`/`?h=`
  * (or `?width=`/`?height=`), because markdown has nowhere else to put them.
- * Ported unchanged from MDXImage, including the 550x450 default.
+ *
+ * Only what the URL actually states. The 550x450 default belongs to `Img`,
+ * which is the one place that has to produce both numbers; a caller that cares
+ * whether the author stated a size can see the difference, which is what
+ * `ArticleImage` needs to prefer a measured size over a half-stated one.
+ *
+ * The base is a placeholder: `URL` needs one to parse a relative `src`, and
+ * nothing but `searchParams` is read.
  */
-export function parseDimsFromUrl(src: string): Dims {
-  const url = new URL(src, 'https://maxleiter.com')
-  const widthParam = url.searchParams.get('w') ?? url.searchParams.get('width')
-  const heightParam =
-    url.searchParams.get('h') ?? url.searchParams.get('height')
-
-  const width = widthParam ? Number.parseInt(widthParam, 10) : Number.NaN
-  const height = heightParam ? Number.parseInt(heightParam, 10) : Number.NaN
-
-  return {
-    width: Number.isFinite(width) && width > 0 ? width : FALLBACK_WIDTH,
-    height: Number.isFinite(height) && height > 0 ? height : FALLBACK_HEIGHT,
+export function urlDims(src: string): Partial<Dims> {
+  const params = new URL(src, 'https://example.invalid').searchParams
+  const dims: Partial<Dims> = {}
+  for (const [side, aliases] of [
+    ['width', ['w', 'width']],
+    ['height', ['h', 'height']],
+  ] as const) {
+    const raw = aliases.map((name) => params.get(name)).find(Boolean)
+    const value = raw ? Number.parseInt(raw, 10) : Number.NaN
+    if (Number.isFinite(value) && value > 0) dims[side] = value
   }
+  return dims
 }
 
 /** A single /_vercel/image URL. `w` must be one of IMAGE_WIDTHS. */
@@ -103,9 +109,11 @@ export function Img({
   priority = false,
   ...rest
 }: ImgProps): ReactElement {
-  const dims = parseDimsFromUrl(src)
-  const w = width ?? dims.width
-  const h = height ?? dims.height
+  // Skip the parse entirely when the caller stated both sides, which is what
+  // every article image does once its size has been measured.
+  const dims = width !== undefined && height !== undefined ? {} : urlDims(src)
+  const w = width ?? dims.width ?? FALLBACK_WIDTH
+  const h = height ?? dims.height ?? FALLBACK_HEIGHT
   const loading = priority ? 'eager' : 'lazy'
   const priorityProps = priority ? { fetchPriority: 'high' as const } : {}
 

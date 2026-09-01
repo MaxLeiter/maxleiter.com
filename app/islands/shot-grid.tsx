@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { Dispatch, RefObject, SetStateAction } from 'react'
 
 /**
  * The lightbox half of the MDX `<ShotGrid>`.
@@ -59,18 +60,56 @@ function findGrid(anchor: Element | null): HTMLElement | null {
   return null
 }
 
-export default function ShotGrid({ items, classes }: ShotGridProps) {
-  const [index, setIndex] = useState<number | null>(null)
-  const dialogRef = useRef<HTMLDialogElement>(null)
-  const isOpen = index !== null
+/**
+ * Opening and closing the lightbox are both caused by an event, so the two
+ * imperative calls each cause live in the handler rather than in an effect
+ * watching a boolean derived from `index`. `showModal()` blocks interaction but
+ * not scrolling, hence the body lock; pure CSS via `body:has(dialog[open])` is
+ * not an option, because the esbuild target in framework/client.ts includes
+ * firefox111 and Firefox only got `:has` in 121.
+ */
+function openLightbox(
+  dialog: HTMLDialogElement | null,
+  at: number,
+  setIndex: Dispatch<SetStateAction<number | null>>,
+): void {
+  setIndex(at)
+  if (dialog && !dialog.open) dialog.showModal()
+  document.body.style.overflow = 'hidden'
+}
 
-  // Upgrade the static grid: every still image becomes the content of a button
-  // that opens the lightbox at that image's position. Videos keep their own
-  // controls and are skipped, matching the order the server built `items` in.
+function closeLightbox(
+  dialog: HTMLDialogElement | null,
+  setIndex: Dispatch<SetStateAction<number | null>>,
+): void {
+  setIndex(null)
+  // A no-op on an already-closed dialog, so the `close`/`cancel` paths stay
+  // idempotent however the platform got there.
+  dialog?.close()
+  document.body.style.overflow = ''
+}
+
+/**
+ * Upgrades the static grid: every still image becomes the content of a button
+ * that opens the lightbox at that image's position. Videos keep their own
+ * controls and are skipped, matching the order the server built `items` in.
+ *
+ * An effect is genuinely required here. This is DOM the server rendered and
+ * React does not own — the grid is the island's sibling, not its child — so
+ * there is no render pass that could produce these buttons. One delegated
+ * listener on the grid serves all of them; the per-image position travels in a
+ * data attribute rather than a captured closure.
+ */
+function useGridTriggers(
+  dialogRef: RefObject<HTMLDialogElement | null>,
+  items: ShotItem[],
+  triggerClass: string,
+  setIndex: Dispatch<SetStateAction<number | null>>,
+): void {
   useEffect(() => {
     const grid = findGrid(dialogRef.current)
     if (!grid) return
-    const cleanups: (() => void)[] = []
+    const buttons: HTMLButtonElement[] = []
     let position = 0
 
     for (const figure of grid.querySelectorAll('figure')) {
@@ -83,56 +122,52 @@ export default function ShotGrid({ items, classes }: ShotGridProps) {
 
       const button = document.createElement('button')
       button.type = 'button'
-      button.className = classes.trigger
+      button.className = triggerClass
+      button.dataset.shotIndex = String(at)
       button.setAttribute(
         'aria-label',
         item.alt ? `Expand: ${item.alt}` : 'Expand image',
       )
-      const onClick = () => setIndex(at)
-      button.addEventListener('click', onClick)
       image.replaceWith(button)
       button.appendChild(image)
-
-      cleanups.push(() => {
-        button.removeEventListener('click', onClick)
-        button.replaceWith(image)
-      })
+      buttons.push(button)
     }
+
+    const onClick = (event: Event) => {
+      const at = (event.target as Element).closest<HTMLElement>(
+        '[data-shot-index]',
+      )?.dataset.shotIndex
+      if (at !== undefined) {
+        openLightbox(dialogRef.current, Number(at), setIndex)
+      }
+    }
+    grid.addEventListener('click', onClick)
 
     return () => {
-      for (const cleanup of cleanups) cleanup()
+      grid.removeEventListener('click', onClick)
+      for (const button of buttons) {
+        const image = button.firstElementChild
+        if (image) button.replaceWith(image)
+      }
     }
-  }, [items, classes.trigger])
+  }, [dialogRef, items, triggerClass, setIndex])
+}
 
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
-    if (isOpen && !dialog.open) dialog.showModal()
-    else if (!isOpen && dialog.open) dialog.close()
-  }, [isOpen])
+export default function ShotGrid({ items, classes }: ShotGridProps) {
+  const [index, setIndex] = useState<number | null>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
 
-  // showModal() blocks interaction but not scrolling.
-  useEffect(() => {
-    if (!isOpen) return
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = previous
-    }
-  }, [isOpen])
+  useGridTriggers(dialogRef, items, classes.trigger, setIndex)
 
-  const close = useCallback(() => setIndex(null), [])
+  const close = () => closeLightbox(dialogRef.current, setIndex)
 
-  const step = useCallback(
-    (delta: number) => {
-      setIndex((current) =>
-        current === null || items.length < 2
-          ? current
-          : (current + delta + items.length) % items.length,
-      )
-    },
-    [items.length],
-  )
+  const step = (delta: number) => {
+    setIndex((current) =>
+      current === null || items.length < 2
+        ? current
+        : (current + delta + items.length) % items.length,
+    )
+  }
 
   if (items.length === 0) return null
 

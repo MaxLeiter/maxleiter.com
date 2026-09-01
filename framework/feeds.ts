@@ -2,8 +2,9 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { marked } from 'marked'
 import RSS from 'rss'
-import { buildEntries, entryHref } from './content'
-import type { BuildContext, Note, Post } from './types'
+import { absoluteUrl, buildEntries, byDateDesc } from './content'
+import { entryHref } from '../app/lib/blog-post'
+import type { BuildContext, Note, Post, RouteInfo } from './types'
 
 /**
  * feed.xml, sitemap.xml, robots.txt and search-index.json.
@@ -20,17 +21,6 @@ import type { BuildContext, Note, Post } from './types'
  *  - next build and build-rss ran concurrently and both wrote
  *    public/feed.xml, so the shipped feed could be the previous build's.
  */
-
-/** Every top-level page, in sitemap order. */
-const TOP_LEVEL = [
-  '',
-  '/about',
-  '/blog',
-  '/notes',
-  '/labs',
-  '/projects',
-  '/talks',
-] as const
 
 export interface SearchIndexItem {
   type: 'blog' | 'note' | 'project'
@@ -54,6 +44,12 @@ export type RenderPostHtml = (post: Post | Note) => string | Promise<string>
 
 export interface FeedsOptions {
   renderPostHtml?: RenderPostHtml
+  /**
+   * Every route the build emitted. The sitemap derives its top-level pages
+   * from this rather than from a transcription of the page registry, which is
+   * how the previous sitemap came to omit /blog, /notes, /labs and /talks.
+   */
+  routes: RouteInfo[]
 }
 
 /** The exact marked configuration scripts/rss.mts used. */
@@ -67,21 +63,17 @@ function markedRenderer(): RenderPostHtml {
   return (post) => marked.parse(post.body, { async: false }) as string
 }
 
-function itemUrl(ctx: BuildContext, item: Post | Note): string {
-  if (item.type === 'post' && item.isThirdParty && item.href) return item.href
-  const section = item.type === 'post' ? 'blog' : 'notes'
-  return `${ctx.site.url}/${section}/${item.slug}`
-}
-
 async function writeFeed(
   ctx: BuildContext,
   render: RenderPostHtml,
 ): Promise<number> {
+  // `byDateDesc`, not a bare date comparison: three notes share Mar 30, 2024,
+  // and without its slug tiebreak node and bun emit different feed.xml bytes.
   const combined: (Post | Note)[] = [
     ...ctx.posts,
     ...ctx.notes,
     ...ctx.externalPosts,
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  ].sort(byDateDesc)
 
   const feed = new RSS({
     title: ctx.site.title,
@@ -93,7 +85,7 @@ async function writeFeed(
 
   for (const item of combined) {
     const isThirdParty = item.type === 'post' && Boolean(item.isThirdParty)
-    const url = itemUrl(ctx, item)
+    const url = entryHref(item, ctx.site.url)
     const description = isThirdParty
       ? `${item.description || ''}<br><br><a href="${url}">Read on ${
           new URL(url).hostname
@@ -139,7 +131,26 @@ function day(iso: string): string {
   return iso.slice(0, 10)
 }
 
-async function writeSitemap(ctx: BuildContext): Promise<number> {
+/**
+ * Every indexable top-level page, in registry order, derived from what the
+ * build actually emitted. A single-segment page route is a top-level page;
+ * `/404` drops out on its own because it is noindex.
+ */
+function topLevelPages(routes: RouteInfo[]): string[] {
+  return routes
+    .filter(
+      (route) =>
+        route.kind === 'page' &&
+        !route.noindex &&
+        route.path.split('/').length === 2,
+    )
+    .map((route) => route.path)
+}
+
+async function writeSitemap(
+  ctx: BuildContext,
+  routes: RouteInfo[],
+): Promise<number> {
   const content = [...ctx.posts, ...ctx.notes]
   // Deterministic: the newest piece of content, not the build clock. A
   // build-time `new Date()` made every sitemap byte-diff against the last one.
@@ -149,18 +160,18 @@ async function writeSitemap(ctx: BuildContext): Promise<number> {
   )
 
   const urls = [
-    ...TOP_LEVEL.map((route) => ({
-      loc: `${ctx.site.url}${route}`,
+    ...topLevelPages(routes).map((route) => ({
+      loc: absoluteUrl(ctx, route),
       lastmod: day(newest),
     })),
     ...ctx.posts
       .filter((post) => Boolean(post.slug))
       .map((post) => ({
-        loc: `${ctx.site.url}/blog/${post.slug}`,
+        loc: entryHref(post, ctx.site.url),
         lastmod: day(post.dateISO),
       })),
     ...ctx.notes.map((note) => ({
-      loc: `${ctx.site.url}/notes/${note.slug}`,
+      loc: entryHref(note, ctx.site.url),
       lastmod: day(note.dateISO),
     })),
   ]
@@ -190,7 +201,7 @@ async function writeRobots(ctx: BuildContext): Promise<void> {
 }
 
 /** The command palette's index. Same shape and order as /api/search-index. */
-export function searchIndex(ctx: BuildContext): SearchIndexItem[] {
+function searchIndex(ctx: BuildContext): SearchIndexItem[] {
   const entries = buildEntries(ctx).map((entry) => {
     const href = entryHref(entry)
     return {
@@ -223,7 +234,7 @@ export interface FeedsResult {
 
 export async function writeFeeds(
   ctx: BuildContext,
-  options: FeedsOptions = {},
+  options: FeedsOptions,
 ): Promise<FeedsResult> {
   const render = options.renderPostHtml ?? markedRenderer()
   const started = performance.now()
@@ -232,7 +243,7 @@ export async function writeFeeds(
   const items = searchIndex(ctx)
   const [feedItems, sitemapUrls] = await Promise.all([
     writeFeed(ctx, render),
-    writeSitemap(ctx),
+    writeSitemap(ctx, options.routes),
     writeRobots(ctx),
     fs.writeFile(
       path.join(ctx.staticDir, 'search-index.json'),
@@ -247,5 +258,3 @@ export async function writeFeeds(
     ms: performance.now() - started,
   }
 }
-
-export default writeFeeds

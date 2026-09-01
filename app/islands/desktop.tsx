@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react'
+import type { Dispatch, MouseEvent } from 'react'
 import {
   lazy,
   Suspense,
@@ -9,12 +9,13 @@ import {
   useSyncExternalStore,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { entryHref } from '@lib/blog-post'
 import { DesktopChrome, type ChromeHandlers } from './desktop/chrome'
 import { Window } from './desktop/window'
 import {
   CONTENT_WINDOWS,
+  DESKTOP_MIN_WIDTH,
   embedHref,
-  postHref,
   postTransitionName,
   type DesktopPost,
   type DesktopProps,
@@ -26,23 +27,37 @@ import {
  * already rendered.
  *
  * Nothing here depends on a router. Maximize was always a navigation rather
- * than a resize, so it is `location.assign`; the same-document window open/close animation calls
- * `document.startViewTransition` directly, and the cross-document half of it is
- * the platform's, driven by matching `view-transition-name` values.
+ * than a resize, so it is `location.assign`; the same-document window
+ * open/close animation calls `document.startViewTransition` directly, and the
+ * cross-document half of it is the platform's, driven by matching
+ * `view-transition-name` values.
+ *
+ * Two effects, both named and both genuinely external: a `keydown` listener on
+ * `window` and the `?openPost` deep link. Everything else that used to be an
+ * effect here -- the clock interval, the viewport breakpoint, a `pageswap`
+ * handoff and the hover-preload unmount cleanup -- is now either a subscription
+ * the renderer drives (`useSyncExternalStore`), a plain event handler, or gone.
  */
-
-const CALCULATOR_TITLE = 'calculator'
 
 const Calculator = lazy(() => import('./desktop/calculator'))
 
 /* --------------------------------------------------------------- state -- */
 
+/** The window id a post opens under, whatever kind of post it is. */
+const postWindowId = (slug: string) => `blog-post-${slug}`
+
 interface WindowState {
-  openWindows: Set<WindowId>
+  /**
+   * Open windows, bottom to top.
+   *
+   * Membership is "open", position is stacking order, and the last element is
+   * the focused window. That is one field doing the job `openWindows: Set`,
+   * `zIndexes: Record` and an ever-growing `nextZIndex` counter used to share,
+   * and it makes every action either "move to end" or "remove". With at most
+   * seven ids the array beats cloning a Set on each open and close, too.
+   */
+  stack: string[]
   blogPostSlug: string | null
-  focusedWindow: string | null
-  zIndexes: Record<string, number>
-  nextZIndex: number
 }
 
 type WindowAction =
@@ -51,98 +66,164 @@ type WindowAction =
   | { type: 'OPEN_BLOG_POST'; slug: string }
   | { type: 'CLOSE_BLOG_POST' }
   | { type: 'FOCUS'; id: string }
+  | { type: 'CLOSE_FOCUSED' }
 
-const INITIAL_STATE: WindowState = {
-  openWindows: new Set(),
-  blogPostSlug: null,
-  focusedWindow: null,
-  zIndexes: {},
-  nextZIndex: 50,
-}
+const INITIAL_STATE: WindowState = { stack: [], blogPostSlug: null }
+
+const raise = (stack: string[], id: string): string[] => [
+  ...stack.filter((open) => open !== id),
+  id,
+]
+
+const drop = (stack: string[], id: string): string[] =>
+  stack.filter((open) => open !== id)
 
 function reducer(state: WindowState, action: WindowAction): WindowState {
   switch (action.type) {
-    case 'OPEN_WINDOW': {
-      const openWindows = new Set(state.openWindows)
-      openWindows.add(action.id)
-      return {
-        ...state,
-        openWindows,
-        focusedWindow: action.id,
-        zIndexes: { ...state.zIndexes, [action.id]: state.nextZIndex },
-        nextZIndex: state.nextZIndex + 1,
-      }
-    }
-    case 'CLOSE_WINDOW': {
-      const openWindows = new Set(state.openWindows)
-      openWindows.delete(action.id)
-      return { ...state, openWindows }
-    }
-    case 'OPEN_BLOG_POST': {
-      const id = `blog-post-${action.slug}`
-      return {
-        ...state,
-        blogPostSlug: action.slug,
-        focusedWindow: id,
-        zIndexes: { ...state.zIndexes, [id]: state.nextZIndex },
-        nextZIndex: state.nextZIndex + 1,
-      }
-    }
-    case 'CLOSE_BLOG_POST':
-      return { ...state, blogPostSlug: null }
+    case 'OPEN_WINDOW':
     case 'FOCUS':
+      return { ...state, stack: raise(state.stack, action.id) }
+    case 'CLOSE_WINDOW':
+      return { ...state, stack: drop(state.stack, action.id) }
+    case 'OPEN_BLOG_POST':
       return {
-        ...state,
-        focusedWindow: action.id,
-        zIndexes: { ...state.zIndexes, [action.id]: state.nextZIndex },
-        nextZIndex: state.nextZIndex + 1,
+        blogPostSlug: action.slug,
+        stack: raise(state.stack, postWindowId(action.slug)),
       }
-    default:
-      return state
+    case 'CLOSE_BLOG_POST':
+      return {
+        blogPostSlug: null,
+        stack: state.blogPostSlug
+          ? drop(state.stack, postWindowId(state.blogPostSlug))
+          : state.stack,
+      }
+    case 'CLOSE_FOCUSED': {
+      // The reducer reads the focused window itself, which is what lets the
+      // Ctrl+W listener register once instead of re-registering on every open,
+      // close and focus in order to see a fresh `focusedWindow`.
+      const focused = state.stack[state.stack.length - 1]
+      if (!focused) return state
+      if (state.blogPostSlug && focused === postWindowId(state.blogPostSlug)) {
+        return reducer(state, { type: 'CLOSE_BLOG_POST' })
+      }
+      return { ...state, stack: drop(state.stack, focused) }
+    }
   }
 }
 
 /* -------------------------------------------------------------- hooks -- */
 
-const subscribeToResize = (callback: () => void) => {
-  window.addEventListener('resize', callback)
-  return () => window.removeEventListener('resize', callback)
+/**
+ * `matchMedia` rather than a `resize` listener: it fires when the breakpoint is
+ * actually crossed, not on every pixel of a window drag.
+ */
+const mobileQuery =
+  typeof matchMedia === 'function'
+    ? matchMedia(`(max-width: ${DESKTOP_MIN_WIDTH - 1}px)`)
+    : null
+
+const subscribeToBreakpoint = (callback: () => void) => {
+  mobileQuery?.addEventListener('change', callback)
+  return () => mobileQuery?.removeEventListener('change', callback)
 }
+
+const getIsMobile = () => mobileQuery?.matches ?? false
+const getIsMobileOnServer = () => false
 
 function useIsMobile(): boolean {
   return useSyncExternalStore(
-    subscribeToResize,
-    () => window.innerWidth < 768,
-    () => false,
+    subscribeToBreakpoint,
+    getIsMobile,
+    getIsMobileOnServer,
   )
 }
 
 /**
- * The clock the inline script in the page already wrote, kept ticking.
+ * The clock the inline script in `app/pages/home.tsx` already wrote, kept
+ * ticking.
  *
  * Seeding from the DOM rather than a `window.__INITIAL_TIME__` global is the
  * whole replacement for that handshake: the value is already in the markup, so
- * the first render matches it by construction.
+ * the first render matches it by construction. An interval is a subscription,
+ * so it belongs in `useSyncExternalStore` rather than in an effect that also
+ * had to re-`tick()` on mount to make up for seeding state it had already
+ * seeded correctly.
+ *
+ * This island is the only writer. `framework/client/runtime.ts` used to run a
+ * second interval against the same element, on the one page where preact owns
+ * it.
  */
+let clockText =
+  typeof document === 'undefined'
+    ? ''
+    : (document.getElementById('menubar-clock')?.textContent ?? '')
+
+const clockListeners = new Set<() => void>()
+
+const subscribeToClock = (callback: () => void) => {
+  clockListeners.add(callback)
+  const timer = setInterval(() => {
+    clockText = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+    for (const listener of clockListeners) listener()
+  }, 60_000)
+  return () => {
+    clearInterval(timer)
+    clockListeners.delete(callback)
+  }
+}
+
+const getClock = () => clockText
+
 function useClock(): string {
-  const [time, setTime] = useState(
-    () => document.getElementById('menubar-clock')?.textContent ?? '',
-  )
+  return useSyncExternalStore(subscribeToClock, getClock, getClock)
+}
 
+/**
+ * `/?openPost=<slug>` is how a post page's minimize button round-trips.
+ *
+ * An effect is required. It deliberately runs after the first render rather
+ * than out of a lazy `useReducer` initializer: the island hydrates over server
+ * markup that contains no window, so opening one during the first render would
+ * mean the tree preact is hydrating and the tree it is handed no longer agree.
+ * `history.replaceState` is an external side effect regardless.
+ */
+function useOpenPostDeepLink(
+  posts: DesktopPost[],
+  dispatch: Dispatch<WindowAction>,
+): void {
   useEffect(() => {
-    const tick = () =>
-      setTime(
-        new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      )
-    tick()
-    const id = setInterval(tick, 60_000)
-    return () => clearInterval(id)
-  }, [])
+    const slug = new URLSearchParams(location.search).get('openPost')
+    if (!slug || !posts.some((post) => post.slug === slug)) return
+    dispatch({ type: 'OPEN_BLOG_POST', slug })
+    history.replaceState({}, '', '/')
+  }, [posts, dispatch])
+}
 
-  return time
+/**
+ * Ctrl+W, not Cmd+W: the browser keeps that one.
+ *
+ * An effect is required: this is a `keydown` listener on `window`, which is DOM
+ * no React element owns. It registers when the first window opens and
+ * unregisters when the last one closes, so on a desktop with nothing open
+ * Ctrl+W still reaches the browser and closes the tab, as it always did.
+ */
+function useCloseFocusedShortcut(
+  dispatch: Dispatch<WindowAction>,
+  hasOpenWindows: boolean,
+): void {
+  useEffect(() => {
+    if (!hasOpenWindows) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!event.ctrlKey || event.metaKey || event.key !== 'w') return
+      event.preventDefault()
+      withTransition(() => dispatch({ type: 'CLOSE_FOCUSED' }))
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [dispatch, hasOpenWindows])
 }
 
 /** Animates a window opening or closing, when the browser and the user allow. */
@@ -168,93 +249,35 @@ function withTransition(update: () => void): void {
 
 export default function Desktop({ posts, projects }: DesktopProps) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
-  const [preloadedPost, setPreloadedPost] = useState<DesktopPost | null>(null)
-  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isMobile = useIsMobile()
   const clock = useClock()
 
-  const zIndexOf = (id: string) => state.zIndexes[id] ?? 50
+  /**
+   * Hovering a post card warms its window's iframe, so opening the window
+   * shows the article rather than a blank frame.
+   *
+   * Not an effect: both edges are events. The unmount cleanup this used to
+   * carry was unreachable anyway -- the island is the root of the page and is
+   * never unmounted -- and a pending `setPreloadedPost` after unmount is a
+   * no-op in React 18 and later regardless.
+   */
+  const [preloadedPost, setPreloadedPost] = useState<DesktopPost | null>(null)
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useOpenPostDeepLink(posts, dispatch)
+  useCloseFocusedShortcut(dispatch, state.stack.length > 0)
+
+  /** Position in the stack is the stacking order; 50 clears the menubar. */
+  const zIndexOf = (id: string) => 50 + Math.max(0, state.stack.indexOf(id))
+
   const openPost = state.blogPostSlug
     ? (posts.find((post) => post.slug === state.blogPostSlug) ?? null)
     : null
 
-  /* `/?openPost=<slug>` is how a post page's minimize button round-trips. */
-  useEffect(() => {
-    const slug = new URLSearchParams(location.search).get('openPost')
-    if (!slug || !posts.some((post) => post.slug === slug)) return
-    dispatch({ type: 'OPEN_BLOG_POST', slug })
-    history.replaceState({}, '', '/')
-  }, [posts])
-
-  /* Ctrl+W, not Cmd+W: the browser keeps that one. */
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (!event.ctrlKey || event.metaKey || event.key !== 'w') return
-      const focused = state.focusedWindow
-      if (!focused) return
-      event.preventDefault()
-      if (focused.startsWith('blog-post-')) {
-        withTransition(() => dispatch({ type: 'CLOSE_BLOG_POST' }))
-      } else if (state.openWindows.has(focused as WindowId)) {
-        dispatch({ type: 'CLOSE_WINDOW', id: focused as WindowId })
-      }
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [state.focusedWindow, state.openWindows])
-
-  useEffect(
-    () => () => {
-      if (hoverTimeout.current) clearTimeout(hoverTimeout.current)
-    },
-    [],
-  )
-
-  /**
-   * Hands the outgoing transition name to the post window instead of the card.
-   *
-   * The runtime's `pageswap` listener names the card matching the destination
-   * slug. When that post is already open in a window, the window is what the
-   * reader is looking at, so it should be the thing that morphs into the
-   * article -- and the card has to give the name up either way, because two
-   * elements holding one `view-transition-name` cancels the transition.
-   *
-   * Order is load-bearing: the runtime is a module script that registers at
-   * parse time and this registers on hydration, so the runtime always runs
-   * first and this always gets the last word.
-   */
-  const openSlug = openPost?.slug ?? null
-  const transitionName = openPost ? postTransitionName(openPost) : null
-  const transitionRef = useRef({ slug: openSlug, name: transitionName })
-  transitionRef.current = { slug: openSlug, name: transitionName }
-
-  useEffect(() => {
-    const onPageSwap = (event: Event) => {
-      const { slug, name } = transitionRef.current
-      if (!slug || !name) return
-      // Only claim the name when the navigation is to the post this window is
-      // showing. Otherwise the runtime's card is the correct pairing.
-      const url = (event as { activation?: { entry?: { url?: string } } })
-        .activation?.entry?.url
-      if (url?.match(/\/(?:blog|notes)\/([^/?#]+)/)?.[1] !== slug) return
-
-      const frame = document.querySelector<HTMLElement>(
-        '[role="dialog"][data-slug]',
-      )
-      if (!frame) return
-      for (const el of document.querySelectorAll<HTMLElement>('[data-slug]')) {
-        if (el !== frame) el.style.viewTransitionName = ''
-      }
-      frame.style.viewTransitionName = name
-    }
-    window.addEventListener('pageswap', onPageSwap)
-    return () => window.removeEventListener('pageswap', onPageSwap)
-  }, [])
-
   const handlers: ChromeHandlers = {
     clock,
     onFolder: (id: WindowId, event: MouseEvent) => {
-      // Below 768px the anchor is left alone and the browser navigates.
+      // Below the breakpoint the anchor is left alone and the browser navigates.
       if (isMobile) return
       event.preventDefault()
       dispatch({ type: 'OPEN_WINDOW', id })
@@ -293,9 +316,9 @@ export default function Desktop({ posts, projects }: DesktopProps) {
         />
       )}
 
-      {state.openWindows.has('calculator') && (
+      {state.stack.includes('calculator') && (
         <Window
-          title={CALCULATOR_TITLE}
+          title="calculator"
           onClose={() => dispatch({ type: 'CLOSE_WINDOW', id: 'calculator' })}
           defaultWidth={500}
           defaultHeight={600}
@@ -320,12 +343,12 @@ export default function Desktop({ posts, projects }: DesktopProps) {
           defaultHeight={600}
           defaultX={150}
           defaultY={80}
-          maximizeHref={postHref(openPost)}
-          zIndex={zIndexOf(`blog-post-${openPost.slug}`)}
+          maximizeHref={entryHref(openPost)}
+          zIndex={zIndexOf(postWindowId(openPost.slug))}
           onFocus={() =>
-            dispatch({ type: 'FOCUS', id: `blog-post-${openPost.slug}` })
+            dispatch({ type: 'FOCUS', id: postWindowId(openPost.slug) })
           }
-          transitionName={transitionName ?? undefined}
+          transitionName={postTransitionName(openPost)}
           slug={openPost.slug}
         >
           <iframe
@@ -336,7 +359,7 @@ export default function Desktop({ posts, projects }: DesktopProps) {
         </Window>
       )}
 
-      {CONTENT_WINDOWS.filter((config) => state.openWindows.has(config.id)).map(
+      {CONTENT_WINDOWS.filter((config) => state.stack.includes(config.id)).map(
         (config) => (
           <Window
             key={config.id}

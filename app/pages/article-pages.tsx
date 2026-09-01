@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
+import { transitionName } from '../../framework/transitions'
 import { PageShell } from './shell'
 
 /**
@@ -32,7 +33,6 @@ const PROSE_VARS = {
 } as CSSProperties
 
 interface ArticleProps {
-  slug: string
   title: string
   date: string
   dateISO: string
@@ -127,13 +127,12 @@ export function BlogPostPage({
       toolbar={toolbar}
     >
       <Article
-        slug={slug}
         title={title}
         date={date}
         dateISO={dateISO}
         description={description}
         content={content}
-        vtName={`blog-post-${slug}`}
+        vtName={transitionName('blog', slug)}
       />
     </PageShell>
   )
@@ -164,14 +163,13 @@ export function NotePage({
       toolbar={toolbar}
     >
       <Article
-        slug={slug}
         title={title}
         date={date}
         dateISO={dateISO}
         description={description}
         content={content}
         kind={kind}
-        vtName={`note-${slug}`}
+        vtName={transitionName('note', slug)}
       />
     </PageShell>
   )

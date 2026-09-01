@@ -1,17 +1,28 @@
-import type { CSSProperties, MouseEvent, ReactNode, TouchEvent } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties, PointerEvent, ReactNode } from 'react'
+import { useRef, useState } from 'react'
 import { getHeaderClassName, windowStyles } from '@lib/window-styles'
+import { DESKTOP_MIN_WIDTH } from './data'
 
 /**
  * A draggable, resizable, snappable window.
  *
- * A near-verbatim port of `app/components/desktop/window.tsx`. The two changes
- * are that `router.push` becomes `location.assign` (maximize has always been a
- * navigation, not a resize) and that the window can carry a
- * `view-transition-name` so it pairs with the article it opens into.
+ * Ported from `app/components/desktop/window.tsx`. Three things changed:
+ * `router.push` became `location.assign` (maximize has always been a
+ * navigation, not a resize); the window can carry a `view-transition-name` so
+ * it pairs with the article it opens into; and dragging is Pointer Events with
+ * `setPointerCapture` instead of document-level mouse and touch listener pairs.
+ *
+ * That last one is why there is no effect in this file. The old version
+ * registered `mousemove`/`mouseup`/`touchmove`/`touchend` on `document` from an
+ * effect keyed on `[isDragging, isResizing]`, which meant the listeners could
+ * not see fresh `position`, `size` or `dragOffset` and had to read them out of
+ * a ref rewritten during every render. Pointer capture routes every move and
+ * the release back to the element the gesture started on, so the handlers are
+ * ordinary React props that close over the current render's values.
  */
 
 type SnapDirection = 'left' | 'right' | 'top' | 'bottom' | null
+type Mode = 'idle' | 'drag' | 'resize'
 
 const SNAP_DISTANCE = 20
 const MENUBAR_HEIGHT = 40
@@ -32,13 +43,8 @@ export interface WindowProps {
   onFocus?: () => void
   /** Emitted as `view-transition-name` on the window frame. */
   transitionName?: string
-  /** Lets the runtime's `pageswap` handler find this frame. */
+  /** Which post the frame is showing. */
   slug?: string
-}
-
-interface Point {
-  x: number
-  y: number
 }
 
 interface Size {
@@ -46,12 +52,18 @@ interface Size {
   height: number
 }
 
+/** Position and size together: they are seeded together and snapped together. */
+interface Rect extends Size {
+  x: number
+  y: number
+}
+
 function constrainToViewport(
   width: number,
   height: number,
   x: number,
   y: number,
-): Point & Size {
+): Rect {
   const maxWidth = window.innerWidth - 40
   const maxHeight = window.innerHeight - 80
 
@@ -63,12 +75,46 @@ function constrainToViewport(
   }
 }
 
-function getSnapDirection(mouseX: number, mouseY: number): SnapDirection {
-  if (mouseX < SNAP_DISTANCE) return 'left'
-  if (mouseX > window.innerWidth - SNAP_DISTANCE) return 'right'
-  if (mouseY < SNAP_DISTANCE + MENUBAR_HEIGHT) return 'top'
-  if (mouseY > window.innerHeight - SNAP_DISTANCE) return 'bottom'
+function getSnapDirection(
+  pointerX: number,
+  pointerY: number,
+  viewport: Size,
+): SnapDirection {
+  if (pointerX < SNAP_DISTANCE) return 'left'
+  if (pointerX > viewport.width - SNAP_DISTANCE) return 'right'
+  if (pointerY < SNAP_DISTANCE + MENUBAR_HEIGHT) return 'top'
+  if (pointerY > viewport.height - SNAP_DISTANCE) return 'bottom'
   return null
+}
+
+function getSnappedRect(
+  direction: Exclude<SnapDirection, null>,
+  current: Rect,
+  viewport: Size,
+): Rect {
+  const { width: vw, height: vh } = viewport
+  const belowMenubar = vh - MENUBAR_HEIGHT
+
+  switch (direction) {
+    case 'left':
+      return { x: 0, y: MENUBAR_HEIGHT, width: vw / 2, height: belowMenubar }
+    case 'right':
+      return {
+        x: vw / 2,
+        y: MENUBAR_HEIGHT,
+        width: vw / 2,
+        height: belowMenubar,
+      }
+    case 'top':
+      return { x: 0, y: MENUBAR_HEIGHT, width: vw, height: belowMenubar }
+    case 'bottom':
+      return {
+        x: current.x,
+        y: belowMenubar / 2 + MENUBAR_HEIGHT,
+        width: current.width,
+        height: belowMenubar / 2,
+      }
+  }
 }
 
 /** True when the pointer went down on the title bar rather than a button. */
@@ -91,111 +137,105 @@ export function Window({
   transitionName,
   slug,
 }: WindowProps) {
-  const initial = constrainToViewport(
-    defaultWidth,
-    defaultHeight,
-    defaultX,
-    defaultY,
+  // Lazy initializers: both read layout, and both are seeds. Computing them in
+  // the render body meant two viewport reads on every one of the ~60 renders a
+  // second a drag produces, every result but the first discarded.
+  const [rect, setRect] = useState<Rect>(() =>
+    constrainToViewport(defaultWidth, defaultHeight, defaultX, defaultY),
   )
-
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [position, setPosition] = useState<Point>({
-    x: initial.x,
-    y: initial.y,
-  })
-  const [size, setSize] = useState<Size>({
-    width: initial.width,
-    height: initial.height,
-  })
-  const [isDragging, setIsDragging] = useState(false)
-  const [isResizing, setIsResizing] = useState(false)
-  const [dragOffset, setDragOffset] = useState<Point>({ x: 0, y: 0 })
+  const [isFullscreen, setIsFullscreen] = useState(
+    () => window.innerWidth < DESKTOP_MIN_WIDTH,
+  )
+  const [mode, setMode] = useState<Mode>('idle')
   const [snapPreview, setSnapPreview] = useState<SnapDirection>(null)
-  const [isSnapped, setIsSnapped] = useState(false)
-  const [preSnapState, setPreSnapState] = useState<{
-    position: Point
-    size: Size
-  } | null>(null)
+  /** The geometry to restore on un-snap. Non-null IS "currently snapped". */
+  const [preSnapRect, setPreSnapRect] = useState<Rect | null>(null)
 
-  // Read inside the pointer-move listener, which is re-registered per drag but
-  // must not close over a stale frame's geometry.
-  const geometry = useRef({ position, size, dragOffset, isSnapped })
-  geometry.current = { position, size, dragOffset, isSnapped }
+  /** Where in the window the pointer grabbed it. Never rendered. */
+  const dragOffset = useRef({ x: 0, y: 0 })
+  /**
+   * Viewport size, captured once per gesture instead of read on every move.
+   * `getSnapDirection` alone used to read `innerWidth` and `innerHeight` on
+   * each of a drag's ~60 events per second. Written on pointer-down and read
+   * only during the gesture that wrote it, so every render in between sees the
+   * value that gesture captured.
+   */
+  const viewport = useRef<Size>({ width: 0, height: 0 })
 
-  useEffect(() => {
-    if (window.innerWidth < 768) setIsFullscreen(true)
-  }, [])
+  const beginGesture = (event: PointerEvent<HTMLElement>, next: Mode) => {
+    event.currentTarget.setPointerCapture(event.pointerId)
+    viewport.current = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    }
+    setMode(next)
+  }
 
-  const getSnappedGeometry = (
-    direction: SnapDirection,
-  ): { position: Point; size: Size } | null => {
-    const vw = window.innerWidth
-    const vh = window.innerHeight
+  const onFramePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    onFocus?.()
+    if (isFullscreen || !isHeaderDrag(event.target)) return
+    beginGesture(event, 'drag')
 
-    switch (direction) {
-      case 'left':
-        return {
-          position: { x: 0, y: MENUBAR_HEIGHT },
-          size: { width: vw / 2, height: vh - MENUBAR_HEIGHT },
-        }
-      case 'right':
-        return {
-          position: { x: vw / 2, y: MENUBAR_HEIGHT },
-          size: { width: vw / 2, height: vh - MENUBAR_HEIGHT },
-        }
-      case 'top':
-        return {
-          position: { x: 0, y: MENUBAR_HEIGHT },
-          size: { width: vw, height: vh - MENUBAR_HEIGHT },
-        }
-      case 'bottom':
-        return {
-          position: {
-            x: geometry.current.position.x,
-            y: (vh - MENUBAR_HEIGHT) / 2 + MENUBAR_HEIGHT,
-          },
-          size: {
-            width: geometry.current.size.width,
-            height: (vh - MENUBAR_HEIGHT) / 2,
-          },
-        }
-      default:
-        return null
+    if (preSnapRect) {
+      // A snapped window pops back to its old size under the cursor.
+      const restoredWidth = preSnapRect.width
+      dragOffset.current = { x: restoredWidth / 2, y: 16 }
+      setRect({
+        ...preSnapRect,
+        x: event.clientX - restoredWidth / 2,
+        y: event.clientY - 16,
+      })
+      setPreSnapRect(null)
+      return
+    }
+    dragOffset.current = {
+      x: event.clientX - rect.x,
+      y: event.clientY - rect.y,
     }
   }
 
-  /** Shared by mouse and touch: a snapped window pops back to its old size. */
-  const beginDrag = (clientX: number, clientY: number) => {
-    if (isSnapped && preSnapState) {
-      const restoredWidth = preSnapState.size.width
-      setSize(preSnapState.size)
-      setPosition({ x: clientX - restoredWidth / 2, y: clientY - 16 })
-      setDragOffset({ x: restoredWidth / 2, y: 16 })
-      setIsSnapped(false)
-      setPreSnapState(null)
-    } else {
-      setDragOffset({ x: clientX - position.x, y: clientY - position.y })
+  const onFramePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (mode === 'idle') return
+    const { clientX, clientY } = event
+
+    if (mode === 'drag') {
+      setRect((current) => ({
+        ...current,
+        x: clientX - dragOffset.current.x,
+        y: clientY - dragOffset.current.y,
+      }))
+      setSnapPreview(getSnapDirection(clientX, clientY, viewport.current))
+      return
     }
-    setIsDragging(true)
+    setRect((current) => ({
+      ...current,
+      width: Math.max(MIN_WIDTH, clientX - current.x),
+      height: Math.max(MIN_HEIGHT, clientY - current.y),
+    }))
   }
 
-  const handleMouseDown = (event: MouseEvent) => {
-    if (isFullscreen) return
-    if (isHeaderDrag(event.target)) beginDrag(event.clientX, event.clientY)
+  const onFramePointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (mode === 'idle') return
+    if (mode === 'drag') {
+      const direction = getSnapDirection(
+        event.clientX,
+        event.clientY,
+        viewport.current,
+      )
+      if (direction) {
+        if (!preSnapRect) setPreSnapRect(rect)
+        setRect(getSnappedRect(direction, rect, viewport.current))
+      }
+      setSnapPreview(null)
+    }
+    setMode('idle')
   }
 
-  const handleTouchStart = (event: TouchEvent) => {
+  const startResize = (event: PointerEvent<HTMLDivElement>) => {
     if (isFullscreen) return
-    if (!isHeaderDrag(event.target)) return
-    const touch = event.touches[0]
-    beginDrag(touch.clientX, touch.clientY)
-    event.preventDefault()
-  }
-
-  const startResize = (event: { stopPropagation: () => void }) => {
-    if (isFullscreen) return
+    // Resizing must not also raise-and-drag the frame behind the handle.
     event.stopPropagation()
-    setIsResizing(true)
+    beginGesture(event, 'resize')
   }
 
   const toggleFullscreen = () => {
@@ -205,80 +245,6 @@ export function Window({
     }
     setIsFullscreen(!isFullscreen)
   }
-
-  useEffect(() => {
-    if (!isDragging && !isResizing) return
-
-    const move = (clientX: number, clientY: number) => {
-      const current = geometry.current
-      if (isDragging) {
-        setPosition({
-          x: clientX - current.dragOffset.x,
-          y: clientY - current.dragOffset.y,
-        })
-        setSnapPreview(getSnapDirection(clientX, clientY))
-      }
-      if (isResizing) {
-        setSize({
-          width: Math.max(MIN_WIDTH, clientX - current.position.x),
-          height: Math.max(MIN_HEIGHT, clientY - current.position.y),
-        })
-      }
-    }
-
-    const end = (clientX: number, clientY: number) => {
-      if (isDragging) {
-        const direction = getSnapDirection(clientX, clientY)
-        const snapped = direction && getSnappedGeometry(direction)
-        if (snapped) {
-          const current = geometry.current
-          if (!current.isSnapped) {
-            setPreSnapState({
-              position: current.position,
-              size: current.size,
-            })
-          }
-          setPosition(snapped.position)
-          setSize(snapped.size)
-          setIsSnapped(true)
-        }
-        setSnapPreview(null)
-      }
-      setIsDragging(false)
-      setIsResizing(false)
-    }
-
-    const onMouseMove = (event: globalThis.MouseEvent) =>
-      move(event.clientX, event.clientY)
-    const onMouseUp = (event: globalThis.MouseEvent) =>
-      end(event.clientX, event.clientY)
-
-    const onTouchMove = (event: globalThis.TouchEvent) => {
-      event.preventDefault()
-      const touch = event.touches[0]
-      if (touch) move(touch.clientX, touch.clientY)
-    }
-    const onTouchEnd = (event: globalThis.TouchEvent) => {
-      const touch = event.changedTouches[0]
-      if (touch) end(touch.clientX, touch.clientY)
-      else end(0, 0)
-    }
-
-    document.body.style.userSelect = 'none'
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUp)
-    document.addEventListener('touchmove', onTouchMove, { passive: false })
-    document.addEventListener('touchend', onTouchEnd)
-
-    return () => {
-      document.body.style.userSelect = ''
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
-      document.removeEventListener('touchmove', onTouchMove)
-      document.removeEventListener('touchend', onTouchEnd)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDragging, isResizing])
 
   const titleId = `window-title-${title.replace(/\s+/g, '-')}`
 
@@ -294,37 +260,45 @@ export function Window({
           height: `calc(100vh - ${MENUBAR_HEIGHT}px)`,
         }
       : {
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-          width: `${size.width}px`,
-          height: `${size.height}px`,
+          left: `${rect.x}px`,
+          top: `${rect.y}px`,
+          width: `${rect.width}px`,
+          height: `${rect.height}px`,
         }),
     ...(transitionName ? { viewTransitionName: transitionName } : null),
   }
 
+  // `touch-action: none` only on the two grab handles. On the frame it would
+  // also stop a finger scrolling the page the window is showing.
+  const headerStyle: CSSProperties = {
+    ...windowStyles.translucentBg,
+    touchAction: 'none',
+    userSelect: 'none',
+  }
+
   return (
     <>
-      <SnapPreview direction={snapPreview} position={position} size={size} />
+      <SnapPreview
+        direction={snapPreview}
+        rect={rect}
+        viewport={viewport.current}
+      />
       {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- the frame owns click-to-focus and drag-to-move for the whole window; moving the handlers to the header alone would stop a click in the body raising the window. */}
       <div
         className="fixed border border-[var(--border-color)] rounded-lg flex flex-col font-mono text-sm"
         style={frameStyle}
         data-slug={slug}
-        onMouseDown={(event) => {
-          handleMouseDown(event)
-          onFocus?.()
-        }}
-        onTouchStart={(event) => {
-          handleTouchStart(event)
-          onFocus?.()
-        }}
+        onPointerDown={onFramePointerDown}
+        onPointerMove={onFramePointerMove}
+        onPointerUp={onFramePointerUp}
+        onPointerCancel={onFramePointerUp}
         role="dialog"
         aria-labelledby={titleId}
         aria-modal="false"
       >
         <header
           className={getHeaderClassName(isFullscreen)}
-          style={windowStyles.translucentBg}
+          style={headerStyle}
         >
           <h3 id={titleId} className={windowStyles.title}>
             {title}
@@ -364,14 +338,11 @@ export function Window({
         {!isFullscreen && (
           <div
             className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
-            onMouseDown={startResize}
-            onTouchStart={(event) => {
-              event.preventDefault()
-              startResize(event)
-            }}
+            style={{ touchAction: 'none' }}
+            onPointerDown={startResize}
             aria-label="Resize window"
             role="slider"
-            aria-valuenow={Math.round(size.width)}
+            aria-valuenow={Math.round(rect.width)}
             tabIndex={0}
           >
             <svg
@@ -389,68 +360,34 @@ export function Window({
 
 function SnapPreview({
   direction,
-  position,
-  size,
+  rect,
+  viewport,
 }: {
   direction: SnapDirection
-  position: Point
-  size: Size
+  rect: Rect
+  viewport: Size
 }) {
   if (!direction) return null
 
-  const vw = window.innerWidth
-  const vh = window.innerHeight
-  const half = (vh - MENUBAR_HEIGHT) / 2
-
-  const previews: Record<
-    Exclude<SnapDirection, null>,
-    { style: CSSProperties; label: string }
-  > = {
-    left: {
-      style: { left: 0, top: MENUBAR_HEIGHT, width: vw / 2, height: vh - 40 },
-      label: 'Snap Left',
-    },
-    right: {
-      style: {
-        left: vw / 2,
-        top: MENUBAR_HEIGHT,
-        width: vw / 2,
-        height: vh - MENUBAR_HEIGHT,
-      },
-      label: 'Snap Right',
-    },
-    top: {
-      style: {
-        left: 0,
-        top: MENUBAR_HEIGHT,
-        width: vw,
-        height: vh - MENUBAR_HEIGHT,
-      },
-      label: 'Fullscreen',
-    },
-    bottom: {
-      style: {
-        left: position.x,
-        top: half + MENUBAR_HEIGHT,
-        width: size.width,
-        height: half,
-      },
-      label: 'Snap Bottom',
-    },
-  }
-
-  const preview = previews[direction]
+  const target = getSnappedRect(direction, rect, viewport)
+  const label =
+    direction === 'top'
+      ? 'Fullscreen'
+      : `Snap ${direction[0].toUpperCase()}${direction.slice(1)}`
 
   return (
     <div
       className="fixed border-2 border-[var(--border-color)] bg-[var(--lighter-gray)] pointer-events-none z-40 flex items-center justify-center"
-      style={preview.style}
+      style={{
+        left: target.x,
+        top: target.y,
+        width: target.width,
+        height: target.height,
+      }}
       role="status"
       aria-live="polite"
     >
-      <span className="text-[var(--gray)] text-xs font-mono">
-        {preview.label}
-      </span>
+      <span className="text-[var(--gray)] text-xs font-mono">{label}</span>
     </div>
   )
 }

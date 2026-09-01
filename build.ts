@@ -1,23 +1,24 @@
-import crypto from 'node:crypto'
-import { existsSync } from 'node:fs'
+import { constants as fsConstants, existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 import zlib from 'node:zlib'
 import * as esbuild from 'esbuild'
 import { transform as lightning } from 'lightningcss'
 import { createBuildContext } from './framework/content'
 import { buildCss } from './framework/css'
 import { buildClient } from './framework/client'
-import type { BuildContext } from './framework/types'
-import type { Fonts } from './framework/render'
+import { prepareFonts } from './framework/fonts'
+import { formatPlatformResult, runPlatformSteps } from './framework/platform'
+import { staticPathFor } from './framework/routing'
+import type { BuildContext, RouteInfo, RouteManifest } from './framework/types'
 import type { RenderedPage, WrapOptions } from './framework/entry-server'
 
 /**
  * The whole build.
  *
  * Runs under `bun run build.ts` locally. Under node it needs an ESM entry that
- * has already been through esbuild (see `build:bespoke:node` in package.json):
+ * has already been through esbuild (see `scripts/build.mjs`):
  * `--experimental-strip-types` erases types but does not transform JSX, and it
  * is not available at all before node 22.6.
  *
@@ -41,6 +42,18 @@ function findRoot(from: string): string {
 
 const ROOT = findRoot(path.dirname(fileURLToPath(import.meta.url)))
 const CACHE = path.join(ROOT, '.cache')
+
+/**
+ * The node/ESM esbuild settings, shared with `scripts/build.mjs`.
+ *
+ * Data rather than a helper module because the launcher is plain JS run
+ * straight by node: it cannot import a `.ts` factory without the very type
+ * stripping it exists to avoid. Both sides read this file and add their own
+ * entry point, plugins and log level.
+ */
+const NODE_BUNDLE = JSON.parse(
+  await fs.readFile(path.join(ROOT, 'framework', 'node-bundle.json'), 'utf8'),
+) as esbuild.BuildOptions
 
 /* ---------------------------------------------------------- timing ------ */
 
@@ -71,62 +84,136 @@ async function step<T>(name: string, fn: () => Promise<T> | T): Promise<T> {
  */
 const moduleCss = new Map<string, { css: string; classes: string[] }>()
 
-/**
- * Which conditional fragment a CSS module belongs to, or `base` for the ones
- * every page needs.
- *
- * react-tweet's theme is 4.7KB plus ten CSS modules, for one post. Shipping it
- * on all 78 pages was the largest per-page regression in Phase 1.
- */
-function featureOf(file: string): string {
-  if (file.includes(`${path.sep}react-tweet${path.sep}`)) return 'tweet'
-  if (file.endsWith('shot-grid.module.css')) return 'shot-grid'
-  if (file.endsWith('file-tree.module.css')) return 'file-tree'
-  if (file.endsWith('inventory.module.css')) return 'minecraft'
-  return 'base'
-}
-
-/** A slice of the stylesheet plus the strings that prove a page needs it. */
+/** A slice of the stylesheet plus what proves a page needs it. */
 interface Fragment {
+  name: string
   css: string
-  markers: string[]
+  /** `markers` as one alternation, compiled once instead of per page. */
+  test: RegExp
+  /** Sorted on before `name`, so a sheet a fragment builds on comes first. */
+  order: number
 }
 
 function moduleEntries(): [string, { css: string; classes: string[] }][] {
   return [...moduleCss.entries()].sort(([a], [b]) => a.localeCompare(b))
 }
 
-function baseModuleCss(): string {
-  return moduleEntries()
-    .filter(([file]) => featureOf(file) === 'base')
-    .map(([, mod]) => mod.css)
-    .join('\n')
+const escapeRe = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+function fragment(
+  name: string,
+  css: string,
+  markers: readonly string[],
+  order = 1,
+): Fragment {
+  return {
+    name,
+    css,
+    test: new RegExp(markers.map(escapeRe).join('|')),
+    order,
+  }
 }
 
 /**
- * Fragments keyed by feature. A page gets one when its markup contains any of
- * that feature's scoped class names, which needs no cooperation from the
- * components themselves.
+ * The first selector in a sheet that is not anchored to one of `classes`, or
+ * null when every rule is.
+ *
+ * A module can only be gated on its own scoped class names if dropping the
+ * module could only ever drop rules those names select. One bare `:root`,
+ * element or `html[data-theme]` selector and it has to ship on every page.
+ * Rules nested inside another style rule are already constrained by their
+ * ancestor, so only the outermost selector of each rule is checked.
  */
-function moduleFragments(): Map<string, Fragment> {
-  const out = new Map<string, Fragment>()
-  for (const [file, mod] of moduleEntries()) {
-    const feature = featureOf(file)
-    if (feature === 'base') continue
-    const existing = out.get(feature) ?? { css: '', markers: [] }
-    existing.css = existing.css ? `${existing.css}\n${mod.css}` : mod.css
-    existing.markers.push(...mod.classes)
-    out.set(feature, existing)
+function unanchoredSelector(css: string, classes: string[]): string | null {
+  if (classes.length === 0) return 'no exported class names'
+  const stack: ('at' | 'style')[] = []
+  let start = 0
+  for (let i = 0; i < css.length; i++) {
+    const char = css[i]
+    if (char === '{') {
+      const prelude = css.slice(start, i).trim()
+      const kind = prelude.startsWith('@') ? 'at' : 'style'
+      if (
+        kind === 'style' &&
+        !stack.includes('style') &&
+        !classes.some((name) => prelude.includes(name))
+      ) {
+        return prelude
+      }
+      stack.push(kind)
+      start = i + 1
+    } else if (char === '}') {
+      stack.pop()
+      start = i + 1
+    } else if (char === ';') {
+      start = i + 1
+    }
   }
-  return out
+  return null
+}
+
+/**
+ * Every CSS module is its own conditional fragment, keyed by the scoped class
+ * names lightningcss already returns, so a page carries a module's rules only
+ * when its markup mentions one of them.
+ *
+ * There is deliberately no list of which modules count as "features":
+ * react-tweet's theme plus ten CSS modules on all 78 pages for the sake of one
+ * post was the largest per-page regression in Phase 1, and a hand-maintained
+ * list is exactly how the next one gets in. What cannot be gated falls back to
+ * the base sheet, loudly.
+ */
+function splitModules(): { base: string; fragments: Fragment[] } {
+  const base: string[] = []
+  const fragments: Fragment[] = []
+  for (const [file, mod] of moduleEntries()) {
+    // pnpm's store path is most of a vendor module's name and none of its
+    // meaning, so the report says `react-tweet/dist/...` rather than the store.
+    const marker = 'node_modules/'
+    const name = file.includes(marker)
+      ? file.slice(file.lastIndexOf(marker) + marker.length)
+      : path.relative(ROOT, file)
+    const unanchored = unanchoredSelector(mod.css, mod.classes)
+    if (unanchored === null) {
+      fragments.push(fragment(name, mod.css, mod.classes))
+      continue
+    }
+    console.log(
+      `  ${name} ships on every page: ` +
+        `\`${unanchored}\` is not one of its own scoped classes`,
+    )
+    base.push(mod.css)
+  }
+  return { base: base.join('\n'), fragments }
+}
+
+/* ------------------------------------------------------ server bundle --- */
+
+/**
+ * Bundles `framework/entry-server.ts` for node. Everything the pages import --
+ * path aliases, CSS modules, JSX -- is resolved here, once, so bun and node
+ * behave the same.
+ */
+async function buildServer(): Promise<string> {
+  const outfile = path.join(CACHE, 'server', 'entry.mjs')
+  await esbuild.build({
+    ...NODE_BUNDLE,
+    entryPoints: [path.join(ROOT, 'framework', 'entry-server.ts')],
+    outfile,
+    absWorkingDir: ROOT,
+    tsconfig: path.join(ROOT, 'tsconfig.json'),
+    plugins: [cssModulePlugin()],
+    logLevel: 'silent',
+  })
+  return outfile
 }
 
 /**
  * `*.module.css` -> a JS object of scoped class names, with the scoped CSS
  * collected for the site sheet.
  *
- * Three of the seven modules open with `@reference "tailwindcss"`, which
- * lightningcss passes through as an unknown at-rule. None of the seven uses
+ * Three of the modules open with `@reference "tailwindcss"`, which
+ * lightningcss passes through as an unknown at-rule. None of them uses
  * `@apply`, so those lines are vestigial and get stripped here.
  */
 function cssModulePlugin(): esbuild.Plugin {
@@ -185,158 +272,34 @@ async function writeCssModuleTypes(
   await fs.writeFile(target, declaration)
 }
 
-/* ------------------------------------------------------ server bundle --- */
+/* ------------------------------------------------------- plain sheets --- */
 
 /**
- * Bundles `framework/entry-server.ts` for node. Everything the pages import --
- * path aliases, CSS modules, JSX -- is resolved here, once, so bun and node
- * behave the same.
- */
-async function buildServer(): Promise<string> {
-  const outfile = path.join(CACHE, 'server', 'entry.mjs')
-  await esbuild.build({
-    entryPoints: [path.join(ROOT, 'framework', 'entry-server.ts')],
-    outfile,
-    bundle: true,
-    platform: 'node',
-    format: 'esm',
-    target: 'node20',
-    packages: 'external',
-    jsx: 'automatic',
-    loader: { '.js': 'jsx' },
-    absWorkingDir: ROOT,
-    tsconfig: path.join(ROOT, 'tsconfig.json'),
-    plugins: [cssModulePlugin()],
-    logLevel: 'silent',
-  })
-  return outfile
-}
-
-/* -------------------------------------------------------------- fonts --- */
-
-/**
- * Used when `framework/fonts.ts` (platform agent) is not present: copy both
- * Geist variable faces verbatim under a content hash and declare them by hand.
- * `--font-geist-sans` / `--font-geist-mono` are what `global.css` consumes.
- */
-async function fallbackFonts(ctx: BuildContext): Promise<Fonts> {
-  const { createRequire } = await import('node:module')
-  const require_ = createRequire(path.join(ROOT, 'package.json'))
-  // `geist`'s exports map does not expose ./package.json, so resolve a real
-  // entry point and walk to the sibling fonts directory instead.
-  const fontsDir = path.join(
-    path.dirname(require_.resolve('geist/font/sans')),
-    'fonts',
-  )
-  const faces = [
-    {
-      file: path.join(fontsDir, 'geist-sans', 'Geist-Variable.woff2'),
-      family: 'Geist Variable',
-      variable: '--font-geist-sans',
-    },
-    {
-      file: path.join(fontsDir, 'geist-mono', 'GeistMono-Variable.woff2'),
-      family: 'Geist Mono Variable',
-      variable: '--font-geist-mono',
-    },
-  ]
-
-  const assetDir = path.join(ctx.staticDir, '_assets')
-  await fs.mkdir(assetDir, { recursive: true })
-  const blocks: string[] = []
-  const preload: string[] = []
-  const variables: string[] = []
-
-  for (const face of faces) {
-    const bytes = await fs.readFile(face.file)
-    const hash = crypto
-      .createHash('sha256')
-      .update(bytes)
-      .digest('hex')
-      .slice(0, 8)
-    const name = `${path.basename(face.file, '.woff2')}.${hash}.woff2`
-    await fs.writeFile(path.join(assetDir, name), bytes)
-    const url = `/_assets/${name}`
-    ctx.assets[path.basename(face.file)] = url
-    preload.push(url)
-    blocks.push(
-      `@font-face{font-family:'${face.family}';font-style:normal;` +
-        `font-weight:100 900;font-display:swap;src:url('${url}') format('woff2')}`,
-    )
-    variables.push(`${face.variable}:'${face.family}'`)
-  }
-
-  return { css: `${blocks.join('')}:root{${variables.join(';')}}`, preload }
-}
-
-/* ------------------------------------------------------ optional modules -- */
-
-/**
- * Imports a module the platform agent owns, if it exists yet.
+ * The fragments that are plain stylesheets rather than CSS modules, so they
+ * have no scoped class names to be keyed on.
  *
- * It is bundled through esbuild first for the same reason `entry-server.ts` is:
- * node cannot import TypeScript, and these files use the `@*` path aliases.
- * A missing or broken module logs and is skipped rather than failing the build.
+ * Their markers are declared here, and are attribute-shaped on purpose: the
+ * bare word `shiki` also appears in prose, and `react-tweet-theme` appears in
+ * the base sheet, so either would gate a page in on a false positive.
  */
-async function optional<T>(
-  relative: string,
-  required = false,
-): Promise<T | null> {
-  const source = path.join(ROOT, relative)
-  try {
-    await fs.access(source)
-  } catch {
-    if (required) throw new Error(`${relative} is missing`)
-    return null
-  }
-  const outfile = path.join(
-    CACHE,
-    'opt',
-    `${path.basename(relative).replace(/\.tsx?$/, '')}.mjs`,
-  )
-  try {
-    await esbuild.build({
-      entryPoints: [source],
-      outfile,
-      bundle: true,
-      platform: 'node',
-      format: 'esm',
-      target: 'node20',
-      packages: 'external',
-      jsx: 'automatic',
-      loader: { '.js': 'jsx' },
-      absWorkingDir: ROOT,
-      tsconfig: path.join(ROOT, 'tsconfig.json'),
-      plugins: [cssModulePlugin()],
-      logLevel: 'silent',
-    })
-    return (await import(`${pathToFileURL(outfile).href}?t=${Date.now()}`)) as T
-  } catch (error) {
-    if (required) throw error
-    console.warn(`  ${relative} failed to load: ${(error as Error).message}`)
-    return null
-  }
-}
+const PLAIN_SHEETS = [
+  {
+    name: 'mdx-diff',
+    file: 'app/styles/fragments/mdx-diff.css',
+    markers: ['class="mdx-diff'],
+    order: 1,
+  },
+  {
+    // react-tweet's own theme sheet, which its CSS modules build on, so it
+    // sorts ahead of them.
+    name: 'react-tweet-theme',
+    specifier: 'react-tweet/theme.css',
+    markers: ['class="react-tweet-theme'],
+    order: 0,
+  },
+] as const
 
-/** The body-bearing shape `framework/feeds.ts` hands to the renderer. */
-interface FeedPost {
-  body: string
-}
-
-interface PlatformModule {
-  runPlatformSteps: (
-    ctx: BuildContext,
-    options?: {
-      renderPostHtml?: (post: FeedPost) => string | Promise<string>
-    },
-  ) => Promise<PlatformResult>
-  formatPlatformResult?: (result: PlatformResult) => string
-}
-
-/** Opaque here; `framework/platform.ts` owns the shape. */
-type PlatformResult = Record<string, unknown>
-
-async function readFragment(relative: string): Promise<string> {
+async function readSheet(relative: string): Promise<string> {
   try {
     return await fs.readFile(path.join(ROOT, relative), 'utf8')
   } catch {
@@ -345,27 +308,22 @@ async function readFragment(relative: string): Promise<string> {
 }
 
 /**
- * react-tweet's theme sheet. Its per-component CSS modules already flow through
- * the server bundle's lightningcss plugin; this is the one plain stylesheet the
- * package ships, and `theme.css` is a public export rather than a deep import.
+ * `theme.css` is a public export of react-tweet rather than a deep import; its
+ * per-component CSS modules already flow through the server bundle's
+ * lightningcss plugin.
  */
-async function vendorCss(): Promise<string> {
+async function readPackageSheet(specifier: string): Promise<string> {
   const { createRequire } = await import('node:module')
   const require_ = createRequire(path.join(ROOT, 'package.json'))
   try {
-    return await fs.readFile(require_.resolve('react-tweet/theme.css'), 'utf8')
+    return await fs.readFile(require_.resolve(specifier), 'utf8')
   } catch (error) {
-    console.warn(`  react-tweet theme.css: ${(error as Error).message}`)
+    console.warn(`  ${specifier}: ${(error as Error).message}`)
     return ''
   }
 }
 
 /* --------------------------------------------------------------- output -- */
-
-function outputFile(staticDir: string, routePath: string): string {
-  const clean = routePath === '/' ? '' : routePath.replace(/^\//, '')
-  return path.join(staticDir, clean, 'index.html')
-}
 
 async function copyPublic(ctx: BuildContext): Promise<number> {
   const from = path.join(ctx.root, 'public')
@@ -382,7 +340,9 @@ async function copyPublic(ctx: BuildContext): Promise<number> {
         await fs.mkdir(target, { recursive: true })
         await walk(source, path.join(rel, entry.name))
       } else {
-        await fs.copyFile(source, target)
+        // COPYFILE_FICLONE makes this an APFS clone locally, which is what
+        // keeps 11MB of images cheap to re-copy, and a plain copy elsewhere.
+        await fs.copyFile(source, target, fsConstants.COPYFILE_FICLONE)
         count += 1
       }
     }
@@ -405,27 +365,44 @@ async function copyPublic(ctx: BuildContext): Promise<number> {
   return count
 }
 
-/* --------------------------------------------------------------- report -- */
+/** What `.vercel/output/routes.json` records for one rendered document. */
+function toRouteInfo(page: RenderedPage): RouteInfo {
+  return {
+    path: page.path,
+    kind: page.kind,
+    ...(page.title === undefined ? {} : { title: page.title }),
+    noindex: page.noindex,
+    ...(page.variants ? { variants: page.variants } : {}),
+    ...(page.variantOf ? { variantOf: page.variantOf } : {}),
+    ...(page.aliases ? { aliases: page.aliases } : {}),
+  }
+}
 
-const pad = (value: string, width: number) => value.padEnd(width)
-const padStart = (value: string, width: number) => value.padStart(width)
+/* --------------------------------------------------------------- report -- */
 
 function timingTable(total: number): string {
   const width = Math.max(...steps.map((s) => s.name.length), 5)
   const rows = steps.map(
-    (s) => `  ${pad(s.name, width)}  ${padStart(s.ms.toFixed(0), 7)} ms`,
+    (s) => `  ${s.name.padEnd(width)}  ${s.ms.toFixed(0).padStart(7)} ms`,
   )
-  rows.push(`  ${pad('total', width)}  ${padStart(total.toFixed(0), 7)} ms`)
+  rows.push(`  ${'total'.padEnd(width)}  ${total.toFixed(0).padStart(7)} ms`)
   return rows.join('\n')
 }
 
+/**
+ * Brotli at quality 5 rather than the default 11. These are console lines, not
+ * artifacts: quality 11 over three pages and eight assets cost 154 ms, more
+ * than a quarter of the build, for numbers within a few percent of these.
+ */
+const BROTLI = { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 5 } }
+
 function sizeRow(name: string, html: string, width: number): string {
   const raw = Buffer.from(html)
-  const gzip = zlib.gzipSync(raw, { level: 9 }).length
-  const brotli = zlib.brotliCompressSync(raw).length
+  const gzip = zlib.gzipSync(raw, { level: 6 }).length
+  const brotli = zlib.brotliCompressSync(raw, BROTLI).length
   return (
-    `  ${pad(name, width)}  ${padStart(String(raw.length), 8)}` +
-    `  ${padStart(String(gzip), 7)}  ${padStart(String(brotli), 7)}`
+    `  ${name.padEnd(width)}  ${String(raw.length).padStart(8)}` +
+    `  ${String(gzip).padStart(7)}  ${String(brotli).padStart(7)}`
   )
 }
 
@@ -457,56 +434,52 @@ async function main(): Promise<void> {
     wrapPage: (page: RenderedPage, options: WrapOptions) => string
     islandManifest: () => string[]
     highlightCss: () => string
-    renderFeedHtml: (ctx: BuildContext, post: FeedPost) => Promise<string>
+    renderFeedHtml: (
+      ctx: BuildContext,
+      post: { body: string },
+    ) => Promise<string>
   }
 
-  const pages = await step('render', () => server.renderAll(ctx))
-
-  const client = await step('client bundle', () =>
-    buildClient({
-      root: ROOT,
-      staticDir: ctx.staticDir,
-      cacheDir: CACHE,
-      islands: server.islandManifest(),
-    }),
+  // Everything the stylesheet needs is known once the server bundle has run
+  // its CSS-module plugin, and `buildCss` shells out to the Tailwind CLI, so
+  // it runs while the main thread renders. Their two step times overlap.
+  const modules = splitModules()
+  const cssPromise = step('css', () =>
+    buildCss({ root: ROOT, cacheDir: CACHE, moduleCss: modules.base }),
   )
+  const pages = await step('render', () => server.renderAll(ctx))
+  const css = await cssPromise
+  const routes = pages.map(toRouteInfo)
+
+  const [client, fonts] = await Promise.all([
+    // Needs `render`: the island manifest is what rendering collects.
+    step('client bundle', () =>
+      buildClient({
+        root: ROOT,
+        staticDir: ctx.staticDir,
+        cacheDir: CACHE,
+        islands: server.islandManifest(),
+      }),
+    ),
+    step('fonts', () => prepareFonts(ctx)),
+  ])
   Object.assign(ctx.assets, client.assets)
 
-  const fonts = await step('fonts', async () => {
-    const mod = await optional<{
-      prepareFonts: (ctx: BuildContext) => Promise<Fonts>
-    }>('framework/fonts.ts')
-    if (!mod) {
-      console.warn('  framework/fonts.ts absent; copying Geist unsubset')
-      return fallbackFonts(ctx)
-    }
-    return mod.prepareFonts(ctx)
-  })
-
-  const css = await step('css', () =>
-    buildCss({ root: ROOT, cacheDir: CACHE, moduleCss: baseModuleCss() }),
-  )
-
   const fragments = await step('css fragments', async () => {
-    const map = moduleFragments()
-
-    // react-tweet's theme rides along with its CSS modules.
-    const theme = await vendorCss()
-    if (theme) {
-      const tweet = map.get('tweet') ?? { css: '', markers: [] }
-      tweet.css = `${theme}\n${tweet.css}`
-      map.set('tweet', tweet)
+    const all = [...modules.fragments]
+    for (const sheet of PLAIN_SHEETS) {
+      const text =
+        'file' in sheet
+          ? await readSheet(sheet.file)
+          : await readPackageSheet(sheet.specifier)
+      if (text) {
+        all.push(fragment(sheet.name, text, sheet.markers, sheet.order))
+      }
     }
-
-    // Two fragments are plain sheets rather than CSS modules, so they carry
-    // hand-written markers instead of scoped class names.
-    const diff = await readFragment('app/styles/fragments/mdx-diff.css')
-    if (diff) map.set('diff', { css: diff, markers: ['mdx-diff'] })
-
+    // shiki's rules key on the class its transformer puts on every `<pre>`.
     const highlight = server.highlightCss()
-    if (highlight) map.set('highlight', { css: highlight, markers: ['shiki'] })
-
-    return map
+    if (highlight) all.push(fragment('shiki', highlight, ['class="shiki']))
+    return all.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name))
   })
 
   /**
@@ -518,23 +491,32 @@ async function main(): Promise<void> {
    * server-rendered markup. Narrowing this to rendered markup would silently
    * drop the lightbox trigger's rules.
    */
-  const cssFor = (body: string): string => {
-    const used = [...fragments.entries()]
-      .filter(([, fragment]) =>
-        fragment.markers.some((marker) => body.includes(marker)),
-      )
-      .sort(([a_], [b_]) => a_.localeCompare(b_))
-      .map(([, fragment]) => fragment.css)
-    return [css.css, ...used].join('\n')
+  const cssFor = (body: string): { css: string; used: string[] } => {
+    const used = fragments.filter((item) => item.test.test(body))
+    return {
+      css: [css.css, ...used.map((item) => item.css)].join('\n'),
+      used: used.map((item) => item.name),
+    }
   }
 
-  const html = new Map<string, string>()
+  const sample = ['/', '/blog/weights', '/notes/fish-directory-colors']
+  const sampled = new Map<string, string>()
+  // Counted from what `cssFor` actually selected, rather than by scanning the
+  // finished HTML for a fragment's first bytes: two mechanisms answering one
+  // question disagree the moment fragment assembly changes.
+  const fragmentPages = new Map<string, number>()
+
   await step('write html', async () => {
     for (const page of pages) {
+      const sheet = cssFor(page.body)
+      for (const name of sheet.used) {
+        fragmentPages.set(name, (fragmentPages.get(name) ?? 0) + 1)
+      }
       const markup = server.wrapPage(page, {
-        css: cssFor(page.body),
+        css: sheet.css,
         fonts,
         assets: ctx.assets,
+        siteUrl: ctx.site.url,
         // Only this page's islands, so a content page does not carry a map
         // entry for the desktop it will never mount.
         islands: Object.fromEntries(
@@ -543,35 +525,43 @@ async function main(): Promise<void> {
             .map((name) => [name, client.islands[name]]),
         ),
       })
-      html.set(page.path, markup)
-      const file = outputFile(ctx.staticDir, page.path)
-      await fs.mkdir(path.dirname(file), { recursive: true })
-      await fs.writeFile(file, markup)
-      // Vercel's static builder injects an error-phase route to `/404.html`
-      // ahead of ours, so the 404 page must also exist under that name.
-      if (page.path === '/404') {
-        await fs.writeFile(path.join(ctx.staticDir, '404.html'), markup)
+      if (sample.includes(page.path)) sampled.set(page.path, markup)
+      // Aliases are extra filenames for the same body, declared on the route
+      // rather than special-cased here: `/404` also has to exist as
+      // `404.html`, because Vercel's static builder injects an error-phase
+      // route to that name ahead of ours.
+      for (const target of [page.path, ...(page.aliases ?? [])]) {
+        const file = path.join(ctx.staticDir, staticPathFor(target))
+        await fs.mkdir(path.dirname(file), { recursive: true })
+        await fs.writeFile(file, markup)
       }
     }
+
+    // Beside `static/`, not inside it, so Vercel never serves it. The sitemap,
+    // the dev server and the snapshot harness read this rather than keeping
+    // their own transcription of the page registry.
+    const manifest: RouteManifest = { routes }
+    await fs.writeFile(
+      path.join(ctx.outDir, 'routes.json'),
+      `${JSON.stringify(manifest, null, 2)}\n`,
+    )
   })
 
-  const copied = await step('copy public', () => copyPublic(ctx))
-
-  // Required, not optional: skipping this step would produce a build with no
-  // OG images, no feed, no sitemap and no config.json, and still exit zero,
-  // so a broken deploy would look like a successful one.
-  const platform = await step('platform', async () => {
-    const mod = await optional<PlatformModule>('framework/platform.ts', true)
-    if (!mod?.runPlatformSteps) {
-      throw new Error('framework/platform.ts exports no runPlatformSteps')
-    }
-    // Without this the feed falls back to `marked`, which renders JSX
-    // components in post bodies as raw text.
-    const result = await mod.runPlatformSteps(ctx, {
-      renderPostHtml: (post) => server.renderFeedHtml(ctx, post),
-    })
-    return { result, format: mod.formatPlatformResult }
-  })
+  const [copied, platform] = await Promise.all([
+    step('copy public', () => copyPublic(ctx)),
+    // Required, not optional: skipping this step would produce a build with no
+    // OG images, no feed, no sitemap and no config.json, and still exit zero,
+    // so a broken deploy would look like a successful one.
+    step('platform', () =>
+      runPlatformSteps(ctx, {
+        fonts,
+        routes,
+        // Without this the feed falls back to `marked`, which renders JSX
+        // components in post bodies as raw text.
+        renderPostHtml: (post) => server.renderFeedHtml(ctx, post),
+      }),
+    ),
+  ])
 
   await step('publish output', async () => {
     // rm + rename, so the window where `.vercel/output` does not exist is a
@@ -582,52 +572,58 @@ async function main(): Promise<void> {
     ctx.staticDir = path.join(finalOut, 'static')
   })
 
-  const total = performance.now() - started
-
-  if (platform.format) {
-    console.log(`\n${platform.format(platform.result)}`)
-  }
-
-  console.log(`\n${pages.length} routes, ${copied} files copied from public/\n`)
-  console.log('steps')
-  console.log(timingTable(total))
-
-  const sample = ['/', '/blog/weights', '/notes/fish-directory-colors']
-  const present = sample.filter((route) => html.has(route))
-  if (present.length > 0) {
-    const width = Math.max(...present.map((r) => r.length), 4)
-    console.log('\nhtml bytes')
+  // Inside a step, so the timing table accounts for it. Compressing three
+  // pages and eight assets used to cost a quarter of the build and was
+  // measured after `total` was computed, so it appeared nowhere.
+  await step('report', async () => {
+    console.log(`\n${formatPlatformResult(platform)}`)
     console.log(
-      `  ${pad('page', width)}  ${padStart('raw', 8)}  ${padStart('gzip', 7)}  ${padStart('brotli', 7)}`,
+      `\n${pages.length} routes, ${copied} files copied from public/\n`,
     )
-    for (const route of present) {
-      console.log(sizeRow(route, html.get(route) as string, width))
-    }
-  }
 
-  console.log('\ncss bytes')
-  console.log(`  tailwind   ${padStart(String(css.tailwindBytes), 8)}`)
-  console.log(`  modules    ${padStart(String(css.moduleBytes), 8)}`)
-  for (const [name, fragment] of [...fragments].sort()) {
-    const pages_ = [...html.values()].filter((markup) =>
-      markup.includes(fragment.css.slice(0, 40)),
-    ).length
-    console.log(
-      `  ${pad(`+${name}`, 9)}  ${padStart(String(Buffer.byteLength(fragment.css)), 8)}  on ${pages_} pages`,
-    )
-  }
-
-  if (client.outputs.length > 0) {
-    console.log('\nclient bytes')
-    for (const output of client.outputs) {
-      const file = path.join(ctx.staticDir, '_assets', output.file)
-      const bytes = await fs.readFile(file)
+    const present = sample.filter((route) => sampled.has(route))
+    if (present.length > 0) {
+      const width = Math.max(...present.map((route) => route.length), 4)
+      console.log('html bytes')
       console.log(
-        `  ${pad(output.file, 28)}  ${padStart(String(bytes.length), 7)}` +
-          `  ${padStart(String(zlib.brotliCompressSync(bytes).length), 6)} br`,
+        `  ${'page'.padEnd(width)}  ${'raw'.padStart(8)}` +
+          `  ${'gzip'.padStart(7)}  ${'brotli'.padStart(7)}`,
       )
+      for (const route of present) {
+        console.log(sizeRow(route, sampled.get(route) as string, width))
+      }
     }
-  }
+
+    const nameWidth = Math.max(...fragments.map((item) => item.name.length), 8)
+    console.log('\ncss bytes')
+    console.log(
+      `  ${'tailwind'.padEnd(nameWidth)}  ${String(css.tailwindBytes).padStart(8)}`,
+    )
+    console.log(
+      `  ${'base'.padEnd(nameWidth)}  ${String(css.moduleBytes).padStart(8)}`,
+    )
+    for (const item of fragments) {
+      const bytes = String(Buffer.byteLength(item.css)).padStart(8)
+      const on = fragmentPages.get(item.name) ?? 0
+      console.log(`  ${item.name.padEnd(nameWidth)}  ${bytes}  on ${on} pages`)
+    }
+
+    if (client.outputs.length > 0) {
+      console.log('\nclient bytes')
+      for (const output of client.outputs) {
+        const file = path.join(ctx.staticDir, '_assets', output.file)
+        const bytes = await fs.readFile(file)
+        const brotli = zlib.brotliCompressSync(bytes, BROTLI).length
+        console.log(
+          `  ${output.file.padEnd(28)}  ${String(bytes.length).padStart(7)}` +
+            `  ${String(brotli).padStart(6)} br`,
+        )
+      }
+    }
+  })
+
+  console.log('\nsteps  (css overlaps render, platform overlaps copy public)')
+  console.log(timingTable(performance.now() - started))
 }
 
 await main().catch((error: unknown) => {

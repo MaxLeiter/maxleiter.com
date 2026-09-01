@@ -230,7 +230,7 @@ export interface OgResult {
 /** Write every OG PNG into `ctx.staticDir`, rendering only cache misses. */
 export async function writeOgImages(ctx: BuildContext): Promise<OgResult> {
   const started = performance.now()
-  const cacheDir = path.join(ctx.root, '.cache', 'og')
+  const cacheDir = path.join(ctx.cacheDir, 'og')
   await fsp.mkdir(cacheDir, { recursive: true })
 
   const fontPath = path.join(ctx.root, 'app', 'fonts', 'Inter-Medium.ttf')
@@ -287,5 +287,3 @@ export async function writeOgImages(ctx: BuildContext): Promise<OgResult> {
     ms: performance.now() - started,
   }
 }
-
-export default writeOgImages

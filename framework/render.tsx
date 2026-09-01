@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import type { ReactElement } from 'react'
-import type { AssetManifest, BuildContext, Head } from './types'
+import type { AssetManifest, PageHead } from './types'
 
 /**
  * The HTML shell. No metadata framework: a typed object and a function.
@@ -15,11 +15,12 @@ import type { AssetManifest, BuildContext, Head } from './types'
  * markup lands directly inside `<body>` with no wrapper element.
  */
 
-const SITE_URL = 'https://maxleiter.com'
 const SITE_NAME = "Max Leiter's website"
 const DEFAULT_TITLE = 'Max Leiter'
-const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image.png`
 const OG_ALT = "Max Leiter's site"
+
+/** The site card, relative to whichever site URL the build context carries. */
+const defaultOgImage = (siteUrl: string) => `${siteUrl}/opengraph-image.png`
 
 /**
  * Runs before first paint and corrects the server-rendered `dark` to whatever
@@ -46,29 +47,26 @@ export interface Fonts {
 }
 
 export interface ShellOptions {
-  head: Head
+  head: PageHead
   body: string
   css: string
   fonts: Fonts
   assets: AssetManifest
   /** Island name -> hashed module URL, for the runtime's lazy import. */
   islands: Record<string, string>
-  /** Appended verbatim before `</body>`. Used by the dev server. */
-  extraBodyHtml?: string
+  /** `ctx.site.url`; the one place the shell learns the origin. */
+  siteUrl: string
 }
 
-function headTags(head: Head): ReactElement[] {
-  const title = !head.title
-    ? DEFAULT_TITLE
-    : head.titleSuffix === false
-      ? head.title
-      : `${head.title} | ${DEFAULT_TITLE}`
+function headTags(head: PageHead, siteUrl: string): ReactElement[] {
+  const title = head.title ? `${head.title} | ${DEFAULT_TITLE}` : DEFAULT_TITLE
   // Empty means omit, not fall back. `posts/nintype.mdx` has a blank
   // `description:` and Next drops all three tags rather than substituting the
   // site default; the baseline records that.
   const description = head.description
-  const ogImage = head.ogImage ?? DEFAULT_OG_IMAGE
-  const isDefaultImage = ogImage === DEFAULT_OG_IMAGE
+  const defaultImage = defaultOgImage(siteUrl)
+  const ogImage = head.ogImage ?? defaultImage
+  const isDefaultImage = ogImage === defaultImage
   const robots = head.noindex ? 'noindex, nofollow' : 'index, follow'
 
   const tags: ReactElement[] = [
@@ -89,7 +87,7 @@ function headTags(head: Head): ReactElement[] {
     <link
       rel="alternate"
       type="application/rss+xml"
-      href={`${SITE_URL}/feed.xml`}
+      href={`${siteUrl}/feed.xml`}
       key="rss"
     />,
     <meta property="og:title" content={DEFAULT_TITLE} key="og:title" />,
@@ -102,7 +100,7 @@ function headTags(head: Head): ReactElement[] {
           />,
         ]
       : []),
-    <meta property="og:url" content={SITE_URL} key="og:url" />,
+    <meta property="og:url" content={siteUrl} key="og:url" />,
     <meta property="og:site_name" content={SITE_NAME} key="og:site_name" />,
     <meta property="og:locale" content="en_US" key="og:locale" />,
     <meta property="og:image" content={ogImage} key="og:image" />,
@@ -170,7 +168,7 @@ function headTags(head: Head): ReactElement[] {
     <meta name="twitter:image:height" content="630" key="twitter:image:h" />,
     <link
       rel="shortcut icon"
-      href={`${SITE_URL}/favicons/favicon.ico`}
+      href={`${siteUrl}/favicons/favicon.ico`}
       key="shortcut"
     />,
     <link
@@ -199,10 +197,10 @@ function preloadTags(hrefs: string[]): ReactElement[] {
 }
 
 export function renderShell(options: ShellOptions): string {
-  const { head, body, css, fonts, assets, islands, extraBodyHtml } = options
+  const { head, body, css, fonts, assets, islands, siteUrl } = options
 
   const headHtml = [
-    renderToStaticMarkup(<>{headTags(head)}</>),
+    renderToStaticMarkup(<>{headTags(head, siteUrl)}</>),
     renderToStaticMarkup(<>{preloadTags(fonts.preload)}</>),
     `<style>${fonts.css}\n${css}\n${VIEW_TRANSITION_CSS}</style>`,
     `<script>${THEME_SCRIPT}</script>`,
@@ -219,7 +217,6 @@ export function renderShell(options: ShellOptions): string {
   const runtime = assets['runtime.js']
   if (runtime) scripts.push(`<script type="module" src="${runtime}"></script>`)
   scripts.push('<script defer src="/_vercel/insights/script.js"></script>')
-  if (extraBodyHtml) scripts.push(extraBodyHtml)
 
   return (
     '<!doctype html>' +
@@ -233,9 +230,4 @@ export function renderShell(options: ShellOptions): string {
 /** Renders a page component to markup, without the shell. */
 export function renderBody(element: ReactElement): string {
   return renderToStaticMarkup(element)
-}
-
-/** Absolute URL for a route path. */
-export function absoluteUrl(ctx: BuildContext, routePath: string): string {
-  return routePath === '/' ? ctx.site.url : `${ctx.site.url}${routePath}`
 }

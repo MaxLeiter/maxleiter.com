@@ -29,7 +29,7 @@ export function collectTweetIds(sources: string[]): string[] {
   return [...ids].sort()
 }
 
-export function tweetCacheDir(root: string): string {
+function tweetCacheDir(root: string): string {
   return path.join(root, 'app', 'data', 'tweets')
 }
 

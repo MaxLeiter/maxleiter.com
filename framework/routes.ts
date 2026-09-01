@@ -28,12 +28,44 @@ import type { BlogPost } from '../app/lib/blog-post'
  * that exists.
  */
 
-const SITE = 'https://maxleiter.com'
 const NOTES_TITLE = 'Notes'
 const NOTES_DESCRIPTION = 'Short-form thoughts, code snippets, and tips.'
 
-function head(partial: Head): Head {
-  return partial
+/**
+ * What an article falls back to when its frontmatter has no description.
+ *
+ * A post with an empty description emits no description tags at all, which is
+ * what the baseline does and what `posts/nintype.mdx` relies on. A note
+ * inherits the section's, because `notes/[slug]` exported no metadata and all
+ * eight note pages shared this string.
+ */
+const SECTION_DESCRIPTION = { blog: '', notes: NOTES_DESCRIPTION } as const
+
+interface Article {
+  kind: 'blog' | 'notes'
+  title: string
+  description: string
+  dateISO: string
+  ogImage?: string
+}
+
+/**
+ * The head every article shares.
+ *
+ * Both sections get the `%s | Max Leiter` template, unlike the baseline:
+ * Next's template reached the layouts but not `generateMetadata` on
+ * `blog/[slug]`, so posts shipped a bare title, and `notes/[slug]` exported no
+ * metadata at all, so all eight notes shared the one section title.
+ * CONTRACT item 14.
+ */
+function articleHead(article: Article): Head {
+  return {
+    title: article.title,
+    description: article.description || SECTION_DESCRIPTION[article.kind],
+    ogImage: article.ogImage,
+    ogType: 'article',
+    publishedTime: article.dateISO,
+  }
 }
 
 function toBlogPost(entry: ListEntry): BlogPost {
@@ -55,13 +87,12 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
     ...ctx.notes.map((note) => note.body),
   ]
 
-  const cacheDir = `${ctx.root}/.cache`
   const [highlighter, tweets, dimensions] = await Promise.all([
     getHighlighter(collectLanguages(bodies)),
     loadTweets(ctx.root, collectTweetIds(bodies)),
     loadImageDimensions(ctx.root, collectImageUrls(bodies)),
   ])
-  const mdx = await createMdxCompiler(cacheDir, highlighter)
+  const mdx = await createMdxCompiler(ctx.cacheDir, highlighter)
   const components = createMdxComponents({
     root: ctx.root,
     tweets,
@@ -75,84 +106,79 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
   const pages: PageDef[] = [
     {
       path: '/',
-      head: head({
+      head: {
         description: 'A website by Max Leiter.',
-        canonical: SITE,
-      }),
+      },
       render: () =>
         createElement(HomePage, { posts: listPosts, projects: projectCards }),
     },
     {
       path: '/about',
-      head: head({
+      head: {
         title: 'About',
         description: 'About this website.',
-        canonical: `${SITE}/about`,
-      }),
+      },
       variants: { embed: true },
       render: ({ toolbar }) => createElement(AboutPage, { toolbar }),
     },
     {
       path: '/blog',
-      head: head({
+      head: {
         title: 'Blog',
         description: 'My blog posts',
-        canonical: `${SITE}/blog`,
-      }),
+      },
       variants: { embed: true },
       render: ({ toolbar }) =>
         createElement(BlogIndexPage, { posts: listPosts, toolbar }),
     },
     {
       path: '/notes',
-      head: head({
+      head: {
         title: NOTES_TITLE,
         description: NOTES_DESCRIPTION,
-        canonical: `${SITE}/notes`,
-      }),
+      },
       variants: { embed: true },
       render: ({ toolbar }) =>
         createElement(NotesIndexPage, { notes: ctx.notes, toolbar }),
     },
     {
       path: '/labs',
-      head: head({
+      head: {
         title: 'Labs',
         description: 'Experimental projects and playthings',
-        canonical: `${SITE}/labs`,
-      }),
+      },
       variants: { embed: true },
       render: ({ toolbar }) => createElement(LabsPage, { toolbar }),
     },
     {
       path: '/projects',
-      head: head({
+      head: {
         title: 'Projects',
         description: 'Most of my projects',
-        canonical: `${SITE}/projects`,
-      }),
+      },
       variants: { embed: true },
       render: ({ toolbar }) =>
         createElement(ProjectsPage, { projects: projectCards, toolbar }),
     },
     {
       path: '/talks',
-      head: head({
+      head: {
         title: 'Talks',
         description: 'Tech talks I enjoy from around the web',
-        canonical: `${SITE}/talks`,
-      }),
+      },
       variants: { embed: true },
       render: ({ toolbar }) => createElement(TalksPage, { toolbar }),
     },
     {
       path: '/404',
-      head: head({
+      head: {
         title: '404',
         description: 'Page not found.',
-        canonical: `${SITE}/404`,
         noindex: true,
-      }),
+      },
+      // Vercel's static builder injects an error-phase route to `/404.html`
+      // ahead of ours, so the body has to exist under that name too.
+      aliases: ['/404.html'],
       render: () => createElement(NotFoundPage),
     },
   ]
@@ -162,16 +188,12 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
     if (!slug) continue
     pages.push({
       path: `/blog/${slug}`,
-      head: head({
-        // The template applies here, unlike the baseline: Next's `%s | Max
-        // Leiter` reaches the layouts but not `generateMetadata` on
-        // `blog/[slug]`, so posts shipped a bare title. CONTRACT item 14.
+      head: articleHead({
+        kind: 'blog',
         title: post.title,
         description: post.description,
-        canonical: `${SITE}/blog/${slug}`,
+        dateISO: post.dateISO,
         ogImage: ogImageUrl(ctx, post),
-        ogType: 'article',
-        publishedTime: post.dateISO,
       }),
       variants: { embed: true },
       render: async ({ toolbar }) =>
@@ -190,16 +212,11 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
   for (const note of ctx.notes) {
     pages.push({
       path: `/notes/${note.slug}`,
-      head: head({
-        // The baseline titled every note page `Notes | Max Leiter` and gave
-        // them all the section description, because `notes/[slug]` exports no
-        // metadata at all. Each note now carries its own title, and its own
-        // description when the frontmatter has one.
+      head: articleHead({
+        kind: 'notes',
         title: note.title,
-        description: note.description || NOTES_DESCRIPTION,
-        canonical: `${SITE}/notes/${note.slug}`,
-        ogType: 'article',
-        publishedTime: note.dateISO,
+        description: note.description,
+        dateISO: note.dateISO,
       }),
       variants: { embed: true },
       render: async ({ toolbar }) =>

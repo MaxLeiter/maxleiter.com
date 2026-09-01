@@ -1,7 +1,8 @@
-import type { BuildContext, Head, Note, Post } from './types'
+import type { BuildContext, Note, PageHead, Post, RouteInfo } from './types'
 import { getPages } from './routes'
-import { resetIslandManifest, takeIslandManifest } from './islands'
+import { takeIslandManifest } from './islands'
 import { collectLanguages, getHighlighter, highlightCss } from './highlight'
+import { absoluteUrl } from './content'
 import { renderBody, renderShell, type Fonts } from './render'
 import { renderPostHtml } from './mdx'
 import { resetArticleImages } from '../app/mdx/static-components'
@@ -16,14 +17,13 @@ import { resetArticleImages } from '../app/mdx/static-components'
  *
  * Rendering happens in two passes. Bodies come first, because rendering them is
  * what registers island names and mints the shiki style classes; only then can
- * the stylesheet and the client bundles be built. `wrapPages` then puts each
+ * the stylesheet and the client bundles be built. `wrapPage` then puts each
  * body inside the shell.
  */
 
-export interface RenderedPage {
-  /** URL path, leading slash, no trailing slash. */
-  path: string
-  head: Head
+/** A rendered document: its manifest record, its head, and its markup. */
+export interface RenderedPage extends RouteInfo {
+  head: PageHead
   body: string
   /** Island names this page actually rendered, for its own bootstrap map. */
   islands: string[]
@@ -41,35 +41,60 @@ export function islandManifest(): string[] {
 }
 
 export async function renderAll(ctx: BuildContext): Promise<RenderedPage[]> {
-  resetIslandManifest()
+  takeIslandManifest()
   allIslands = new Set<string>()
   const pages = await getPages(ctx)
   const rendered: RenderedPage[] = []
 
-  const finish = (path: string, head: Head, body: string): RenderedPage => {
+  const finish = (
+    route: RouteInfo,
+    head: PageHead,
+    body: string,
+  ): RenderedPage => {
     const islands = takeIslandManifest()
     for (const name of islands) allIslands.add(name)
-    return { path, head, body, islands }
+    return { ...route, head, body, islands }
   }
 
   for (const page of pages) {
+    // The canonical URL is the route's own path, always. Deriving it here is
+    // what lets a `PageDef` stop restating its own path as a string.
+    const canonical = absoluteUrl(ctx, page.path)
+    const embed = Boolean(page.variants?.embed)
+
     // Per document, so the LCP image of every page (and of every embed
     // variant) is the first one in that page's own body.
     resetArticleImages()
     rendered.push(
       finish(
-        page.path,
-        page.head,
+        {
+          path: page.path,
+          kind: 'page',
+          title: page.head.title,
+          noindex: Boolean(page.head.noindex),
+          ...(embed ? { variants: ['embed' as const] } : {}),
+          ...(page.aliases ? { aliases: page.aliases } : {}),
+        },
+        { ...page.head, canonical },
         renderBody(await page.render({ toolbar: true })),
       ),
     )
 
-    if (page.variants?.embed) {
+    if (embed) {
       resetArticleImages()
       rendered.push(
         finish(
-          `${page.path}/embed`,
-          { ...page.head, canonical: page.head.canonical, noindex: true },
+          {
+            path: `${page.path}/embed`,
+            kind: 'embed',
+            title: page.head.title,
+            noindex: true,
+            variantOf: page.path,
+          },
+          // An embed keeps the canonical of the page it varies: it is the same
+          // document without the chrome, and only one of the two belongs in an
+          // index.
+          { ...page.head, canonical, noindex: true },
           renderBody(await page.render({ toolbar: false })),
         ),
       )
@@ -84,20 +109,18 @@ export interface WrapOptions {
   fonts: Fonts
   assets: Record<string, string>
   islands: Record<string, string>
-  extraBodyHtml?: string
+  siteUrl: string
 }
 
-export function wrapPage(page: RenderedPage, options: WrapOptions): string {
-  return renderShell({
-    head: page.head,
-    body: page.body,
-    css: options.css,
-    fonts: options.fonts,
-    assets: options.assets,
-    islands: options.islands,
-    extraBodyHtml: options.extraBodyHtml,
-  })
-}
+export const wrapPage = (page: RenderedPage, options: WrapOptions): string =>
+  renderShell({ head: page.head, body: page.body, ...options })
+
+/**
+ * `feeds.ts` renders one feed item at a time and `collectLanguages` scans every
+ * post and note body, while `getHighlighter` ignores its argument after the
+ * first call. Resolving it once turns 38 scans of the whole corpus into one.
+ */
+let feedHighlighter: ReturnType<typeof getHighlighter> | null = null
 
 /**
  * Renders one post or note body to HTML for the RSS feed, through the same MDX
@@ -109,12 +132,12 @@ export async function renderFeedHtml(
   ctx: BuildContext,
   post: Post | Note,
 ): Promise<string> {
-  const highlighter = await getHighlighter(
+  feedHighlighter ??= getHighlighter(
     collectLanguages([...ctx.posts, ...ctx.notes].map((item) => item.body)),
   )
   return renderPostHtml(post.body, {
-    cacheDir: `${ctx.root}/.cache`,
-    highlighter,
+    cacheDir: ctx.cacheDir,
+    highlighter: await feedHighlighter,
   })
 }
 

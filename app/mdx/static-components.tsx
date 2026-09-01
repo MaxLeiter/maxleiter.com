@@ -4,8 +4,8 @@ import Link from '@components/link'
 import Info from '@components/icons/info'
 import Home from '@components/icons/home'
 import { MDXNote } from './components/mdx-note'
-import { createIslandComponents } from './island-components'
-import { Img } from '../../framework/images'
+import { createIslandComponents, flattenText } from './island-components'
+import { Img, urlDims } from '../../framework/images'
 import type { TweetMap } from '../../framework/tweets'
 import type { DimensionMap } from '../../framework/image-dims'
 // Deep import on purpose; see the note on makeTweet below.
@@ -54,23 +54,6 @@ export function resetArticleImages(): void {
  */
 let imageDimensions: DimensionMap = {}
 
-/**
- * `<Img>` reads intrinsic dimensions off the `?w=`/`?h=` URL convention itself
- * (`parseDimsFromUrl`, 550x450 default), so callers need only supply an alt.
- */
-/** Only when the author gave both sides; a lone `?w=` is not enough. */
-function statedDims(src: string): { width: number; height: number } | null {
-  const params = new URL(src, 'https://maxleiter.com').searchParams
-  const w = params.get('w') ?? params.get('width')
-  const h = params.get('h') ?? params.get('height')
-  if (!w || !h) return null
-  const width = Number.parseInt(w, 10)
-  const height = Number.parseInt(h, 10)
-  if (!Number.isFinite(width) || !Number.isFinite(height)) return null
-  if (width <= 0 || height <= 0) return null
-  return { width, height }
-}
-
 function ArticleImage({
   src,
   alt,
@@ -88,7 +71,9 @@ function ArticleImage({
   // author wrote, then the measured size. A URL carrying only `?w=` is a
   // half-hint whose missing side would fall back to a guessed 450, so the
   // measurement wins there.
-  const stated = statedDims(src)
+  const url = urlDims(src)
+  const stated =
+    url.width !== undefined && url.height !== undefined ? url : undefined
   const measured = imageDimensions[src]
   return (
     <Img
@@ -107,19 +92,6 @@ function ArticleImage({
 const DIFF_ORIGINAL = `On or about 1788 in a small town of Streliska Galitsia a
 family by the name of Wolf sin Mordecai was living with his
 Wife and three sons ;- Berl, Lippe, and Mordecai.`
-
-function flattenText(node: ReactNode): string {
-  if (node === null || node === undefined || typeof node === 'boolean')
-    return ''
-  if (typeof node === 'string' || typeof node === 'number') return String(node)
-  if (Array.isArray(node)) return node.map(flattenText).join('')
-  if (React.isValidElement(node)) {
-    const element = node as React.ReactElement<{ children?: ReactNode }>
-    if (element.type === 'br') return '\n'
-    return flattenText(element.props.children)
-  }
-  return ''
-}
 
 /**
  * Diffs are computed at build and emitted as a static two-column table.

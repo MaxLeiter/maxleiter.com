@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { contentTypeFor, resolveRequest } from './routing'
 
 /**
  * The dev server: watch, rebuild, serve, reload.
@@ -36,26 +37,6 @@ declare const Bun: {
 const RELOAD_SCRIPT =
   '<script>new EventSource("/__reload").onmessage=()=>location.reload()</script>'
 
-const MIME: Record<string, string> = {
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.mjs': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.xml': 'application/xml; charset=utf-8',
-  '.txt': 'text/plain; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.webp': 'image/webp',
-  '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2',
-  '.mem': 'application/octet-stream',
-  '.rom': 'application/octet-stream',
-}
-
 const clients = new Set<ReadableStreamDefaultController<Uint8Array>>()
 const encoder = new TextEncoder()
 
@@ -71,6 +52,10 @@ function notifyClients(): void {
 
 let building: Promise<void> | null = null
 let queued = false
+
+/** Long enough to coalesce one save's events, short enough to feel instant. */
+const DEBOUNCE_MS = 30
+let pending: ReturnType<typeof setTimeout> | undefined
 
 function runBuild(): Promise<void> {
   return new Promise((resolve) => {
@@ -103,28 +88,22 @@ async function rebuild(): Promise<void> {
   notifyClients()
 }
 
-/** Directory-output resolution: `/blog/weights` -> `blog/weights/index.html`. */
-async function resolveFile(pathname: string): Promise<string | null> {
-  const clean = pathname.replace(/^\/+/, '').replace(/\/+$/, '')
-  const candidates = [
-    path.join(STATIC, clean, 'index.html'),
-    path.join(STATIC, clean),
-  ]
-  for (const candidate of candidates) {
-    if (!candidate.startsWith(STATIC)) continue
-    try {
-      const stat = await fsp.stat(candidate)
-      if (stat.isFile()) return candidate
-    } catch {
-      // Try the next candidate.
-    }
+/** The file `framework/routing.ts` resolves this URL to, if it exists. */
+async function resolveFile(relative: string): Promise<string | null> {
+  const candidate = path.join(STATIC, relative)
+  // `..` in a request path must not escape the output tree.
+  if (!candidate.startsWith(STATIC)) return null
+  try {
+    if ((await fsp.stat(candidate)).isFile()) return candidate
+  } catch {
+    // Not built, or not a file.
   }
   return null
 }
 
 async function respond(file: string): Promise<Response> {
   const ext = path.extname(file).toLowerCase()
-  const type = MIME[ext] ?? 'application/octet-stream'
+  const type = contentTypeFor(file)
   if (ext === '.html') {
     const html = await fsp.readFile(file, 'utf8')
     return new Response(html.replace('</body>', `${RELOAD_SCRIPT}</body>`), {
@@ -146,7 +125,10 @@ async function start(): Promise<void> {
     fs.watch(target, { recursive: true }, (_event, filename) => {
       // The build writes .d.ts files next to CSS modules; ignore its own output.
       if (filename && filename.endsWith('.d.ts')) return
-      void rebuild()
+      // One editor save emits both `rename` and `change` on macOS, and the
+      // in-flight guard queues the second one into a whole extra build.
+      clearTimeout(pending)
+      pending = setTimeout(() => void rebuild(), DEBOUNCE_MS)
     })
   }
 
@@ -175,10 +157,27 @@ async function start(): Promise<void> {
         )
       }
 
-      const file = await resolveFile(pathname)
-      if (file) return respond(file)
+      // The same rules config.json runs on: trailing slash, redirects, the
+      // `?embed` rewrite, then the filesystem. The dev server could not
+      // exercise any redirect at all while it had its own resolver.
+      const resolved = resolveRequest(pathname, new URL(request.url).search)
+      if (resolved.redirect !== undefined) {
+        return new Response(null, {
+          status: 308,
+          headers: { location: resolved.redirect },
+        })
+      }
 
-      const notFound = await resolveFile('/404')
+      const file =
+        resolved.file === undefined ? null : await resolveFile(resolved.file)
+      if (file) return respond(file)
+      // A missing hashed asset 404s outright rather than serving the 404 page,
+      // matching the guard route in config.json.
+      if (resolved.noFallback) {
+        return new Response('Not found', { status: 404 })
+      }
+
+      const notFound = await resolveFile('404/index.html')
       if (notFound) {
         const response = await respond(notFound)
         return new Response(response.body, {
