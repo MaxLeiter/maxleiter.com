@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { loadCommitted } from './committed'
 
 /**
  * Intrinsic dimensions for remote post images, committed to the repo.
@@ -108,7 +109,12 @@ function webp(b: Buffer): Dimensions | null {
   return null
 }
 
-function readHeader(buffer: Buffer): Dimensions | null {
+/**
+ * Intrinsic size from an image header, or null when the bytes are not one of
+ * the four formats. Exported for `tools/snapshot.ts`, which used to carry its
+ * own PNG IHDR reader.
+ */
+export function readHeader(buffer: Buffer): Dimensions | null {
   return png(buffer) ?? gif(buffer) ?? jpeg(buffer) ?? webp(buffer) ?? null
 }
 
@@ -118,12 +124,25 @@ function dimensionsFile(root: string): string {
   return path.join(root, 'app', 'data', 'image-dimensions.json')
 }
 
-async function measure(url: string): Promise<Dimensions | null> {
+async function measure(url: string): Promise<Dimensions> {
   // 64KB is past the header of every format here, including JPEGs that carry
   // a large EXIF thumbnail before the first start-of-frame.
-  const response = await fetch(url, { headers: { range: 'bytes=0-65535' } })
-  if (!response.ok && response.status !== 206) return null
-  return readHeader(Buffer.from(await response.arrayBuffer()))
+  let dims: Dimensions | null = null
+  try {
+    const response = await fetch(url, { headers: { range: 'bytes=0-65535' } })
+    if (response.ok || response.status === 206) {
+      dims = readHeader(Buffer.from(await response.arrayBuffer()))
+    }
+  } catch (error) {
+    throw new Error(
+      `could not measure ${url} (${(error as Error).message}); ` +
+        'falling back to the default',
+    )
+  }
+  if (!dims || dims.width <= 0 || dims.height <= 0) {
+    throw new Error(`could not measure ${url}; falling back to the default`)
+  }
+  return dims
 }
 
 export async function loadImageDimensions(
@@ -131,46 +150,36 @@ export async function loadImageDimensions(
   urls: string[],
 ): Promise<DimensionMap> {
   const file = dimensionsFile(root)
-  let cached: DimensionMap = {}
+  const committed: DimensionMap = {}
   try {
-    cached = JSON.parse(await fs.readFile(file, 'utf8')) as DimensionMap
+    Object.assign(
+      committed,
+      JSON.parse(await fs.readFile(file, 'utf8')) as DimensionMap,
+    )
   } catch {
     // First run.
   }
 
-  const missing = urls.filter((url) => !cached[url])
-  if (missing.length === 0) return cached
-
-  console.log(`  measuring ${missing.length} image(s) for intrinsic size`)
-  const measured = await Promise.all(
-    missing.map(async (url): Promise<[string, Dimensions | null]> => {
-      try {
-        return [url, await measure(url)]
-      } catch (error) {
-        console.warn(`  ${url}: ${(error as Error).message}`)
-        return [url, null]
+  await loadCommitted<Dimensions>({
+    label: 'image dimensions',
+    keys: urls,
+    // A wrong box is worse than a guessed one, but not worth failing a build
+    // over: `<Img>` falls back to 550x450 and the warning says which image.
+    onMiss: 'warn',
+    read: async (url) => committed[url] ?? null,
+    fetch: measure,
+    persist: async (added) => {
+      for (const [url, dims] of added) committed[url] = dims
+      // Sorted so the committed file does not churn between runs.
+      const sorted: DimensionMap = {}
+      for (const key of Object.keys(committed).sort()) {
+        sorted[key] = committed[key]
       }
-    }),
-  )
+      await fs.mkdir(path.dirname(file), { recursive: true })
+      await fs.writeFile(file, `${JSON.stringify(sorted, null, 2)}\n`)
+    },
+  })
 
-  let added = 0
-  for (const [url, dims] of measured) {
-    if (!dims || dims.width <= 0 || dims.height <= 0) {
-      console.warn(`  could not measure ${url}; falling back to the default`)
-      continue
-    }
-    cached[url] = dims
-    added += 1
-  }
-
-  if (added > 0) {
-    // Sorted so the committed file does not churn between runs.
-    const sorted: DimensionMap = {}
-    for (const key of Object.keys(cached).sort()) sorted[key] = cached[key]
-    await fs.mkdir(path.dirname(file), { recursive: true })
-    await fs.writeFile(file, `${JSON.stringify(sorted, null, 2)}\n`)
-    return sorted
-  }
-
-  return cached
+  // Every measurement, not just this build's URLs: the map outlives one run.
+  return committed
 }

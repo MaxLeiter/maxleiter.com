@@ -45,10 +45,16 @@ framework/
   css.ts                         tailwind cli + lightningcss css modules -> one sheet
   client.ts                      esbuild island/runtime bundles -> /_assets
   routes.ts                      page registry: every route -> PageDef
+  routing.ts                     URL -> file: redirects, ?embed rewrite, MIME. One table,
+                                 read by vercel.ts, dev.ts and tools/snapshot.ts
+  node-bundle.json               the node/ESM esbuild options build.ts and
+                                 scripts/build.mjs both bundle with
+  transitions.ts                 transitionName(kind, slug) and its URL inverse
   platform.ts                    runPlatformSteps(ctx) (platform agent owns; see below)
   og.ts feeds.ts vercel.ts images.tsx fonts.ts   (platform agent owns)
   dev.ts                         watch + static server + live reload
-  client/runtime.ts              the ~1KB vanilla runtime (islands, theme, cmd-k, clock)
+  client/runtime.ts              the ~1KB vanilla runtime (islands, theme, cmd-k,
+                                 delegated analytics, view-transition names)
 app/islands/<name>.tsx           client island components (default export)
 app/pages/*.tsx                  page components (plain React, no Next imports)
 tools/snapshot.ts tools/diff-html.ts   (harness agent owns)
@@ -101,16 +107,42 @@ export interface PageDef {
 - Directory output, never extensionless files: `/blog/weights` ->
   `static/blog/weights/index.html`. Root -> `static/index.html`. 404 ->
   `static/404/index.html` (referenced by routes as `dest: '/404'`).
+  `staticPathFor()` in `framework/routing.ts` is the single implementation of
+  that mapping; the write loop, the dev server and the harness all call it.
+- A page needing its markup under a second filename declares `aliases` on its
+  `PageDef`, and the write loop stays generic. `/404` declares `/404.html`,
+  because Vercel's static builder injects an error-phase route to that name
+  ahead of ours. Aliases land in the route manifest, so the harness sees them.
+- Route manifest: the build writes `.vercel/output/routes.json` (beside
+  `static/`, so it is never served) listing every emitted document as
+  `{path, kind, title?, noindex, variants?, variantOf?, aliases?}` in registry
+  order, with no timestamp. It is the single record of what the build produced:
+  the sitemap's top-level pages are derived from it, and the harness reads it
+  rather than keeping its own transcription of the page registry.
 - Embed variant: `static/blog/<slug>/embed/index.html` and
   `static/notes/<slug>/embed/index.html`. Homepage iframes point at
   `/blog/<slug>/embed`. A `has: query embed` rewrite keeps old `?embed=true` links working.
+  An embed's canonical URL is the page it varies, and it is always `noindex`.
+- Redirects, the `?embed` rewrite and the `_assets` no-store guard are declared
+  once in `framework/routing.ts`. `vercel.ts` turns them into config.json
+  routes, `dev.ts` and `tools/snapshot.ts --dir` interpret them, so the three
+  cannot drift. The `?embed` rewrite applies to `/blog/` and `/notes/` only.
 - Hashed assets under `static/_assets/<name>.<8-char-hash>.<ext>`, immutable.
 - Unhashed root files: `search-index.json`, `feed.xml`, `sitemap.xml`,
   `robots.txt`, `opengraph-image.png`, `blog/<slug>/opengraph-image.png`.
 - `public/**` copied verbatim into `static/` (KnightOS emulator, favicons, mc images,
   Search Console verification file). `public/feed.xml` is NOT copied; feeds.ts writes it.
-- CSS: one site sheet, inlined into `<head>` of every page (matches today's
-  `inlineCss`). Page-scoped CSS is a later optimization, not Phase 1.
+- CSS: one base sheet inlined into `<head>` of every page, plus the conditional
+  fragments that page needs. **Every `*.module.css` is its own fragment, keyed
+  by the scoped class names lightningcss returns for it.** There is no list of
+  which modules count as features: adding a module gates it automatically.
+  `build.ts` checks that every rule in a module is anchored to one of that
+  module's own class names; a module with a bare `:root` or element selector
+  cannot be gated safely, so it goes into the base sheet and the build says so.
+  The three fragments that are plain sheets rather than modules (`mdx-diff.css`,
+  react-tweet's `theme.css`, shiki's generated rules) declare their markers in
+  one table in `build.ts`. Those markers are attribute-shaped
+  (`class="shiki`, not `shiki`) because a bare word matches prose.
 - Theme: server renders `<html data-theme="dark" style="color-scheme:dark">`; a
   ~230B blocking inline script in `<head>` corrects from `localStorage.theme`
   or `prefers-color-scheme` before first paint. `[data-theme='light']` is the
@@ -146,9 +178,20 @@ export interface PageDef {
    `react`/`react-dom`/`react-dom/client` -> `preact/compat`(+`/client`),
    `jsxImportSource: 'preact'`, entry per island in the manifest +
    `framework/client/runtime.ts`. Output `/_assets/`, fills `ctx.assets`.
-7. `platform.ts` -> `runPlatformSteps(ctx)` (OG, feeds, sitemap, robots,
-   search-index, fonts, config.json). Core calls it last.
-8. Copy `public/`. Write `.vercel/output/config.json` (platform).
+7. `platform.ts` -> `runPlatformSteps(ctx, { fonts, routes, renderPostHtml })`
+   (OG, feeds, sitemap, robots, search-index, config.json), imported statically
+   like every other framework module. Its three steps write disjoint files and
+   run under one `Promise.all`. **Fonts are prepared once, by `build.ts`,**
+   because the page shell needs their CSS before any page is written; the
+   result is passed in so the platform log line can report it. Preparing them
+   in both places re-read, re-hashed and rewrote both woff2 files every build.
+8. Copy `public/`. Write `.vercel/output/config.json` (platform) and
+   `.vercel/output/routes.json` (the route manifest, from `renderAll`'s result).
+
+Steps that do not depend on each other overlap: the Tailwind CLI child process
+runs while pages render, and the platform steps run while `public/` is copied.
+The timing table says so, because per-step numbers then no longer sum to the
+total.
 
 package.json scripts, post-cutover: `dev` (`bun run framework/dev.ts`), `build`
 (`node scripts/build.mjs`, what Vercel runs), `build:bun` (`bun run build.ts`),
@@ -183,19 +226,42 @@ package.json scripts, post-cutover: `dev` (`bun run framework/dev.ts`), `build`
   island mints at runtime (the shot grid's `trigger`) appears in props and never
   in server markup, so narrowing detection to rendered markup would silently drop
   its rules.
-- An island with an EMPTY fallback still mounts on `visible`: a zero-area element
-  never intersects, so `schedule()` observes `el.parentElement` when the rect has
-  zero width or height. Prefer a real fallback anyway, since that is what makes
-  the no-JS experience work.
+- `on="visible"` uses ONE shared `IntersectionObserver` at `rootMargin: 200px`
+  for every such island on the page, and it always observes the island element
+  itself. A zero-area island is fine: the spec sets `isIntersecting` when
+  target and root overlap or are merely edge-adjacent, "even if the
+  intersection has zero area", which was verified in Chrome against the built
+  output. There used to be a fallback that observed `el.parentElement` when the
+  rect had zero width or height; its only real effect was turning `visible`
+  into `load` for the shot grid, whose island is a fragment sibling of the grid
+  and whose parent therefore spans the whole article. It is gone.
+  A real fallback is still preferred, because that is what makes the page work
+  with JavaScript off. An EMPTY fallback is correct only where the island adds
+  a control surface rather than reproducing markup — the shot grid renders just
+  a `<dialog>`, and it is a SIBLING of the server-rendered grid on purpose: an
+  island wrapping that grid would have to reproduce the image optimizer's
+  `<img>` markup exactly or preact would destroy it on hydration.
+  The runtime also registers the `interaction` listeners on `visible` islands,
+  so an island the observer never reports still mounts when someone touches it.
+  That path is only reachable for an island whose fallback has area.
 - The runtime also handles, without any island: `[data-theme-toggle]` clicks,
   Cmd/Ctrl+K -> unhide `[data-island="palette"]` and mount it, `[data-track]`
-  delegated analytics calls, `#menubar-clock` ticking, and the `pageswap`
-  view-transition naming. For `[data-track]`, `data-track` is the event NAME and
-  every other data attribute becomes a payload key, camelCased by the dataset
-  API: write `data-section`, not `data-track-section`.
-- The `pageswap` handler clears only the element it named itself. `data-slug` is
-  not exclusive to post cards (the desktop's window frame carries it), and a
-  blanket clear wipes names another listener owns.
+  delegated analytics calls, and outgoing view-transition names. For
+  `[data-track]`, `data-track` is the event NAME and every other data attribute
+  becomes a payload key, camelCased by the dataset API: write `data-section`,
+  not `data-track-section`. `data-vt-name` is the one attribute excluded from
+  that payload, because it is the transition opt-in below.
+- The menubar clock is NOT the runtime's. `#menubar-clock` exists only on the
+  homepage, where the desktop island hydrates over it and owns it; a second
+  interval writing `textContent` behind preact's back is one owner too many.
+- View-transition names have a single owner: the runtime's `pageswap` handler.
+  Elements opt in declaratively with `data-vt-name`, it names at most one of
+  them, it stands down when something already holds that name as a live inline
+  style (which is how an open post window wins over the card behind it), and it
+  clears only the element it named itself. Two elements holding one name cancels
+  the transition outright, so this cannot be two listeners racing on
+  registration order. The name itself comes from `transitionName(kind, slug)` in
+  `framework/transitions.ts` — never spelled out at a call site.
 
 ## Platform module contracts (platform agent)
 
@@ -206,17 +272,26 @@ All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:
   black, Inter Medium from `app/fonts/Inter-Medium.ttf`, via `@vercel/og` in Node
   (ESM shim per report 03 §3.5). Cache by (slug, title, date) hash in `.cache/og/`.
   Never fetch the network. Export `ogImageUrl(ctx, post?)` for `Head.ogImage`.
-- `feeds.ts` `writeFeeds(ctx)`: `feed.xml` (RSS 2.0, published posts + notes +
-  external posts, full HTML bodies rendered by the SAME MDX pipeline: import
-  `renderPostHtml` from `framework/mdx.ts`, fallback to `marked` only if core has
-  not exposed it yet), `sitemap.xml` (all 8 top-level pages + posts + notes, with
-  lastmod from dateISO), `robots.txt`, `search-index.json`
+- `feeds.ts` `writeFeeds(ctx, { routes, renderPostHtml? })`: `feed.xml` (RSS 2.0,
+  published posts + notes + external posts, full HTML bodies rendered by the SAME
+  MDX pipeline, which core injects as `renderPostHtml`; without it the feed falls
+  back to `marked`), `sitemap.xml`, `robots.txt`, `search-index.json`
   (`{type,title,href,external}[]` identical to today's `/api/search-index`).
+  The sitemap's top-level pages are **derived from `routes`**, the manifest the
+  build emitted: every single-segment `page` route that is not `noindex`. It is
+  never a list written out by hand — that is exactly how the previous sitemap
+  came to omit `/blog`, `/notes`, `/labs` and `/talks`. Posts and notes are
+  placed by `entryHref`, the same helper the feed and the list pages use.
 - `vercel.ts` `writeVercelConfig(ctx)`: `config.json` exactly per
   `04-architecture-design.md` §2.9 (routing-utils redirects + immutable `_assets`
   header, embed query rewrites, `handle: filesystem`, `_assets` 404 no-store guard,
   `handle: error` -> `/404`, `images` block with REGEX remotePatterns for the
-  blob host, `formats` avif/webp, `sizes` [640,828,1200,1920], `qualities` [75]).
+  blob host, `formats` avif/webp). The redirects, the embed rewrite, the asset
+  prefix and its cache-control string come from `framework/routing.ts`, and
+  `sizes`/`qualities` are `IMAGE_WIDTHS`/`IMAGE_QUALITY` imported from
+  `framework/images.tsx`. Nothing here restates a number another module owns: a
+  width in a `srcset` that is missing from `images.sizes` 400s in production
+  only, which is not a failure a comment can prevent.
   Also write root `vercel.json` `{ "$schema": ..., "framework": null,
   "buildCommand": "node scripts/build.mjs", "installCommand":
   "npx --yes pnpm@9.15.9 install --frozen-lockfile" }`. The Vercel project
@@ -234,6 +309,9 @@ All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:
   common punctuation + arrows using `subset-font`, written to `app/fonts/*.woff2`
   (committed) if missing, then copied to `/_assets/` with hash, returns the
   `@font-face` CSS string + preload hrefs. Report before/after bytes.
+  **`build.ts` is its only caller**, and passes the result to
+  `runPlatformSteps`. It writes files and mutates `ctx.assets`, so a second
+  caller is a second owner of the same build artifact.
 
 ## Gates
 
@@ -242,6 +320,16 @@ All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:
 - Phase 2/3: per-page JS budget: content pages <= runtime only; homepage <= 35KB brotli.
 - Phase 4: `vercel build` (CLI) succeeds from the repo root and `vercel deploy --prebuilt`
   preview passes the checklist in `04-architecture-design.md` §7 Phase 4.
+- Route reconciliation has three outcomes, not two. A route the build's route
+  manifest declares but the baseline lacks is **informational**, reported as
+  `added routes: N` and listed: publishing a post adds routes the committed
+  baseline cannot contain, and a gate that fails on new content is a gate
+  nobody can keep green. A route the baseline has and the build no longer
+  emits is **fatal**. An `index.html` in the output that the manifest never
+  declared is **fatal**, because it means something is writing pages the page
+  registry does not know about. `allowNewRoutes` is therefore only for that
+  last case; today its one entry is the KnightOS emulator copied out of
+  `public/`.
 
 ## Decisions log
 
@@ -284,3 +372,47 @@ All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:
 - 2026-08-31 Cutover: `app/lib/types.d.ts` and `app/lib/portfolio-data.ts` are
   gone; the surviving components take their `Note` from `framework/types` and
   their `Project` from `@lib/blog-post`.
+
+### Simplify pass, 2026-08-31
+
+- Canonical URLs are DERIVED, not declared. `Head` has no `canonical` field;
+  `entry-server.ts` sets it from the route's own path, and an embed variant
+  carries the canonical of the page it varies. `Head.titleSuffix` is deleted:
+  no route ever set it, and the branch it guarded reproduced a Next defect the
+  Decisions log above explicitly decided not to reproduce.
+- `entryHref(entry, base?)` and `POPULAR_SLUGS` live in `app/lib/blog-post.ts`
+  and `app/lib/popular-posts.ts`, NOT in `framework/content.ts`. The desktop
+  island imports both, and `content.ts` imports `node:fs` and gray-matter,
+  which the browser bundle cannot resolve. Anything shared between the build
+  and an island has to be a leaf module.
+- The node/ESM esbuild options are DATA (`framework/node-bundle.json`), read by
+  `build.ts` and `scripts/build.mjs`. The launcher is plain JS run straight by
+  node, so it cannot import a `.ts` factory without the type stripping it
+  exists to avoid; the two copies had already drifted to different `target`s.
+- The build-time size report is inside a timed step and compresses at brotli
+  quality 5. It used to run after `total` was computed, so a quarter of the
+  build's cost appeared in no table at all.
+- `framework/platform.test.ts` asserted `installCommand === undefined` while
+  `vercel.ts` writes a pinned one; the assertion was simply failing. It now
+  asserts the pinned value. Its route list is an INPUT fixture, not a second
+  transcription of the registry: agreement between registry and sitemap is
+  structural now, since the build feeds one manifest to both.
+
+### Intended improvements over the production site, 2026-08-31 (QA)
+
+Verified deviations where the new build is better, not merely different:
+
+- `feed.xml` excludes `published: false` content. Production leaked 8 items.
+- `sitemap.xml` covers all 7 top-level pages. Production had 3.
+- `rel=canonical` is emitted on `/` and on note pages. Production had none.
+- `<link rel=alternate type=application/rss+xml>` is on post pages. Production
+  had it on the homepage only.
+- `og:type` is `article` on posts and notes. Production said `website` on every
+  page, articles included.
+- The post toolbar's controls are real `<a href>` links. Production rendered
+  `<button>`, so they were not navigable without JavaScript.
+- The command palette's navigation items are server-rendered.
+- `/404` returns a real 404 status.
+- `<Diff>` has no published consumer: its only caller is
+  `posts/transcribing-typewriter.mdx`, which is `published: false`. It is
+  therefore untested in the output, and its CSS fragment ships on 0 pages.

@@ -21,6 +21,13 @@ export interface ClientResult {
   islands: Record<string, string>
   /** Per-output byte counts, for the build report. */
   outputs: { file: string; bytes: number }[]
+  /**
+   * The runtime's source with chunk imports made absolute, for inlining into
+   * every page as a module. An external module script in `<head>` makes
+   * Chrome skip inbound cross-document view transitions; an inline one does
+   * not (see `ShellOptions.runtime`).
+   */
+  runtime: string
 }
 
 /**
@@ -155,5 +162,14 @@ export async function buildClient(options: {
     }
   }
 
-  return { assets, islands: islandUrls, outputs }
+  // Inline modules resolve relative specifiers against the page URL, so the
+  // shared-chunk imports esbuild wrote as `./chunk.X.js` become absolute.
+  const runtimeFile = assets['runtime.js']
+  const runtime = runtimeFile
+    ? (
+        await fs.readFile(path.join(outdir, path.basename(runtimeFile)), 'utf8')
+      ).replace(/(["'])\.\/(chunk\.[A-Z0-9]+\.js)\1/g, '$1/_assets/$2$1')
+    : ''
+
+  return { assets, islands: islandUrls, outputs, runtime }
 }

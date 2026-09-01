@@ -56,6 +56,13 @@ export interface ShellOptions {
   islands: Record<string, string>
   /** `ctx.site.url`; the one place the shell learns the origin. */
   siteUrl: string
+  /**
+   * The built runtime's source, inlined as a module. Chrome skips the inbound
+   * cross-document view transition when the destination has an external
+   * `<script type="module" src>` in its head, but runs it for an inline
+   * module (bisected 2026-08-31, Chrome 151). It is ~1KB brotli.
+   */
+  runtime?: string
 }
 
 function headTags(head: PageHead, siteUrl: string): ReactElement[] {
@@ -214,8 +221,14 @@ export function renderShell(options: ShellOptions): string {
       )}</script>`,
     )
   }
-  const runtime = assets['runtime.js']
-  if (runtime) scripts.push(`<script type="module" src="${runtime}"></script>`)
+  if (options.runtime) {
+    const inline = options.runtime.replace(/<\/script/gi, '<\\/script')
+    scripts.push(`<script type="module">${inline}</script>`)
+  } else if (assets['runtime.js']) {
+    scripts.push(
+      `<script type="module" src="${assets['runtime.js']}"></script>`,
+    )
+  }
   scripts.push('<script defer src="/_vercel/insights/script.js"></script>')
 
   return (

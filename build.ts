@@ -115,6 +115,14 @@ function fragment(
 }
 
 /**
+ * At-rules whose braces hold declarations or keyframe stops rather than
+ * selectors. `0%` inside `@keyframes` is not a selector, and reading it as one
+ * would condemn the whole module to the base sheet.
+ */
+const OPAQUE_AT_RULE =
+  /^@(-\w+-)?(keyframes|font-face|property|counter-style|page|font-feature-values)\b/
+
+/**
  * The first selector in a sheet that is not anchored to one of `classes`, or
  * null when every rule is.
  *
@@ -126,16 +134,21 @@ function fragment(
  */
 function unanchoredSelector(css: string, classes: string[]): string | null {
   if (classes.length === 0) return 'no exported class names'
-  const stack: ('at' | 'style')[] = []
+  const stack: ('group' | 'opaque' | 'style')[] = []
   let start = 0
   for (let i = 0; i < css.length; i++) {
     const char = css[i]
     if (char === '{') {
       const prelude = css.slice(start, i).trim()
-      const kind = prelude.startsWith('@') ? 'at' : 'style'
+      const kind = !prelude.startsWith('@')
+        ? 'style'
+        : OPAQUE_AT_RULE.test(prelude)
+          ? 'opaque'
+          : 'group'
       if (
         kind === 'style' &&
         !stack.includes('style') &&
+        !stack.includes('opaque') &&
         !classes.some((name) => prelude.includes(name))
       ) {
         return prelude
@@ -517,6 +530,7 @@ async function main(): Promise<void> {
         fonts,
         assets: ctx.assets,
         siteUrl: ctx.site.url,
+        runtime: client.runtime,
         // Only this page's islands, so a content page does not carry a map
         // entry for the desktop it will never mount.
         islands: Object.fromEntries(

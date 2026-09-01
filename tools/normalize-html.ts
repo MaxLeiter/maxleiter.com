@@ -52,15 +52,6 @@ export interface ViewTransitionRecord {
   sample?: string
 }
 
-export interface NormalizeOptions {
-  /**
-   * Rewrite CSS-module hashed class tokens (`XKrDjq_variable`) to
-   * `<cssmod>_variable`. On by default: the hash changes on every build and
-   * will change again under the bespoke pipeline.
-   */
-  normalizeCssModuleClasses?: boolean
-}
-
 /**
  * The code blocks on a page, in document order.
  *
@@ -87,13 +78,6 @@ export interface NormalizeResult {
   /** Concatenated contents of every <style>, in document order. */
   css: string
   viewTransitions: ViewTransitionRecord[]
-  dropped: {
-    flightScripts: number
-    nextScripts: number
-    nextPreloads: number
-    styles: number
-    comments: number
-  }
 }
 
 /**
@@ -250,8 +234,12 @@ export function maskUrl(value: string): string {
   return out
 }
 
-function maskClassList(value: string, enabled: boolean): string {
-  if (!enabled) return value
+/**
+ * Rewrite CSS-module hashed class tokens (`XKrDjq_variable`) to
+ * `<cssmod>_variable`. Always: the hash changes on every build, so leaving it
+ * in would make every snapshot differ from the last for no reason.
+ */
+function maskClassList(value: string): string {
   return value
     .split(/\s+/)
     .filter(Boolean)
@@ -284,48 +272,32 @@ function selectorFor(path: { tag: string; index: number }[]): string {
 interface WalkState {
   css: string[]
   vts: ViewTransitionRecord[]
-  dropped: NormalizeResult['dropped']
-  opts: Required<NormalizeOptions>
 }
 
 /** True when this <script> is Next.js plumbing rather than app code. */
-function isFrameworkScript(el: P5Element, state: WalkState): boolean {
+function isFrameworkScript(el: P5Element): boolean {
   const src = attrOf(el, 'src')
-  if (src && src.includes('/_next/')) {
-    state.dropped.nextScripts++
-    return true
-  }
+  if (src && src.includes('/_next/')) return true
   const body = textOf(el)
-  if (body.includes('self.__next_f') || body.includes('__next_')) {
-    state.dropped.flightScripts++
-    return true
-  }
-  return false
+  return body.includes('self.__next_f') || body.includes('__next_')
 }
 
 /** True when this <link> is a Next.js asset preload. */
-function isFrameworkPreload(el: P5Element, state: WalkState): boolean {
+function isFrameworkPreload(el: P5Element): boolean {
   const rel = (attrOf(el, 'rel') ?? '').toLowerCase()
   if (rel !== 'preload' && rel !== 'modulepreload' && rel !== 'prefetch')
     return false
-  const href = attrOf(el, 'href') ?? ''
-  if (!href.includes('/_next/')) return false
-  state.dropped.nextPreloads++
-  return true
+  return (attrOf(el, 'href') ?? '').includes('/_next/')
 }
 
-function normalizeAttrs(
-  el: P5Element,
-  state: WalkState,
-): { name: string; value: string }[] {
+function normalizeAttrs(el: P5Element): { name: string; value: string }[] {
   const out: { name: string; value: string }[] = []
   for (const attr of el.attrs) {
     const name = attr.name.toLowerCase()
     if (shouldDropAttr(name)) continue
     let value = attr.value
     if (URL_ATTRS.has(name)) value = maskUrl(value)
-    if (name === 'class')
-      value = maskClassList(value, state.opts.normalizeCssModuleClasses)
+    if (name === 'class') value = maskClassList(value)
     if (name === 'style') value = value.replace(/\s+/g, ' ').trim()
     else value = value.replace(/[\t\n\r]+/g, ' ')
     out.push({ name, value })
@@ -363,10 +335,7 @@ function printNode(
 ): void {
   const pad = '  '.repeat(depth)
 
-  if (node.nodeName === '#comment') {
-    state.dropped.comments++
-    return
-  }
+  if (node.nodeName === '#comment') return
 
   if (node.nodeName === '#documentType') {
     lines.push('<!doctype html>')
@@ -387,15 +356,14 @@ function printNode(
 
   const tag = node.tagName.toLowerCase()
 
-  if (tag === 'script' && isFrameworkScript(node, state)) return
-  if (tag === 'link' && isFrameworkPreload(node, state)) return
+  if (tag === 'script' && isFrameworkScript(node)) return
+  if (tag === 'link' && isFrameworkPreload(node)) return
 
   recordViewTransition(node, path, state)
 
   if (tag === 'style') {
     state.css.push(textOf(node))
-    state.dropped.styles++
-    const attrs = normalizeAttrs(node, state)
+    const attrs = normalizeAttrs(node)
     const rendered = attrs
       .map((a) => ` ${a.name}="${escapeAttr(a.value)}"`)
       .join('')
@@ -405,7 +373,7 @@ function printNode(
     return
   }
 
-  const attrs = normalizeAttrs(node, state)
+  const attrs = normalizeAttrs(node)
   const rendered = attrs
     .map((a) => ` ${a.name}="${escapeAttr(a.value)}"`)
     .join('')
@@ -461,7 +429,7 @@ function headKey(tag: string, attrs: Record<string, string>): string {
   return tag
 }
 
-function extractHead(doc: P5Node, state: WalkState): HeadRecord {
+function extractHead(doc: P5Node): HeadRecord {
   const record: HeadRecord = {
     title: null,
     tags: [],
@@ -485,21 +453,11 @@ function extractHead(doc: P5Node, state: WalkState): HeadRecord {
   for (const child of children(head)) {
     if (!isElement(child)) continue
     const tag = child.tagName.toLowerCase()
-    if (
-      tag === 'script' &&
-      isFrameworkScript(child, { ...state, dropped: { ...state.dropped } })
-    ) {
-      continue
-    }
-    if (
-      tag === 'link' &&
-      isFrameworkPreload(child, { ...state, dropped: { ...state.dropped } })
-    ) {
-      continue
-    }
+    if (tag === 'script' && isFrameworkScript(child)) continue
+    if (tag === 'link' && isFrameworkPreload(child)) continue
 
     const attrs: Record<string, string> = {}
-    for (const a of normalizeAttrs(child, state)) attrs[a.name] = a.value
+    for (const a of normalizeAttrs(child)) attrs[a.name] = a.value
 
     if (tag === 'title') {
       const text = textOf(child).replace(/\s+/g, ' ').trim()
@@ -641,29 +599,11 @@ function findBody(node: P5Node): P5Node | null {
   return null
 }
 
-export function normalizeHtml(
-  raw: string,
-  options: NormalizeOptions = {},
-): NormalizeResult {
-  const opts: Required<NormalizeOptions> = {
-    normalizeCssModuleClasses: options.normalizeCssModuleClasses ?? true,
-  }
-
+export function normalizeHtml(raw: string): NormalizeResult {
   const doc = parse(raw)
-  const state: WalkState = {
-    css: [],
-    vts: [],
-    dropped: {
-      flightScripts: 0,
-      nextScripts: 0,
-      nextPreloads: 0,
-      styles: 0,
-      comments: 0,
-    },
-    opts,
-  }
+  const state: WalkState = { css: [], vts: [] }
 
-  const head = extractHead(doc, state)
+  const head = extractHead(doc)
 
   // `path` always includes the node itself, so selectors start at <html>.
   const lines: string[] = []
@@ -693,6 +633,5 @@ export function normalizeHtml(
     code: extractCode(body),
     css: state.css.join('\n/* --- */\n'),
     viewTransitions: state.vts,
-    dropped: state.dropped,
   }
 }

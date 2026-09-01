@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { Tweet } from 'react-tweet/api'
+import { loadCommitted } from './committed'
 
 /**
  * Tweet data, fetched once and committed to the repo.
@@ -41,37 +42,47 @@ export async function loadTweets(
   const dir = tweetCacheDir(root)
   await fs.mkdir(dir, { recursive: true })
 
-  const entries = await Promise.all(
-    ids.map(async (id): Promise<[string, Tweet]> => {
-      const file = path.join(dir, `${id}.json`)
-      try {
-        return [id, JSON.parse(await fs.readFile(file, 'utf8')) as Tweet]
-      } catch {
-        // Not committed yet; fetch once and write it.
-      }
+  const fileFor = (id: string) => path.join(dir, `${id}.json`)
 
+  const tweets = await loadCommitted<Tweet>({
+    label: 'tweets',
+    keys: ids,
+    // A degraded card would ship unnoticed, so a miss is fatal.
+    onMiss: 'fail',
+    read: async (id) => {
+      try {
+        return JSON.parse(await fs.readFile(fileFor(id), 'utf8')) as Tweet
+      } catch {
+        return null
+      }
+    },
+    fetch: async (id) => {
+      const where = path.relative(root, fileFor(id))
       let fetched: Tweet | undefined
       try {
         const { getTweet } = await import('react-tweet/api')
         fetched = await getTweet(id)
       } catch (error) {
         throw new Error(
-          `tweet ${id} is not cached at ${path.relative(root, file)} and ` +
-            `could not be fetched: ${(error as Error).message}`,
+          `tweet ${id} is not cached at ${where} and could not be fetched: ` +
+            `${(error as Error).message}`,
         )
       }
       if (!fetched) {
         throw new Error(
-          `tweet ${id} is not cached at ${path.relative(root, file)} and the ` +
-            'API returned nothing (deleted, private, or rate limited)',
+          `tweet ${id} is not cached at ${where} and the API returned ` +
+            'nothing (deleted, private, or rate limited)',
         )
       }
+      return fetched
+    },
+    persist: async (added) => {
+      for (const [id, tweet] of added) {
+        await fs.writeFile(fileFor(id), `${JSON.stringify(tweet, null, 2)}\n`)
+        console.log(`  wrote ${path.relative(root, fileFor(id))}`)
+      }
+    },
+  })
 
-      await fs.writeFile(file, `${JSON.stringify(fetched, null, 2)}\n`)
-      console.log(`  fetched tweet ${id} -> ${path.relative(root, file)}`)
-      return [id, fetched]
-    }),
-  )
-
-  return Object.fromEntries(entries)
+  return Object.fromEntries(tweets)
 }

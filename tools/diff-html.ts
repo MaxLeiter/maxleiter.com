@@ -28,15 +28,9 @@
 import { readFile, readdir, stat } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { diffLines } from 'diff'
+import type { HeadRecord } from './normalize-html.ts'
 
-export type DiffKind =
-  | 'head'
-  | 'prose'
-  | 'code'
-  | 'text'
-  | 'html'
-  | 'file'
-  | 'route'
+export type DiffKind = 'head' | 'prose' | 'code' | 'text' | 'html' | 'file'
 
 interface CodeRecordLike {
   blocks: string[]
@@ -158,17 +152,15 @@ function firstLine(block: string): string {
   return `${head.slice(0, 90)}${rest > 0 ? ` (+${rest} more lines)` : ''}`
 }
 
-interface Matcher {
-  test: (value: string) => boolean
-}
+type Matcher = (value: string) => boolean
 
 function matcher(spec: string | undefined): Matcher {
-  if (spec === undefined) return { test: () => true }
+  if (spec === undefined) return () => true
   if (spec.startsWith('re:')) {
     const re = new RegExp(spec.slice(3))
-    return { test: (v) => re.test(v) }
+    return (value) => re.test(value)
   }
-  return { test: (v) => v.includes(spec) }
+  return (value) => value.includes(spec)
 }
 
 interface CompiledRule {
@@ -214,8 +206,8 @@ function filterIgnored(
   return changes.filter((c) => {
     for (const r of rules) {
       if (r.rule.kind !== undefined && r.rule.kind !== kind) continue
-      if (!r.routes.test(route)) continue
-      if (!r.pattern.test(c.line)) continue
+      if (!r.routes(route)) continue
+      if (!r.pattern(c.line)) continue
       r.used++
       return false
     }
@@ -223,20 +215,8 @@ function filterIgnored(
   })
 }
 
-interface HeadTagLike {
-  tag: string
-  attrs: Record<string, string>
-  text?: string
-  key: string
-}
-
-interface HeadRecordLike {
-  title: string | null
-  tags: HeadTagLike[]
-}
-
 /** One canonical line per head tag, so diffLines pairs them sensibly. */
-function headLines(head: HeadRecordLike): string[] {
+function headLines(head: HeadRecord): string[] {
   return head.tags.map((t) => {
     const attrs = Object.keys(t.attrs)
       .sort()
@@ -275,6 +255,8 @@ interface RoutesManifest {
     height?: number
     identicalTo?: string
     error?: string
+    /** Discovered from the build's route manifest rather than a fixed list. */
+    intended?: boolean
   }[]
   uncovered?: string[]
 }
@@ -300,7 +282,7 @@ async function listFiles(dir: string): Promise<string[]> {
   return out.sort()
 }
 
-export async function diffSnapshots(
+async function diffSnapshots(
   baselineDir: string,
   currentDir: string,
   ignore: IgnoreFile,
@@ -308,9 +290,11 @@ export async function diffSnapshots(
   reports: RouteReport[]
   unusedRules: IgnoreRule[]
   routeIssues: string[]
+  addedRoutes: string[]
 }> {
   const rules = compile(ignore)
   const routeIssues: string[] = []
+  const addedRoutes: string[] = []
 
   const baseManifestRaw = await readIfExists(join(baselineDir, 'routes.json'))
   if (baseManifestRaw === null) {
@@ -336,25 +320,33 @@ export async function diffSnapshots(
   const allowMissing = (ignore.allowMissingRoutes ?? []).map(matcher)
   const allowNew = (ignore.allowNewRoutes ?? []).map(matcher)
 
-  if (currManifest) {
-    const basePaths = new Set(baseManifest.routes.map((r) => r.path))
-    const currPaths = new Set(currManifest.routes.map((r) => r.path))
-    for (const p of basePaths) {
-      if (currPaths.has(p)) continue
-      if (allowMissing.some((m) => m.test(p))) continue
-      routeIssues.push(`route missing from new build: ${p}`)
+  const basePaths = new Set(baseManifest.routes.map((r) => r.path))
+  const currPaths = new Set(currManifest.routes.map((r) => r.path))
+  for (const p of basePaths) {
+    if (currPaths.has(p)) continue
+    if (allowMissing.some((m) => m(p))) continue
+    routeIssues.push(`route missing from new build: ${p}`)
+  }
+  // A route the build's own manifest declares is a route the build MEANT to
+  // emit, so publishing a post is reported, not failed. A route that appears
+  // without the manifest saying so is still a defect: it means something is
+  // writing pages the registry does not know about.
+  for (const route of currManifest.routes) {
+    if (basePaths.has(route.path)) continue
+    if (route.intended) {
+      addedRoutes.push(route.path)
+      continue
     }
-    for (const p of currPaths) {
-      if (basePaths.has(p)) continue
-      if (allowNew.some((m) => m.test(p))) continue
-      routeIssues.push(`route added by new build: ${p}`)
-    }
-    // Pages the build emitted that route discovery never reached. Without
-    // this the harness would report a clean run while ignoring them entirely.
-    for (const p of currManifest.uncovered ?? []) {
-      if (allowNew.some((m) => m.test(p))) continue
-      routeIssues.push(`built page not covered by any snapshotted route: ${p}`)
-    }
+    if (allowNew.some((m) => m(route.path))) continue
+    routeIssues.push(`route added by new build: ${route.path}`)
+  }
+  addedRoutes.sort()
+  // Pages the build emitted that route discovery never reached, and alias
+  // files it declared but did not write. Without this the harness would
+  // report a clean run while ignoring them entirely.
+  for (const p of currManifest.uncovered ?? []) {
+    if (allowNew.some((m) => m(p))) continue
+    routeIssues.push(`built page not covered by any snapshotted route: ${p}`)
   }
 
   const reports: RouteReport[] = []
@@ -369,16 +361,16 @@ export async function diffSnapshots(
         : (baseManifest.routes.find((r) => r.path === route.identicalTo)?.dir ??
           route.dir)
     const baseRouteDir = join(baselineDir, baseDirName)
-    const currRoute = currManifest?.routes.find((r) => r.path === route.path)
+    const currRoute = currManifest.routes.find((r) => r.path === route.path)
     const currDirName =
       currRoute?.identicalTo === undefined
         ? route.dir
-        : (currManifest?.routes.find((r) => r.path === currRoute.identicalTo)
+        : (currManifest.routes.find((r) => r.path === currRoute.identicalTo)
             ?.dir ?? route.dir)
     const currRouteDir = join(currentDir, currDirName)
 
     if (route.kind === 'binary') {
-      const curr = currManifest?.routes.find((r) => r.path === route.path)
+      const curr = currManifest.routes.find((r) => r.path === route.path)
       const a = `bytes=${route.bytes} ${route.width}x${route.height}\n`
       const b = curr
         ? `bytes=${curr.bytes} ${curr.width}x${curr.height}\n`
@@ -404,7 +396,7 @@ export async function diffSnapshots(
 
     if (route.kind === 'file') {
       if (!(await isDir(currRouteDir))) {
-        if (!allowMissing.some((m) => m.test(route.path))) {
+        if (!allowMissing.some((m) => m(route.path))) {
           routeIssues.push(`file route missing from new build: ${route.path}`)
         }
         continue
@@ -429,13 +421,13 @@ export async function diffSnapshots(
     const currHead = await readIfExists(join(currRouteDir, 'head.json'))
     if (baseHead !== null) {
       if (currHead === null) {
-        if (!allowMissing.some((m) => m.test(route.path))) {
+        if (!allowMissing.some((m) => m(route.path))) {
           routeIssues.push(`page missing from new build: ${route.path}`)
         }
         continue
       }
-      const a = `${headLines(JSON.parse(baseHead) as HeadRecordLike).join('\n')}\n`
-      const b = `${headLines(JSON.parse(currHead) as HeadRecordLike).join('\n')}\n`
+      const a = `${headLines(JSON.parse(baseHead) as HeadRecord).join('\n')}\n`
+      const b = `${headLines(JSON.parse(currHead) as HeadRecord).join('\n')}\n`
       const changes = filterIgnored(
         changedLines(a, b),
         route.path,
@@ -498,7 +490,7 @@ export async function diffSnapshots(
   }
 
   const unusedRules = rules.filter((r) => r.used === 0).map((r) => r.rule)
-  return { reports, unusedRules, routeIssues }
+  return { reports, unusedRules, routeIssues, addedRoutes }
 }
 
 function printReports(reports: RouteReport[], info: Set<DiffKind>): void {
@@ -555,17 +547,21 @@ async function main(): Promise<void> {
       `current:  ${currentDir}\n          ${await describe(currentDir)}\n`,
   )
 
-  const { reports, unusedRules, routeIssues } = await diffSnapshots(
-    baselineDir,
-    currentDir,
-    ignore,
-  )
+  const { reports, unusedRules, routeIssues, addedRoutes } =
+    await diffSnapshots(baselineDir, currentDir, ignore)
 
   const info = new Set<DiffKind>(ignore.informationalKinds ?? [])
 
   printReports(reports, info)
 
   for (const issue of routeIssues) process.stdout.write(`\nROUTE: ${issue}\n`)
+
+  // Publishing a post adds routes the baseline cannot have. That is news, not
+  // a failure: re-snapshot the baseline when the addition is intended.
+  if (addedRoutes.length > 0) {
+    process.stdout.write(`\nadded routes: ${addedRoutes.length}\n`)
+    for (const p of addedRoutes) process.stdout.write(`  + ${p}\n`)
+  }
 
   if (unusedRules.length > 0) {
     process.stdout.write('\nunused ignore rules (stale, consider deleting):\n')
@@ -598,6 +594,7 @@ async function main(): Promise<void> {
     `\n${reports.length} routes with diffs. ` +
       `blocking: ${blocking} lines across ${blockingRoutes.size} routes. ` +
       `informational: ${informational} lines. ` +
+      `added routes: ${addedRoutes.length}. ` +
       `route issues: ${routeIssues.length}.\n`,
   )
   if (blocking > 0 || routeIssues.length > 0) process.exitCode = 1

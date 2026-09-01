@@ -178,16 +178,16 @@
   "allowMissingRoutes": [],
 
   "$allowNewRoutesComment": [
-    "Matched against 'route added by new build' and against built pages that",
-    "route discovery never reached. Anything not listed here fails, so a page",
-    "appearing out of nowhere cannot go unnoticed.",
-    "Checked before allowlisting: the six list-page embeds strip the toolbar,",
-    "carry the right titles, and are noindex,nofollow. /knightos/ is the",
-    "KnightOS emulator, copied verbatim out of public/ with its own index.html,",
-    "so it is an asset rather than a route the site generates."
+    "A route the build's own .vercel/output/routes.json declares is reported",
+    "as an added route and never fails the run: publishing a post or a note",
+    "adds routes the committed baseline cannot possibly contain, and that is",
+    "news rather than a defect. Re-snapshot the baseline when you mean to",
+    "adopt them. This list is therefore only for pages that appear WITHOUT",
+    "the manifest declaring them, which is the case that stays fatal.",
+    "/knightos/ is the KnightOS emulator, copied verbatim out of public/ with",
+    "its own index.html. It is an asset rather than a route the site",
+    "generates, so route discovery will never reach it and it would otherwise",
+    "be reported as a built page no route covers."
   ],
-  "allowNewRoutes": [
-    "re:^/(about|blog|labs|notes|projects|talks)/embed$",
-    "re:^/knightos/"
-  ]
+  "allowNewRoutes": ["re:^/knightos/"]
 }

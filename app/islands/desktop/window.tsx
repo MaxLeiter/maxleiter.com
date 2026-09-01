@@ -120,7 +120,7 @@ function getSnappedRect(
 /** True when the pointer went down on the title bar rather than a button. */
 function isHeaderDrag(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null
-  return Boolean(el?.closest('.window-header') && !el.closest('button'))
+  return Boolean(el?.closest('.window-header') && !el.closest('button, a'))
 }
 
 export function Window({
@@ -163,7 +163,13 @@ export function Window({
   const viewport = useRef<Size>({ width: 0, height: 0 })
 
   const beginGesture = (event: PointerEvent<HTMLElement>, next: Mode) => {
-    event.currentTarget.setPointerCapture(event.pointerId)
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // Capture can be refused (an unknown or already-captured pointer). The
+      // gesture still works while the pointer stays over the frame, so this
+      // must not abort the drag.
+    }
     viewport.current = {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -231,6 +237,17 @@ export function Window({
     setMode('idle')
   }
 
+  /**
+   * A cancelled pointer is not a release: `pointercancel` carries no meaningful
+   * coordinates (the browser reports 0, 0), and feeding those to
+   * `getSnapDirection` reads as "released against the left edge" and snaps a
+   * window the reader never dragged there.
+   */
+  const onFramePointerCancel = () => {
+    setSnapPreview(null)
+    setMode('idle')
+  }
+
   const startResize = (event: PointerEvent<HTMLDivElement>) => {
     if (isFullscreen) return
     // Resizing must not also raise-and-drag the frame behind the handle.
@@ -238,13 +255,32 @@ export function Window({
     beginGesture(event, 'resize')
   }
 
-  const toggleFullscreen = () => {
-    if (maximizeHref) {
-      location.assign(isFullscreen ? '/' : maximizeHref)
-      return
-    }
-    setIsFullscreen(!isFullscreen)
-  }
+  const toggleFullscreen = () => setIsFullscreen(!isFullscreen)
+
+  /**
+   * Maximize is a navigation, so it renders as a real link rather than a
+   * button calling `location.assign`: Chrome runs the cross-document view
+   * transition (window frame morphing into the article) for link clicks but
+   * skips it for script-initiated navigations. Verified 2026-08-31 against a
+   * two-page control with Chrome 151.
+   */
+  const maximizeTarget = maximizeHref
+    ? isFullscreen
+      ? '/'
+      : maximizeHref
+    : null
+  const maximizeIcon = (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+      <rect
+        x={isFullscreen ? '4' : '2'}
+        y={isFullscreen ? '4' : '2'}
+        width={isFullscreen ? '8' : '12'}
+        height={isFullscreen ? '8' : '12'}
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+    </svg>
+  )
 
   const titleId = `window-title-${title.replace(/\s+/g, '-')}`
 
@@ -291,7 +327,7 @@ export function Window({
         onPointerDown={onFramePointerDown}
         onPointerMove={onFramePointerMove}
         onPointerUp={onFramePointerUp}
-        onPointerCancel={onFramePointerUp}
+        onPointerCancel={onFramePointerCancel}
         role="dialog"
         aria-labelledby={titleId}
         aria-modal="false"
@@ -304,24 +340,26 @@ export function Window({
             {title}
           </h3>
           <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={toggleFullscreen}
-              className={windowStyles.button}
-              aria-label={isFullscreen ? 'Restore window' : 'Maximize window'}
-              title={isFullscreen ? 'Restore' : 'Maximize'}
-            >
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                <rect
-                  x={isFullscreen ? '4' : '2'}
-                  y={isFullscreen ? '4' : '2'}
-                  width={isFullscreen ? '8' : '12'}
-                  height={isFullscreen ? '8' : '12'}
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-              </svg>
-            </button>
+            {maximizeTarget ? (
+              <a
+                href={maximizeTarget}
+                className={windowStyles.button}
+                aria-label={isFullscreen ? 'Restore window' : 'Maximize window'}
+                title={isFullscreen ? 'Restore' : 'Maximize'}
+              >
+                {maximizeIcon}
+              </a>
+            ) : (
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                className={windowStyles.button}
+                aria-label={isFullscreen ? 'Restore window' : 'Maximize window'}
+                title={isFullscreen ? 'Restore' : 'Maximize'}
+              >
+                {maximizeIcon}
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}

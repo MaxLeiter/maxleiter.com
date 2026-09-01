@@ -1,6 +1,6 @@
 declare const styles: {
-  readonly "note": string
-  readonly "icon": string
-  readonly "content": string
+  readonly content: string
+  readonly note: string
+  readonly icon: string
 }
 export default styles

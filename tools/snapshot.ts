@@ -18,19 +18,39 @@
  * `head.json` and `text.txt`; raw responses go to `<raw>/` (gitignored).
  * Also writes `routes.json` and `view-transition-names.json` at the root.
  *
- * Route discovery is driven by `/sitemap.xml` plus the top-level pages the
- * sitemap omits, so adding a post needs no change here.
+ * Route discovery in `--dir` mode reads the build's own route manifest at
+ * `.vercel/output/routes.json`, so every route the build emits is snapshotted,
+ * including the ones no sitemap lists. `--base` has no manifest to read and
+ * falls back to `/sitemap.xml` plus the top-level pages that sitemap omitted.
  *
- * Runs under bun and node >= 20 (global fetch, ESM, no runtime-specific APIs).
+ * URL-to-file resolution is `framework/routing.ts`, the same module that
+ * generates config.json, so the harness cannot end up checking a routing table
+ * that production does not run.
+ *
+ * Runs under bun, or node >= 23.6 (ESM, global fetch, and type stripping for
+ * the `.ts` imports; no runtime-specific APIs).
  */
 
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
-import { dirname, extname, join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { maskUrl, normalizeHtml } from './normalize-html.ts'
 import type { HeadRecord, ViewTransitionRecord } from './normalize-html.ts'
+import {
+  contentTypeFor,
+  EMBED_SECTIONS,
+  resolveRequest,
+  staticPathFor,
+} from '../framework/routing.ts'
+import type { RouteInfo, RouteManifest } from '../framework/types.ts'
+import { readHeader } from '../framework/image-dims.ts'
 
-/** Top-level pages that exist but are missing from the current sitemap. */
+/**
+ * Top-level pages the Next sitemap omitted.
+ *
+ * Only `--base` needs this list. `--dir` reads the build's own route manifest,
+ * so a route the bespoke build adds is discovered rather than transcribed.
+ */
 const EXTRA_PAGES = [
   '/',
   '/about',
@@ -54,38 +74,19 @@ const TEXT_FILES = [
   { path: '/api/search-index', file: 'search-index.json' },
 ]
 
-const CONTENT_TYPES: Record<string, string> = {
-  '.html': 'text/html; charset=utf-8',
-  '.xml': 'application/xml',
-  '.txt': 'text/plain',
-  '.json': 'application/json',
-  '.png': 'image/png',
-}
-
 /**
- * URL -> file inside `.vercel/output/static`, matching how Vercel serves the
- * tree: directory-index resolution plus the rewrites in `config.json`.
- *
- * The special cases are deliberate route moves in the bespoke build. They live
- * here so the baseline keeps addressing every route by its ORIGINAL URL and
- * the diff compares content instead of reporting one big rename.
+ * URLs the baseline used that the bespoke build no longer serves at that
+ * address. They are aliases for the HARNESS only, so the committed baseline
+ * keeps addressing every route by its ORIGINAL URL and the diff compares
+ * content instead of reporting one big rename. Nothing here is production
+ * routing; that all lives in `framework/routing.ts`.
  */
-export function staticFileForPath(urlPath: string): {
-  file: string
-  status: number
-} {
-  const [pathname, query] = urlPath.split('?')
-
+function baselineAlias(
+  pathname: string,
+): { file: string; status: number } | null {
   // The 404 body is served for anything the filesystem does not match.
   if (pathname === NOT_FOUND_PROBE) {
     return { file: '404/index.html', status: 404 }
-  }
-  // config.json rewrites `?embed` to the directory variant.
-  if (query === 'embed=true') {
-    return {
-      file: `${pathname.replace(/^\//, '')}/embed/index.html`,
-      status: 200,
-    }
   }
   // The search index moved from a Next route handler to a root JSON file.
   if (pathname === '/api/search-index') {
@@ -95,12 +96,31 @@ export function staticFileForPath(urlPath: string): {
   if (pathname.endsWith('/opengraph-image')) {
     return { file: `${pathname.replace(/^\//, '')}.png`, status: 200 }
   }
-  if (pathname === '/') return { file: 'index.html', status: 200 }
+  return null
+}
 
-  const rel = pathname.replace(/^\//, '')
-  const last = rel.split('/').pop() ?? ''
-  if (last.includes('.')) return { file: rel, status: 200 }
-  return { file: `${rel}/index.html`, status: 200 }
+/**
+ * URL -> file inside `.vercel/output/static`, the way Vercel serves the tree.
+ *
+ * The rules come from `framework/routing.ts`, the same module that generates
+ * config.json, so the harness cannot check a routing table that does not
+ * exist. It used to rewrite `?embed` on ANY path, while production rewrites it
+ * only under /blog and /notes.
+ */
+export function staticFileForPath(urlPath: string): {
+  file: string
+  status: number
+} {
+  const [pathname, query] = urlPath.split('?')
+  const alias = baselineAlias(pathname)
+  if (alias) return alias
+
+  const resolved = resolveRequest(pathname, query ?? '')
+  // A redirect has no body to snapshot; record the target's file instead.
+  const file = resolved.redirect
+    ? staticPathFor(resolved.redirect)
+    : (resolved.file ?? staticPathFor(pathname))
+  return { file, status: 200 }
 }
 
 interface FetchResult {
@@ -130,7 +150,7 @@ function dirFetcher(staticDir: string): Fetcher {
       const body = await readFile(join(staticDir, file))
       return {
         status,
-        contentType: CONTENT_TYPES[extname(file)] ?? 'application/octet-stream',
+        contentType: contentTypeFor(file),
         body: new Uint8Array(body),
       }
     } catch {
@@ -169,6 +189,12 @@ export interface RouteRecord {
   height?: number
   /** Set when an embed variant is byte-identical to its canonical route. */
   identicalTo?: string
+  /**
+   * Discovered from the build's own route manifest, so the build meant to
+   * emit it. diff-html.ts reports such a route as added rather than failing:
+   * publishing a post cannot be a gate failure.
+   */
+  intended?: boolean
   error?: string
 }
 
@@ -178,9 +204,10 @@ export interface SnapshotManifest {
   routes: RouteRecord[]
   /**
    * `--dir` mode only: HTML the build emitted that no snapshotted route
-   * covers. Route discovery starts from the sitemap plus a fixed list, so a
-   * page the build invents on its own would otherwise be looked at by
-   * nothing at all. diff-html.ts reports these as route issues.
+   * covers, plus any alias file a route declares and the build did not write.
+   * Discovery reads the route manifest, so this catches what arrives another
+   * way: a page copied in from `public/`, or a missing `/404.html`.
+   * diff-html.ts reports these as route issues.
    */
   uncovered?: string[]
 }
@@ -195,20 +222,24 @@ interface Args {
   only: string | null
   /** `all` probes every per-post OG image, `one` just the first, `none` skips. */
   og: 'all' | 'one' | 'none'
-  /** Resolved from `dir` or `base` in main(). */
+}
+
+/** The parsed flags plus the reader `main()` resolved from `dir` or `base`. */
+interface Run extends Args {
   fetch: Fetcher
 }
 
+const DEFAULT_BASE = 'http://localhost:3457'
+
 function parseArgs(argv: string[]): Args {
   const args: Args = {
-    base: 'http://localhost:3457',
+    base: DEFAULT_BASE,
     dir: null,
     out: 'docs/rewrite/baseline',
     raw: '.cache/baseline-raw',
     concurrency: 8,
     only: null,
     og: 'all',
-    fetch: httpFetcher('http://localhost:3457'),
   }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
@@ -242,7 +273,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 /** URL path -> snapshot directory. `/` is `root`; `?embed=true` is `__embed`. */
-export function dirForPath(path: string): string {
+function dirForPath(path: string): string {
   const [pathname, query] = path.split('?')
   const base =
     pathname === '/' ? 'root' : pathname.replace(/^\//, '').replace(/\/$/, '')
@@ -254,13 +285,18 @@ function sha256(data: Uint8Array | string): string {
   return createHash('sha256').update(data).digest('hex')
 }
 
-/** Read width/height out of a PNG IHDR chunk. */
-function pngSize(bytes: Uint8Array): { width: number; height: number } | null {
-  const sig = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
-  if (bytes.length < 24) return null
-  for (let i = 0; i < sig.length; i++) if (bytes[i] !== sig[i]) return null
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
-  return { width: view.getUint32(16), height: view.getUint32(20) }
+/**
+ * Intrinsic size of a snapshotted image. `framework/image-dims.ts` already
+ * reads these headers for the build, so the harness borrows its reader rather
+ * than keeping a second, PNG-only copy.
+ */
+function imageSize(
+  bytes: Uint8Array,
+): { width: number; height: number } | null {
+  // A view over the same memory, not a copy.
+  return readHeader(
+    Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength),
+  )
 }
 
 async function writeFileEnsuring(
@@ -320,7 +356,7 @@ interface PageResult {
 }
 
 async function snapshotPage(
-  args: Args,
+  args: Run,
   path: string,
   kind: 'page' | 'embed',
   expectStatus = 200,
@@ -386,7 +422,7 @@ async function snapshotPage(
 }
 
 async function snapshotTextFile(
-  args: Args,
+  args: Run,
   path: string,
   file: string,
 ): Promise<RouteRecord> {
@@ -418,7 +454,7 @@ async function snapshotTextFile(
   return record
 }
 
-async function snapshotBinary(args: Args, path: string): Promise<RouteRecord> {
+async function snapshotBinary(args: Run, path: string): Promise<RouteRecord> {
   const res = await args.fetch(path)
   const buf = res.body
   // The requested URL carries Next's per-build metadata hash; the record keys
@@ -438,7 +474,7 @@ async function snapshotBinary(args: Args, path: string): Promise<RouteRecord> {
     record.error = `HTTP ${res.status}`
     return record
   }
-  const size = pngSize(buf)
+  const size = imageSize(buf)
   if (size) {
     record.width = size.width
     record.height = size.height
@@ -469,18 +505,35 @@ async function pool<T, R>(
 }
 
 /**
- * Every `index.html` the build emitted that no snapshotted route resolves to.
- * Route discovery is driven by the sitemap plus a fixed list of top-level
- * pages, so a page the build adds on its own is invisible to the harness
- * until it shows up here.
+ * Every `index.html` the build emitted that no snapshotted route resolves to,
+ * plus any declared alias file that is missing.
+ *
+ * Discovery reads the route manifest, so this should now be empty for anything
+ * the build generates. It still bites for files that arrive another way: a
+ * page copied in from `public/`, or an alias like `/404.html` that the write
+ * loop failed to produce.
  */
 async function findUncovered(
   staticDir: string,
   records: RouteRecord[],
+  routes: RouteInfo[] | null,
 ): Promise<string[]> {
   const covered = new Set<string>()
   for (const r of records) {
     covered.add(staticFileForPath(r.path).file)
+  }
+
+  const missingAliases: string[] = []
+  for (const route of routes ?? []) {
+    for (const alias of route.aliases ?? []) {
+      const file = staticPathFor(alias)
+      covered.add(file)
+      try {
+        await readFile(join(staticDir, file))
+      } catch {
+        missingAliases.push(`${alias} (declared by ${route.path})`)
+      }
+    }
   }
 
   const built: string[] = []
@@ -494,28 +547,83 @@ async function findUncovered(
   }
   await walk(staticDir, '')
 
-  return built
-    .filter((f) => !covered.has(f))
-    .map(
-      (f) =>
-        `/${f.replace(/(^|\/)index\.html$/, '')}`.replace(/\/$/, '') || '/',
-    )
-    .sort()
+  return [
+    ...built
+      .filter((f) => !covered.has(f))
+      .map(
+        (f) =>
+          `/${f.replace(/(^|\/)index\.html$/, '')}`.replace(/\/$/, '') || '/',
+      ),
+    ...missingAliases,
+  ].sort()
 }
 
-export async function snapshot(args: Args): Promise<SnapshotManifest> {
-  const sitemapPaths = await fetchSitemapPaths(args.fetch)
-  const pagePaths = [...new Set([...EXTRA_PAGES, ...sitemapPaths])].sort()
-  const contentPaths = pagePaths.filter(
-    (p) => p.startsWith('/blog/') || p.startsWith('/notes/'),
-  )
-  const embedPaths = contentPaths.map((p) => `${p}?embed=true`)
+/**
+ * The build's route manifest, which sits beside `static/` rather than in it.
+ * Absent for `--base`, and for any build older than the manifest.
+ */
+async function readRouteManifest(
+  staticDir: string,
+): Promise<RouteInfo[] | null> {
+  try {
+    const raw = await readFile(join(staticDir, '..', 'routes.json'), 'utf8')
+    return (JSON.parse(raw) as RouteManifest).routes
+  } catch {
+    return null
+  }
+}
+
+/**
+ * The URL to snapshot an embed variant at.
+ *
+ * Content embeds are addressed as `?embed=true`, which is both the URL the
+ * baseline used and a real production rewrite. The list-page embeds never had
+ * a query form, so they are addressed by their own path.
+ */
+function embedUrl(route: RouteInfo): string {
+  const parent = route.variantOf ?? route.path.replace(/\/embed$/, '')
+  // The rewrite is `/<section>/<slug>`, so `/blog` itself is not eligible.
+  const [, section = '', slug = ''] = parent.split('/')
+  return slug && (EMBED_SECTIONS as readonly string[]).includes(section)
+    ? `${parent}?embed=true`
+    : route.path
+}
+
+export async function snapshot(args: Run): Promise<SnapshotManifest> {
+  const routes =
+    args.dir === null ? null : await readRouteManifest(resolve(args.dir))
+
+  let pagePaths: string[]
+  let embedPaths: string[]
+  if (routes) {
+    // Driven by what the build says it emitted. The prefix filter this
+    // replaces never reached the six list-page embeds, so they were diffed by
+    // nothing at all.
+    pagePaths = routes
+      .filter((route) => route.kind === 'page' && !route.noindex)
+      .map((route) => route.path)
+      .sort()
+    embedPaths = routes
+      .filter((route) => route.kind === 'embed')
+      .map(embedUrl)
+      .sort()
+  } else {
+    const sitemapPaths = await fetchSitemapPaths(args.fetch)
+    pagePaths = [...new Set([...EXTRA_PAGES, ...sitemapPaths])].sort()
+    embedPaths = pagePaths
+      .filter((p) => p.startsWith('/blog/') || p.startsWith('/notes/'))
+      .map((p) => `${p}?embed=true`)
+  }
 
   const selected = (p: string): boolean =>
     args.only === null || p.includes(args.only)
 
   await rm(args.out, { recursive: true, force: true })
   await mkdir(args.out, { recursive: true })
+
+  // Only what the manifest listed. A path that came from the sitemap or the
+  // fixed fallback list is not evidence that the build intended it.
+  const intended = new Set(routes ? [...pagePaths, ...embedPaths] : [])
 
   const records: RouteRecord[] = []
   const vtMap: Record<string, ViewTransitionRecord[]> = {}
@@ -528,6 +636,7 @@ export async function snapshot(args: Args): Promise<SnapshotManifest> {
   )
   const postOgImages: string[] = []
   for (const r of pageResults) {
+    if (intended.has(r.record.path)) r.record.intended = true
     records.push(r.record)
     if (r.vts.length > 0) vtMap[r.record.path] = r.vts
     pageHtml.set(r.record.path, r.normalizedHtml)
@@ -564,6 +673,7 @@ export async function snapshot(args: Args): Promise<SnapshotManifest> {
       // committed baseline; diff-html.ts follows `identicalTo` instead.
       await rm(join(args.out, r.record.dir), { recursive: true, force: true })
     }
+    if (intended.has(r.record.path)) r.record.intended = true
     records.push(r.record)
     if (r.vts.length > 0) vtMap[r.record.path] = r.vts
     process.stdout.write(
@@ -606,7 +716,7 @@ export async function snapshot(args: Args): Promise<SnapshotManifest> {
   }
 
   if (args.dir !== null) {
-    const uncovered = await findUncovered(args.dir, records)
+    const uncovered = await findUncovered(args.dir, records, routes)
     if (uncovered.length > 0) {
       manifest.uncovered = uncovered
       process.stdout.write(
@@ -629,12 +739,14 @@ export async function snapshot(args: Args): Promise<SnapshotManifest> {
 }
 
 async function main(): Promise<void> {
-  const args = parseArgs(process.argv.slice(2))
-  args.out = resolve(args.out)
-  args.raw = resolve(args.raw)
-  const source = args.dir === null ? args.base : resolve(args.dir)
-  args.fetch =
-    args.dir === null ? httpFetcher(args.base) : dirFetcher(resolve(args.dir))
+  const flags = parseArgs(process.argv.slice(2))
+  const source = flags.dir === null ? flags.base : resolve(flags.dir)
+  const args: Run = {
+    ...flags,
+    out: resolve(flags.out),
+    raw: resolve(flags.raw),
+    fetch: flags.dir === null ? httpFetcher(flags.base) : dirFetcher(source),
+  }
   process.stdout.write(`snapshotting ${source} -> ${args.out}\n`)
   const manifest = await snapshot(args)
   const failed = manifest.routes.filter((r) => r.error)
@@ -651,8 +763,6 @@ async function main(): Promise<void> {
   // A broken asset route is recorded, not fatal: the baseline has real ones.
   if (hard.length > 0) process.exitCode = 1
 }
-
-export { parseArgs }
 
 const entry = process.argv[1] ?? ''
 if (entry.endsWith('snapshot.ts') || entry.endsWith('snapshot.js')) {

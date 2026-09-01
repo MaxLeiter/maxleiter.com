@@ -110,6 +110,8 @@ export interface WrapOptions {
   assets: Record<string, string>
   islands: Record<string, string>
   siteUrl: string
+  /** Built runtime source, inlined by the shell; see `ShellOptions.runtime`. */
+  runtime?: string
 }
 
 export const wrapPage = (page: RenderedPage, options: WrapOptions): string =>
