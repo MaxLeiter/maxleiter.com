@@ -242,8 +242,13 @@ function cssModulePlugin(): esbuild.Plugin {
           cssModules: { pattern: '[hash]_[local]' },
           minify: true,
         })
+        // Sorted, because lightningcss returns `exports` in an order that
+        // varies between runs. Unsorted, the generated `.d.ts` and the class
+        // map in the bundle both churned on every single build.
         const names: Record<string, string> = {}
-        for (const [local, value] of Object.entries(exports ?? {})) {
+        for (const [local, value] of Object.entries(exports ?? {}).sort(
+          ([a], [b]) => a.localeCompare(b),
+        )) {
           names[local] = value.name
         }
         moduleCss.set(args.path, {
@@ -267,13 +272,28 @@ function cssModulePlugin(): esbuild.Plugin {
   }
 }
 
-/** Keeps `tsc --noEmit` happy without the typescript-plugin-css-modules plugin. */
+/** A class name that can be written as a bare property key. */
+const BARE_KEY = /^[A-Za-z_$][\w$]*$/
+
+/**
+ * Keeps `tsc --noEmit` happy without the typescript-plugin-css-modules plugin.
+ *
+ * Keys are emitted the way oxfmt would write them: bare when they are valid
+ * identifiers, quoted otherwise. Quoting everything meant the build wrote one
+ * form, `pnpm lint` rewrote it to the other, and all five generated files
+ * showed up modified after every build-then-lint cycle.
+ */
 async function writeCssModuleTypes(
   file: string,
   keys: string[],
 ): Promise<void> {
   const declaration = ['declare const styles: {']
-    .concat(keys.map((key) => `  readonly ${JSON.stringify(key)}: string`))
+    .concat(
+      keys.map((key) => {
+        const name = BARE_KEY.test(key) ? key : JSON.stringify(key)
+        return `  readonly ${name}: string`
+      }),
+    )
     .concat(['}', 'export default styles', ''])
     .join('\n')
   const target = `${file}.d.ts`
@@ -419,22 +439,114 @@ function sizeRow(name: string, html: string, width: number): string {
   )
 }
 
+/* -------------------------------------------------------- scratch dirs -- */
+
+/**
+ * Every scratch directory carries the pid of the build that owns it, which is
+ * what lets two builds run at once. They used to share one name, so one
+ * build's `rm -rf` raced the other's writes and died with `ENOTEMPTY`.
+ */
+const SCRATCH = /^\.output-(?:build|previous)-(\d+)$/
+const scratchDir = (kind: 'build' | 'previous') =>
+  path.join(ROOT, '.vercel', `.output-${kind}-${process.pid}`)
+
+/** Ten minutes. A build takes half a second; this is pure paranoia. */
+const ABANDONED_MS = 10 * 60 * 1000
+
+function isRunning(pid: number): boolean {
+  try {
+    // Signal 0 checks for the process without touching it. EPERM means it
+    // exists and belongs to someone else, which still counts as running.
+    process.kill(pid, 0)
+    return true
+  } catch (error) {
+    return (error as NodeJS.ErrnoException).code === 'EPERM'
+  }
+}
+
+/**
+ * Remove scratch directories left behind by builds that died before they
+ * published. Ours and any live build's are left alone, so this is safe to run
+ * while another build is in flight.
+ */
+async function pruneAbandonedBuilds(): Promise<void> {
+  const parent = path.join(ROOT, '.vercel')
+  let entries: string[]
+  try {
+    entries = await fs.readdir(parent)
+  } catch {
+    return
+  }
+  for (const name of entries) {
+    const pid = Number(SCRATCH.exec(name)?.[1])
+    if (!Number.isInteger(pid) || pid === process.pid) continue
+    const dir = path.join(parent, name)
+    try {
+      // A pid can be reused, so age is the tiebreak: a directory whose owner
+      // looks alive but which nothing has touched in ten minutes is garbage.
+      const { mtimeMs } = await fs.stat(dir)
+      if (isRunning(pid) && Date.now() - mtimeMs < ABANDONED_MS) continue
+      await fs.rm(dir, { recursive: true, force: true })
+    } catch {
+      // Gone already, or another build is cleaning up the same one.
+    }
+  }
+}
+
+/**
+ * Swap the finished tree into `.vercel/output`.
+ *
+ * Moving the old tree aside rather than deleting it in place keeps the window
+ * where nothing is published one rename wide. Two builds finishing together
+ * can still interleave, and the loser's rename then lands on a directory the
+ * winner just created, which POSIX rejects with ENOTEMPTY. Both builds produce
+ * identical bytes, so last writer wins is fine; this only has to not fail.
+ */
+async function publish(buildOut: string, finalOut: string): Promise<void> {
+  const previous = scratchDir('previous')
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await fs.rm(previous, { recursive: true, force: true })
+      try {
+        await fs.rename(finalOut, previous)
+      } catch (error) {
+        // Nothing published yet, which is the first build in a clean tree.
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+      }
+      await fs.rename(buildOut, finalOut)
+      await fs.rm(previous, { recursive: true, force: true })
+      return
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code
+      const racy =
+        code === 'ENOTEMPTY' || code === 'EEXIST' || code === 'ENOENT'
+      if (attempt >= 4 || !racy) throw error
+      await new Promise((resolve) => setTimeout(resolve, 20 * (attempt + 1)))
+    }
+  }
+}
+
 /* ----------------------------------------------------------------- main -- */
 
 async function main(): Promise<void> {
   const started = performance.now()
 
-  // Build into a sibling directory and swap it in at the very end.
+  // Build into a scratch directory of our own and swap it in at the very end.
   //
-  // Rebuilding `.vercel/output` in place left it partial for the ~600ms the
+  // Rebuilding `.vercel/output` in place left it partial for the ~500ms the
   // build takes, so anything reading it concurrently -- another agent's
   // verification, a browser holding a page whose hashed asset URLs just
   // vanished, `vercel deploy --prebuilt` -- saw a torn tree and failed in ways
   // that looked like real defects. A failed build now also leaves the previous
   // good output untouched instead of destroying it.
+  //
+  // The pid in the name is what makes two builds at once safe. They used to
+  // share one scratch directory, so the `rm -rf` here raced the other build's
+  // writes and died with `ENOTEMPTY: directory not empty`.
   const finalOut = path.join(ROOT, '.vercel', 'output')
-  const buildOut = path.join(ROOT, '.vercel', '.output-build')
+  const buildOut = scratchDir('build')
   await fs.rm(buildOut, { recursive: true, force: true })
+  await pruneAbandonedBuilds()
 
   const ctx = await step('content', () => createBuildContext(ROOT))
   ctx.outDir = buildOut
@@ -578,10 +690,7 @@ async function main(): Promise<void> {
   ])
 
   await step('publish output', async () => {
-    // rm + rename, so the window where `.vercel/output` does not exist is a
-    // couple of syscalls rather than the whole build.
-    await fs.rm(finalOut, { recursive: true, force: true })
-    await fs.rename(buildOut, finalOut)
+    await publish(buildOut, finalOut)
     ctx.outDir = finalOut
     ctx.staticDir = path.join(finalOut, 'static')
   })
