@@ -8,9 +8,9 @@
       "canonical": "https://maxleiter.com",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "62d866a99e8ac898",
+      "textHash": "3ea2190adc145fb1",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 45071
+      "partialBytes": 44856
     },
     {
       "path": "/404",
@@ -30,9 +30,9 @@
       "canonical": "https://maxleiter.com/about",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "9e28fbb6b974481e",
+      "textHash": "ff5bb00355b8497c",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 7383
+      "partialBytes": 7385
     },
     {
       "path": "/about/embed",
@@ -41,9 +41,9 @@
       "canonical": "https://maxleiter.com/about",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "8aa81edf99ad5c0d",
+      "textHash": "b8f0a3e0dc5d52a3",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 4244
+      "partialBytes": 4246
     },
     {
       "path": "/blog",

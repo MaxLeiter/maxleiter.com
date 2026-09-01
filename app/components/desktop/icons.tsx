@@ -21,6 +21,27 @@ export function FolderIconDefault({ className }: { className?: string }) {
   )
 }
 
+/** A document with a folded corner, same weight as the folder. */
+export function FileIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      height="48"
+      width="48"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+      strokeLinecap="round"
+      className={className || 'text-foreground'}
+    >
+      <path d="M9.5 1H3.5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V5L9.5 1Z" />
+      <path d="M9.5 1v4h4" />
+      <path d="M5 8.5h6M5 11h6" />
+    </svg>
+  )
+}
+
 export function ExternalLinkIcon() {
   return (
     <svg

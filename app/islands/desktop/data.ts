@@ -68,15 +68,18 @@ export interface FolderConfig {
   id: WindowId
   name: string
   route: string
+  /** Drawn as a document rather than a folder. */
+  file?: boolean
 }
 
+/** Desktop order. The icon grid is five across, so About leads the second row. */
 export const FOLDERS: FolderConfig[] = [
   { id: 'blog-list', name: 'blog', route: '/blog' },
   { id: 'notes', name: 'notes', route: '/notes' },
   { id: 'projects', name: 'projects', route: '/projects' },
-  { id: 'about', name: 'about', route: '/about' },
-  { id: 'labs', name: 'labs', route: '/labs' },
   { id: 'talks', name: 'talks', route: '/talks' },
+  { id: 'labs', name: 'labs', route: '/labs' },
+  { id: 'about', name: 'ABOUT.md', route: '/about', file: true },
 ]
 
 export interface ContentWindowConfig extends FolderConfig {

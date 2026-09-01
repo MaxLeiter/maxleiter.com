@@ -1,5 +1,9 @@
 import type { CSSProperties, MouseEvent, ReactNode } from 'react'
-import { ExternalLinkIcon, FolderIconDefault } from '@components/desktop/icons'
+import {
+  ExternalLinkIcon,
+  FileIcon,
+  FolderIconDefault,
+} from '@components/desktop/icons'
 import {
   CalculatorIcon,
   GitHubIcon,
@@ -119,7 +123,7 @@ function buildItems(handlers: ChromeHandlers): DesktopItem[] {
     ...FOLDERS.map((folder) => ({
       id: folder.name,
       name: folder.name,
-      icon: <FolderIconDefault />,
+      icon: folder.file ? <FileIcon /> : <FolderIconDefault />,
       href: folder.route,
       section: folder.id,
       onClick: handlers.onFolder
