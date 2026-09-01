@@ -602,9 +602,9 @@
       "canonical": "https://maxleiter.com/labs",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "68e15b9ed66df179",
+      "textHash": "1993b66cf7b5141e",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 12537
+      "partialBytes": 14977
     },
     {
       "path": "/labs/embed",
@@ -613,9 +613,9 @@
       "canonical": "https://maxleiter.com/labs",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "fc224c6fbe63fb4f",
+      "textHash": "44038e67a24f5df7",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 9401
+      "partialBytes": 11841
     },
     {
       "path": "/notes",
