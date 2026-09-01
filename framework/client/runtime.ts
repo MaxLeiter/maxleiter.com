@@ -199,6 +199,16 @@ document.addEventListener('click', (event) => {
     }
     root.dataset.theme = next
     root.style.colorScheme = next
+    // Open windows iframe same-origin embeds, so their documents are ours to
+    // write. Each booted from localStorage before this click and would keep
+    // the old theme until reloaded.
+    for (const frame of document.querySelectorAll('iframe')) {
+      const doc = frame.contentDocument?.documentElement
+      if (doc) {
+        doc.dataset.theme = next
+        doc.style.colorScheme = next
+      }
+    }
     return
   }
 
