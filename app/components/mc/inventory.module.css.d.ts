@@ -1,7 +1,7 @@
 declare const styles: {
-  readonly "container": string
-  readonly "mod": string
-  readonly "slot": string
   readonly "tooltip": string
+  readonly "slot": string
+  readonly "mod": string
+  readonly "container": string
 }
 export default styles

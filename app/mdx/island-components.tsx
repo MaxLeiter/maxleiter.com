@@ -1,7 +1,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import React from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import fileTreeStyles from '@components/file-tree/file-tree.module.css'
+import linkStyles from '@components/link/link.module.css'
 import shotStyles from '@mdx/components/shot-grid.module.css'
 import inventoryStyles from '@components/mc/inventory.module.css'
 import FileTreeIsland from '@islands/file-tree'
@@ -32,6 +34,28 @@ export interface IslandComponentOptions {
   /** Repo root, for the Minecraft inventory's image walk. */
   root: string
   Image: ArticleImageComponent
+}
+
+/**
+ * The text of an MDX node, with `<br>` as a newline.
+ *
+ * Shot captions are MDX, so they arrive as React elements; the lightbox needs
+ * a plain string. `static-components.tsx` has a copy for `<Diff>`; if that file
+ * ever wants one source, this is the one to import, because the dependency
+ * already runs in that direction.
+ */
+export function flattenText(node: ReactNode): string {
+  if (node === null || node === undefined || typeof node === 'boolean') {
+    return ''
+  }
+  if (typeof node === 'string' || typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(flattenText).join('')
+  if (React.isValidElement(node)) {
+    const element = node as React.ReactElement<{ children?: ReactNode }>
+    if (element.type === 'br') return '\n'
+    return flattenText(element.props.children)
+  }
+  return ''
 }
 
 /* ----------------------------------------------------------- file tree -- */
@@ -160,25 +184,28 @@ function makeShot(Image: ArticleImageComponent) {
     poster,
     sources,
   }: ShotProps) {
-  const media = mimeForSrc(src) ? (
-    <video
-      poster={poster}
-      width={width}
-      height={height}
-      controls
-      playsInline
-      preload="metadata"
-      aria-label={alt || undefined}
-    >
-      {[src, ...(sources ?? [])].map((source) => (
-        <source key={source} src={source} type={mimeForSrc(source)} />
-      ))}
-    </video>
-  ) : (
-    // Through the optimizer like every other post image, rather than the raw
-    // blob URL the client-side version used.
-    <Image src={src} alt={alt} width={width} height={height} />
-  )
+    const media = mimeForSrc(src) ? (
+      // These clips are silent screen recordings with no narration to caption,
+      // and no caption track exists to point a `<track>` at.
+      // oxlint-disable-next-line jsx-a11y/media-has-caption
+      <video
+        poster={poster}
+        width={width}
+        height={height}
+        controls
+        playsInline
+        preload="metadata"
+        aria-label={alt || undefined}
+      >
+        {[src, ...(sources ?? [])].map((source) => (
+          <source key={source} src={source} type={mimeForSrc(source)} />
+        ))}
+      </video>
+    ) : (
+      // Through the optimizer like every other post image, rather than the raw
+      // blob URL the client-side version used.
+      <Image src={src} alt={alt} width={width} height={height} />
+    )
 
     return (
       <figure className={shotStyles.shot}>
@@ -343,6 +370,10 @@ function makeMinecraftInventory(root: string) {
       >
         {items.map((item, index) => (
           <div key={`${item.name}-${index}`} className={inventoryStyles.slot}>
+            {/* 32px pixel-art icons rendered at 32px. Sending them through the
+                optimizer would cost 53 billable transformations to produce the
+                bytes we already have, and resampling would blur them. */}
+            {/* oxlint-disable-next-line nextjs/no-img-element */}
             <img
               src={item.src}
               alt={item.name}
