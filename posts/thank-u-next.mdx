@@ -62,11 +62,11 @@ It used ~10% of my Claude Code 20x subscription.
 
 Note that I've made some minor changes/improvements since those stats were recorded, but I'd estimate those stats covered 95% of the work.
 
-You can try the Next.js version of this site at next.maxleiter.com.
+You can try the Next.js version of this site at [next.maxleiter.com](https://next.maxleiter.com).
 
 ## How it works
 
-Mostly written by Claude, edited by me:
+The below was written by Claude, edited by me:
 
 - It's more of a build script than a framework. `build.ts` reads `posts/`, renders every route to a static index.html with React (on the server), and writes a [Vercel Build Output](https://vercel.com/docs/build-output-api) directory. Build time is ~half a second warm on my M2 MBP.
 - MDX compiled once per file at build with the same remark and rehype plugins as before. Syntax highlighting runs at build with shiki, emitting both themes into the HTML so theme switching needs no JavaScript.
@@ -77,7 +77,7 @@ Mostly written by Claude, edited by me:
 
 ## Why do this?
 
-A bunch of reasons. For one, you could recursively run a loop like this and replace most/all of your dependencies, eliminating a host of [supply chain attacks](/blog/pin-dependencies). You vendor exactly what you need and nothing else, which is what this framework is — the parts of Next.js this site actually uses. Two, the framework is 5,000 lines; easily reviewable by human and model alike. Next.js and React are hundreds of thousands.
+A bunch of reasons. For one, you could recursively run a loop like this and replace most/all of your dependencies, eliminating a host of [supply chain attacks](/blog/pin-dependencies). You vendor exactly what you need and nothing else, which is what this framework is — the parts of Next.js this site actually uses. Two, the framework is [5,000 lines](https://github.com/MaxLeiter/maxleiter.com/tree/master/framework); easily reviewable by human and model alike. Next.js and React are hundreds of thousands.
 
 Now, there's something to be said that this could all be a lot simpler if I chose a simpler static site generator, switched to python, whatever. Those are all (mostly) true but this is just a demonstration of the future of software, not just static sites.
 

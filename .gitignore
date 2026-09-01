@@ -23,4 +23,5 @@ tsconfig.tsbuildinfo
 
 .vscode
 .opencode
-.claude
+.claude/*
+!.claude/skills/
