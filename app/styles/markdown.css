@@ -240,10 +240,8 @@ article table {
 article thead th {
   padding: 0.5rem 0.75rem;
   text-align: left;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--gray);
   border-bottom: 1px solid var(--light-gray);
 }
