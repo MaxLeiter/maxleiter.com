@@ -1,0 +1,14 @@
+{
+  "$comment": [
+    "Intended differences between the Next.js baseline and the bespoke build.",
+    "Every rule needs a `reason`. `pattern` and `routes` are substrings, or",
+    "`re:<javascript regexp>`. `kind` is head | text | html | file | route.",
+    "diff-html.ts prints rules that matched nothing, so stale entries surface.",
+    "This file is intentionally EMPTY of content rules for Phase 0: the",
+    "baseline must diff clean against itself with no exceptions at all.",
+    "Phase 1+ agents add rules here as intended divergences land."
+  ],
+  "rules": [],
+  "allowMissingRoutes": [],
+  "allowNewRoutes": []
+}

@@ -1,0 +1,671 @@
+<!doctype html>
+<html class="&lt;cssmod>_variable &lt;cssmod>_variable" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <style>
+      /* css */
+    </style>
+    <meta content="" name="next-size-adjust">
+    <meta content="#000000" name="theme-color">
+    <title>
+      Sandcastle: A web-based Linux desktop environment
+    </title>
+    <meta content="index, follow" name="robots">
+    <meta content="index, follow" name="googlebot">
+    <link href="https://maxleiter.com/blog/sandcastle" rel="canonical">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/blog/sandcastle/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="600" property="og:image:height">
+    <meta content="website" property="og:type">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="https://maxleiter.com/blog/sandcastle/opengraph-image" name="twitter:image">
+    <meta content="image/png" name="twitter:image:type">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="600" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+  </head>
+  <body>
+    <div hidden="">
+    </div>
+    <script>
+      ((a,b,c,d,e,f,g,h)=>{let i=document.documentElement,j=["light","dark"];function k(b){var c;(Array.isArray(a)?a:[a]).forEach(a=>{let c="class"===a,d=c&&f?e.map(a=>f[a]||a):e;c?(i.classList.remove(...d),i.classList.add(f&&f[b]?f[b]:b)):i.setAttribute(a,b)}),c=b,h&&j.includes(c)&&(i.style.colorScheme=c)}if(d)k(d);else try{let a=localStorage.getItem(b)||c,d=g&&"system"===a?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":a;k(d)}catch(a){}})("data-theme","theme","dark",null,["light","dark"],null,true,true)
+    </script>
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <div id="blog-toolbar">
+        <header class="h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10" style="background-color:var(--bg-window-alpha);backdrop-filter:blur(12px)">
+          <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm font-mono text-[var(--gray)]">
+            <a class="hover:text-[var(--fg)] transition-colors" href="/">
+              ~
+            </a>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/blog">
+                blog
+              </a>
+            </div>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/blog/sandcastle">
+                sandcastle
+              </a>
+            </div>
+          </nav>
+          <div class="flex items-center gap-1">
+            <button aria-label="Minimize window" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" title="Minimize">
+              <svg fill="none" height="12" viewbox="0 0 16 16" width="12">
+                <rect height="8" stroke="currentColor" stroke-width="1.5" width="8" x="4" y="4">
+                </rect>
+              </svg>
+            </button>
+            <button aria-label="Close Sandcastle: A web-based Linux desktop environment" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors">
+              ✕
+            </button>
+          </div>
+        </header>
+      </div>
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto">
+          <div class="mb-1">
+            <span class="font-mono text-sm" style="color:var(--gray)">
+              Feb 11, 2026
+            </span>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            Sandcastle: A web-based Linux desktop environment
+          </h1>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <p>
+              <img alt="" data-nimg="1" decoding="async" height="450" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fheader.png&amp;w=1200&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fheader.png&amp;w=640&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fheader.png&amp;w=1200&amp;q=75 2x" style="color:transparent" width="550">
+            </p>
+            <p>
+              Six years ago, while I should have been studying for finals, I patched and compiled X11 (and all its dependencies) to
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://maxleiter.com/blog/X11" rel="noopener noreferrer" tabindex="0" target="_blank">
+                run on a jailbroken iPad
+              </a>
+              . I wanted to run real applications on my tablet.
+            </p>
+            <p>
+              I've spent the last few
+              <del>
+                months
+              </del>
+              <del>
+                weeks
+              </del>
+              <del>
+                days
+              </del>
+              hours
+              <del>
+                building
+              </del>
+              vibecoding something that feels like a better solution: a Linux desktop environment, on the web. I wrote zero lines of code.
+            </p>
+            <p>
+              You can try it out
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://sandcastle-os.vercel.app" rel="noopener noreferrer" tabindex="0" target="_blank">
+                here
+              </a>
+              , and the source is available
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/vercel-labs/sandcastle" rel="noopener noreferrer" tabindex="0" target="_blank">
+                here
+              </a>
+              .
+            </p>
+            <aside class="&lt;cssmod>_note">
+              <div class="&lt;cssmod>_icon">
+                <svg class="feather feather-info" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="var(--info-stroke-circle-color, currentColor)">
+                  </circle>
+                  <line stroke="var(--info-stroke-line-color, currentColor)" x1="12" x2="12" y1="16" y2="12">
+                  </line>
+                  <line stroke="var(--info-stroke-line-color, currentColor)" x1="12" x2="12.01" y1="8" y2="8">
+                  </line>
+                </svg>
+              </div>
+              <div class="&lt;cssmod>_content">
+                <b>
+                  Note:
+                </b>
+                <p>
+                  If you're familiar with Desktop Environments and Linux, you can
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#the-servers" tabindex="0">
+                    skip the next few sections
+                  </a>
+                </p>
+              </div>
+            </aside>
+            <h3 id="table-of-contents">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#table-of-contents" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Table of Contents
+            </h3>
+            <ul>
+              <li>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#x11" tabindex="0">
+                  X11?
+                </a>
+              </li>
+              <li>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#desktop-environments" tabindex="0">
+                  Desktop Environments?
+                </a>
+              </li>
+              <li>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#the-servers" tabindex="0">
+                  The servers
+                </a>
+                <ul>
+                  <li>
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#enter-sandcastle" tabindex="0">
+                      Enter Sandcastle
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#pieces-of-the-castle" tabindex="0">
+                  Pieces of the castle
+                </a>
+                <ul>
+                  <li>
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#xpra" tabindex="0">
+                      Xpra
+                    </a>
+                  </li>
+                  <li>
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#ghostty-web" tabindex="0">
+                      Ghostty-web
+                    </a>
+                  </li>
+                  <li>
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#hiding-window-decorations" tabindex="0">
+                      Hiding window decorations
+                    </a>
+                  </li>
+                  <li>
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#d-bus-and-notifications" tabindex="0">
+                      D-Bus and notifications
+                    </a>
+                  </li>
+                  <li>
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#but-what-about-mobile" tabindex="0">
+                      But what about mobile?
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#vibecoding-takeaways" tabindex="0">
+                  Vibecoding takeaways
+                </a>
+              </li>
+              <li>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#wrapping-up" tabindex="0">
+                  Wrapping up
+                </a>
+              </li>
+            </ul>
+            <h1 id="x11">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#x11" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              X11?
+            </h1>
+            <p>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://www.x.org/wiki/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                X11
+              </a>
+              is the display server protocol that has powered Linux machines for decades. Released in 1984, it handles drawing windows on screens and routing input (key presses and clicks) to the right applications. Because computers were
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="/blog/formatting" tabindex="0">
+                very different
+              </a>
+              in the 80s, X11 is built for
+              <em>
+                servers
+              </em>
+              and
+              <em>
+                clients
+              </em>
+              . The application runs on a server, and dumb clients can draw the windows and interact with it. The actual compute is on the server. (Note that today, most people don't use separate machines for their X server and clients - they both run on the same machine, like your laptop).
+            </p>
+            <p>
+              The client-server model, where programs are "X clients" and the display manager is the "X server," makes it possible to run graphical apps remotely over a network. And what is a website if not a client to a remote server?
+            </p>
+            <h1 id="desktop-environments">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#desktop-environments" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Desktop Environments?
+            </h1>
+            <p>
+              If you are on macOS or Windows, you use the desktop environment that Apple and Microsoft provide. Linux users do not have the same constraints: there are dozens of desktop environments to choose from, each with different takes on what a desktop can be. Each environment has its own software stack and configs; some are tiling and minimal, others are incredibly flashy.
+            </p>
+            <p>
+              Here's
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://kde.org" rel="noopener noreferrer" tabindex="0" target="_blank">
+                KDE
+              </a>
+              :
+            </p>
+            <p>
+              <img alt="" data-nimg="1" decoding="async" height="450" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fkde.png&amp;w=1200&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fkde.png&amp;w=640&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fkde.png&amp;w=1200&amp;q=75 2x" style="color:transparent" width="550">
+            </p>
+            <p>
+              Here's
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://swaywm.org/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Sway
+              </a>
+              :
+            </p>
+            <p>
+              <img alt="" data-nimg="1" decoding="async" height="450" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fsway.png&amp;w=1200&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fsway.png&amp;w=640&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fsway.png&amp;w=1200&amp;q=75 2x" style="color:transparent" width="550">
+            </p>
+            <figcaption>
+              <p>
+                Sway is a tiling window manager: you don't really drag windows around, you use your keyboard and the windows tile against each other.
+              </p>
+            </figcaption>
+            <p>
+              And here's Sandcastle:
+            </p>
+            <p>
+              <img alt="A screenshot of Sandcastle showing xeyes, GIMP, and a file explorer" data-nimg="1" decoding="async" height="450" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fsandcastle.png&amp;w=1200&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fsandcastle.png&amp;w=640&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fsandcastle.png&amp;w=1200&amp;q=75 2x" style="color:transparent" width="550">
+            </p>
+            <figcaption>
+              <p>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://www.reddit.com/r/linuxquestions/comments/1aur066/what_is_the_purpose_of_xeyes/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  xeyes
+                </a>
+                ,
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://www.gimp.org/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  GIMP
+                </a>
+                , and a file explorer. At the top you can see the desktop icons.
+              </p>
+            </figcaption>
+            <p>
+              So that kind of covers the client (more below), but what's the server here?
+            </p>
+            <h1 id="the-servers">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#the-servers" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              The servers
+            </h1>
+            <p>
+              With the rise of AI agents that can make stupid and dangerous actions,
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://www.daytona.io/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                plenty
+              </a>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://e2b.dev/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                of
+              </a>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://sandbox.cloudflare.com/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                companies
+              </a>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://modal.com/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                are
+              </a>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://sprites.dev/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                launching
+              </a>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://vercel.com/docs/vercel-sandbox" rel="noopener noreferrer" tabindex="0" target="_blank">
+                sandboxes
+              </a>
+              . I built this on Vercel Sandbox, but theoretically any Linux machine can host the same.
+            </p>
+            <p>
+              There's a lot to like about sandboxes, but what I love is their ephemeral nature and ability to scale.
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://vercel.com/blog/introducing-fluid-compute" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Fluid Compute
+              </a>
+              lets me worry less about cost, and
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://vercel.com/docs/vercel-sandbox/concepts/snapshots" rel="noopener noreferrer" tabindex="0" target="_blank">
+                snapshots
+              </a>
+              let me not worry about keeping them running forever. I can spin up as many sandboxes as I need.
+            </p>
+            <p>
+              I also love running agents. But I hate having to manually approve their
+              <code>
+                npm
+              </code>
+              commands or reviewing the scripts they are about to run. Sandboxes don't prevent agents from being tricked, but they do limit the blast radius. If you get prompt injected with a malicious agent skill or npm package, the damage should be self-contained.
+            </p>
+            <p>
+              Plenty of people have tweeted about how they're running agents on their VPSs or Mac Minis. But the way they remote into them feels archaic. I love CLI agents as much as the next nerd but they are not ideal for mobile.
+            </p>
+            <p>
+              So I decided to mess around with what a sandboxed web OS could look like.
+            </p>
+            <h2 id="enter-sandcastle">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#enter-sandcastle" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Enter Sandcastle
+            </h2>
+            <p>
+              You can think of Sandcastle as a web interface to interact with the underlying Linux machine. The Files app is a React component running entirely in the browser. It uses some API routes that speak to the Linux machine to list the available files:
+            </p>
+            <p>
+              <img alt="" data-nimg="1" decoding="async" height="450" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Ffiles.png&amp;w=1200&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Ffiles.png&amp;w=640&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Ffiles.png&amp;w=1200&amp;q=75 2x" style="color:transparent" width="550">
+            </p>
+            <p>
+              But it also runs X11 applications and streams them to the browser:
+            </p>
+            <p>
+              <img alt="" data-nimg="1" decoding="async" height="450" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fx11-apps.png%3Fw%3D800&amp;w=1920&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fx11-apps.png%3Fw%3D800&amp;w=828&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fx11-apps.png%3Fw%3D800&amp;w=1920&amp;q=75 2x" style="color:transparent" width="800">
+            </p>
+            <figcaption>
+              <p>
+                GIMP, gnome-calculator, Firefox, and a system monitor running
+              </p>
+            </figcaption>
+            <p>
+              Here's an LLM-generated architecture diagram:
+            </p>
+            <div data-bright-mode="dark" data-bright-theme="solarized-dark" style="color:#839496;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#274642;--line-number-color:#858585;--tab-border:#003847;--tab-background:#002B37;--tab-color:#d6dbdb;--inactive-tab-background:#004052;--inactive-tab-color:#93A1A1;--tab-bottom-border:#002B37;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#839496;background:#002B36;padding:1em 0;overflow:auto">
+                Browser (React)                        Next.js                      Vercel Sandbox (microVM)┌──────────────────┐              ┌──────────────────┐             ┌──────────────────────┐│ Desktop UI       │◄────────────►│ API Routes       │◄───────────►│ :14081 Services API  ││ Window Manager   │              │ /api/sandbox/*   │             │   - file CRUD        ││ Taskbar          │              │ /api/auth/*      │             │   - .desktop scanner ││ App Launcher     │              │ /api/files/*     │             │   - process launcher ││ (Cmd+K)          │              │ /api/apps/*      │             │                      ││                  │              │                  │             │                      ││ Terminal ────────┼──── WSS ─────┼──────────────────┼────────────►│ :14081 PTY Relay     ││ (ghostty-web)    │              │                  │             │   - bash over WS     ││                  │              │ Sandbox SDK      │             │                      ││ Code Server ─────┼── iframe ───┼──────────────────┼────────────►│ :14082 code-server   ││                  │              │ (@vercel/sandbox)│             │   - VS Code in browser││                  │              │                  │             │                      ││ Xpra Canvas ─────┼── WSS ─────┼──────────────────┼────────────►│ :14080 Xpra Server   ││ (X11 apps)       │              │                  │             │   - X11 app streaming││                  │              │                  │             │                      ││ File Manager ────┼── fetch ────┼──► proxy ────────┼────────────►│ :14083 Reserved      │└──────────────────┘              └────────┬─────────┘             └──────────────────────┘                                           │                                  ┌────────▼─────────┐                                  │ Neon Postgres     │                                  │ - users           │                                  │ - workspaces      │                                  │ - warm_pool       │                                  │ - config          │                                  └──────────────────┘
+              </pre>
+            </div>
+            <div data-bright-mode="light" data-bright-theme="material-palenight" style="color:#A6ACCD;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#717CB450;--line-number-color:#3A3F58;--tab-border:#292D3E;--tab-background:#292D3E;--tab-color:#FFFFFF;--inactive-tab-background:#292D3E;--inactive-tab-color:#676E95;--tab-bottom-border:#80CBC4;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#A6ACCD;background:#292D3E;padding:1em 0;overflow:auto">
+                Browser (React)                        Next.js                      Vercel Sandbox (microVM)┌──────────────────┐              ┌──────────────────┐             ┌──────────────────────┐│ Desktop UI       │◄────────────►│ API Routes       │◄───────────►│ :14081 Services API  ││ Window Manager   │              │ /api/sandbox/*   │             │   - file CRUD        ││ Taskbar          │              │ /api/auth/*      │             │   - .desktop scanner ││ App Launcher     │              │ /api/files/*     │             │   - process launcher ││ (Cmd+K)          │              │ /api/apps/*      │             │                      ││                  │              │                  │             │                      ││ Terminal ────────┼──── WSS ─────┼──────────────────┼────────────►│ :14081 PTY Relay     ││ (ghostty-web)    │              │                  │             │   - bash over WS     ││                  │              │ Sandbox SDK      │             │                      ││ Code Server ─────┼── iframe ───┼──────────────────┼────────────►│ :14082 code-server   ││                  │              │ (@vercel/sandbox)│             │   - VS Code in browser││                  │              │                  │             │                      ││ Xpra Canvas ─────┼── WSS ─────┼──────────────────┼────────────►│ :14080 Xpra Server   ││ (X11 apps)       │              │                  │             │   - X11 app streaming││                  │              │                  │             │                      ││ File Manager ────┼── fetch ────┼──► proxy ────────┼────────────►│ :14083 Reserved      │└──────────────────┘              └────────┬─────────┘             └──────────────────────┘                                           │                                  ┌────────▼─────────┐                                  │ Neon Postgres     │                                  │ - users           │                                  │ - workspaces      │                                  │ - warm_pool       │                                  │ - config          │                                  └──────────────────┘
+              </pre>
+            </div>
+            <h1 id="pieces-of-the-castle">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#pieces-of-the-castle" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Pieces of the castle
+            </h1>
+            <h2 id="xpra">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#xpra" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Xpra
+            </h2>
+            <p>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/Xpra-org/xpra" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Xpra
+              </a>
+              does a lot of the heavy lifting here. From their about section:
+            </p>
+            <blockquote>
+              <p>
+                Xpra is known as "screen for X" : its seamless mode allows you to run X11 programs, usually on a remote host, direct their display to your local machine, and then to disconnect from these programs and reconnect from the same or another machine(s), without losing any state. Effectively giving you remote access to individual graphical applications. It can also be used to access existing desktop sessions and start remote desktop sessions.
+              </p>
+            </blockquote>
+            <p>
+              By running Xpra on the underlying sandbox and using its websocket transport to render
+              <code>
+                canvas
+              </code>
+              s on the client, we can load and manipulate X windows.
+            </p>
+            <p>
+              Xpra also lets us make links clicked in X11 apps open in your browser, handles bidirectional clipboard syncing, etc. It's fantastic.
+            </p>
+            <h2 id="ghostty-web">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#ghostty-web" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Ghostty-web
+            </h2>
+            <p>
+              Unless you live in a cave, if you clicked on this post you've likely heard of the terminal emulator
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://ghostty.org/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Ghostty
+              </a>
+              . While Sandcastle does support native terminal emulators like XTerm and alacritty, they suffer from being native apps: resizing is a bit wonky, keyboard input on mobile is difficult (see:
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="#but-what-about-mobile" tabindex="0">
+                But what about mobile?
+              </a>
+              below), and they suffer from input lag (it is over a network boundary, after all). By using a JavaScript "app" for the terminal emulator, those issues are all addressed and the terminal is snappy. To accomplish this, I reached for
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/coder/ghostty-web" rel="noopener noreferrer" tabindex="0" target="_blank">
+                ghostty-web
+              </a>
+              , a WASM-compiled ghostty with xterm.js compatibility. I'd been wanting to experiment with
+              <code>
+                ghostty-web
+              </code>
+              for a while and this was the perfect opportunity.
+            </p>
+            <h2 id="hiding-window-decorations">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#hiding-window-decorations" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Hiding window decorations
+            </h2>
+            <p>
+              Early on, I encountered a fun problem where X11 apps rendered their own window decorations (the traffic light icons for closing and the window title, mainly):
+            </p>
+            <p>
+              <img alt="A screenshot of gnome-calculator with two stacked window decorations: mine and GNOME's" data-nimg="1" decoding="async" height="450" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fdouble-dec.png%3Fw%3D200&amp;w=640&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fdouble-dec.png%3Fw%3D200&amp;w=256&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fdouble-dec.png%3Fw%3D200&amp;w=640&amp;q=75 2x" style="color:transparent" width="200">
+            </p>
+            <p>
+              To fix this for most applications, I (AKA Claude) was able to write a system init script that does the following:
+            </p>
+            <div data-bright-mode="dark" data-bright-theme="solarized-dark" style="color:#839496;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#274642;--line-number-color:#858585;--tab-border:#003847;--tab-background:#002B37;--tab-color:#d6dbdb;--inactive-tab-background:#004052;--inactive-tab-color:#93A1A1;--tab-bottom-border:#002B37;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#839496;background:#002B36;padding:1em 0;overflow:auto">
+                # We hide GTK's CSD via three mechanisms:# 1. gtk-decoration-layout= (empty) -- removes window control buttons# 2. Custom gtk.css -- collapses the headerbar to zero height# 3. CSD shadow/border removal -- prevents extra padding around windows
+              </pre>
+            </div>
+            <div data-bright-mode="light" data-bright-theme="material-palenight" style="color:#A6ACCD;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#717CB450;--line-number-color:#3A3F58;--tab-border:#292D3E;--tab-background:#292D3E;--tab-color:#FFFFFF;--inactive-tab-background:#292D3E;--inactive-tab-color:#676E95;--tab-bottom-border:#80CBC4;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#A6ACCD;background:#292D3E;padding:1em 0;overflow:auto">
+                # We hide GTK's CSD via three mechanisms:# 1. gtk-decoration-layout= (empty) -- removes window control buttons# 2. Custom gtk.css -- collapses the headerbar to zero height# 3. CSD shadow/border removal -- prevents extra padding around windows
+              </pre>
+            </div>
+            <p>
+              Some apps still have window decorations, but the GNOME apps I like to use all look great now.
+            </p>
+            <h2 id="d-bus-and-notifications">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#d-bus-and-notifications" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              D-Bus and notifications
+            </h2>
+            <p>
+              On a normal Linux desktop, applications don't talk to each other directly. They use a message bus called
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://www.freedesktop.org/wiki/Software/dbus/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                D-Bus
+              </a>
+              . When Firefox finishes a download and shows a notification, it's sending a message over dbus to the notification daemon. When a video player tells the OS not to activate the screensaver, that's dbus too. Sandcastle doesn't have a real desktop environment running inside the VM, so none of these services are present.
+            </p>
+            <p>
+              Without them, programs like
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://man.archlinux.org/man/notify-send.1.en" rel="noopener noreferrer" tabindex="0" target="_blank">
+                notify-send
+              </a>
+              fail and GTK4 apps can't read the system theme. The fix Claude and I devised is a Python daemon that claims three bus names on a shared D-Bus session bus:
+            </p>
+            <ol style="padding-left:1.5rem;padding-top:1rem">
+              <li>
+                <p>
+                  <code>
+                    org.freedesktop.Notifications
+                  </code>
+                  : implements the
+                  <a href="https://specifications.freedesktop.org/notification-spec/latest/">
+                    Desktop Notifications Specification
+                  </a>
+                  , so
+                  <code>
+                    notify-send
+                  </code>
+                  and GLib apps can send notifications
+                </p>
+              </li>
+              <li>
+                <p>
+                  <code>
+                    org.freedesktop.ScreenSaver
+                  </code>
+                  : stubs the screensaver inhibit interface so apps like video players don't think the session is idle
+                </p>
+              </li>
+              <li>
+                <p>
+                  <code>
+                    org.freedesktop.portal.Desktop
+                  </code>
+                  : exposes the color scheme setting so GTK4/libadwaita apps can read (and react to) dark/light mode without a full
+                  <code>
+                    xdg-desktop-portal
+                  </code>
+                </p>
+                <ul>
+                  <li>
+                    <p>
+                      The tricky part was getting notifications from inside a Linux VM to a React app in the browser. The (gross) pipeline looks like this:
+                      <code>
+                        notify-send → D-Bus → Python bridge → JSON file → Node.js HTTP API → polling → toast UI
+                      </code>
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      The bridge daemon writes its state to a JSON file. A Node.js service inside the sandbox reads that file and exposes it as HTTP routes. Any Linux app that knows how to send a notification will show a native desktop notification on your machine.
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      The same JSON file is how theme syncing works in reverse: when you toggle dark mode in the browser, it POSTs the new color-scheme to the Node.js service, which writes it to the JSON file, which the Python daemon reads. When the value changes, it emits a
+                      <code>
+                        SettingChanged
+                      </code>
+                      D-Bus signal, and GTK apps pick up the theme change in real-time.
+                    </p>
+                  </li>
+                </ul>
+              </li>
+            </ol>
+            <h2 id="but-what-about-mobile">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#but-what-about-mobile" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              But what about mobile?
+            </h2>
+            <p>
+              One fun thing about working on this is I got to experiment with what a responsive operating system can be. On desktops, you get a fairly familiar desktop environment: draggable windows, a task bar, desktop icons. But on smaller screens, it turns into more of a tiling window manager.
+            </p>
+            <video controls="" height="400" width="600">
+              <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/responsive.webm" type="video/webm">
+            </video>
+            <figcaption>
+              <p>
+                Ignore the busted terminal after resizing. I did say this was vibecoded.
+              </p>
+            </figcaption>
+            <p>
+              "But Max", you may say, "you're using canvas elements to render the X11 apps. How do they handle input on mobile?"
+            </p>
+            <p>
+              "Great question!", I'd respond. On mobile, when you click the keyboard icon rendered on each window, there is a hidden
+              <code>
+                <input>
+              </code>
+              field that passes its contents to the underlying app. There are also buttons for keys like ctrl, alt, etc. GIMP on a phone? It sucks to use, but it does work!
+            </p>
+            <h1 id="vibecoding-takeaways">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#vibecoding-takeaways" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Vibecoding takeaways
+            </h1>
+            <p>
+              This is generally what my IDE looked like while working on this:
+            </p>
+            <p>
+              <img alt="A screenshot of VS Code with 6 terminals open: one for the dev server, one for Codex, four for OpenCode" data-nimg="1" decoding="async" height="450" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fide.png&amp;w=1200&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fide.png&amp;w=640&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsandcastle%2Fide.png&amp;w=1200&amp;q=75 2x" style="color:transparent" width="550">
+            </p>
+            <p>
+              I used OpenCode with the Vercel AI Gateway (primarily for Opus 4.6 and Kimi K2.5) and Codex. Kimi and Opus are great for product work, but I feel like Codex is the smartest-but-slowest model. So I often have Codex review code and generate plans, then hand its plans off to other models for implementation.
+            </p>
+            <p>
+              One thing that let me iterate quickly here was the
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://vercel.com/changelog/vercel-sandbox-cli-is-now-available" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Sandbox CLI
+              </a>
+              . My agents were able to spin up sandboxes, mess around with the underlying linux box, and use that knowledge in their code. This let them figure out things like what Vercel Sandboxes have by default, whether the python bridge was working, and xpra's CLI arguments.
+            </p>
+            <p>
+              After one agent spent time figuring out how the Sandbox CLI worked, I had it write a skill for other agents to use, and also had it draft an integration test. The test is just a simple script that spawns a sandbox, sets up Sandcastle, and validates all the files and functionality works as expected. Letting the agents experiment in the VM and having a simple test saved me countless hours of waiting for them to read docs and trial-by-error.
+            </p>
+            <h1 id="wrapping-up">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#wrapping-up" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Wrapping up
+            </h1>
+            <p>
+              Sandcastle is not meant to be a serious desktop environment. It's not even a serious project. Please do not use it in production.
+            </p>
+            <p>
+              But if agents are going to write and run code, install packages, and manipulate browsers, maybe the interface to that shouldn't be a terminal, or
+              <em>
+                anything
+              </em>
+              running on your own machine.
+            </p>
+            <p>
+              Six years ago I was compiling X11 by hand on an iPad. This time I just prompted it on my laptop. Next time, I hope to prompt it
+              <em>
+                not
+              </em>
+              on my own machine.
+            </p>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script>
+      (()=>{let a=new URLSearchParams(window.location.search),b=null!==a.get("embed");if(window.__IS_EMBED__=b,b){let a=document.getElementById("blog-toolbar");a&&a.remove()}})()
+    </script>
+    <script id="_R_">
+      (globalThis["TURBOPACK"] || (globalThis["TURBOPACK"] = [])).push({"otherChunks":["static/chunks/1fo_i3zi4doqe.js","static/chunks/3nvuk-v5vchcw.js","static/chunks/2nckoqqunqhf1.js","static/chunks/203zi8tl808_6.js"],"runtimeModuleIds":[55947]});
+    </script>
+  </body>
+</html>

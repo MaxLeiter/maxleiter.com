@@ -1,0 +1,122 @@
+~
+/blog
+✕
+writing/
+popular
+They're Made Out of Weights
+with apologies to Terry Bisson
+Jun 3, 2026
+Running Wayland, X11, GNOME, and KDE natively on an iPad
+X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition
+Jul 28, 2026
+Formatting code should be unnecessary
+and we knew this back in the 80s
+Sep 6, 2025
+all posts
+Running Wayland, X11, GNOME, and KDE natively on an iPad
+X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition
+Jul 28, 2026
+They're Made Out of Weights
+with apologies to Terry Bisson
+Jun 3, 2026
+Per-directory terminal colors in fish shell
+Apr 5, 2026 · note
+Sandcastle: A web-based Linux desktop environment
+Feb 11, 2026
+How we made v0 an effective coding agent
+Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.
+Jan 7, 2026 · external
+Introducing HFSViewer
+View and modify HFS partitions on modern macOS versions
+Jan 2, 2026
+The new maxleiter.com
+iframes, view transitions, progressive enhancement, and React Server Components
+Nov 12, 2025
+You should be rewriting your prompts
+We talk about overfitting models but never overfitting prompts to models
+Sept 14, 2025
+I have seen the future through AR glasses
+My experience with the XReal One Pros
+Sept 7, 2025
+Formatting code should be unnecessary
+and we knew this back in the 80s
+Sep 6, 2025
+Vibe-coding Minecraft mods
+and the lessons learned
+Jun 21, 2025
+Implementing Notion style URLs
+Create /some-title-here-{id} URLs for recognizable links in Next.js
+Jun 19, 2025
+Introducing the v0 composite model family
+Introducing the v0 composite model family.
+Jun 1, 2025 · external
+Never think about branch names again
+a bash script for generating branch names
+Aug 19, 2024 · note
+Updating JSONB fields with Drizzle
+hint: just use `sql` and COALESCE.
+July 11, 2024 · note
+Ship something every day
+Jun 10, 2024
+Set your default directory in VS Code's open dialog
+Jun 6, 2024 · note
+gemini.sh script
+A script for concatenating files in a directory for copying to an LLM
+Apr 14, 2024 · note
+Sending a Slack message with fetch
+Mar 30, 2024 · note
+SWR for more than fetching
+SWR for state management
+Mar 30, 2024 · note
+Loading wasm files on Vercel Edge and Node.js runtimes
+Mar 30, 2024 · note
+Introducing AI SDK 3.0 with Generative UI support
+Stream React Components from LLMs to deliver richer user experiences.
+Mar 1, 2024 · external
+Introducing the Vercel AI SDK
+An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.
+Jun 15, 2023 · external
+Why your website's fonts might be larger than intended
+A well-meaning mobile browser feature can be problematic
+Jun 9, 2023
+Nintype is still the best iOS keyboard
+May 22, 2023
+Building a blog with Next.js 15 and React Server Components
+Use MDX, RSC, and Bright to build a blog with Next.js 15.
+Apr 16, 2023
+Improving the accessibility of our Next.js site
+We've made some improvements to the accessibility of our Next.js site. Here's how we did it.
+Sep 30, 2022 · external
+The Node ecosystem (still) has tooling problems
+It shouldn't take this much work to publish a small library
+July 30, 2022
+Live updating page views with Supabase and Next.js
+A step-by-step guide to page views and server analytics
+May 15, 2022
+Easy ways to improve your websites accessibility and performance
+A list of simple tips for developing a more accessible and user-friendly web.
+Apr 23, 2022
+How hackers* run their sites
+An analysis based on 700 personal websites
+Apr 7, 2022
+Introducing Drift
+A self-hostable alternative to GitHub Gist and Pastebin
+Mar 26, 2022
+How to start contributing to open-source projects
+A small guide to finding projects and contributing changes
+Jan 25, 2022
+Pin your npm/yarn dependencies
+A guide on how to pin your dependencies and why you may want to
+Jan 9, 2022
+Impressions of the Framework Laptop
+My thoughts on the Framework Laptop's hardware
+Nov 3, 2021
+Adding ambient light support to Linux and GNOME
+A quick dive into Linux kernel drivers
+Dec 15, 2020
+New edge dev infrastructure
+New edge dev infrastructure.
+Jul 21, 2020 · external
+X11 on iOS
+A guide on how to compile the X Window System for iOS
+Dec 15, 2019

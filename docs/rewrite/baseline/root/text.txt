@@ -1,0 +1,45 @@
+Max Leiter's website
+~
+blog
+notes
+projects
+about
+labs
+talks
+calc
+github
+linkedin
+X
+Writing
+popular/
+They're Made Out of Weights
+Jun 3, 2026
+Running Wayland, X11, GNOME, and KDE natively on an iPad
+Jul 28, 2026
+Formatting code should be unnecessary
+Sep 6, 2025
+recent/
+Per-directory terminal colors in fish shell
+Apr 5, 2026· note
+Sandcastle: A web-based Linux desktop environment
+Feb 11, 2026
+How we made v0 an effective coding agent
+Jan 7, 2026· external
+View all posts →
+Projects
+The Lounge
+Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.
+2016present
+v0
+I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.
+20232026
+SortableJS-vue3
+A TypeScript wrapper for SortableJS built for Vue 3.
+20222026
+AI SDK
+I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK.
+20232024
+Drift
+A self-hostable and open-source alternative to GitHub Gist and Pastebin.
+20222023
+View all projects →

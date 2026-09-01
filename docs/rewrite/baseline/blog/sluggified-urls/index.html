@@ -1,0 +1,254 @@
+<!doctype html>
+<html class="&lt;cssmod>_variable &lt;cssmod>_variable" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <style>
+      /* css */
+    </style>
+    <meta content="" name="next-size-adjust">
+    <meta content="#000000" name="theme-color">
+    <title>
+      Implementing Notion style URLs
+    </title>
+    <meta content="Create /some-title-here-{id} URLs for recognizable links in Next.js" name="description">
+    <meta content="index, follow" name="robots">
+    <meta content="index, follow" name="googlebot">
+    <link href="https://maxleiter.com/blog/sluggified-urls" rel="canonical">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="Create /some-title-here-{id} URLs for recognizable links in Next.js" property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/blog/sluggified-urls/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="600" property="og:image:height">
+    <meta content="website" property="og:type">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="Create /some-title-here-{id} URLs for recognizable links in Next.js" name="twitter:description">
+    <meta content="https://maxleiter.com/blog/sluggified-urls/opengraph-image" name="twitter:image">
+    <meta content="image/png" name="twitter:image:type">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="600" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+  </head>
+  <body>
+    <div hidden="">
+    </div>
+    <script>
+      ((a,b,c,d,e,f,g,h)=>{let i=document.documentElement,j=["light","dark"];function k(b){var c;(Array.isArray(a)?a:[a]).forEach(a=>{let c="class"===a,d=c&&f?e.map(a=>f[a]||a):e;c?(i.classList.remove(...d),i.classList.add(f&&f[b]?f[b]:b)):i.setAttribute(a,b)}),c=b,h&&j.includes(c)&&(i.style.colorScheme=c)}if(d)k(d);else try{let a=localStorage.getItem(b)||c,d=g&&"system"===a?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":a;k(d)}catch(a){}})("data-theme","theme","dark",null,["light","dark"],null,true,true)
+    </script>
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <div id="blog-toolbar">
+        <header class="h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10" style="background-color:var(--bg-window-alpha);backdrop-filter:blur(12px)">
+          <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm font-mono text-[var(--gray)]">
+            <a class="hover:text-[var(--fg)] transition-colors" href="/">
+              ~
+            </a>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/blog">
+                blog
+              </a>
+            </div>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/blog/sluggified-urls">
+                sluggified-urls
+              </a>
+            </div>
+          </nav>
+          <div class="flex items-center gap-1">
+            <button aria-label="Minimize window" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" title="Minimize">
+              <svg fill="none" height="12" viewbox="0 0 16 16" width="12">
+                <rect height="8" stroke="currentColor" stroke-width="1.5" width="8" x="4" y="4">
+                </rect>
+              </svg>
+            </button>
+            <button aria-label="Close Implementing Notion style URLs" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors">
+              ✕
+            </button>
+          </div>
+        </header>
+      </div>
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto">
+          <div class="mb-1">
+            <span class="font-mono text-sm" style="color:var(--gray)">
+              Jun 19, 2025
+            </span>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            Implementing Notion style URLs
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            Create /some-title-here-{id} URLs for recognizable links in Next.js
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <p>
+              I hate unrecognizable URLs. If I want to go back to a specific document or page, I should be able to type the name of it in the address bar and find it in my browser history. Notion is particularly good at this, and v0 was particularly bad at it (for a while), so this is what I did to fix v0.
+            </p>
+            <p>
+              Here's what a notion URL looks like:
+            </p>
+            <span style="font-family:monospace;font-size:1.2em">
+              <p>
+                <code>
+                  https://notion.so/org/Team-Roadmap-159f06b059c491d9abb8
+                </code>
+              </p>
+            </span>
+            <p>
+              It's recognizable, visually appealing, and easy to find in your browser history:
+            </p>
+            <img alt="Screenshot of Firefox Suggestion matching the URL when I typed Team Roadmap" data-nimg="1" decoding="async" height="100" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fnotion-urls%2Fsuggestion.png&amp;w=1200&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fnotion-urls%2Fsuggestion.png&amp;w=640&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fnotion-urls%2Fsuggestion.png&amp;w=1200&amp;q=75 2x" style="color:transparent" width="600">
+            <p>
+              I'm a fan.
+            </p>
+            <hr>
+            <p>
+              At first I thought implementing it would be straight forward, but there are a few easy-to-hit gotcha's involved. This post will be focused on Next.js, but the concepts are universal. Here are some of the things to keep in mind:
+            </p>
+            <ul>
+              <li>
+                You need to ensure the
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://developers.google.com/search/docs/crawling-indexing/canonicalization" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  canonical URL
+                </a>
+                is up-to-date
+              </li>
+              <li>
+                The client needs to wind up on the most recent URL, otherwise crawlers like Google can index "fake" paths
+              </li>
+              <li>
+                Be mindful of your previous URLs and ensure they don't conflict with the logic for adding/parsing the slug
+              </li>
+            </ul>
+            <p>
+              To get started, we need two functions: one to generate the URL, and one to parse it.
+            </p>
+            <p>
+              It's important we support URLs both with and without the title, and I recommend using a library to handle the slugification so you don't need to worry about things like special characters.
+            </p>
+            <div data-bright-mode="dark" data-bright-theme="solarized-dark" style="color:#839496;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#274642;--line-number-color:#858585;--tab-border:#003847;--tab-background:#002B37;--tab-color:#d6dbdb;--inactive-tab-background:#004052;--inactive-tab-color:#93A1A1;--tab-bottom-border:#002B37;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#839496;background:#002B36;padding:1em 0;overflow:auto">
+                function extractIdFromSlug(slug: string): {  id: string  title?: string} {  const lastHyphenIndex = slug.lastIndexOf('-')  // If no hyphen found, its just the ID  if (lastHyphenIndex === -1) {    return { id: slug, title: undefined }  }  const id = slug.substring(lastHyphenIndex + 1)  const title = slug.substring(0, lastHyphenIndex)  return { id, title: title || undefined }}
+              </pre>
+            </div>
+            <div data-bright-mode="light" data-bright-theme="material-palenight" style="color:#A6ACCD;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#717CB450;--line-number-color:#3A3F58;--tab-border:#292D3E;--tab-background:#292D3E;--tab-color:#FFFFFF;--inactive-tab-background:#292D3E;--inactive-tab-color:#676E95;--tab-bottom-border:#80CBC4;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#A6ACCD;background:#292D3E;padding:1em 0;overflow:auto">
+                function extractIdFromSlug(slug: string): {  id: string  title?: string} {  const lastHyphenIndex = slug.lastIndexOf('-')  // If no hyphen found, its just the ID  if (lastHyphenIndex === -1) {    return { id: slug, title: undefined }  }  const id = slug.substring(lastHyphenIndex + 1)  const title = slug.substring(0, lastHyphenIndex)  return { id, title: title || undefined }}
+              </pre>
+            </div>
+            <div data-bright-mode="dark" data-bright-theme="solarized-dark" style="color:#839496;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#274642;--line-number-color:#858585;--tab-border:#003847;--tab-background:#002B37;--tab-color:#d6dbdb;--inactive-tab-background:#004052;--inactive-tab-color:#93A1A1;--tab-bottom-border:#002B37;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#839496;background:#002B36;padding:1em 0;overflow:auto">
+                function getSluggifiedId(id: string, title: string | undefined) {  if (title) {    /* you can use slugify or some other library */    return `${slugify(title.slice(0, 50))}-${id}`  }  return id}
+              </pre>
+            </div>
+            <div data-bright-mode="light" data-bright-theme="material-palenight" style="color:#A6ACCD;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#717CB450;--line-number-color:#3A3F58;--tab-border:#292D3E;--tab-background:#292D3E;--tab-color:#FFFFFF;--inactive-tab-background:#292D3E;--inactive-tab-color:#676E95;--tab-bottom-border:#80CBC4;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#A6ACCD;background:#292D3E;padding:1em 0;overflow:auto">
+                function getSluggifiedId(id: string, title: string | undefined) {  if (title) {    /* you can use slugify or some other library */    return `${slugify(title.slice(0, 50))}-${id}`  }  return id}
+              </pre>
+            </div>
+            <p>
+              (In practice, I had to add support for passing in a minimum ID length for each case, because v0 used to generate IDs with dashes. )
+            </p>
+            <p>
+              Now, integrating these utilities into our pages requires:
+            </p>
+            <ul>
+              <li>
+                Updating the canonical URL
+              </li>
+              <li>
+                Implementing a way to redirect users to the updated URL.
+                <ul>
+                  <li>
+                    If you do this on the server, you can serve a 301 redirect
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <p>
+              Using the Next.js
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://nextjs.org/docs/app/getting-started/metadata-and-og-images" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Metadata API
+              </a>
+              :
+            </p>
+            <div data-bright-mode="dark" data-bright-theme="solarized-dark" style="color:#839496;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#274642;--line-number-color:#858585;--tab-border:#003847;--tab-background:#002B37;--tab-color:#d6dbdb;--inactive-tab-background:#004052;--inactive-tab-color:#93A1A1;--tab-bottom-border:#002B37;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#839496;background:#002B36;padding:1em 0;overflow:auto">
+                export async function generateMetadata(): Promise<Metadata> {  return {    // ...other fields here...    alternates: {      canonical: `/chat/${getSluggifiedId(chatId, title)}`,    },  }}
+              </pre>
+            </div>
+            <div data-bright-mode="light" data-bright-theme="material-palenight" style="color:#A6ACCD;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#717CB450;--line-number-color:#3A3F58;--tab-border:#292D3E;--tab-background:#292D3E;--tab-color:#FFFFFF;--inactive-tab-background:#292D3E;--inactive-tab-color:#676E95;--tab-bottom-border:#80CBC4;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#A6ACCD;background:#292D3E;padding:1em 0;overflow:auto">
+                export async function generateMetadata(): Promise<Metadata> {  return {    // ...other fields here...    alternates: {      canonical: `/chat/${getSluggifiedId(chatId, title)}`,    },  }}
+              </pre>
+            </div>
+            <p>
+              This ensures the pages Metadata is correct for SSR (be sure to revalidate the path if you update the title), but the client can still be on the wrong page if they visit an old URL.
+            </p>
+            <p>
+              To solve that, we can introduce a client component that we'll include in our root layout (or wherever you need it):
+            </p>
+            <div data-bright-mode="dark" data-bright-theme="solarized-dark" style="color:#839496;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#274642;--line-number-color:#858585;--tab-border:#003847;--tab-background:#002B37;--tab-color:#d6dbdb;--inactive-tab-background:#004052;--inactive-tab-color:#93A1A1;--tab-bottom-border:#002B37;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#839496;background:#002B36;padding:1em 0;overflow:auto">
+                'use client'// throw this in your layout/pageexport function KeepClientOnUpToDateSlugPath({  id,  title,}: {  id: string  title?: string}) {  useLayoutEffect(() => {    const slug = getSluggifiedId(id, title)    const url = new URL(window.location.href)    const pathParts = url.pathname.split('/')    const lastPart = pathParts[pathParts.length - 1]    if (lastPart && lastPart !== slug) {      // Replace last path segment      pathParts[pathParts.length - 1] = slug      url.pathname = pathParts.join('/')      window.history.replaceState(null, '', url.toString())    }  }, [id, title])  return null}
+              </pre>
+            </div>
+            <div data-bright-mode="light" data-bright-theme="material-palenight" style="color:#A6ACCD;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#717CB450;--line-number-color:#3A3F58;--tab-border:#292D3E;--tab-background:#292D3E;--tab-color:#FFFFFF;--inactive-tab-background:#292D3E;--inactive-tab-color:#676E95;--tab-bottom-border:#80CBC4;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#A6ACCD;background:#292D3E;padding:1em 0;overflow:auto">
+                'use client'// throw this in your layout/pageexport function KeepClientOnUpToDateSlugPath({  id,  title,}: {  id: string  title?: string}) {  useLayoutEffect(() => {    const slug = getSluggifiedId(id, title)    const url = new URL(window.location.href)    const pathParts = url.pathname.split('/')    const lastPart = pathParts[pathParts.length - 1]    if (lastPart && lastPart !== slug) {      // Replace last path segment      pathParts[pathParts.length - 1] = slug      url.pathname = pathParts.join('/')      window.history.replaceState(null, '', url.toString())    }  }, [id, title])  return null}
+              </pre>
+            </div>
+            <p>
+              Fin! Now I have great URLs like
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://v0.app/chat/autoplay-slideshow-for-v0-Z7canzuZ4b9" rel="noopener noreferrer" tabindex="0" target="_blank">
+                https://v0.app/chat/autoplay-slideshow-for-v0-Z7canzuZ4b9
+              </a>
+            </p>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script>
+      (()=>{let a=new URLSearchParams(window.location.search),b=null!==a.get("embed");if(window.__IS_EMBED__=b,b){let a=document.getElementById("blog-toolbar");a&&a.remove()}})()
+    </script>
+    <script id="_R_">
+      (globalThis["TURBOPACK"] || (globalThis["TURBOPACK"] = [])).push({"otherChunks":["static/chunks/1fo_i3zi4doqe.js","static/chunks/3nvuk-v5vchcw.js","static/chunks/2nckoqqunqhf1.js","static/chunks/203zi8tl808_6.js"],"runtimeModuleIds":[55947]});
+    </script>
+  </body>
+</html>

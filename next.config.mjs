@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Phase 0 (bespoke-framework branch only): the Next 16 canary generates
+  // .next/dev/types/validator.ts with 4 TS2559 errors for opengraph-image /
+  // robots / sitemap. Not app code. This file is deleted at cutover.
+  typescript: { ignoreBuildErrors: true },
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [

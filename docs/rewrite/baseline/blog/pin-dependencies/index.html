@@ -1,0 +1,223 @@
+<!doctype html>
+<html class="&lt;cssmod>_variable &lt;cssmod>_variable" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <style>
+      /* css */
+    </style>
+    <meta content="" name="next-size-adjust">
+    <meta content="#000000" name="theme-color">
+    <title>
+      Pin your npm/yarn dependencies
+    </title>
+    <meta content="A guide on how to pin your dependencies and why you may want to" name="description">
+    <meta content="index, follow" name="robots">
+    <meta content="index, follow" name="googlebot">
+    <link href="https://maxleiter.com/blog/pin-dependencies" rel="canonical">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="A guide on how to pin your dependencies and why you may want to" property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/blog/pin-dependencies/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="600" property="og:image:height">
+    <meta content="website" property="og:type">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="A guide on how to pin your dependencies and why you may want to" name="twitter:description">
+    <meta content="https://maxleiter.com/blog/pin-dependencies/opengraph-image" name="twitter:image">
+    <meta content="image/png" name="twitter:image:type">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="600" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+  </head>
+  <body>
+    <div hidden="">
+    </div>
+    <script>
+      ((a,b,c,d,e,f,g,h)=>{let i=document.documentElement,j=["light","dark"];function k(b){var c;(Array.isArray(a)?a:[a]).forEach(a=>{let c="class"===a,d=c&&f?e.map(a=>f[a]||a):e;c?(i.classList.remove(...d),i.classList.add(f&&f[b]?f[b]:b)):i.setAttribute(a,b)}),c=b,h&&j.includes(c)&&(i.style.colorScheme=c)}if(d)k(d);else try{let a=localStorage.getItem(b)||c,d=g&&"system"===a?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":a;k(d)}catch(a){}})("data-theme","theme","dark",null,["light","dark"],null,true,true)
+    </script>
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <div id="blog-toolbar">
+        <header class="h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10" style="background-color:var(--bg-window-alpha);backdrop-filter:blur(12px)">
+          <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm font-mono text-[var(--gray)]">
+            <a class="hover:text-[var(--fg)] transition-colors" href="/">
+              ~
+            </a>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/blog">
+                blog
+              </a>
+            </div>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/blog/pin-dependencies">
+                pin-dependencies
+              </a>
+            </div>
+          </nav>
+          <div class="flex items-center gap-1">
+            <button aria-label="Minimize window" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" title="Minimize">
+              <svg fill="none" height="12" viewbox="0 0 16 16" width="12">
+                <rect height="8" stroke="currentColor" stroke-width="1.5" width="8" x="4" y="4">
+                </rect>
+              </svg>
+            </button>
+            <button aria-label="Close Pin your npm/yarn dependencies" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors">
+              ✕
+            </button>
+          </div>
+        </header>
+      </div>
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto">
+          <div class="mb-1">
+            <span class="font-mono text-sm" style="color:var(--gray)">
+              Jan 9, 2022
+            </span>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            Pin your npm/yarn dependencies
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            A guide on how to pin your dependencies and why you may want to
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <p>
+              Today, the open-source maintainer
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/Marak" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Marak
+              </a>
+              intentionally
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://www.bleepingcomputer.com/news/security/dev-corrupts-npm-libs-colors-and-faker-breaking-thousands-of-apps/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                bricked two popular JavaScript libraries
+              </a>
+              (with ~25 total million weekly downloads) in such a way that they broke dependents software. There's nothing that npm or any other public registry could've done to have prevented this; the release was indistinguishable from a regular update, unless you looked at the code. This is not the first time an npm dependency has
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://qz.com/646467/how-one-programmer-broke-the-internet-by-deleting-a-tiny-piece-of-code/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                gone rogue
+              </a>
+              and
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/dominictarr/event-stream/issues/115" rel="noopener noreferrer" tabindex="0" target="_blank">
+                caused havoc
+              </a>
+              due to supply chain problems, and it certainly won't be the last. And so the defensive role falls to you, the developer.
+            </p>
+            <h3 id="pinning-dependencies">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#pinning-dependencies" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Pinning dependencies
+            </h3>
+            <p>
+              My recommendation is to
+              <strong>
+                pin your dependencies
+              </strong>
+              . If you're unfamiliar with what this means, you should first be familiar with
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://semver.org/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                semantic versioning
+              </a>
+              . In short, pinning dependencies means the
+              <em>
+                exact
+              </em>
+              version specified will be installed, rather than a dependency matching the range criteria. Here's an example:
+            </p>
+            <div data-bright-mode="dark" data-bright-theme="solarized-dark" style="color:#839496;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#274642;--line-number-color:#858585;--tab-border:#003847;--tab-background:#002B37;--tab-color:#d6dbdb;--inactive-tab-background:#004052;--inactive-tab-color:#93A1A1;--tab-bottom-border:#002B37;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#839496;background:#002B36;padding:1em 0;overflow:auto">
+                {  "dependencies": {    "react": "17.0.2", // installs react@17.0.2 exactly. I recommend this.    "react": "^17.0.2", // installs the latest minor version after .0 (so 17.*.*)    "react": "~17.0.2" // installs the latest patch after .2 (so 17.0.*)  }}
+              </pre>
+            </div>
+            <div data-bright-mode="light" data-bright-theme="material-palenight" style="color:#A6ACCD;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#717CB450;--line-number-color:#3A3F58;--tab-border:#292D3E;--tab-background:#292D3E;--tab-color:#FFFFFF;--inactive-tab-background:#292D3E;--inactive-tab-color:#676E95;--tab-bottom-border:#80CBC4;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#A6ACCD;background:#292D3E;padding:1em 0;overflow:auto">
+                {  "dependencies": {    "react": "17.0.2", // installs react@17.0.2 exactly. I recommend this.    "react": "^17.0.2", // installs the latest minor version after .0 (so 17.*.*)    "react": "~17.0.2" // installs the latest patch after .2 (so 17.0.*)  }}
+              </pre>
+            </div>
+            <p>
+              To automatically accomplish this in your projects, you can add `save-exact=true` to a `.npmrc` file, or use `--save-exact` when adding the dependency via npm (or `--exact` via yarn).
+            </p>
+            <p>
+              If you do this, I also recommend some sort of dependency management so you stay up-to-date. I personally use the
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/renovatebot/renovate" rel="noopener noreferrer" tabindex="0" target="_blank">
+                renovate
+              </a>
+              bot for my GitHub projects.
+            </p>
+            <h3 id="what-about-lockfiles">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#what-about-lockfiles" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              What about lockfiles?
+            </h3>
+            <p>
+              You may have noticed npm and yarn generate `package-lock.json` and `yarn.lock` when you run `npm i` and `yarn`, respectively. The lockfiles allow every version of every sub-dependency to be pinned, while modifying the package.json only guarantees we pin the immediate dependency (which may not pin its own dependencies).
+            </p>
+            <p>
+              One problem with relying on lockfiles is that they and their semantics are confusing. In my experience, many new-to-npm users expect `npm i` to function like `npm ci`, and are unaware of the differences. `npm i` can update `package-lock.json`, whereas `npm ci` will only read from it.
+            </p>
+            <blockquote>
+              <p>
+                Tip: You almost always want to use `npm ci`
+              </p>
+            </blockquote>
+            <p>
+              Meanwhile, with yarn, `yarn install` will install the version in the yarn.lock, regardless of the version in the package.json. Good for security? Sure. Good for the developer experience? Not so much. You need to use `yarn upgrade <package>` in order to fetch the version in the package.json if it's more recent than specified in the yarn.lock. It's now far more difficult to determine
+              <em>
+                when
+              </em>
+              something is updated. If you've ever found yourself staring at a yarn.lock diff you'll know what I mean.
+            </p>
+            <p>
+              Lockfiles are good tools, but can be difficult and unintuitive to work with.
+            </p>
+            <h3 id="in-conclusion">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#in-conclusion" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              In conclusion
+            </h3>
+            <p>
+              Use lockfiles for pinning transitive dependencies, but have your package.json be the source of truth. Pin your dependencies so you have a human-friendly, readable method to audit your dependencies and ensure a specific version is installed. Automate some process to make sure you remain up-to-date.
+            </p>
+            <p>
+              If you disagree or have comments, feel free to
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="mailto:maxwell.leiter@gmail.com" tabindex="0">
+                email me
+              </a>
+              or reach out on
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://twitter.com/maxleiter" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Twitter
+              </a>
+              .
+            </p>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script>
+      (()=>{let a=new URLSearchParams(window.location.search),b=null!==a.get("embed");if(window.__IS_EMBED__=b,b){let a=document.getElementById("blog-toolbar");a&&a.remove()}})()
+    </script>
+    <script id="_R_">
+      (globalThis["TURBOPACK"] || (globalThis["TURBOPACK"] = [])).push({"otherChunks":["static/chunks/1fo_i3zi4doqe.js","static/chunks/3nvuk-v5vchcw.js","static/chunks/2nckoqqunqhf1.js","static/chunks/203zi8tl808_6.js"],"runtimeModuleIds":[55947]});
+    </script>
+  </body>
+</html>

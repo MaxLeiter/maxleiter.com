@@ -1,0 +1,168 @@
+<!doctype html>
+<html class="&lt;cssmod>_variable &lt;cssmod>_variable" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link as="image" href="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/node-tooling/unix-poster.jpg" rel="preload">
+    <style>
+      /* css */
+    </style>
+    <meta content="" name="next-size-adjust">
+    <meta content="#000000" name="theme-color">
+    <title>
+      The Node ecosystem (still) has tooling problems
+    </title>
+    <meta content="It shouldn't take this much work to publish a small library" name="description">
+    <meta content="index, follow" name="robots">
+    <meta content="index, follow" name="googlebot">
+    <link href="https://maxleiter.com/blog/node-has-tooling-problems" rel="canonical">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="It shouldn't take this much work to publish a small library" property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/blog/node-has-tooling-problems/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="600" property="og:image:height">
+    <meta content="website" property="og:type">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="It shouldn't take this much work to publish a small library" name="twitter:description">
+    <meta content="https://maxleiter.com/blog/node-has-tooling-problems/opengraph-image" name="twitter:image">
+    <meta content="image/png" name="twitter:image:type">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="600" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+  </head>
+  <body>
+    <div hidden="">
+    </div>
+    <script>
+      ((a,b,c,d,e,f,g,h)=>{let i=document.documentElement,j=["light","dark"];function k(b){var c;(Array.isArray(a)?a:[a]).forEach(a=>{let c="class"===a,d=c&&f?e.map(a=>f[a]||a):e;c?(i.classList.remove(...d),i.classList.add(f&&f[b]?f[b]:b)):i.setAttribute(a,b)}),c=b,h&&j.includes(c)&&(i.style.colorScheme=c)}if(d)k(d);else try{let a=localStorage.getItem(b)||c,d=g&&"system"===a?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":a;k(d)}catch(a){}})("data-theme","theme","dark",null,["light","dark"],null,true,true)
+    </script>
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <div id="blog-toolbar">
+        <header class="h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10" style="background-color:var(--bg-window-alpha);backdrop-filter:blur(12px)">
+          <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm font-mono text-[var(--gray)]">
+            <a class="hover:text-[var(--fg)] transition-colors" href="/">
+              ~
+            </a>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/blog">
+                blog
+              </a>
+            </div>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/blog/node-has-tooling-problems">
+                node-has-tooling-problems
+              </a>
+            </div>
+          </nav>
+          <div class="flex items-center gap-1">
+            <button aria-label="Minimize window" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" title="Minimize">
+              <svg fill="none" height="12" viewbox="0 0 16 16" width="12">
+                <rect height="8" stroke="currentColor" stroke-width="1.5" width="8" x="4" y="4">
+                </rect>
+              </svg>
+            </button>
+            <button aria-label="Close The Node ecosystem (still) has tooling problems" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors">
+              ✕
+            </button>
+          </div>
+        </header>
+      </div>
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto">
+          <div class="mb-1">
+            <span class="font-mono text-sm" style="color:var(--gray)">
+              July 30, 2022
+            </span>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            The Node ecosystem (still) has tooling problems
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            It shouldn't take this much work to publish a small library
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <p>
+              I recently published a
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/maxleiter/sortablejs-vue3" rel="noopener noreferrer" tabindex="0" target="_blank">
+                small npm package
+              </a>
+              containing a Vue library. The package is written in TypeScript powered by Vite, which I (wrongly) assumed would mediate most of my woes.
+            </p>
+            <p>
+              <img alt="Obi Wan gif of him sarcastically saying &quot;Oh, this is going to be easy&quot;" data-nimg="1" decoding="async" height="450" loading="lazy" src="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fnode-tooling%2Fobiwan.gif&amp;w=1200&amp;q=75" srcset="/_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fnode-tooling%2Fobiwan.gif&amp;w=640&amp;q=75 1x, /_next/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fnode-tooling%2Fobiwan.gif&amp;w=1200&amp;q=75 2x" style="color:transparent" width="550">
+            </p>
+            <p>
+              First, I used Vite to build a small front-end site to demonstrate the library. This let me test the component and demonstrate usage in the same repository. Getting this working was fairly straight forward for someone with experience wrangling TypeScript configurations, but I imagine for a less experienced developer it could've been a daunting task. I ended up with two tsconfigs, `tsconfig.node.json` and `tsconfig.site.json`, had to figure out module resolution, realized I needed `vue-tsc`, and had a multitude of other minor roadblocks. The nicest thing about Vite is it is
+              <em>
+                fast
+              </em>
+              , which made working on this manageable.
+            </p>
+            <p>
+              Second, I had to figure out how to publish a library. After lots of research (AKA reading Reddit threads and blog posts), I figured out the proper incantation of `tsc` parameters, `package.json` options, and tsconfigs to get something almost functional by channeling the Unix Magic wizard:
+            </p>
+            <img alt="Unix Magic poster, a wizard crafting a potion surrounded by ingredients named after Unix tools" height="500" src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/node-tooling/unix-poster.jpg">
+            <p>
+              I added a *third* tsconfig, `tsconfig.dist.json` (that also extends `tsconfig.node.json`), added a new `vite.config.ts` for distribution (which required special options for passing to rollup), and I added something like the following to my package.json:
+            </p>
+            <div data-bright-mode="dark" data-bright-theme="solarized-dark" style="color:#839496;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#274642;--line-number-color:#858585;--tab-border:#003847;--tab-background:#002B37;--tab-color:#d6dbdb;--inactive-tab-background:#004052;--inactive-tab-color:#93A1A1;--tab-bottom-border:#002B37;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#839496;background:#002B36;padding:1em 0;overflow:auto">
+                  "types": "./dist/types/main.d.ts",  "files": [    "dist"  ],  "main": "./dist/sortablejs-vue3.umd.js",  "module": "./dist/sortablejs-vue3.es.js",  "exports": {    ".": {      "import": "./dist/sortablejs-vue3.es.js",      "require": "./dist/sortablejs-vue3.umd.js"    }  },
+              </pre>
+            </div>
+            <div data-bright-mode="light" data-bright-theme="material-palenight" style="color:#A6ACCD;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#717CB450;--line-number-color:#3A3F58;--tab-border:#292D3E;--tab-background:#292D3E;--tab-color:#FFFFFF;--inactive-tab-background:#292D3E;--inactive-tab-color:#676E95;--tab-bottom-border:#80CBC4;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#A6ACCD;background:#292D3E;padding:1em 0;overflow:auto">
+                  "types": "./dist/types/main.d.ts",  "files": [    "dist"  ],  "main": "./dist/sortablejs-vue3.umd.js",  "module": "./dist/sortablejs-vue3.es.js",  "exports": {    ".": {      "import": "./dist/sortablejs-vue3.es.js",      "require": "./dist/sortablejs-vue3.umd.js"    }  },
+              </pre>
+            </div>
+            <p>
+              The next thing I did was establish some tooling. I set-up Prettier with an npm script to format my code (which requires two new configuration files), a GitHub bot for updating dependencies (which requires a configuration file), and Vercel for deploying the demo site. Someone later submit a pull request for auto-publishing to npm when new tags are pushed, which required a `.github/` directory to be made.
+            </p>
+            <p>
+              Now I was ready to release the library! Or so I thought: for some reason, \`.github/\` was being included in the package contents. After some digging, I found I needed to add an \`.npmignore\`, something I've done in the past but forgot about. Thankfully, using it again caused me to remember that npm defaults to using your \`.gitignore\`, and when you add an npmignore it
+              <em>
+                no longer does!
+              </em>
+              I copied the contents of my \`.gitignore\` over and added a line for \`.github\`.
+            </p>
+            <p>
+              Finally, I had a publishable library!
+            </p>
+            <p>
+              You can see the code at
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/MaxLeiter/sortablejs-vue3" rel="noopener noreferrer" tabindex="0" target="_blank">
+                https://github.com/MaxLeiter/sortablejs-vue3
+              </a>
+              , and I hope it's helpful to anyone looking to publish something similar in the future.
+            </p>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script>
+      (()=>{let a=new URLSearchParams(window.location.search),b=null!==a.get("embed");if(window.__IS_EMBED__=b,b){let a=document.getElementById("blog-toolbar");a&&a.remove()}})()
+    </script>
+    <script id="_R_">
+      (globalThis["TURBOPACK"] || (globalThis["TURBOPACK"] = [])).push({"otherChunks":["static/chunks/1fo_i3zi4doqe.js","static/chunks/3nvuk-v5vchcw.js","static/chunks/2nckoqqunqhf1.js","static/chunks/203zi8tl808_6.js"],"runtimeModuleIds":[55947]});
+    </script>
+  </body>
+</html>

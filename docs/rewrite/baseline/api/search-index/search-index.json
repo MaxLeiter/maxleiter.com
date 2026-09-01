@@ -1,0 +1,296 @@
+[
+  {
+    "type": "blog",
+    "title": "Running Wayland, X11, GNOME, and KDE natively on an iPad",
+    "href": "/blog/xios",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "They're Made Out of Weights",
+    "href": "/blog/weights",
+    "external": false
+  },
+  {
+    "type": "note",
+    "title": "Per-directory terminal colors in fish shell",
+    "href": "/notes/fish-directory-colors",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Sandcastle: A web-based Linux desktop environment",
+    "href": "/blog/sandcastle",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "How we made v0 an effective coding agent",
+    "href": "https://vercel.com/blog/how-we-made-v0-an-effective-coding-agent",
+    "external": true
+  },
+  {
+    "type": "blog",
+    "title": "Introducing HFSViewer",
+    "href": "/blog/HFSViewer",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "The new maxleiter.com",
+    "href": "/blog/the-new-maxleiter-com",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "You should be rewriting your prompts",
+    "href": "/blog/rewrite-your-prompts",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "I have seen the future through AR glasses",
+    "href": "/blog/seeing-the-future",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Formatting code should be unnecessary",
+    "href": "/blog/formatting",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Vibe-coding Minecraft mods",
+    "href": "/blog/vibecoding-minecraft-mods",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Implementing Notion style URLs",
+    "href": "/blog/sluggified-urls",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Introducing the v0 composite model family",
+    "href": "https://vercel.com/blog/v0-composite-model-family",
+    "external": true
+  },
+  {
+    "type": "note",
+    "title": "Never think about branch names again",
+    "href": "/notes/git-checkout-script",
+    "external": false
+  },
+  {
+    "type": "note",
+    "title": "Updating JSONB fields with Drizzle",
+    "href": "/notes/updating-jsonb-drizzle",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Ship something every day",
+    "href": "/blog/ship-every-day",
+    "external": false
+  },
+  {
+    "type": "note",
+    "title": "Set your default directory in VS Code's open dialog",
+    "href": "/notes/vscode-default-dir",
+    "external": false
+  },
+  {
+    "type": "note",
+    "title": "gemini.sh script",
+    "href": "/notes/gemini-script",
+    "external": false
+  },
+  {
+    "type": "note",
+    "title": "Sending a Slack message with fetch",
+    "href": "/notes/slack-message-fetch",
+    "external": false
+  },
+  {
+    "type": "note",
+    "title": "SWR for more than fetching",
+    "href": "/notes/swr-state",
+    "external": false
+  },
+  {
+    "type": "note",
+    "title": "Loading wasm files on Vercel Edge and Node.js runtimes",
+    "href": "/notes/wasm-edge-and-node",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Introducing AI SDK 3.0 with Generative UI support",
+    "href": "https://vercel.com/blog/ai-sdk-3-generative-ui",
+    "external": true
+  },
+  {
+    "type": "blog",
+    "title": "Introducing the Vercel AI SDK",
+    "href": "https://vercel.com/blog/introducing-the-vercel-ai-sdk",
+    "external": true
+  },
+  {
+    "type": "blog",
+    "title": "Why your website's fonts might be larger than intended",
+    "href": "/blog/mobile-browsers-resizing-font",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Nintype is still the best iOS keyboard",
+    "href": "/blog/nintype",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Building a blog with Next.js 15 and React Server Components",
+    "href": "/blog/build-a-blog-with-nextjs-13",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Improving the accessibility of our Next.js site",
+    "href": "https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site",
+    "external": true
+  },
+  {
+    "type": "blog",
+    "title": "The Node ecosystem (still) has tooling problems",
+    "href": "/blog/node-has-tooling-problems",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Live updating page views with Supabase and Next.js",
+    "href": "/blog/supabase-next-analytics",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Easy ways to improve your websites accessibility and performance",
+    "href": "/blog/easy-site-improvements",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "How hackers* run their sites",
+    "href": "/blog/hacker-sites",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Introducing Drift",
+    "href": "/blog/introducing-drift",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "How to start contributing to open-source projects",
+    "href": "/blog/contributing-to-oss",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Pin your npm/yarn dependencies",
+    "href": "/blog/pin-dependencies",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Impressions of the Framework Laptop",
+    "href": "/blog/framework",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "Adding ambient light support to Linux and GNOME",
+    "href": "/blog/MSHW0184",
+    "external": false
+  },
+  {
+    "type": "blog",
+    "title": "New edge dev infrastructure",
+    "href": "https://vercel.com/blog/new-edge-dev-infrastructure",
+    "external": true
+  },
+  {
+    "type": "blog",
+    "title": "X11 on iOS",
+    "href": "/blog/X11",
+    "external": false
+  },
+  {
+    "type": "project",
+    "title": "The Lounge",
+    "href": "https://github.com/thelounge/thelounge",
+    "external": true
+  },
+  {
+    "type": "project",
+    "title": "v0",
+    "href": "https://v0.app",
+    "external": true
+  },
+  {
+    "type": "project",
+    "title": "SortableJS-vue3",
+    "href": "https://github.com/maxleiter/sortablejs-vue3/",
+    "external": true
+  },
+  {
+    "type": "project",
+    "title": "AI SDK",
+    "href": "https://github.com/vercel/ai",
+    "external": true
+  },
+  {
+    "type": "project",
+    "title": "Drift",
+    "href": "https://github.com/maxleiter/drift",
+    "external": true
+  },
+  {
+    "type": "project",
+    "title": "MSHW0184 driver for Linux kernel",
+    "href": "blog/MSHW0184",
+    "external": false
+  },
+  {
+    "type": "project",
+    "title": "easyarty.com",
+    "href": "https://easyarty.com",
+    "external": true
+  },
+  {
+    "type": "project",
+    "title": "X11 on iOS",
+    "href": "/blog/X11",
+    "external": false
+  },
+  {
+    "type": "project",
+    "title": "KnightOS",
+    "href": "https://github.com/knightos/knightos",
+    "external": true
+  },
+  {
+    "type": "project",
+    "title": "Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening",
+    "href": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362",
+    "external": true
+  },
+  {
+    "type": "project",
+    "title": "jsonTree",
+    "href": "https://github.com/maxleiter/jsontree",
+    "external": true
+  }
+]

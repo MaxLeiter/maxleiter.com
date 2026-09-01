@@ -1,0 +1,155 @@
+<!doctype html>
+<html class="&lt;cssmod>_variable &lt;cssmod>_variable" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <style>
+      /* css */
+    </style>
+    <meta content="" name="next-size-adjust">
+    <meta content="#000000" name="theme-color">
+    <title>
+      Notes | Max Leiter
+    </title>
+    <meta content="Short-form thoughts, code snippets, and tips." name="description">
+    <meta content="index, follow" name="robots">
+    <meta content="index, follow" name="googlebot">
+    <link href="https://maxleiter.com/feed.xml" rel="alternate" type="application/rss+xml">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="Short-form thoughts, code snippets, and tips." property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/opengraph-image" property="og:image">
+    <meta content="1200" property="og:image:width">
+    <meta content="630" property="og:image:height">
+    <meta content="Max Leiter's site" property="og:image:alt">
+    <meta content="website" property="og:type">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="Short-form thoughts, code snippets, and tips." name="twitter:description">
+    <meta content="https://maxleiter.com/opengraph-image" name="twitter:image">
+    <meta content="Max Leiter's site" name="twitter:image:alt">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="630" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+  </head>
+  <body>
+    <div hidden="">
+    </div>
+    <script>
+      ((a,b,c,d,e,f,g,h)=>{let i=document.documentElement,j=["light","dark"];function k(b){var c;(Array.isArray(a)?a:[a]).forEach(a=>{let c="class"===a,d=c&&f?e.map(a=>f[a]||a):e;c?(i.classList.remove(...d),i.classList.add(f&&f[b]?f[b]:b)):i.setAttribute(a,b)}),c=b,h&&j.includes(c)&&(i.style.colorScheme=c)}if(d)k(d);else try{let a=localStorage.getItem(b)||c,d=g&&"system"===a?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":a;k(d)}catch(a){}})("data-theme","theme","dark",null,["light","dark"],null,true,true)
+    </script>
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <div id="blog-toolbar">
+        <header class="h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10" style="background-color:var(--bg-window-alpha);backdrop-filter:blur(12px)">
+          <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm font-mono text-[var(--gray)]">
+            <a class="hover:text-[var(--fg)] transition-colors" href="/">
+              ~
+            </a>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/notes">
+                notes
+              </a>
+            </div>
+            <div class="flex items-center gap-2">
+              <span>
+                /
+              </span>
+              <a class="hover:text-[var(--fg)] transition-colors" href="/notes/gemini-script">
+                gemini-script
+              </a>
+            </div>
+          </nav>
+          <div class="flex items-center gap-1">
+            <button aria-label="Minimize window" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" title="Minimize">
+              <svg fill="none" height="12" viewbox="0 0 16 16" width="12">
+                <rect height="8" stroke="currentColor" stroke-width="1.5" width="8" x="4" y="4">
+                </rect>
+              </svg>
+            </button>
+            <button aria-label="Close gemini.sh script" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors">
+              ✕
+            </button>
+          </div>
+        </header>
+      </div>
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto">
+          <div class="mb-1">
+            <span class="font-mono text-sm" style="color:var(--gray)">
+              Apr 14, 2024
+            </span>
+            <span class="font-mono text-xs ml-4 capitalize" style="color:var(--gray)">
+              snippet
+            </span>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            gemini.sh script
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            A script for concatenating files in a directory for copying to an LLM
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <aside class="&lt;cssmod>_note">
+              <div class="&lt;cssmod>_icon">
+                <svg class="feather feather-info" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="var(--info-stroke-circle-color, currentColor)">
+                  </circle>
+                  <line stroke="var(--info-stroke-line-color, currentColor)" x1="12" x2="12" y1="16" y2="12">
+                  </line>
+                  <line stroke="var(--info-stroke-line-color, currentColor)" x1="12" x2="12.01" y1="8" y2="8">
+                  </line>
+                </svg>
+              </div>
+              <div class="&lt;cssmod>_content">
+                <b>
+                  Note:
+                </b>
+                <p>
+                  As of late 2024/early 2025, I recommend using the great repomix tool:
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/yamadashy/repomix" rel="noopener noreferrer" tabindex="0" target="_blank">
+                    https://github.com/yamadashy/repomix
+                  </a>
+                </p>
+              </div>
+            </aside>
+            <p>
+              I've been messing with gemini-1.5-pro with the 1 million token context window for a while now and found this script very useful for grabbing entire repos. It ignores most binary files and concatenates the rest into a single file.
+            </p>
+            <p>
+              You'll need to have `parallel` installed for this to work (`brew install parallel` on macOS).
+            </p>
+            <div data-bright-mode="dark" data-bright-theme="solarized-dark" style="color:#839496;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#274642;--line-number-color:#858585;--tab-border:#003847;--tab-background:#002B37;--tab-color:#d6dbdb;--inactive-tab-background:#004052;--inactive-tab-color:#93A1A1;--tab-bottom-border:#002B37;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#839496;background:#002B36;padding:1em 0;overflow:auto">
+                #!/bin/bash# written by Claude 3 Opus and Gemini-1.5-pro.set -e# Check for correct number of argumentsif [ "$#" -ne 2 ]; then    echo "Usage: gemini.sh <directory> <output file>"    exit 1fi# Check if directory existsif [ ! -d "$1" ]; then    echo "Directory $1 does not exist"    exit 1fi# Check if can replace output fileif [ -f "$2" ]; then    read -p "File $2 already exists. Overwrite? [y/n] " -n 1 -r    echo    if [[ ! $REPLY =~ ^[Yy]$ ]]; then        exit 1    fi    rm "$2"fi# Function to check if a file should be ignoredis_ignored() {    local file="$1"    local gitignore=$(git rev-parse --show-toplevel)/.gitignore 2>/dev/null    if [[ -f "$gitignore" ]]; then        git check-ignore -q "$file" && return 0    fi    if [[ $file == *.git* ]]; then        return 0    fi    # ignore run folder    if [[ $file == run/* ]]; then        return 0    fi    if [[ $file == *.bin/* || $file == *build/* || $file == *dist/* ]]; then        return 0    fi    if [[ $file == *.gradle/* || $file == *.idea/* || $file == *.vscode/* ]]; then        return 0    fi    # ignore .bin files    if [[ $file == *.bin ]]; then        return 0    fi        local mimetype=$(file --mime-type -b "$file")    if [[ $mimetype == image/* || $mimetype == *binary* || $mimetype == video/* || $mimetype == audio/* ]]; then        return 0    fi    if [[ $file == *.wasm ]]; then        return 0    fi    if [[ $file == .DS_Store ]]; then        return 0    fi    if [[ $mimetype == application/zip* ]]; then        return 0    fi    return 1}# Export the function so it can be used by parallelexport -f is_ignoredfind "$1" -type f -print0 | parallel -0 -k '    if is_ignored {}; then        exit    fi    echo "/** {} **/"    cat {}    echo ""' >>"$2"echo "Gemini complete"exit 0
+              </pre>
+            </div>
+            <div data-bright-mode="light" data-bright-theme="material-palenight" style="color:#A6ACCD;border-radius:4px;overflow:hidden;margin:1em 0;--selection-background:#717CB450;--line-number-color:#3A3F58;--tab-border:#292D3E;--tab-background:#292D3E;--tab-color:#FFFFFF;--inactive-tab-background:#292D3E;--inactive-tab-color:#676E95;--tab-bottom-border:#80CBC4;color-scheme:dark">
+              <style>
+                /* css */
+              </style>
+              <pre style="margin:0;color:#A6ACCD;background:#292D3E;padding:1em 0;overflow:auto">
+                #!/bin/bash# written by Claude 3 Opus and Gemini-1.5-pro.set -e# Check for correct number of argumentsif [ "$#" -ne 2 ]; then    echo "Usage: gemini.sh <directory> <output file>"    exit 1fi# Check if directory existsif [ ! -d "$1" ]; then    echo "Directory $1 does not exist"    exit 1fi# Check if can replace output fileif [ -f "$2" ]; then    read -p "File $2 already exists. Overwrite? [y/n] " -n 1 -r    echo    if [[ ! $REPLY =~ ^[Yy]$ ]]; then        exit 1    fi    rm "$2"fi# Function to check if a file should be ignoredis_ignored() {    local file="$1"    local gitignore=$(git rev-parse --show-toplevel)/.gitignore 2>/dev/null    if [[ -f "$gitignore" ]]; then        git check-ignore -q "$file" && return 0    fi    if [[ $file == *.git* ]]; then        return 0    fi    # ignore run folder    if [[ $file == run/* ]]; then        return 0    fi    if [[ $file == *.bin/* || $file == *build/* || $file == *dist/* ]]; then        return 0    fi    if [[ $file == *.gradle/* || $file == *.idea/* || $file == *.vscode/* ]]; then        return 0    fi    # ignore .bin files    if [[ $file == *.bin ]]; then        return 0    fi        local mimetype=$(file --mime-type -b "$file")    if [[ $mimetype == image/* || $mimetype == *binary* || $mimetype == video/* || $mimetype == audio/* ]]; then        return 0    fi    if [[ $file == *.wasm ]]; then        return 0    fi    if [[ $file == .DS_Store ]]; then        return 0    fi    if [[ $mimetype == application/zip* ]]; then        return 0    fi    return 1}# Export the function so it can be used by parallelexport -f is_ignoredfind "$1" -type f -print0 | parallel -0 -k '    if is_ignored {}; then        exit    fi    echo "/** {} **/"    cat {}    echo ""' >>"$2"echo "Gemini complete"exit 0
+              </pre>
+            </div>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script>
+      (()=>{let a=new URLSearchParams(window.location.search),b=null!==a.get("embed");if(window.__IS_EMBED__=b,b){let a=document.getElementById("blog-toolbar");a&&a.remove()}})()
+    </script>
+    <script id="_R_">
+      (globalThis["TURBOPACK"] || (globalThis["TURBOPACK"] = [])).push({"otherChunks":["static/chunks/1fo_i3zi4doqe.js","static/chunks/3nvuk-v5vchcw.js","static/chunks/2nckoqqunqhf1.js","static/chunks/203zi8tl808_6.js"],"runtimeModuleIds":[55947]});
+    </script>
+  </body>
+</html>

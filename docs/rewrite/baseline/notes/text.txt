@@ -1,0 +1,24 @@
+~
+/notes
+✕
+notes/
+Per-directory terminal colors in fish shell
+Apr 5, 2026 • note
+Never think about branch names again
+a bash script for generating branch names
+Aug 19, 2024 • snippet
+Updating JSONB fields with Drizzle
+hint: just use `sql` and COALESCE.
+July 11, 2024 • snippet
+Set your default directory in VS Code's open dialog
+Jun 6, 2024 • note
+gemini.sh script
+A script for concatenating files in a directory for copying to an LLM
+Apr 14, 2024 • snippet
+Sending a Slack message with fetch
+Mar 30, 2024 • snippet
+SWR for more than fetching
+SWR for state management
+Mar 30, 2024 • note
+Loading wasm files on Vercel Edge and Node.js runtimes
+Mar 30, 2024 • snippet
