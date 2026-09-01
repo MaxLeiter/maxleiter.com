@@ -219,3 +219,58 @@ article details {
 .react-tweet-theme {
   max-height: 600px;
 }
+
+/* Tables: no outer box, a quiet uppercase header, hairline row dividers. */
+article table {
+  width: 100%;
+  margin-block: 1.5rem;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+article thead th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gray);
+  border-bottom: 1px solid var(--light-gray);
+}
+
+article tbody td {
+  padding: 0.6rem 0.75rem;
+  vertical-align: top;
+  border-bottom: 1px solid var(--lighter-gray);
+}
+
+article tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+article tbody tr:hover td {
+  background: var(--lightest-gray);
+}
+
+article td:first-child {
+  color: var(--gray);
+}
+
+/* A bold first cell is a section label; give it the foreground and some air. */
+article td:first-child strong {
+  color: var(--fg);
+}
+
+article tbody tr:has(td:first-child strong) td {
+  padding-top: 1.1rem;
+}
+
+@media screen and (max-width: 760px) {
+  article table {
+    display: block;
+    overflow-x: auto;
+  }
+}

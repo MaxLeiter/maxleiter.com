@@ -122,7 +122,10 @@ async function start(): Promise<void> {
   for (const dir of WATCHED) {
     const target = path.join(ROOT, dir)
     if (!fs.existsSync(target)) continue
-    fs.watch(target, { recursive: true }, () => {
+    fs.watch(target, { recursive: true }, (_event, filename) => {
+      // The build itself writes under app/data and app/fonts (measured image
+      // sizes, tweet payloads, font subsets); reacting to those is a loop.
+      if (dir === 'app' && /^(data|fonts)\//.test(String(filename))) return
       // One editor save emits both `rename` and `change` on macOS, and the
       // in-flight guard queues the second one into a whole extra build.
       clearTimeout(pending)
@@ -158,6 +161,14 @@ async function start(): Promise<void> {
       // The same rules config.json runs on: trailing slash, redirects, the
       // `?embed` rewrite, then the filesystem. The dev server could not
       // exercise any redirect at all while it had its own resolver.
+      // Vercel's image optimizer only exists on Vercel. Locally, hand back
+      // the source image so <Img> renders instead of 404ing.
+      if (pathname === '/_vercel/image') {
+        const source = new URL(request.url).searchParams.get('url')
+        if (!source) return new Response('Missing url', { status: 400 })
+        return Response.redirect(new URL(source, request.url).href, 302)
+      }
+
       const resolved = resolveRequest(pathname, new URL(request.url).search)
       if (resolved.redirect !== undefined) {
         return new Response(null, {

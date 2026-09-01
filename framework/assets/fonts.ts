@@ -215,7 +215,11 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
     )
   }
 
-  await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
+  // Write only on change: the dev server watches app/, and rewriting an
+  // identical manifest on every build retriggered the build forever.
+  const manifestText = `${JSON.stringify(manifest, null, 2)}\n`
+  const previous = await fs.readFile(manifestPath, 'utf8').catch(() => '')
+  if (previous !== manifestText) await fs.writeFile(manifestPath, manifestText)
 
   const css = `${faces.join('')}:root{--font-geist-sans:'${
     FONTS[0].family

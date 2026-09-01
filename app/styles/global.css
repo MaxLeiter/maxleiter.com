@@ -319,14 +319,6 @@ details {
   cursor: pointer;
 }
 
-table {
-  border: 1px solid gray;
-}
-
-td,
-th {
-  border: 1px solid gray;
-}
 
 @media print {
   :root {
