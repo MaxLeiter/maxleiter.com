@@ -1,16 +1,16 @@
 declare const styles: {
-  readonly "grid": string
-  readonly "close": string
-  readonly "next": string
-  readonly "shot": string
   readonly "trigger": string
+  readonly "lightbox-in": string
+  readonly "control": string
+  readonly "shot": string
+  readonly "lightbox": string
   readonly "lightboxCaption": string
+  readonly "prev": string
+  readonly "lightboxFigure": string
+  readonly "next": string
+  readonly "close": string
   readonly "lightboxMedia": string
   readonly "counter": string
-  readonly "control": string
-  readonly "lightbox": string
-  readonly "prev": string
-  readonly "lightbox-in": string
-  readonly "lightboxFigure": string
+  readonly "grid": string
 }
 export default styles

@@ -1,6 +1,6 @@
 declare const styles: {
+  readonly "underline": string
   readonly "transition": string
   readonly "link": string
-  readonly "underline": string
 }
 export default styles
