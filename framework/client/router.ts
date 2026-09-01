@@ -243,32 +243,76 @@ function withTransition(update: () => void): Promise<void> {
 /* ---------------------------------------------------------------- swap -- */
 
 /** Head tags a page owns. Everything else in `<head>` is identical site-wide. */
-const PER_PAGE_HEAD =
-  'title, meta[name="description"], meta[name="robots"], ' +
-  'meta[name="googlebot"], link[rel="canonical"], ' +
-  'meta[property^="og:"], meta[name^="twitter:"]'
+/**
+ * What a head tag identifies, or null if the page does not own it.
+ *
+ * `<meta charset>` has no name and so is never keyed, never compared and never
+ * touched -- the same goes for the font preloads, the theme script, the
+ * speculation rules and `#css-base`, none of which are meta or canonical tags.
+ */
+function headKey(el: Element): string | null {
+  if (el.tagName === 'META') {
+    const name = el.getAttribute('name') ?? el.getAttribute('property')
+    return name ? `meta:${name}` : null
+  }
+  if (el.tagName === 'LINK') {
+    return el.getAttribute('rel') === 'canonical' ? 'link:canonical' : null
+  }
+  return null
+}
+
+const OWNED_HEAD = 'meta, link[rel="canonical"]'
 
 /**
- * Replaces the page-specific head tags and the page stylesheet, and leaves
- * `#css-base`, the fonts, the preloads and the runtime alone.
+ * Updates the head in place, touching only what actually differs.
  *
- * Works for a partial and for a full document alike: a full document simply
- * carries the base tags too, and those are matched by neither selector.
+ * Deliberately NOT `head.replaceChildren()`, and no longer even a remove-all
+ * then insert-all of the page-specific tags: iOS Firefox showed its loading
+ * indicator on soft navigations while iOS Safari, the same engine on the same
+ * router path, did not. The difference is the browser shell reacting to head
+ * churn, so the swap now rewrites one attribute at a time. A typical
+ * navigation changes the title, the description, the canonical and a couple of
+ * og/twitter values, and writes nothing else.
+ *
+ * Works for a partial and a full document alike: a full document carries the
+ * site-wide tags too, and those compare equal and are left alone.
  */
 function swapHead(doc: Document): void {
-  document.title = doc.title
-  for (const el of document.head.querySelectorAll(PER_PAGE_HEAD)) el.remove()
-  const incoming = doc.querySelectorAll(PER_PAGE_HEAD)
-  const pageCss = doc.querySelector('#css-page')
-  const current = document.getElementById('css-page')
-  if (pageCss && current) {
-    current.textContent = pageCss.textContent
+  if (document.title !== doc.title) document.title = doc.title
+
+  // The page stylesheet keeps its element; only the rules inside it change.
+  const nextCss = doc.getElementById('css-page')?.textContent ?? ''
+  const pageCss = document.getElementById('css-page')
+  if (pageCss && pageCss.textContent !== nextCss) pageCss.textContent = nextCss
+
+  const current = new Map<string, Element>()
+  for (const el of document.head.querySelectorAll(OWNED_HEAD)) {
+    const key = headKey(el)
+    if (key) current.set(key, el)
   }
-  // In front of the stylesheets, matching the order renderShell emits.
-  const base = document.getElementById('css-base')
-  for (const el of incoming) {
-    if (el.id === 'css-page') continue
-    document.head.insertBefore(el, base)
+
+  const seen = new Set<string>()
+  for (const el of doc.querySelectorAll(OWNED_HEAD)) {
+    const key = headKey(el)
+    if (!key) continue
+    seen.add(key)
+    const existing = current.get(key)
+    if (!existing) {
+      document.head.appendChild(document.importNode(el, true))
+      continue
+    }
+    const attr = existing.tagName === 'META' ? 'content' : 'href'
+    const value = el.getAttribute(attr)
+    if (value !== null && existing.getAttribute(attr) !== value) {
+      existing.setAttribute(attr, value)
+    }
+  }
+
+  // A page can legitimately drop a tag: `posts/nintype.mdx` has a blank
+  // description, and the shell omits all three description tags rather than
+  // substituting a default.
+  for (const [key, el] of current) {
+    if (!seen.has(key)) el.remove()
   }
 }
 

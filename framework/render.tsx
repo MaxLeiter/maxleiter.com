@@ -253,6 +253,10 @@ export function renderShell(options: ShellOptions): string {
     `<script>${THEME_SCRIPT}</script>`,
   ].join('')
 
+  // Body, not head. In the head this would be a new tag on all 71 routes that
+  // the baseline does not have, and the head diff is a blocking gate. It is
+  // only ever consumed by browsers on the native path, which never swap the
+  // body, so it is always present exactly where it is used.
   const scripts: string[] = [
     islandsScript(islands),
     `<script type="speculationrules">${SPECULATION_RULES}</script>`,
