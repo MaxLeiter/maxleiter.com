@@ -212,17 +212,31 @@ export default function Desktop({ posts, projects }: DesktopProps) {
   )
 
   /**
-   * The runtime names the first `[data-slug]` card for a cross-document
-   * transition. When a post window owns that name, the card must give it up:
-   * two elements sharing a `view-transition-name` cancels the transition.
+   * Hands the outgoing transition name to the post window instead of the card.
+   *
+   * The runtime's own `pageswap` listener clears the name from every
+   * `[data-slug]` element -- the window frame included, because its name is an
+   * inline style -- and then puts it on the first matching card. This listener
+   * registers second, so it runs second and takes the name back: maximizing a
+   * window should morph the window into the article, not a card behind it. Two
+   * elements holding one name cancels the transition, so the card has to lose
+   * it.
    */
+  const transitionName = openPost ? postTransitionName(openPost) : null
+  const transitionNameRef = useRef(transitionName)
+  transitionNameRef.current = transitionName
+
   useEffect(() => {
     const onPageSwap = () => {
-      const frame = document.querySelector('[role="dialog"][data-slug]')
-      if (!frame) return
+      const name = transitionNameRef.current
+      if (!name) return
+      const frame = document.querySelector<HTMLElement>(
+        '[role="dialog"][data-slug]',
+      )
       for (const el of document.querySelectorAll<HTMLElement>('[data-slug]')) {
         if (el !== frame) el.style.viewTransitionName = ''
       }
+      if (frame) frame.style.viewTransitionName = name
     }
     window.addEventListener('pageswap', onPageSwap)
     return () => window.removeEventListener('pageswap', onPageSwap)
@@ -302,8 +316,8 @@ export default function Desktop({ posts, projects }: DesktopProps) {
           onFocus={() =>
             dispatch({ type: 'FOCUS', id: `blog-post-${openPost.slug}` })
           }
-          transitionName={postTransitionName(openPost)}
-          slug={openPost.type === 'post' ? openPost.slug : undefined}
+          transitionName={transitionName ?? undefined}
+          slug={openPost.slug}
         >
           <iframe
             src={embedHref(openPost)}

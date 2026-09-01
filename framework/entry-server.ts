@@ -1,6 +1,6 @@
 import type { BuildContext, Head, Note, Post } from './types'
 import { getPages } from './routes'
-import { islandManifest, resetIslandManifest } from './islands'
+import { resetIslandManifest, takeIslandManifest } from './islands'
 import { collectLanguages, getHighlighter, highlightCss } from './highlight'
 import { renderBody, renderShell, type Fonts } from './render'
 import { renderPostHtml } from './mdx'
@@ -25,30 +25,54 @@ export interface RenderedPage {
   path: string
   head: Head
   body: string
+  /** Island names this page actually rendered, for its own bootstrap map. */
+  islands: string[]
+}
+
+/**
+ * The union across every page, which is what the client bundler needs. Each
+ * page carries only its own names, so a content page's `__islands` JSON does
+ * not advertise the desktop.
+ */
+let allIslands = new Set<string>()
+
+export function islandManifest(): string[] {
+  return [...allIslands].sort()
 }
 
 export async function renderAll(ctx: BuildContext): Promise<RenderedPage[]> {
   resetIslandManifest()
+  allIslands = new Set<string>()
   const pages = await getPages(ctx)
   const rendered: RenderedPage[] = []
+
+  const finish = (path: string, head: Head, body: string): RenderedPage => {
+    const islands = takeIslandManifest()
+    for (const name of islands) allIslands.add(name)
+    return { path, head, body, islands }
+  }
 
   for (const page of pages) {
     // Per document, so the LCP image of every page (and of every embed
     // variant) is the first one in that page's own body.
     resetArticleImages()
-    rendered.push({
-      path: page.path,
-      head: page.head,
-      body: renderBody(await page.render({ toolbar: true })),
-    })
+    rendered.push(
+      finish(
+        page.path,
+        page.head,
+        renderBody(await page.render({ toolbar: true })),
+      ),
+    )
 
     if (page.variants?.embed) {
       resetArticleImages()
-      rendered.push({
-        path: `${page.path}/embed`,
-        head: { ...page.head, canonical: page.head.canonical, noindex: true },
-        body: renderBody(await page.render({ toolbar: false })),
-      })
+      rendered.push(
+        finish(
+          `${page.path}/embed`,
+          { ...page.head, canonical: page.head.canonical, noindex: true },
+          renderBody(await page.render({ toolbar: false })),
+        ),
+      )
     }
   }
 
@@ -94,4 +118,4 @@ export async function renderFeedHtml(
   })
 }
 
-export { islandManifest, highlightCss }
+export { highlightCss }

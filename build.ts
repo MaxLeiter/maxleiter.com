@@ -526,12 +526,23 @@ async function main(): Promise<void> {
         css: cssFor(page.body),
         fonts,
         assets: ctx.assets,
-        islands: client.islands,
+        // Only this page's islands, so a content page does not carry a map
+        // entry for the desktop it will never mount.
+        islands: Object.fromEntries(
+          page.islands
+            .filter((name) => client.islands[name])
+            .map((name) => [name, client.islands[name]]),
+        ),
       })
       html.set(page.path, markup)
       const file = outputFile(ctx.staticDir, page.path)
       await fs.mkdir(path.dirname(file), { recursive: true })
       await fs.writeFile(file, markup)
+      // Vercel's static builder injects an error-phase route to `/404.html`
+      // ahead of ours, so the 404 page must also exist under that name.
+      if (page.path === '/404') {
+        await fs.writeFile(path.join(ctx.staticDir, '404.html'), markup)
+      }
     }
   })
 

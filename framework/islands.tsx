@@ -32,6 +32,13 @@ export function resetIslandManifest(): void {
   used.clear()
 }
 
+/** The names rendered since the last reset, clearing them for the next page. */
+export function takeIslandManifest(): string[] {
+  const names = [...used].sort()
+  used.clear()
+  return names
+}
+
 export function Island({
   name,
   on = 'idle',

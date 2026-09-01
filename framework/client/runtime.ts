@@ -44,6 +44,14 @@ function schedule(el: HTMLElement): void {
     return
   }
   if (on === 'visible') {
+    // An island whose fallback is empty has a zero-area box, and
+    // IntersectionObserver never reports a zero-area element as intersecting,
+    // so it would silently never mount. Watch the parent in that case.
+    const rect = el.getBoundingClientRect()
+    const target =
+      (rect.width === 0 || rect.height === 0) && el.parentElement
+        ? el.parentElement
+        : el
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
@@ -53,7 +61,7 @@ function schedule(el: HTMLElement): void {
       },
       { rootMargin: '200px' },
     )
-    io.observe(el)
+    io.observe(target)
     return
   }
   if (on === 'interaction') {
@@ -122,6 +130,10 @@ document.addEventListener('click', (event) => {
     return
   }
 
+  // `data-track` is the event name; every OTHER data attribute on the element
+  // becomes a payload key, camelCased by the dataset API. So `data-section`
+  // arrives as `{section}`, while `data-track-section` would arrive as
+  // `{trackSection}`. Name payload attributes after the key you want.
   const tracked = target.closest<HTMLElement>('[data-track]')
   if (tracked) {
     const va = (window as { va?: VercelAnalytics }).va
@@ -143,21 +155,27 @@ if (clock) {
 /* ----------------------------------------------------- view transitions -- */
 
 /**
- * Narrows the shared `blog-post` transition name to the card actually clicked,
- * so a cross-document navigation morphs that card into the article. Cards opt
- * in with `data-slug`; pages without them just cross-fade.
+ * Narrows the transition name to the card actually clicked, so a cross-document
+ * navigation morphs that card into the article. Cards opt in with `data-slug`;
+ * pages without them just cross-fade.
+ *
+ * The prefix has to come from the URL segment. `article-pages.tsx` names a post
+ * `blog-post-<slug>` and a note `note-<slug>`, so hardcoding the post prefix
+ * meant a note card could never pair with its article.
  */
 addEventListener('pageswap', (event) => {
   const url = (
     event as unknown as { activation?: { entry?: { url?: string } } }
   ).activation?.entry?.url
-  const slug = url?.match(/\/(?:blog|notes)\/([^/?#]+)/)?.[1]
-  if (!slug) return
+  const match = url?.match(/\/(blog|notes)\/([^/?#]+)/)
+  if (!match) return
+  const [, section, slug] = match
+  const name = section === 'notes' ? `note-${slug}` : `blog-post-${slug}`
   for (const el of document.querySelectorAll<HTMLElement>('[data-slug]')) {
     el.style.viewTransitionName = ''
   }
   const card = document.querySelector<HTMLElement>(
     `[data-slug="${CSS.escape(slug)}"]`,
   )
-  if (card) card.style.viewTransitionName = `blog-post-${slug}`
+  if (card) card.style.viewTransitionName = name
 })

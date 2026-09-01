@@ -188,8 +188,10 @@ All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:
   `handle: error` -> `/404`, `images` block with REGEX remotePatterns for the
   blob host, `formats` avif/webp, `sizes` [640,828,1200,1920], `qualities` [75]).
   Also write root `vercel.json` `{ "$schema": ..., "framework": null,
-  "buildCommand": "node scripts/build.mjs" }`. NEVER set `installCommand`:
-  a bare `pnpm install` override makes Vercel use pnpm 6 (report 03 §8.7).
+  "buildCommand": "node scripts/build.mjs", "installCommand":
+  "npx --yes pnpm@9.15.9 install --frozen-lockfile" }`. The Vercel project
+  dashboard carries a bare `pnpm install` override (the pnpm 6 trap, report 03
+  §8.7), so vercel.json must pin an explicit version to neutralise it.
   `scripts/build.mjs` esbuild-bundles `build.ts` and runs it under Node 24
   (`engines.node` = 24.x); `bun run build.ts` is the local path. Do not remove
   or alter `next.config.mjs` (cutover agent does).
@@ -228,3 +230,7 @@ All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:
 - 2026-08-31 Extension-less imports everywhere under `framework/` and `app/`;
   `tools/` may use `.ts` extensions (runs unbundled). `allowImportingTsExtensions` on.
 - 2026-08-31 A failed import of `framework/platform.ts` is fatal in `build.ts`.
+- 2026-08-31 Vercel project settings (dashboard) were found to be framework
+  "nextjs", installCommand "pnpm install", node 22.x. vercel.json overrides all
+  three per-deployment (framework null, pinned npx pnpm install, engines 24.x).
+  Cutover should also flip the dashboard to Other / auto-detect install.

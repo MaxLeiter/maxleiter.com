@@ -139,14 +139,16 @@ export function buildConfig(): Record<string, unknown> {
  * cannot handle the .tsx files in the graph. `bun run build.ts` stays the
  * local dev path. Node 24 is pinned through `engines` in package.json.
  *
- * There is deliberately no `installCommand`. Overriding it with a bare
- * `pnpm install` makes Vercel pick the OLDEST pnpm in the container, which is
- * pnpm 6 (report 03 section 8.7). Left on auto-detect, `lockfileVersion: 9.0`
- * in pnpm-lock.yaml selects pnpm 9 or 10.
+ * `installCommand` is pinned on purpose. The Vercel project dashboard carries
+ * a bare `pnpm install` override, which makes Vercel pick the OLDEST pnpm in
+ * the container, pnpm 6 (report 03 section 8.7), and locally hits a broken
+ * corepack shim. A per-deployment value here beats the dashboard setting, and
+ * `npx pnpm@<exact>` works identically in the build image and on a laptop.
  */
 const VERCEL_JSON = {
   $schema: 'https://openapi.vercel.sh/vercel.json',
   framework: null,
+  installCommand: 'npx --yes pnpm@9.15.9 install --frozen-lockfile',
   buildCommand: 'node scripts/build.mjs',
 }
 
