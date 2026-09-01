@@ -196,9 +196,14 @@ function useOpenPostDeepLink(
 ): void {
   useEffect(() => {
     const slug = new URLSearchParams(location.search).get('openPost')
-    if (!slug || !posts.some((post) => post.slug === slug)) return
-    dispatch({ type: 'OPEN_BLOG_POST', slug })
+    if (!slug) return
     history.replaceState({}, '', '/')
+    // On a phone there are no windows to minimize into: cards navigate to the
+    // real page, so "minimize" just means "back to the homepage".
+    if (getIsMobile()) return
+    if (posts.some((post) => post.slug === slug)) {
+      dispatch({ type: 'OPEN_BLOG_POST', slug })
+    }
   }, [posts, dispatch])
 }
 
