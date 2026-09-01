@@ -65,10 +65,23 @@ article img {
 
 /* Lists */
 
+/* Markers hang outside so wrapped lines stay indented, and items get air. */
 article ul {
-  list-style-position: inside;
+  list-style-position: outside;
   list-style-type: disc;
-  padding-left: var(--gap);
+  padding-left: 1.5rem;
+}
+
+article li {
+  padding-left: 0.25rem;
+}
+
+article li + li {
+  margin-top: 0.5em;
+}
+
+article li::marker {
+  color: var(--gray);
 }
 
 article ul ul {
@@ -80,19 +93,13 @@ article ul ul ul {
 }
 
 article ol {
-  padding: 0;
-  list-style-position: inside;
+  padding-left: 1.5rem;
+  list-style-position: outside;
   list-style-type: decimal;
 }
-/* 
-article ol li:not(:last-child),
-article ul li:not(:last-child) {
-  margin-bottom: var(--gap);
-} */
 
 article ol > li > ul {
-  margin-left: var(--gap-double);
-  list-style-position: inside;
+  margin-top: 0.5em;
   list-style-type: circle;
 }
 
