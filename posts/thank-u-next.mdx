@@ -13,7 +13,7 @@ type: post
   https://en.wikipedia.org/wiki/Thank_U,_Next
 </figcaption>
 
-There's been a lot of talk about custom / personal software lately. I've been a huge fan -- I'm writing this in a [markdown editor](https://github.com/MaxLeiter/md-viewer) I made for myself. And lately I've been toying with thoughts about the future of frameworks. A nice intersection of the two seemed like a personal framework.
+There's been a lot of talk about custom / personal software and LLMs lately. I've been a huge fan -- I'm writing this in a [markdown editor](https://github.com/MaxLeiter/md-viewer) I made for myself. And lately I've been toying with thoughts about the future of frameworks. A nice intersection of the two seemed like a personal framework.
 
 So as of September 1st, this website is no longer running on Next.js. Instead, it's built by a bespoke custom framework that Fable architected and Opus implemented. If this were a commercial project, I'd probably stay on Next[^1], but it's not, so 🤷
 
@@ -91,9 +91,24 @@ There are many.
 3. Depending on what you replace, you may have stale security issues that would be fixed upstream. That doesn't apply here since this is a static site.
 4. You own it now. Bugs, security issues, and feature requests are now yours to deal with.
 
+Two browser issues that Claude ran into, which Next presumably handles:
+
+> 1. Chrome / cross-document view transitions. Chrome silently skips the inbound half of a cross-document view transition when the destination page has an external `<script type="module" src>` in its `<head>`. An inline module script doesn't trigger it. Bisected with a two-page control page; it's the reason the runtime is inlined into every page rather than linked.
+> 2. WebKit / Speculation Rules. Safari hardcodes `HTMLScriptElement.supports('speculationrules')` to true while only implementing the prefetch half, and it exposes no `document.prerendering`. So feature-detecting "this browser can prerender" needs both checks.
+
 ## What does this mean?
 
-I think its fruitless to try reading tea leaves about software engineering. Who knows where models will be in six months, much less two or three years. But I'll try a bit anyways: I think we'll see an increase in vendoring and in-house agentic-rewrites ("slop forks"[^2]). The security and performance benefits outweigh the costs, which are decreasing rapidly: as agents take on more of the SDLC automonously, they can maintain the software.
+I think its fruitless to try reading tea leaves about software engineering.
+Who knows where models will be in six months, much less two or three years.
+But I'll try a bit anyways:
+
+Obviously, we'll see an increase in vendoring and in-house agentic-rewrites ("slop forks"[^2]). We're already seeing this: Bun [autonomously rewrote from Zig to Rust](https://bun.com/blog/bun-in-rust)
+and Cloudflare did similar with [Vinext](https://github.com/cloudflare/vinext).
+
+Maybe a more far-out take is that frameworks will die out.
+
+What matters, as is evident from the Chrome and WebKit issues above, is the vast knowledge built into frameworks.
+And that can be distilled into skills or some future standard - perhaps the successor to the framework.
 
 ---
 
