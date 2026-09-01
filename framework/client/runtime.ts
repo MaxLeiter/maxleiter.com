@@ -159,10 +159,19 @@ if (clock) {
  * navigation morphs that card into the article. Cards opt in with `data-slug`;
  * pages without them just cross-fade.
  *
- * The prefix has to come from the URL segment. `article-pages.tsx` names a post
+ * The prefix comes from the URL segment. `article-pages.tsx` names a post
  * `blog-post-<slug>` and a note `note-<slug>`, so hardcoding the post prefix
  * meant a note card could never pair with its article.
+ *
+ * This clears only the element it named last, never every `[data-slug]` on the
+ * page. `data-slug` is not exclusive to post cards -- the desktop's window
+ * frame carries it too -- and a blanket clear wiped a name another listener had
+ * set, which silently degraded the window-to-article morph to a cross-fade.
+ * Owning only what it assigned also removes the dependence on listener
+ * registration order.
  */
+let namedForTransition: HTMLElement | null = null
+
 addEventListener('pageswap', (event) => {
   const url = (
     event as unknown as { activation?: { entry?: { url?: string } } }
@@ -171,11 +180,15 @@ addEventListener('pageswap', (event) => {
   if (!match) return
   const [, section, slug] = match
   const name = section === 'notes' ? `note-${slug}` : `blog-post-${slug}`
-  for (const el of document.querySelectorAll<HTMLElement>('[data-slug]')) {
-    el.style.viewTransitionName = ''
+  if (namedForTransition) {
+    namedForTransition.style.viewTransitionName = ''
+    namedForTransition = null
   }
   const card = document.querySelector<HTMLElement>(
     `[data-slug="${CSS.escape(slug)}"]`,
   )
-  if (card) card.style.viewTransitionName = name
+  if (card) {
+    card.style.viewTransitionName = name
+    namedForTransition = card
+  }
 })
