@@ -164,16 +164,16 @@ async function start(): Promise<void> {
       const started = performance.now()
       const response = await handle(request)
       const { pathname } = new URL(request.url)
-      // The reload stream stays open for the life of the tab; timing it is
-      // meaningless and it would show up on every page as a second line.
-      if (pathname !== '/__reload') {
+      // Only page routes are worth a line. Fonts, chunks and images are
+      // several per page and never the thing being debugged; the reload
+      // stream stays open for the life of the tab.
+      if (!pathname.startsWith('/_') && !/\.\w+$/.test(pathname)) {
         const ms = (performance.now() - started).toFixed(1)
         const status = response.status
         const mark =
           status >= 400 ? '\x1b[31m' : status >= 300 ? '\x1b[33m' : '\x1b[32m'
-        const dim = pathname.startsWith('/_') ? '\x1b[2m' : ''
         console.log(
-          `  ${mark}${status}\x1b[0m ${dim}${request.method} ${pathname}\x1b[0m \x1b[2m${ms}ms\x1b[0m`,
+          `  ${mark}${status}\x1b[0m ${request.method} ${pathname} \x1b[2m${ms}ms\x1b[0m`,
         )
       }
       return response
@@ -220,6 +220,11 @@ async function handle(request: Request): Promise<Response> {
   // exercise any redirect at all while it had its own resolver.
   // Vercel's image optimizer only exists on Vercel. Locally, hand back
   // the source image so <Img> renders instead of 404ing.
+  // Vercel Analytics only exists on Vercel. An empty script keeps the
+  // console free of a 404 on every page.
+  if (pathname === '/_vercel/insights/script.js') {
+    return new Response('', { headers: { 'content-type': 'text/javascript' } })
+  }
   if (pathname === '/_vercel/image') {
     const source = new URL(request.url).searchParams.get('url')
     if (!source) return new Response('Missing url', { status: 400 })
