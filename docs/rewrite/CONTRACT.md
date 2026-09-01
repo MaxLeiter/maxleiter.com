@@ -21,9 +21,15 @@ same change and say so in your report.
   path aliases, CSS-module and MDX imports are handled by esbuild (see Pipeline),
   never by runtime loaders, so node and bun behave identically.
 - Path alias `@*` -> `./app/*` stays (tsconfig `paths`). esbuild reads tsconfig.
-- Until cutover, `next` stays installed and the Next app must still build. Do not
-  delete or rename files under `app/` that the Next app imports unless you are the
-  cutover agent. Add new files; leave old ones.
+- **Cutover is done. `next` is removed** — uninstalled, and the whole Next app
+  (`app/(subpages)/`, `app/layout.tsx`, `app/api/`, the metadata routes) is
+  deleted along with every component only it reached. `bun run build.ts` /
+  `node scripts/build.mjs` is the only build. Nothing imports `next/*`; the
+  esbuild shims for those specifiers are gone. `docs/rewrite/baseline/` is the
+  committed record of the old output, so the gate needs no Next install.
+  Anything under `app/` unreachable from `framework/entry-server.ts`,
+  `framework/routes.ts`, `app/pages/**` or `app/islands/**` is dead and should be
+  deleted, not left in place.
 
 ## Directory layout
 
@@ -144,9 +150,9 @@ export interface PageDef {
    search-index, fonts, config.json). Core calls it last.
 8. Copy `public/`. Write `.vercel/output/config.json` (platform).
 
-Scripts to add to package.json (keep the existing Next scripts until cutover):
-`"build:bespoke": "bun run build.ts"`, `"dev:bespoke": "bun run framework/dev.ts"`,
-`"verify": "bun run tools/diff-html.ts"`, `"snapshot": "bun run tools/snapshot.ts"`.
+package.json scripts, post-cutover: `dev` (`bun run framework/dev.ts`), `build`
+(`node scripts/build.mjs`, what Vercel runs), `build:bun` (`bun run build.ts`),
+`check` (`tsc --noEmit`), `lint` (oxlint + oxfmt), `snapshot`, `verify`, `gate`.
 
 ## Islands (core agent defines; islands/desktop agents consume)
 
@@ -160,12 +166,36 @@ Scripts to add to package.json (keep the existing Next scripts until cutover):
 - Island component file: `app/islands/<name>.tsx`, `export default function`.
   Receives `props` parsed from `data-props`. Must render identical markup to the
   fallback on first render (it hydrates over it).
-- Runtime hydrates with `hydrate` from `preact/compat/client`... the runtime
-  imports `/_assets/island.<name>.<hash>.js` lazily; `client.ts` writes the
-  name->URL map into the page as `<script type="application/json" id="__islands">`.
+- Runtime hydrates with `hydrateRoot` from `preact/compat/client`, NOT `hydrate`:
+  that module exports only `createRoot` and `hydrateRoot`, and `hydrate` lives on
+  `preact/compat`. `client.ts` generates one wrapper entry per island that owns
+  the call, which is what keeps preact out of the runtime.
+- The runtime imports `/_assets/island.<name>.<hash>.js` lazily. Each page gets
+  only its OWN islands in `<script type="application/json" id="__islands">`, not
+  the site-wide union; `client.ts` still bundles the union.
+- **Islands take class names as props, never by importing a CSS module.** The
+  client esbuild config deliberately has no `*.module.css` plugin, so an island
+  importing one fails loudly rather than shipping a second copy of rules already
+  in the page's inlined sheet. The server resolves the class map and passes it
+  through `data-props`. If that plugin is ever added, keep this rule.
+- Per-page CSS gating reads the rendered HTML for a fragment's scoped class
+  names, **including the `data-props` JSON**. That is load-bearing: a class an
+  island mints at runtime (the shot grid's `trigger`) appears in props and never
+  in server markup, so narrowing detection to rendered markup would silently drop
+  its rules.
+- An island with an EMPTY fallback still mounts on `visible`: a zero-area element
+  never intersects, so `schedule()` observes `el.parentElement` when the rect has
+  zero width or height. Prefer a real fallback anyway, since that is what makes
+  the no-JS experience work.
 - The runtime also handles, without any island: `[data-theme-toggle]` clicks,
   Cmd/Ctrl+K -> unhide `[data-island="palette"]` and mount it, `[data-track]`
-  delegated analytics `track()` calls, `#menubar-clock` ticking.
+  delegated analytics calls, `#menubar-clock` ticking, and the `pageswap`
+  view-transition naming. For `[data-track]`, `data-track` is the event NAME and
+  every other data attribute becomes a payload key, camelCased by the dataset
+  API: write `data-section`, not `data-track-section`.
+- The `pageswap` handler clears only the element it named itself. `data-slug` is
+  not exclusive to post cards (the desktop's window frame carries it), and a
+  blanket clear wipes names another listener owns.
 
 ## Platform module contracts (platform agent)
 
@@ -234,3 +264,23 @@ All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:
   "nextjs", installCommand "pnpm install", node 22.x. vercel.json overrides all
   three per-deployment (framework null, pinned npx pnpm install, engines 24.x).
   Cutover should also flip the dashboard to Other / auto-detect install.
+- 2026-08-31 Cutover: `next`, `next-mdx-remote`, `next-themes`, `bright`,
+  `react-diff-viewer`, `@vercel/analytics`, `postcss`, `@tailwindcss/postcss`,
+  `concurrently`, `typescript-plugin-css-modules` and `@types/mdx` are removed.
+  `react-tweet` stays (build-time tweet rendering); `geist` stays (fonts.ts
+  regenerates the subsets from `node_modules/geist`). Everything is a
+  devDependency now, because static output has no runtime dependencies -- so
+  `vercel.json`'s install command carries `--prod=false`, since pnpm reads
+  `NODE_ENV=production` as an implicit `--prod`.
+- 2026-08-31 Cutover: `--breakpoint-3xl: 120rem` is now defined in an `@theme`
+  block in `global.css`. The ~21 surviving `3xl:` classes in the desktop chrome
+  (inventory item 57) were no-ops; defining the breakpoint restores the
+  intended large-screen scaling rather than deleting the intent.
+- 2026-08-31 Cutover: the shadcn/ui variable block in `global.css` is deleted.
+  Its only consumer was `app/styles/desktop.css`, itself reachable only from
+  `app/layout.tsx`; `text-foreground`/`bg-background` were never utilities here
+  because those were plain `:root` properties, not `@theme` keys. `--radius`
+  reverts from `0.5rem` to the `8px` above it, an identical computed value.
+- 2026-08-31 Cutover: `app/lib/types.d.ts` and `app/lib/portfolio-data.ts` are
+  gone; the surviving components take their `Note` from `framework/types` and
+  their `Project` from `@lib/blog-post`.

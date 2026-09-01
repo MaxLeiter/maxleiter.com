@@ -1,8 +1,7 @@
-/* oxlint-disable nextjs/no-img-element -- this framework replaces next/image */
 import type { ImgHTMLAttributes, ReactElement } from 'react'
 
 /**
- * The replacement for next/image.
+ * The image component: a plain <img> with a Vercel-optimized srcset.
  *
  * Vercel's image optimizer is a platform feature, not a framework feature: it
  * is enabled purely by the `images` key in .vercel/output/config.json and

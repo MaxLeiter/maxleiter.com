@@ -305,6 +305,7 @@ export function Window({
   return (
     <>
       <SnapPreview direction={snapPreview} position={position} size={size} />
+      {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- the frame owns click-to-focus and drag-to-move for the whole window; moving the handlers to the header alone would stop a click in the body raising the window. */}
       <div
         className="fixed border border-[var(--border-color)] rounded-lg flex flex-col font-mono text-sm"
         style={frameStyle}

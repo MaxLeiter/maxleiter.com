@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { ExternalLinkIcon } from './icons'
 
 interface ListCardProps {
@@ -26,7 +25,6 @@ export function ListCard({
   onMouseEnter,
   onMouseLeave,
 }: ListCardProps) {
-  const Component = external ? 'a' : Link
   const externalProps = external
     ? { target: '_blank', rel: 'noopener noreferrer' }
     : {}
@@ -49,7 +47,7 @@ export function ListCard({
 
   return (
     <li>
-      <Component
+      <a
         href={href}
         className="block p-3 rounded hover:bg-[var(--lighter-gray)] transition-colors border border-[var(--border-color)] group"
         onClick={onClick}
@@ -84,7 +82,7 @@ export function ListCard({
           </div>
           {external && <ExternalLinkIcon />}
         </div>
-      </Component>
+      </a>
     </li>
   )
 }

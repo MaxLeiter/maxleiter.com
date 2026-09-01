@@ -5,9 +5,10 @@
   "printWidth": 80,
   "sortPackageJson": false,
   "ignorePatterns": [
-    ".next",
+    ".cache",
+    ".snapshots",
+    ".vercel",
     "node_modules",
-    "out",
     "public"
   ]
 }

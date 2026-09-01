@@ -9,10 +9,10 @@ import { resetArticleImages } from '../app/mdx/static-components'
 /**
  * The server bundle's entry point.
  *
- * esbuild bundles this file with plugins for `*.module.css` and the `next/*`
- * aliases, then `build.ts` imports the result. That is what makes path
- * aliases, CSS modules and JSX behave identically under bun and node: nothing
- * is resolved by a runtime loader.
+ * esbuild bundles this file with a plugin for `*.module.css`, then `build.ts`
+ * imports the result. That is what makes path aliases, CSS modules and JSX
+ * behave identically under bun and node: nothing is resolved by a runtime
+ * loader.
  *
  * Rendering happens in two passes. Bodies come first, because rendering them is
  * what registers island names and mints the shiki style classes; only then can

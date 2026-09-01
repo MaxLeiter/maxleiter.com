@@ -1,32 +1,26 @@
 .DS_Store
 node_modules
-.next
-out
-.now
 /public/feed.xml
 dist/
 packages/
 yalc.lock
 .yalc
 .env*
+.env*.local
 
+# build output (Vercel Build Output API) and build cache
 .vercel
+.cache/
+tsconfig.tsbuildinfo
+
+# parity harness
+.snapshots
 
 # Supabase
 .supabase
-
-# Supabase
 **/supabase/.branches
 **/supabase/.temp
 
 .vscode
-
-# next bundle analyzer
-analyze/
-.env*.local
-tsconfig.tsbuildinfo
-
 .opencode
 .claude
-# bespoke build
-.cache/

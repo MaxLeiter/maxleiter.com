@@ -25,9 +25,8 @@ import {
  * The desktop window manager, hydrated over the markup `app/pages/home.tsx`
  * already rendered.
  *
- * `next/link`, `useRouter`, `next/dynamic` and React's `<ViewTransition>` are
- * all gone. Maximize was always a navigation rather than a resize, so it is
- * `location.assign` now; the same-document window open/close animation calls
+ * Nothing here depends on a router. Maximize was always a navigation rather
+ * than a resize, so it is `location.assign`; the same-document window open/close animation calls
  * `document.startViewTransition` directly, and the cross-document half of it is
  * the platform's, driven by matching `view-transition-name` values.
  */
@@ -214,29 +213,39 @@ export default function Desktop({ posts, projects }: DesktopProps) {
   /**
    * Hands the outgoing transition name to the post window instead of the card.
    *
-   * The runtime's own `pageswap` listener clears the name from every
-   * `[data-slug]` element -- the window frame included, because its name is an
-   * inline style -- and then puts it on the first matching card. This listener
-   * registers second, so it runs second and takes the name back: maximizing a
-   * window should morph the window into the article, not a card behind it. Two
-   * elements holding one name cancels the transition, so the card has to lose
-   * it.
+   * The runtime's `pageswap` listener names the card matching the destination
+   * slug. When that post is already open in a window, the window is what the
+   * reader is looking at, so it should be the thing that morphs into the
+   * article -- and the card has to give the name up either way, because two
+   * elements holding one `view-transition-name` cancels the transition.
+   *
+   * Order is load-bearing: the runtime is a module script that registers at
+   * parse time and this registers on hydration, so the runtime always runs
+   * first and this always gets the last word.
    */
+  const openSlug = openPost?.slug ?? null
   const transitionName = openPost ? postTransitionName(openPost) : null
-  const transitionNameRef = useRef(transitionName)
-  transitionNameRef.current = transitionName
+  const transitionRef = useRef({ slug: openSlug, name: transitionName })
+  transitionRef.current = { slug: openSlug, name: transitionName }
 
   useEffect(() => {
-    const onPageSwap = () => {
-      const name = transitionNameRef.current
-      if (!name) return
+    const onPageSwap = (event: Event) => {
+      const { slug, name } = transitionRef.current
+      if (!slug || !name) return
+      // Only claim the name when the navigation is to the post this window is
+      // showing. Otherwise the runtime's card is the correct pairing.
+      const url = (event as { activation?: { entry?: { url?: string } } })
+        .activation?.entry?.url
+      if (url?.match(/\/(?:blog|notes)\/([^/?#]+)/)?.[1] !== slug) return
+
       const frame = document.querySelector<HTMLElement>(
         '[role="dialog"][data-slug]',
       )
+      if (!frame) return
       for (const el of document.querySelectorAll<HTMLElement>('[data-slug]')) {
         if (el !== frame) el.style.viewTransitionName = ''
       }
-      if (frame) frame.style.viewTransitionName = name
+      frame.style.viewTransitionName = name
     }
     window.addEventListener('pageswap', onPageSwap)
     return () => window.removeEventListener('pageswap', onPageSwap)

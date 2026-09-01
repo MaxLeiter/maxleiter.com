@@ -10,8 +10,8 @@ import { Island } from '../../framework/islands'
  * The palette's overlay, input and empty list are server-rendered into every
  * page inside a `hidden` div. The runtime unhides it and focuses the input on
  * the first Cmd/Ctrl+K, so typing is never swallowed while the island module
- * and the search index load. Today's implementation puts the palette behind
- * `next/dynamic({ssr:false})`, so the first press waits on a round trip.
+ * and the search index load, rather than waiting on a round trip before the
+ * first keystroke can land.
  */
 
 interface BreadcrumbSegment {

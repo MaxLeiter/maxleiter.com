@@ -1,7 +1,7 @@
 'use client'
 
 import { ListCard } from '@components/desktop/list-card'
-import type { Note } from '@lib/types'
+import type { Note } from '../../../framework/types'
 
 interface NotesContentProps {
   notes: Note[]

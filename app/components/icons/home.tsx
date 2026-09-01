@@ -1,3 +1,4 @@
+/* oxlint-disable jsx-a11y/prefer-tag-over-role -- no semantic tag to prefer: role="img" on an inline <svg> with a <title> is the recommended pattern, and the rule targets `<div role="img">`. */
 const Home = ({ size = 24 }: { size: number }) => {
   return (
     <svg

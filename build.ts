@@ -187,12 +187,10 @@ async function writeCssModuleTypes(
 
 /* ------------------------------------------------------ server bundle --- */
 
-const shim = (name: string) => path.join(ROOT, 'framework', 'shims', name)
-
 /**
  * Bundles `framework/entry-server.ts` for node. Everything the pages import --
- * path aliases, CSS modules, JSX, the `next/*` specifiers still present in the
- * reused components -- is resolved here, once, so bun and node behave the same.
+ * path aliases, CSS modules, JSX -- is resolved here, once, so bun and node
+ * behave the same.
  */
 async function buildServer(): Promise<string> {
   const outfile = path.join(CACHE, 'server', 'entry.mjs')
@@ -208,13 +206,6 @@ async function buildServer(): Promise<string> {
     loader: { '.js': 'jsx' },
     absWorkingDir: ROOT,
     tsconfig: path.join(ROOT, 'tsconfig.json'),
-    alias: {
-      'next/link': shim('next-link.tsx'),
-      'next/navigation': shim('next-navigation.ts'),
-      'next/dynamic': shim('next-dynamic.tsx'),
-      'next/image': path.join(ROOT, 'framework', 'images.tsx'),
-      '@vercel/analytics': shim('analytics.ts'),
-    },
     plugins: [cssModulePlugin()],
     logLevel: 'silent',
   })
@@ -442,12 +433,22 @@ function sizeRow(name: string, html: string, width: number): string {
 
 async function main(): Promise<void> {
   const started = performance.now()
-  await fs.rm(path.join(ROOT, '.vercel', 'output'), {
-    recursive: true,
-    force: true,
-  })
+
+  // Build into a sibling directory and swap it in at the very end.
+  //
+  // Rebuilding `.vercel/output` in place left it partial for the ~600ms the
+  // build takes, so anything reading it concurrently -- another agent's
+  // verification, a browser holding a page whose hashed asset URLs just
+  // vanished, `vercel deploy --prebuilt` -- saw a torn tree and failed in ways
+  // that looked like real defects. A failed build now also leaves the previous
+  // good output untouched instead of destroying it.
+  const finalOut = path.join(ROOT, '.vercel', 'output')
+  const buildOut = path.join(ROOT, '.vercel', '.output-build')
+  await fs.rm(buildOut, { recursive: true, force: true })
 
   const ctx = await step('content', () => createBuildContext(ROOT))
+  ctx.outDir = buildOut
+  ctx.staticDir = path.join(buildOut, 'static')
   await fs.mkdir(ctx.staticDir, { recursive: true })
 
   const entryFile = await step('server bundle', buildServer)
@@ -508,7 +509,15 @@ async function main(): Promise<void> {
     return map
   })
 
-  /** Base sheet plus only the fragments this page's markup references. */
+  /**
+   * Base sheet plus only the fragments this page references.
+   *
+   * The body string includes each island's `data-props` JSON, and that is
+   * load-bearing rather than incidental: the shot grid's `trigger` class is
+   * passed as a prop and minted at runtime, so it never appears in the
+   * server-rendered markup. Narrowing this to rendered markup would silently
+   * drop the lightbox trigger's rules.
+   */
   const cssFor = (body: string): string => {
     const used = [...fragments.entries()]
       .filter(([, fragment]) =>
@@ -562,6 +571,15 @@ async function main(): Promise<void> {
       renderPostHtml: (post) => server.renderFeedHtml(ctx, post),
     })
     return { result, format: mod.formatPlatformResult }
+  })
+
+  await step('publish output', async () => {
+    // rm + rename, so the window where `.vercel/output` does not exist is a
+    // couple of syscalls rather than the whole build.
+    await fs.rm(finalOut, { recursive: true, force: true })
+    await fs.rename(buildOut, finalOut)
+    ctx.outDir = finalOut
+    ctx.staticDir = path.join(finalOut, 'static')
   })
 
   const total = performance.now() - started

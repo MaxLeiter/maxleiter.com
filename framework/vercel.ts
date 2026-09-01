@@ -144,11 +144,17 @@ export function buildConfig(): Record<string, unknown> {
  * the container, pnpm 6 (report 03 section 8.7), and locally hits a broken
  * corepack shim. A per-deployment value here beats the dashboard setting, and
  * `npx pnpm@<exact>` works identically in the build image and on a laptop.
+ *
+ * `--prod=false` is load-bearing since the cutover. The site is static output,
+ * so nothing is a runtime dependency and every package the build needs sits in
+ * devDependencies; pnpm reads `NODE_ENV=production` as an implicit `--prod`,
+ * which would install none of them.
  */
 const VERCEL_JSON = {
   $schema: 'https://openapi.vercel.sh/vercel.json',
   framework: null,
-  installCommand: 'npx --yes pnpm@9.15.9 install --frozen-lockfile',
+  installCommand:
+    'npx --yes pnpm@9.15.9 install --frozen-lockfile --prod=false',
   buildCommand: 'node scripts/build.mjs',
 }
 

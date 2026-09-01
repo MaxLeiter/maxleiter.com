@@ -5,18 +5,17 @@ import { ProjectsContent } from '@components/content/projects-content'
 import { BlogListContent } from '@components/content/blog-list-content'
 import { NotesContent } from '@components/content/notes-content'
 import type { BlogPost, Project } from '@lib/blog-post'
-import type { Note } from '@lib/types'
+import type { Note } from '../../framework/types'
 import { PageShell } from './shell'
 
 /**
  * The six list-and-prose routes.
  *
- * Each reuses the existing component under `app/components/content/` verbatim;
- * esbuild aliases `next/link` to a plain anchor, so the markup is what the Next
- * build produces today. The one difference is where the view-transition name
- * lands: React's `<ViewTransition>` put it on the content component's own root
- * element, and these put it on `<main>`, because the content components do not
- * take a style prop.
+ * Each reuses the existing component under `app/components/content/`, so the
+ * markup matches what the Next build produced. The one difference is where the
+ * view-transition name lands: React's `<ViewTransition>` put it on the content
+ * component's own root element, and these put it on `<main>`, because the
+ * content components do not take a style prop.
  *
  * All six take `toolbar` so the build can emit an `/embed` variant with no
  * chrome. The desktop's folder windows iframe those, which keeps the window

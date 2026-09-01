@@ -1,18 +1,13 @@
 {
   "compilerOptions": {
-    "plugins": [
-      {
-        "name": "typescript-plugin-css-modules"
-      },
-      {
-        "name": "next"
-      }
-    ],
     "target": "ES2017",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
+    ],
+    "types": [
+      "node"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -34,14 +29,12 @@
     }
   },
   "include": [
-    "next-env.d.ts",
-    "css-modules.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".vercel",
+    ".cache"
   ]
 }

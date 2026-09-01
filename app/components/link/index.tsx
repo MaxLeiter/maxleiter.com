@@ -1,11 +1,8 @@
 import clsx from 'clsx'
-import NextLink from 'next/link'
 
 import styles from './link.module.css'
 
-// Inherit default link props from NextLink or <a>
-type LinkProps = React.ComponentProps<typeof NextLink>
-type Props = LinkProps & {
+type Props = React.ComponentProps<'a'> & {
   external?: boolean
   href: string
   title?: string
@@ -48,7 +45,7 @@ const Link = ({
   }
 
   return (
-    <NextLink
+    <a
       href={href}
       title={title}
       className={className}
@@ -56,7 +53,7 @@ const Link = ({
       tabIndex={tabIndex}
     >
       {children}
-    </NextLink>
+    </a>
   )
 }
 
