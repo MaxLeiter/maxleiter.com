@@ -161,78 +161,97 @@ async function start(): Promise<void> {
   Bun.serve({
     port: PORT,
     async fetch(request) {
+      const started = performance.now()
+      const response = await handle(request)
       const { pathname } = new URL(request.url)
-
-      if (pathname === '/__reload') {
-        return new Response(
-          new ReadableStream<Uint8Array>({
-            start(controller) {
-              clients.add(controller)
-              // A tab opened (or reloaded) while the build is broken should
-              // see the error too, not a stale page with no explanation.
-              if (lastError) {
-                controller.enqueue(
-                  encoder.encode(
-                    `event: build-error\ndata: ${JSON.stringify(lastError)}\n\n`,
-                  ),
-                )
-              }
-            },
-            cancel() {
-              // The controller is dropped with the stream.
-            },
-          }),
-          {
-            headers: {
-              'content-type': 'text/event-stream',
-              'cache-control': 'no-cache',
-              connection: 'keep-alive',
-            },
-          },
+      // The reload stream stays open for the life of the tab; timing it is
+      // meaningless and it would show up on every page as a second line.
+      if (pathname !== '/__reload') {
+        const ms = (performance.now() - started).toFixed(1)
+        const status = response.status
+        const mark =
+          status >= 400 ? '\x1b[31m' : status >= 300 ? '\x1b[33m' : '\x1b[32m'
+        const dim = pathname.startsWith('/_') ? '\x1b[2m' : ''
+        console.log(
+          `  ${mark}${status}\x1b[0m ${dim}${request.method} ${pathname}\x1b[0m \x1b[2m${ms}ms\x1b[0m`,
         )
       }
-
-      // The same rules config.json runs on: trailing slash, redirects, the
-      // `?embed` rewrite, then the filesystem. The dev server could not
-      // exercise any redirect at all while it had its own resolver.
-      // Vercel's image optimizer only exists on Vercel. Locally, hand back
-      // the source image so <Img> renders instead of 404ing.
-      if (pathname === '/_vercel/image') {
-        const source = new URL(request.url).searchParams.get('url')
-        if (!source) return new Response('Missing url', { status: 400 })
-        return Response.redirect(new URL(source, request.url).href, 302)
-      }
-
-      const resolved = resolveRequest(pathname, new URL(request.url).search)
-      if (resolved.redirect !== undefined) {
-        return new Response(null, {
-          status: 308,
-          headers: { location: resolved.redirect },
-        })
-      }
-
-      const file =
-        resolved.file === undefined ? null : await resolveFile(resolved.file)
-      if (file) return respond(file)
-      // A missing hashed asset 404s outright rather than serving the 404 page,
-      // matching the guard route in config.json.
-      if (resolved.noFallback) {
-        return new Response('Not found', { status: 404 })
-      }
-
-      const notFound = await resolveFile('404/index.html')
-      if (notFound) {
-        const response = await respond(notFound)
-        return new Response(response.body, {
-          status: 404,
-          headers: response.headers,
-        })
-      }
-      return new Response('Not found', { status: 404 })
+      return response
     },
   })
 
   console.log(`  http://localhost:${PORT}`)
+}
+
+async function handle(request: Request): Promise<Response> {
+  const { pathname } = new URL(request.url)
+
+  if (pathname === '/__reload') {
+    return new Response(
+      new ReadableStream<Uint8Array>({
+        start(controller) {
+          clients.add(controller)
+          // A tab opened (or reloaded) while the build is broken should
+          // see the error too, not a stale page with no explanation.
+          if (lastError) {
+            controller.enqueue(
+              encoder.encode(
+                `event: build-error\ndata: ${JSON.stringify(lastError)}\n\n`,
+              ),
+            )
+          }
+        },
+        cancel() {
+          // The controller is dropped with the stream.
+        },
+      }),
+      {
+        headers: {
+          'content-type': 'text/event-stream',
+          'cache-control': 'no-cache',
+          connection: 'keep-alive',
+        },
+      },
+    )
+  }
+
+  // The same rules config.json runs on: trailing slash, redirects, the
+  // `?embed` rewrite, then the filesystem. The dev server could not
+  // exercise any redirect at all while it had its own resolver.
+  // Vercel's image optimizer only exists on Vercel. Locally, hand back
+  // the source image so <Img> renders instead of 404ing.
+  if (pathname === '/_vercel/image') {
+    const source = new URL(request.url).searchParams.get('url')
+    if (!source) return new Response('Missing url', { status: 400 })
+    return Response.redirect(new URL(source, request.url).href, 302)
+  }
+
+  const resolved = resolveRequest(pathname, new URL(request.url).search)
+  if (resolved.redirect !== undefined) {
+    return new Response(null, {
+      status: 308,
+      headers: { location: resolved.redirect },
+    })
+  }
+
+  const file =
+    resolved.file === undefined ? null : await resolveFile(resolved.file)
+  if (file) return respond(file)
+  // A missing hashed asset 404s outright rather than serving the 404 page,
+  // matching the guard route in config.json.
+  if (resolved.noFallback) {
+    return new Response('Not found', { status: 404 })
+  }
+
+  const notFound = await resolveFile('404/index.html')
+  if (notFound) {
+    const response = await respond(notFound)
+    return new Response(response.body, {
+      status: 404,
+      headers: response.headers,
+    })
+  }
+  return new Response('Not found', { status: 404 })
 }
 
 await start()
