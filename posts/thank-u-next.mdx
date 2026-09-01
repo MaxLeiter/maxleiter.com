@@ -67,9 +67,7 @@ You can try the Next.js version of this site at [next.maxleiter.com](https://nex
 
 ## How it works
 
-The below was written by Claude, edited by me:
-
-- It's more of a build script than a framework. `build.ts` reads `posts/`, renders every route to a static index.html with React (on the server), and writes a [Vercel Build Output](https://vercel.com/docs/build-output-api) directory. Build time is ~half a second warm on my M2 MBP.
+- It's more of a build script. `build.ts` reads `posts/`, renders every route to a static index.html with React (on the server), and writes a [Vercel Build Output](https://vercel.com/docs/build-output-api) directory. Build time is ~half a second warm on my M2 MBP.
 - MDX compiled once per file at build with the same remark and rehype plugins as before. Syntax highlighting runs at build with shiki, emitting both themes into the HTML so theme switching needs no JavaScript.
 - Zero JavaScript on blog/content pages except a 2 KB inline script that handles the theme toggle, Cmd+K, and lazy island loading.
 - [Islands](https://docs.astro.build/en/concepts/islands/) for interactivity. The desktop window manager and the command palette are Preact components that hydrate over server-rendered markup, loaded only on the pages that use them. The palette loads on first Cmd+K. Preact via its React compatibility layer is 7 KB instead of React's 52 KB.
