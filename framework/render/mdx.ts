@@ -38,8 +38,17 @@ const CACHE_VERSION = 'v3'
 export type MdxComponents = Record<string, ComponentType<never> | unknown>
 
 export interface MdxCompiler {
-  render: (source: string, components: MdxComponents) => Promise<ReactElement>
-  renderHtml: (source: string, components: MdxComponents) => Promise<string>
+  /** `file` is the source path, used only to name it in error messages. */
+  render: (
+    source: string,
+    components: MdxComponents,
+    file?: string,
+  ) => Promise<ReactElement>
+  renderHtml: (
+    source: string,
+    components: MdxComponents,
+    file?: string,
+  ) => Promise<string>
   stats: () => { hits: number; misses: number }
 }
 
@@ -146,7 +155,10 @@ export async function createMdxCompiler(
     components: MdxComponents
   }
 
-  const load = async (source: string): Promise<ComponentType<MdxProps>> => {
+  const load = async (
+    source: string,
+    file = 'mdx',
+  ): Promise<ComponentType<MdxProps>> => {
     const key = createHash('sha256')
       .update(CACHE_VERSION)
       .update('\0')
@@ -165,7 +177,14 @@ export async function createMdxCompiler(
     } catch {
       misses += 1
       const pass = createHighlightPass(highlighter)
-      const code = String(await compile(source, mdxOptions(pass)))
+      let code: string
+      try {
+        code = String(
+          await compile({ value: source, path: file }, mdxOptions(pass)),
+        )
+      } catch (error) {
+        throw mdxError(file, error)
+      }
       entry = { code, css: pass.css() }
       await fs.writeFile(cacheFile, JSON.stringify(entry))
     }
@@ -178,25 +197,25 @@ export async function createMdxCompiler(
     return mod.default as ComponentType<MdxProps>
   }
 
-  const componentFor = (source: string) => {
+  const componentFor = (source: string, file?: string) => {
     // Two pages can render the same body (a post and its embed variant); the
     // in-process map keeps that to one compile.
     const key = createHash('sha256').update(source).digest('hex')
     let existing = compiled.get(key)
     if (!existing) {
-      existing = load(source)
+      existing = load(source, file)
       compiled.set(key, existing)
     }
     return existing
   }
 
   return {
-    async render(source, components) {
-      const Content = await componentFor(source)
+    async render(source, components, file) {
+      const Content = await componentFor(source, file)
       return createElement(Content, { components })
     },
-    async renderHtml(source, components) {
-      const Content = await componentFor(source)
+    async renderHtml(source, components, file) {
+      const Content = await componentFor(source, file)
       return renderToStaticMarkup(createElement(Content, { components }))
     },
     stats: () => ({ hits, misses }),
@@ -268,4 +287,30 @@ const feedComponents: MdxComponents = {
   MinecraftInventory: () => null,
   InfoIcon: () => null,
   HomeIcon: () => null,
+}
+
+/**
+ * MDX reports through a VFileMessage whose `message` is empty and whose
+ * details sit in `reason`, `line` and `column`. Turn it into an Error a
+ * terminal can act on: `posts/x.mdx:96:197 Expected a closing tag for <head>`.
+ */
+function mdxError(file: string, error: unknown): Error {
+  const e = error as {
+    reason?: string
+    message?: string
+    line?: number | null
+    column?: number | null
+  }
+  const reason = e.reason || e.message || String(error)
+  const where = e.line ? `:${e.line}${e.column ? `:${e.column}` : ''}` : ''
+  let hint = ''
+  if (
+    /closing tag|Unexpected character .* before name|end of .* before/.test(
+      reason,
+    )
+  ) {
+    hint =
+      '\n  hint: MDX reads any bare <tag> in prose as JSX. Wrap it in backticks: `<head>`'
+  }
+  return new Error(`${file}${where} ${reason}${hint}`)
 }

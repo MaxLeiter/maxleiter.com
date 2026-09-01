@@ -188,7 +188,7 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
           date: post.date,
           dateISO: post.dateISO,
           description: post.description,
-          content: await mdx.render(post.body, components),
+          content: await mdx.render(post.body, components, post.file),
           toolbar,
         }),
     })
@@ -212,7 +212,7 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
           dateISO: note.dateISO,
           description: note.description,
           kind: note.type,
-          content: await mdx.render(note.body, components),
+          content: await mdx.render(note.body, components, note.file),
           toolbar,
         }),
     })

@@ -60,26 +60,79 @@ async function readDir(dir: string): Promise<string[]> {
 async function loadCollection<T extends { date: string; slug?: string }>(
   root: string,
   dir: string,
-  parse: (data: Record<string, unknown>, body: string) => T | null,
+  parse: (
+    data: Record<string, unknown>,
+    body: string,
+    file: string,
+  ) => T | null,
 ): Promise<T[]> {
   const full = path.join(root, dir)
   const files = await readDir(full)
   const parsed = await Promise.all(
     files.map(async (file) => {
+      const rel = `${dir}/${file}`
       const source = await fs.readFile(path.join(full, file), 'utf8')
-      const { data, content } = matter(source)
-      return parse(data, content)
+      let data: Record<string, unknown>
+      let content: string
+      try {
+        ;({ data, content } = matter(source))
+      } catch (error) {
+        throw new Error(
+          `${rel}: frontmatter is not valid YAML (${(error as Error).message})`,
+        )
+      }
+      const item = parse(data, content, rel)
+      if (item) validateEntry(rel, data)
+      return item
     }),
   )
-  return parsed.filter((item) => item !== null).sort(byDateDesc)
+  const items = parsed.filter((item) => item !== null)
+  const seen = new Map<string, string>()
+  for (const item of items) {
+    if (!item.slug) continue
+    const other = seen.get(item.slug)
+    if (other) {
+      throw new Error(
+        `duplicate slug "${item.slug}" in ${other} and ${(item as { file?: string }).file ?? dir}`,
+      )
+    }
+    seen.set(item.slug, (item as { file?: string }).file ?? dir)
+  }
+  return items.sort(byDateDesc)
+}
+
+/**
+ * The frontmatter mistakes that used to fail silently: a title that is not a
+ * string, a date `new Date()` cannot read, a slug with a slash or a space.
+ */
+function validateEntry(file: string, data: Record<string, unknown>): void {
+  const problems: string[] = []
+  if (typeof data.title !== 'string' || !data.title.trim()) {
+    problems.push('missing `title`')
+  }
+  const date = String(data.date ?? '')
+  if (!date || Number.isNaN(new Date(date).getTime())) {
+    problems.push(
+      `\`date: ${date || '(empty)'}\` is not a date new Date() can parse`,
+    )
+  }
+  if (data.slug !== undefined && !/^[A-Za-z0-9._-]+$/.test(String(data.slug))) {
+    problems.push(
+      `\`slug: ${String(data.slug)}\` may only contain letters, digits, . _ -`,
+    )
+  }
+  if (problems.length) {
+    throw new Error(`${file}: ${problems.join('; ')}`)
+  }
 }
 
 function loadPosts(root: string): Promise<Post[]> {
-  return loadCollection(root, 'posts', (data, content) => {
+  return loadCollection(root, 'posts', (data, content, file) => {
     // Same filter as app/lib/get-posts.ts: unpublished, or no slug, is out.
     if (data.published === false || !data.slug) return null
     const date = String(data.date ?? '')
     return {
+      file,
       title: String(data.title ?? ''),
       // `posts/nintype.mdx` has a bare `description:` line. Empty means
       // absent: the shell omits the description tags entirely rather than
@@ -97,10 +150,11 @@ function loadPosts(root: string): Promise<Post[]> {
 }
 
 function loadNotes(root: string): Promise<Note[]> {
-  return loadCollection(root, 'notes', (data, content) => {
+  return loadCollection(root, 'notes', (data, content, file) => {
     if (data.published === false) return null
     const date = String(data.date ?? '')
     return {
+      file,
       title: String(data.title ?? ''),
       description: String(data.description ?? '').trim(),
       slug: String(data.slug),

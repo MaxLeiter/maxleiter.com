@@ -15,6 +15,8 @@ export type Base = {
   title: string
   description: string
   href?: string
+  /** Source path relative to the repo root, e.g. `posts/weights.mdx`. */
+  file?: string
 }
 
 export type Post = Base & {

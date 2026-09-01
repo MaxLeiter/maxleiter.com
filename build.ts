@@ -676,6 +676,10 @@ async function main(): Promise<void> {
 }
 
 await main().catch((error: unknown) => {
-  console.error(`\nbuild failed: ${(error as Error).stack ?? error}`)
+  const e = error as Error
+  // Message first: that is the line a person acts on. The stack is noise
+  // unless asked for, and VFileMessages have an empty one anyway.
+  console.error(`\nbuild failed: ${e?.message || String(error)}`)
+  if (process.env.DEBUG && e?.stack) console.error(e.stack)
   process.exitCode = 1
 })

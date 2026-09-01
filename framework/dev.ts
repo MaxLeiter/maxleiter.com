@@ -11,10 +11,11 @@ import { contentTypeFor, resolveRequest } from './shared/routing'
  * This is the only file allowed to use `Bun.*` APIs; everything in the build
  * path stays runtime-agnostic so `vercel build` can run it under node.
  *
- * There is no Fast Refresh and no error overlay: editing a component reloads
- * the page and loses component state. The content-hash caches in `.cache/`
- * keep an incremental rebuild to a few hundred ms, which is what makes that
- * trade bearable.
+ * There is no Fast Refresh: editing a component reloads the page and loses
+ * component state. The content-hash caches in `.cache/` keep an incremental
+ * rebuild to a few hundred ms, which is what makes that trade bearable. A
+ * failed build is pushed to the page as a red overlay so a broken post shows
+ * its file and line where the author is looking.
  */
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
@@ -35,20 +36,34 @@ declare const Bun: {
 }
 
 const RELOAD_SCRIPT =
-  '<script>new EventSource("/__reload").onmessage=()=>location.reload()</script>'
+  '<script>(()=>{const es=new EventSource("/__reload");' +
+  'es.onmessage=()=>location.reload();' +
+  'es.addEventListener("build-error",e=>{let o=document.getElementById("__build_error");' +
+  'if(!o){o=document.createElement("pre");o.id="__build_error";' +
+  'o.style.cssText="position:fixed;inset:auto 0 0 0;max-height:45vh;overflow:auto;margin:0;padding:16px;' +
+  'background:#2a0b0b;color:#ffb4b4;font:13px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;z-index:99999;' +
+  'border-top:2px solid #ff5c5c";document.body.appendChild(o)}o.textContent=JSON.parse(e.data)});' +
+  '})()</script>'
 
 const clients = new Set<ReadableStreamDefaultController<Uint8Array>>()
 const encoder = new TextEncoder()
 
-function notifyClients(): void {
+function notifyClients(event?: string, data = 'reload'): void {
+  // Custom events carry JSON so multi-line build output survives the SSE
+  // framing; the plain reload event stays the bare word the client expects.
+  const payload = event ? JSON.stringify(data) : data
+  const frame = `${event ? `event: ${event}\n` : ''}data: ${payload}\n\n`
   for (const controller of clients) {
     try {
-      controller.enqueue(encoder.encode('data: reload\n\n'))
+      controller.enqueue(encoder.encode(frame))
     } catch {
       clients.delete(controller)
     }
   }
 }
+
+/** The last failed build's stderr, shown in the page until a build succeeds. */
+let lastError = ''
 
 let building: Promise<void> | null = null
 let queued = false
@@ -57,17 +72,26 @@ let queued = false
 const DEBOUNCE_MS = 30
 let pending: ReturnType<typeof setTimeout> | undefined
 
-function runBuild(): Promise<void> {
+function runBuild(): Promise<boolean> {
   return new Promise((resolve) => {
     const started = Date.now()
     const child = spawn(process.execPath, [path.join(ROOT, 'build.ts')], {
       cwd: ROOT,
-      stdio: ['ignore', 'ignore', 'inherit'],
+      stdio: ['ignore', 'ignore', 'pipe'],
+    })
+    // Mirror stderr to the terminal and keep a copy for the browser overlay,
+    // so a broken post shows its file and line where the author is looking.
+    let stderr = ''
+    child.stderr?.on('data', (chunk: Buffer) => {
+      stderr += chunk.toString()
+      process.stderr.write(chunk)
     })
     child.on('exit', (code) => {
-      const label = code === 0 ? 'rebuilt' : `build failed (${code})`
+      const ok = code === 0
+      const label = ok ? 'rebuilt' : `build failed (${code})`
       console.log(`  ${label} in ${Date.now() - started}ms`)
-      resolve()
+      lastError = ok ? '' : stderr.trim()
+      resolve(ok)
     })
   })
 }
@@ -77,15 +101,16 @@ async function rebuild(): Promise<void> {
     queued = true
     return
   }
-  building = runBuild()
+  building = runBuild().then((ok) => {
+    if (ok) notifyClients()
+    else notifyClients('build-error', lastError)
+  })
   await building
   building = null
   if (queued) {
     queued = false
     await rebuild()
-    return
   }
-  notifyClients()
 }
 
 /** The file `framework/shared/routing.ts` resolves this URL to, if it exists. */
@@ -143,6 +168,15 @@ async function start(): Promise<void> {
           new ReadableStream<Uint8Array>({
             start(controller) {
               clients.add(controller)
+              // A tab opened (or reloaded) while the build is broken should
+              // see the error too, not a stale page with no explanation.
+              if (lastError) {
+                controller.enqueue(
+                  encoder.encode(
+                    `event: build-error\ndata: ${JSON.stringify(lastError)}\n\n`,
+                  ),
+                )
+              }
             },
             cancel() {
               // The controller is dropped with the stream.
