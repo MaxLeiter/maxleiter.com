@@ -142,9 +142,10 @@ const TALKS: Talk[] = [
 export function TalksContent() {
   return (
     <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
+      <h1 className="text-3xl font-mono font-bold mb-2 text-[var(--fg)]">
         talks/
       </h1>
+      <p className="mb-8 text-[var(--gray)]">Talks I like.</p>
 
       <ul className="space-y-2">
         {TALKS.map((talk) => (

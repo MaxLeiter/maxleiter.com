@@ -866,9 +866,9 @@
       "canonical": "https://maxleiter.com/talks",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "20bc10a5a3c92b44",
+      "textHash": "c2f5edc80cd890cb",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 27478
+      "partialBytes": 27530
     },
     {
       "path": "/talks/embed",
@@ -877,9 +877,9 @@
       "canonical": "https://maxleiter.com/talks",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "929c839c24752df5",
+      "textHash": "ed6e109186374be9",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 24339
+      "partialBytes": 24391
     }
   ]
 }

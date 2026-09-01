@@ -127,7 +127,13 @@ export interface WrapOptions {
 export const wrapPage = (
   page: RenderedPage,
   options: WrapOptions & { runtime: string },
-): string => renderShell({ head: page.head, body: page.body, ...options })
+): string =>
+  renderShell({
+    head: page.head,
+    body: page.body,
+    embed: page.kind === 'embed',
+    ...options,
+  })
 
 /** The soft-navigation variant of the same page; see `renderPartial`. */
 export const wrapPartial = (page: RenderedPage, options: WrapOptions): string =>

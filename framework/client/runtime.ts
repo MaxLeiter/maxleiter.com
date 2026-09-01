@@ -289,7 +289,13 @@ const nativeInstantNav =
   'prerendering' in document &&
   'PageRevealEvent' in window
 
-if (!nativeInstantNav) {
+// A framed document is an `/embed` inside a desktop window. Its links carry
+// `<base target="_top">` and must reach the browser untouched; the router
+// reads the anchor's own `target`, which `<base>` does not set, and would
+// swap the new page into the frame.
+const framed = window.self !== window.top
+
+if (!nativeInstantNav && !framed) {
   /**
    * Holds a click that lands before the router chunk arrives.
    *

@@ -89,6 +89,12 @@ export interface ShellOptions {
    * module (bisected 2026-08-31, Chrome 151). About 1.1KB brotli.
    */
   runtime: string
+  /**
+   * The document is the `/embed` variant, loaded in a desktop window's iframe.
+   * Every link in it must navigate the top page, not the frame: a post that
+   * links another post would otherwise open it nested inside the window.
+   */
+  embed?: boolean
 }
 
 /**
@@ -251,6 +257,7 @@ export function renderShell(options: ShellOptions): string {
 
   const headHtml = [
     renderToStaticMarkup(<>{headTags(head, siteUrl)}</>),
+    options.embed ? '<base target="_top">' : '',
     renderToStaticMarkup(<>{preloadTags(fonts.preload)}</>),
     // Two tags, not one. The base sheet, the fonts and the view-transition
     // rules are byte-identical on every page, so a same-document navigation
