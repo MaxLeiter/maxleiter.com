@@ -492,9 +492,9 @@
       "canonical": "https://maxleiter.com/blog/thank-u-next",
       "ogImage": "https://maxleiter.com/blog/thank-u-next/opengraph-image.png",
       "noindex": false,
-      "textHash": "a452df93820388b8",
+      "textHash": "70d251c55eae15e7",
       "codeHash": "6e1d1614777e5aa9",
-      "partialBytes": 24376
+      "partialBytes": 24337
     },
     {
       "path": "/blog/thank-u-next/embed",
@@ -503,9 +503,9 @@
       "canonical": "https://maxleiter.com/blog/thank-u-next",
       "ogImage": "https://maxleiter.com/blog/thank-u-next/opengraph-image.png",
       "noindex": true,
-      "textHash": "8220abd14ad67789",
+      "textHash": "c5984e77c88f2fbd",
       "codeHash": "6e1d1614777e5aa9",
-      "partialBytes": 20677
+      "partialBytes": 20638
     },
     {
       "path": "/blog/the-new-maxleiter-com",

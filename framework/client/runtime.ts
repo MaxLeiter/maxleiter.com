@@ -250,15 +250,41 @@ document.addEventListener('click', (event) => {
  */
 let namedForTransition: HTMLElement | null = null
 
+/**
+ * Back and forward on a phone get no transition. The browser already animates
+ * the swipe-back gesture, and a morph on top of it reads as the page lurching.
+ * Both halves have to agree: a skip in `pageswap` drops the outbound capture,
+ * and the `pagereveal` skip covers a back/forward restore from bfcache or
+ * prerender where no `pageswap` ran on this document.
+ */
+const skipTraversal = (type: string | undefined): boolean =>
+  type === 'traverse' && matchMedia('(max-width: 767px)').matches
+
+addEventListener('pagereveal', (event) => {
+  const activation = (
+    navigation as { activation?: { navigationType?: string } }
+  ).activation
+  const transition = (event as { viewTransition?: { skipTransition(): void } })
+    .viewTransition
+  if (transition && skipTraversal(activation?.navigationType)) {
+    transition.skipTransition()
+  }
+})
+
 addEventListener('pageswap', (event) => {
+  const swap = event as {
+    activation?: { navigationType?: string; entry?: { url?: string } }
+    viewTransition?: { skipTransition(): void }
+  }
+  if (swap.viewTransition && skipTraversal(swap.activation?.navigationType)) {
+    swap.viewTransition.skipTransition()
+  }
   if (namedForTransition) {
     namedForTransition.style.viewTransitionName = ''
     namedForTransition = null
   }
 
-  const url = (
-    event as unknown as { activation?: { entry?: { url?: string } } }
-  ).activation?.entry?.url
+  const url = swap.activation?.entry?.url
   const name = url ? transitionNameForUrl(url) : null
   if (!name || isNameLive(name)) return
 

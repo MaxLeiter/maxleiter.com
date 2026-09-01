@@ -234,9 +234,14 @@ article details {
 }
 
 /* Tables: no outer box, a quiet uppercase header, hairline row dividers. */
+article .table-scroll {
+  overflow-x: auto;
+  margin-block: 1.5rem;
+}
+
 article table {
   width: 100%;
-  margin-block: 1.5rem;
+  margin-block: 0;
   border-collapse: collapse;
   font-size: 0.95rem;
   line-height: 1.5;
@@ -284,13 +289,6 @@ article td:first-child strong {
 
 article tbody tr:has(td:first-child strong) td {
   padding-top: 1.1rem;
-}
-
-@media screen and (max-width: 760px) {
-  article table {
-    display: block;
-    overflow-x: auto;
-  }
 }
 
 /* A rule in prose gets the same air above as below; the generic 1em block gap

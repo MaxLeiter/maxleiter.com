@@ -216,6 +216,13 @@ export function createMdxComponents(options: MdxComponentOptions) {
     },
     img: ArticleImage,
     Image: ArticleImage,
+    // A wide table scrolls inside this div on phones. `display:block` on the
+    // table itself did the same in Chrome, but Safari let the page pan instead.
+    table: (props: React.TableHTMLAttributes<HTMLTableElement>) => (
+      <div className="table-scroll">
+        <table {...props} />
+      </div>
+    ),
     Details: ({
       children,
       summary,

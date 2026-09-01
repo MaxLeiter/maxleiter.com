@@ -222,8 +222,9 @@ function claimTransitionName(source: Element | null, url: string): () => void {
   }
 }
 
-function withTransition(update: () => void): Promise<void> {
+function withTransition(update: () => void, enabled: boolean): Promise<void> {
   if (
+    !enabled ||
     typeof document.startViewTransition !== 'function' ||
     matchMedia('(prefers-reduced-motion: reduce)').matches
   ) {
@@ -327,11 +328,13 @@ export interface NavigateOptions {
   scroll?: number
   /** The element that started this, for the transition-name handoff. */
   source?: Element | null
+  /** False for back/forward on a phone; see `skipTraversal` in runtime.ts. */
+  transition?: boolean
 }
 
 export async function navigate(
   url: string,
-  { push, scroll = 0, source = null }: NavigateOptions,
+  { push, scroll = 0, source = null, transition = true }: NavigateOptions,
 ): Promise<void> {
   if (navigating) return
   navigating = true
@@ -377,7 +380,7 @@ export async function navigate(
       hooks.setup()
       observeLinks()
       scrollTo(0, scroll)
-    })
+    }, transition)
 
     release()
   } finally {
@@ -411,7 +414,11 @@ export function installRouter(islandHooks: IslandHooks): void {
 
   addEventListener('popstate', () => {
     const state = history.state as { scroll?: number } | null
-    void navigate(location.href, { push: false, scroll: state?.scroll ?? 0 })
+    void navigate(location.href, {
+      push: false,
+      scroll: state?.scroll ?? 0,
+      transition: !matchMedia('(max-width: 767px)').matches,
+    })
   })
 
   /**
