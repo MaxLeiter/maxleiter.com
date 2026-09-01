@@ -258,6 +258,13 @@ article tbody td {
   border-bottom: 1px solid var(--lighter-gray);
 }
 
+/* Columns keep a readable width on phones and the table scrolls instead of
+   wrapping every cell into a word-per-line column. */
+article th,
+article td {
+  min-width: 8rem;
+}
+
 article tbody tr:last-child td {
   border-bottom: 0;
 }
