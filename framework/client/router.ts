@@ -364,6 +364,12 @@ export async function navigate(
       resetLinkObserver()
       swapHead(doc)
       document.body.replaceChildren(...doc.body.childNodes)
+      // A <video> whose <source> children were attached inside the inert
+      // DOMParser document never ran source selection, and Firefox does not
+      // re-run it on adoption: the player shows "No video with supported
+      // format" until load() is called. Chrome takes the native path and never
+      // swaps, so this is the one Firefox-specific line in the router.
+      for (const video of document.body.querySelectorAll('video')) video.load()
       if (push) history.pushState({ scroll: 0 }, '', url)
       hooks.setup()
       observeLinks()
