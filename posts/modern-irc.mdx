@@ -1,0 +1,107 @@
+---
+title: Bringing IRC (and The Lounge) to the 21st century
+slug: modern-irc
+published: false
+---
+
+# Bringing IRC (and The Lounge) to the 21st century
+
+TheLounge v4.6.0
+
+The Lounge 4.6.0 was just released and I am excited. It brings many new features and improvements on both the user-facing client side and in the technical sense.
+
+For those unfamiliar, The Lounge is a self-hosted IRC client. You host it on an always on server, and it acts as an always-online bouncer so your messages are preserved even if no web client is connected. We also support a public mode for public usage without database message persistence.
+
+On the internal side of things, our last few releases replaced Webpack and Babel with Vite as our bundler and build system, and we're now on Vite 8 with Rolldown. Local development and HMR got noticeably faster, and production
+bundle sizes were halved thanks to better tree-shaking and bundling.
+
+<details>
+```
+Webpack vs Vite Build Comparison
+
+┌────────────┬──────────────────────┬────────────────────┬───────────────┐
+│ Metric │ Webpack 5 │ Vite 8 (Rolldown) │ Change │
+├────────────┼──────────────────────┼────────────────────┼───────────────┤
+│ Build time │ 1,961ms (2.96s wall) │ 612ms (0.82s wall) │ 3.2x faster │
+├────────────┼──────────────────────┼────────────────────┼───────────────┤
+│ CPU time │ 11.0s user │ 1.3s user │ 8.5x less CPU │
+└────────────┴──────────────────────┴────────────────────┴───────────────┘
+
+Bundle sizes (gzipped)
+
+┌────────────────┬─────────┬────────┬────────┐
+│ Asset │ Webpack │ Vite │ Change │
+├────────────────┼─────────┼────────┼────────┤
+│ App JS │ 152.6K │ 104.9K │ -31% │
+├────────────────┼─────────┼────────┼────────┤
+│ Vendor JS │ 251.1K │ 81.6K │ -68% │
+├────────────────┼─────────┼────────┼────────┤
+│ Runtime JS │ — │ 0.5K │ new │
+├────────────────┼─────────┼────────┼────────┤
+│ Total JS │ 403.7K │ 187.0K │ -54% │
+├────────────────┼─────────┼────────┼────────┤
+│ CSS │ 12.5K │ 11.9K │ -5% │
+├────────────────┼─────────┼────────┼────────┤
+│ Total transfer │ 416.2K │ 198.9K │ -52% │
+└────────────────┴─────────┴────────┴────────┘
+
+```
+The real exciting news is in the new features. IRCv3 support was a focus of mine this release and we are now one of the most supporting clients in the client registry.
+
+The new features include:
+
+</details>
+
+- MONITOR / extended-monitor (away status)
+- emoji reactions (`+draft/react`)
+- reply threading (`+draft/reply`)
+- typing indicators (`+typing`)
+- multiline (`draft/multiline`)
+- Bot Mode
+
+Let's look into each. Most of these are server-side extensions and need a compatible IRCd. The client-only tags (those prefixed with `+`) are relayed by the server but interpreted by clients.
+
+
+### MONITOR / extended-monitor support
+
+Traditionally, IRC clients track user status — like away messages — by periodically polling the server with `WHO`/`WHOIS`. The `MONITOR` and `extended-monitor` specs turn this into an event-driven system: a client subscribes once and receives away (and account) updates as they happen. That lets us ship live status indicators like away dots without the constant `WHO`
+polling older clients rely on (and that would flood IRC servers)
+
+ ![Screenshot 2026-07-19 at 17-16-52 #libera-communities — The Lounge](/Users/max/Downloads/Screenshot 2026-07-19 at 17-16-52 #libera-communities — The Lounge.png)
+
+ ![Screenshot 2026-07-19 at 17-17-42 #libera-communities — The Lounge](</Users/max/Downloads/Screenshot 2026-07-19 at 17-17-42 #libera-communities — The Lounge.png>)
+
+ ### Emoji Reactions
+
+For supporting servers, The Lounge users can now react to messages with emojis. This is possible in a new on-hover/tap menu that is also used for reply threading.
+
+![Screenshot 2026-07-19 at 17-26-37 #ergo — The Lounge](</Users/max/Downloads/Screenshot 2026-07-19 at 17-26-37 #ergo — The Lounge.png>)
+
+ ### Reply Threading
+
+Familiar to those who have used Discord or Slack, you can now also reply to specific messages. Replies should work with all clients that support the message-id spec, and non-supporting clients will fallback gracefully to normal messages
+
+![Screenshot 2026-07-19 at 17-27-26 #thelounge — The Lounge](</Users/max/Downloads/Screenshot 2026-07-19 at 17-27-26 #thelounge — The Lounge.png>)
+
+ ### Typing Indicators
+
+Typing indicator support was one of our [most upvoted issues](https://github.com/thelounge/thelounge/issues/2419) and I'm very happy to see it finally ship.
+
+![image](/Users/max/Downloads/image.png)
+
+By default, the setting is set to "receive", meaning you will see other's typing notification but you will not send any of your own.
+
+ ### And more
+
+We also shipped a handful of other IRCv3 features: [Bot Mode](https://ircv3.net/specs/extensions/bot-mode),
+[multiline](https://ircv3.net/specs/extensions/multiline), standard-replies, and channel-context.
+
+Multiline lets a single logical message span multiple lines instead of being split into separate ones. standard-replies gives us structured `FAIL`/`WARN`/`NOTE` responses from the server, and channel-context (`+draft/channel-context`) lets
+messages carry the channel they relate to.
+
+Bot Mode is self-explanatory but more important than ever in this world of [talking weights](/blog/weights). It's simple enough: bots set a flag in their user mode, and clients are now notified — so we badge them with a `[bot]` indicator in the userlist.
+
+### Try it out
+
+You can try the live demo (running in public mode) at https://demo.thelounge.chat.  If you get The Lounge up and running, be sure to join us in #thelounge on irc.libera.chat. GitHub issues and pull requests are welcome for any feedback. Happy chatting!
+```
