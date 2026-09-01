@@ -4,18 +4,21 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import zlib from 'node:zlib'
 import * as esbuild from 'esbuild'
-import { createBuildContext } from '@framework/content'
+import { createBuildContext } from '@framework/content/index'
 import { buildCss } from '@framework/assets/css'
 import { buildClient } from '@framework/assets/client'
 import { prepareFonts } from '@framework/assets/fonts'
-import { formatPlatformResult, runPlatformSteps } from '@framework/platform'
+import {
+  formatPlatformResult,
+  runPlatformSteps,
+} from '@framework/platform/index'
 import { staticPathFor } from '@framework/shared/routing'
 import type {
   BuildContext,
   RouteInfo,
   RouteManifest,
 } from '@framework/shared/types'
-import type { RenderedPage, WrapOptions } from '@framework/render'
+import type { RenderedPage, WrapOptions } from '@framework/render/index'
 
 /**
  * The whole build.

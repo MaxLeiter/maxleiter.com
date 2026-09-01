@@ -78,7 +78,7 @@ export interface BuildContext {
 /**
  * What a route declares about its document. The canonical URL is deliberately
  * absent: it is always the route's own path against `ctx.site.url`, so
- * `render/site.ts` derives it once rather than every `PageDef` restating its
+ * `render/index.ts` derives it once rather than every `PageDef` restating its
  * own path as a string.
  */
 export interface Head {

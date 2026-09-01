@@ -38,7 +38,7 @@ const used = new Set<string>()
 
 /**
  * The island names rendered since the last call, clearing them for the next
- * page. `render/site.ts` calls it once to discard anything a previous run
+ * page. `render/index.ts` calls it once to discard anything a previous run
  * left behind, then once per rendered document.
  */
 export function takeIslandManifest(): string[] {
