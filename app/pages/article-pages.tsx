@@ -95,7 +95,7 @@ function Article({
       </div>
 
       <footer
-        className="mt-12 pt-6 border-t text-sm"
+        className="mt-8 pt-5 border-t text-sm"
         style={{ borderColor: 'var(--border-color)', color: 'var(--gray)' }}
       >
         <p>

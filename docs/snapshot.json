@@ -63,9 +63,9 @@
       "canonical": "https://maxleiter.com/blog/build-a-blog-with-nextjs-13",
       "ogImage": "https://maxleiter.com/blog/build-a-blog-with-nextjs-13/opengraph-image.png",
       "noindex": false,
-      "textHash": "d05eca63596142a8",
+      "textHash": "279c5065da5624ac",
       "codeHash": "02a6e93a53e7b727",
-      "partialBytes": 99962
+      "partialBytes": 100422
     },
     {
       "path": "/blog/build-a-blog-with-nextjs-13/embed",
@@ -74,9 +74,9 @@
       "canonical": "https://maxleiter.com/blog/build-a-blog-with-nextjs-13",
       "ogImage": "https://maxleiter.com/blog/build-a-blog-with-nextjs-13/opengraph-image.png",
       "noindex": true,
-      "textHash": "6a7c6837d8918128",
+      "textHash": "56b09cb8306dd9d5",
       "codeHash": "02a6e93a53e7b727",
-      "partialBytes": 96229
+      "partialBytes": 96689
     },
     {
       "path": "/blog/contributing-to-oss",
@@ -85,9 +85,9 @@
       "canonical": "https://maxleiter.com/blog/contributing-to-oss",
       "ogImage": "https://maxleiter.com/blog/contributing-to-oss/opengraph-image.png",
       "noindex": false,
-      "textHash": "6c75e7b0c52f1d30",
+      "textHash": "d3c41ce2f068234b",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 18449
+      "partialBytes": 18909
     },
     {
       "path": "/blog/contributing-to-oss/embed",
@@ -96,9 +96,9 @@
       "canonical": "https://maxleiter.com/blog/contributing-to-oss",
       "ogImage": "https://maxleiter.com/blog/contributing-to-oss/opengraph-image.png",
       "noindex": true,
-      "textHash": "e132e267c1f706cb",
+      "textHash": "784f912263298168",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 14693
+      "partialBytes": 15153
     },
     {
       "path": "/blog/easy-site-improvements",
@@ -107,9 +107,9 @@
       "canonical": "https://maxleiter.com/blog/easy-site-improvements",
       "ogImage": "https://maxleiter.com/blog/easy-site-improvements/opengraph-image.png",
       "noindex": false,
-      "textHash": "7745c228ec981a00",
+      "textHash": "b698d060d173ab8d",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 16587
+      "partialBytes": 17047
     },
     {
       "path": "/blog/easy-site-improvements/embed",
@@ -118,9 +118,9 @@
       "canonical": "https://maxleiter.com/blog/easy-site-improvements",
       "ogImage": "https://maxleiter.com/blog/easy-site-improvements/opengraph-image.png",
       "noindex": true,
-      "textHash": "70661e8438afb9f3",
+      "textHash": "188e157dfb2ca091",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 12807
+      "partialBytes": 13267
     },
     {
       "path": "/blog/embed",
@@ -140,9 +140,9 @@
       "canonical": "https://maxleiter.com/blog/formatting",
       "ogImage": "https://maxleiter.com/blog/formatting/opengraph-image.png",
       "noindex": false,
-      "textHash": "a61f9da35f7718f9",
+      "textHash": "b28668a58fba93a1",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 16952
+      "partialBytes": 17412
     },
     {
       "path": "/blog/formatting/embed",
@@ -151,9 +151,9 @@
       "canonical": "https://maxleiter.com/blog/formatting",
       "ogImage": "https://maxleiter.com/blog/formatting/opengraph-image.png",
       "noindex": true,
-      "textHash": "d681321df1b2eeee",
+      "textHash": "288dd1e40eb51a4d",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 13235
+      "partialBytes": 13695
     },
     {
       "path": "/blog/framework",
@@ -162,9 +162,9 @@
       "canonical": "https://maxleiter.com/blog/framework",
       "ogImage": "https://maxleiter.com/blog/framework/opengraph-image.png",
       "noindex": false,
-      "textHash": "802ee78780094fea",
+      "textHash": "3059e33472d4eca3",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 14331
+      "partialBytes": 14791
     },
     {
       "path": "/blog/framework/embed",
@@ -173,9 +173,9 @@
       "canonical": "https://maxleiter.com/blog/framework",
       "ogImage": "https://maxleiter.com/blog/framework/opengraph-image.png",
       "noindex": true,
-      "textHash": "4f80d5ef9cf7c8bb",
+      "textHash": "76c1a75612b0218b",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 10619
+      "partialBytes": 11079
     },
     {
       "path": "/blog/hacker-sites",
@@ -184,9 +184,9 @@
       "canonical": "https://maxleiter.com/blog/hacker-sites",
       "ogImage": "https://maxleiter.com/blog/hacker-sites/opengraph-image.png",
       "noindex": false,
-      "textHash": "ad33362a69b61b94",
+      "textHash": "2cd2a48295990e49",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 11260
+      "partialBytes": 11720
     },
     {
       "path": "/blog/hacker-sites/embed",
@@ -195,9 +195,9 @@
       "canonical": "https://maxleiter.com/blog/hacker-sites",
       "ogImage": "https://maxleiter.com/blog/hacker-sites/opengraph-image.png",
       "noindex": true,
-      "textHash": "8398c419aeddc3b0",
+      "textHash": "073d50696dc685e8",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 7546
+      "partialBytes": 8006
     },
     {
       "path": "/blog/HFSViewer",
@@ -206,9 +206,9 @@
       "canonical": "https://maxleiter.com/blog/HFSViewer",
       "ogImage": "https://maxleiter.com/blog/HFSViewer/opengraph-image.png",
       "noindex": false,
-      "textHash": "76a8f76003a8777d",
+      "textHash": "65cc5fd9b6f16ac6",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 12631
+      "partialBytes": 13091
     },
     {
       "path": "/blog/HFSViewer/embed",
@@ -217,9 +217,9 @@
       "canonical": "https://maxleiter.com/blog/HFSViewer",
       "ogImage": "https://maxleiter.com/blog/HFSViewer/opengraph-image.png",
       "noindex": true,
-      "textHash": "51937a7cba164372",
+      "textHash": "3f57e2fb51d5046e",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 8933
+      "partialBytes": 9393
     },
     {
       "path": "/blog/introducing-drift",
@@ -228,9 +228,9 @@
       "canonical": "https://maxleiter.com/blog/introducing-drift",
       "ogImage": "https://maxleiter.com/blog/introducing-drift/opengraph-image.png",
       "noindex": false,
-      "textHash": "edfb5e5b42b80b0a",
+      "textHash": "92f31769f875a7e5",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 13979
+      "partialBytes": 14439
     },
     {
       "path": "/blog/introducing-drift/embed",
@@ -239,9 +239,9 @@
       "canonical": "https://maxleiter.com/blog/introducing-drift",
       "ogImage": "https://maxleiter.com/blog/introducing-drift/opengraph-image.png",
       "noindex": true,
-      "textHash": "489e6823cbe2b356",
+      "textHash": "8af18685ae74b96b",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 10261
+      "partialBytes": 10721
     },
     {
       "path": "/blog/mobile-browsers-resizing-font",
@@ -250,9 +250,9 @@
       "canonical": "https://maxleiter.com/blog/mobile-browsers-resizing-font",
       "ogImage": "https://maxleiter.com/blog/mobile-browsers-resizing-font/opengraph-image.png",
       "noindex": false,
-      "textHash": "f4e73017a894e96c",
+      "textHash": "7cc6a07ea3085803",
       "codeHash": "ab28b0bcce94c12d",
-      "partialBytes": 13461
+      "partialBytes": 13921
     },
     {
       "path": "/blog/mobile-browsers-resizing-font/embed",
@@ -261,9 +261,9 @@
       "canonical": "https://maxleiter.com/blog/mobile-browsers-resizing-font",
       "ogImage": "https://maxleiter.com/blog/mobile-browsers-resizing-font/opengraph-image.png",
       "noindex": true,
-      "textHash": "15354be4c2ca0197",
+      "textHash": "773591dc80cbbf58",
       "codeHash": "ab28b0bcce94c12d",
-      "partialBytes": 9665
+      "partialBytes": 10125
     },
     {
       "path": "/blog/MSHW0184",
@@ -272,9 +272,9 @@
       "canonical": "https://maxleiter.com/blog/MSHW0184",
       "ogImage": "https://maxleiter.com/blog/MSHW0184/opengraph-image.png",
       "noindex": false,
-      "textHash": "8134ca595bc35981",
+      "textHash": "6f03fb0253fb4f59",
       "codeHash": "21fe48e730e4baf5",
-      "partialBytes": 22316
+      "partialBytes": 22776
     },
     {
       "path": "/blog/MSHW0184/embed",
@@ -283,9 +283,9 @@
       "canonical": "https://maxleiter.com/blog/MSHW0184",
       "ogImage": "https://maxleiter.com/blog/MSHW0184/opengraph-image.png",
       "noindex": true,
-      "textHash": "aa9992a7ee0abc85",
+      "textHash": "262fca3f1a9a329f",
       "codeHash": "21fe48e730e4baf5",
-      "partialBytes": 18595
+      "partialBytes": 19055
     },
     {
       "path": "/blog/nintype",
@@ -294,9 +294,9 @@
       "canonical": "https://maxleiter.com/blog/nintype",
       "ogImage": "https://maxleiter.com/blog/nintype/opengraph-image.png",
       "noindex": false,
-      "textHash": "660baef8944bef8b",
+      "textHash": "18aa41612ceb3ca8",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 14768
+      "partialBytes": 15228
     },
     {
       "path": "/blog/nintype/embed",
@@ -305,9 +305,9 @@
       "canonical": "https://maxleiter.com/blog/nintype",
       "ogImage": "https://maxleiter.com/blog/nintype/opengraph-image.png",
       "noindex": true,
-      "textHash": "c7f8af3e3c77475e",
+      "textHash": "e4cee86988133581",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 11059
+      "partialBytes": 11519
     },
     {
       "path": "/blog/node-has-tooling-problems",
@@ -316,9 +316,9 @@
       "canonical": "https://maxleiter.com/blog/node-has-tooling-problems",
       "ogImage": "https://maxleiter.com/blog/node-has-tooling-problems/opengraph-image.png",
       "noindex": false,
-      "textHash": "8f1b7fba19761329",
+      "textHash": "83dcd91285beb891",
       "codeHash": "3f24a11511110725",
-      "partialBytes": 17816
+      "partialBytes": 18276
     },
     {
       "path": "/blog/node-has-tooling-problems/embed",
@@ -327,9 +327,9 @@
       "canonical": "https://maxleiter.com/blog/node-has-tooling-problems",
       "ogImage": "https://maxleiter.com/blog/node-has-tooling-problems/opengraph-image.png",
       "noindex": true,
-      "textHash": "5291d3df80fa52d0",
+      "textHash": "4cb9e2c2ca14c2b9",
       "codeHash": "3f24a11511110725",
-      "partialBytes": 14044
+      "partialBytes": 14504
     },
     {
       "path": "/blog/pin-dependencies",
@@ -338,9 +338,9 @@
       "canonical": "https://maxleiter.com/blog/pin-dependencies",
       "ogImage": "https://maxleiter.com/blog/pin-dependencies/opengraph-image.png",
       "noindex": false,
-      "textHash": "bef9096b796b9538",
+      "textHash": "bcbae7efcaf1319b",
       "codeHash": "b875bc1dcab45df2",
-      "partialBytes": 15858
+      "partialBytes": 16318
     },
     {
       "path": "/blog/pin-dependencies/embed",
@@ -349,9 +349,9 @@
       "canonical": "https://maxleiter.com/blog/pin-dependencies",
       "ogImage": "https://maxleiter.com/blog/pin-dependencies/opengraph-image.png",
       "noindex": true,
-      "textHash": "375a91334b5dbb85",
+      "textHash": "63bb204dccaeb78a",
       "codeHash": "b875bc1dcab45df2",
-      "partialBytes": 12130
+      "partialBytes": 12590
     },
     {
       "path": "/blog/rewrite-your-prompts",
@@ -360,9 +360,9 @@
       "canonical": "https://maxleiter.com/blog/rewrite-your-prompts",
       "ogImage": "https://maxleiter.com/blog/rewrite-your-prompts/opengraph-image.png",
       "noindex": false,
-      "textHash": "f8271034ec28916a",
+      "textHash": "6ab38e16e41d164e",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 17435
+      "partialBytes": 17895
     },
     {
       "path": "/blog/rewrite-your-prompts/embed",
@@ -371,9 +371,9 @@
       "canonical": "https://maxleiter.com/blog/rewrite-your-prompts",
       "ogImage": "https://maxleiter.com/blog/rewrite-your-prompts/opengraph-image.png",
       "noindex": true,
-      "textHash": "07527cc40bc5ade6",
+      "textHash": "f5c9c81e05ca901f",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 13689
+      "partialBytes": 14149
     },
     {
       "path": "/blog/sandcastle",
@@ -382,9 +382,9 @@
       "canonical": "https://maxleiter.com/blog/sandcastle",
       "ogImage": "https://maxleiter.com/blog/sandcastle/opengraph-image.png",
       "noindex": false,
-      "textHash": "3fea1b4d1a8e125b",
+      "textHash": "c8214af71dbc8ea3",
       "codeHash": "51ad4f3a15cddfcc",
-      "partialBytes": 40810
+      "partialBytes": 41270
     },
     {
       "path": "/blog/sandcastle/embed",
@@ -393,9 +393,9 @@
       "canonical": "https://maxleiter.com/blog/sandcastle",
       "ogImage": "https://maxleiter.com/blog/sandcastle/opengraph-image.png",
       "noindex": true,
-      "textHash": "99979ae5cea744f9",
+      "textHash": "d4f28c8bb8442629",
       "codeHash": "51ad4f3a15cddfcc",
-      "partialBytes": 37081
+      "partialBytes": 37541
     },
     {
       "path": "/blog/seeing-the-future",
@@ -404,9 +404,9 @@
       "canonical": "https://maxleiter.com/blog/seeing-the-future",
       "ogImage": "https://maxleiter.com/blog/seeing-the-future/opengraph-image.png",
       "noindex": false,
-      "textHash": "24347433f41b0a17",
+      "textHash": "4b905c6cb87473ed",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 32149
+      "partialBytes": 32609
     },
     {
       "path": "/blog/seeing-the-future/embed",
@@ -415,9 +415,9 @@
       "canonical": "https://maxleiter.com/blog/seeing-the-future",
       "ogImage": "https://maxleiter.com/blog/seeing-the-future/opengraph-image.png",
       "noindex": true,
-      "textHash": "0a9b5899c8737118",
+      "textHash": "3c04a5a0d9415593",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 28407
+      "partialBytes": 28867
     },
     {
       "path": "/blog/ship-every-day",
@@ -426,9 +426,9 @@
       "canonical": "https://maxleiter.com/blog/ship-every-day",
       "ogImage": "https://maxleiter.com/blog/ship-every-day/opengraph-image.png",
       "noindex": false,
-      "textHash": "740031eb25d649e2",
+      "textHash": "daaca142c329f36e",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 9335
+      "partialBytes": 9795
     },
     {
       "path": "/blog/ship-every-day/embed",
@@ -437,9 +437,9 @@
       "canonical": "https://maxleiter.com/blog/ship-every-day",
       "ogImage": "https://maxleiter.com/blog/ship-every-day/opengraph-image.png",
       "noindex": true,
-      "textHash": "6ed514f0308ba201",
+      "textHash": "6c37dbc7c30bf387",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 5619
+      "partialBytes": 6079
     },
     {
       "path": "/blog/sluggified-urls",
@@ -448,9 +448,9 @@
       "canonical": "https://maxleiter.com/blog/sluggified-urls",
       "ogImage": "https://maxleiter.com/blog/sluggified-urls/opengraph-image.png",
       "noindex": false,
-      "textHash": "fa951cd04ce5b10f",
+      "textHash": "4efad4f80e2e6289",
       "codeHash": "ad6dd6d618d84d53",
-      "partialBytes": 26529
+      "partialBytes": 26989
     },
     {
       "path": "/blog/sluggified-urls/embed",
@@ -459,9 +459,9 @@
       "canonical": "https://maxleiter.com/blog/sluggified-urls",
       "ogImage": "https://maxleiter.com/blog/sluggified-urls/opengraph-image.png",
       "noindex": true,
-      "textHash": "3280e77119a8ec20",
+      "textHash": "dc9e79e65591ad72",
       "codeHash": "ad6dd6d618d84d53",
-      "partialBytes": 22804
+      "partialBytes": 23264
     },
     {
       "path": "/blog/supabase-next-analytics",
@@ -470,9 +470,9 @@
       "canonical": "https://maxleiter.com/blog/supabase-next-analytics",
       "ogImage": "https://maxleiter.com/blog/supabase-next-analytics/opengraph-image.png",
       "noindex": false,
-      "textHash": "971fb78e9e20bbbc",
+      "textHash": "812df3ef1c704cc8",
       "codeHash": "cfd8a8bd5929e315",
-      "partialBytes": 53218
+      "partialBytes": 53678
     },
     {
       "path": "/blog/supabase-next-analytics/embed",
@@ -481,9 +481,9 @@
       "canonical": "https://maxleiter.com/blog/supabase-next-analytics",
       "ogImage": "https://maxleiter.com/blog/supabase-next-analytics/opengraph-image.png",
       "noindex": true,
-      "textHash": "ab519dbe33f7c648",
+      "textHash": "0e3fef9bb99d8105",
       "codeHash": "cfd8a8bd5929e315",
-      "partialBytes": 49449
+      "partialBytes": 49909
     },
     {
       "path": "/blog/thank-u-next",
@@ -492,9 +492,9 @@
       "canonical": "https://maxleiter.com/blog/thank-u-next",
       "ogImage": "https://maxleiter.com/blog/thank-u-next/opengraph-image.png",
       "noindex": false,
-      "textHash": "95cdc627849e59f4",
+      "textHash": "a452df93820388b8",
       "codeHash": "6e1d1614777e5aa9",
-      "partialBytes": 23922
+      "partialBytes": 24376
     },
     {
       "path": "/blog/thank-u-next/embed",
@@ -503,9 +503,9 @@
       "canonical": "https://maxleiter.com/blog/thank-u-next",
       "ogImage": "https://maxleiter.com/blog/thank-u-next/opengraph-image.png",
       "noindex": true,
-      "textHash": "620e4070f266a796",
+      "textHash": "8220abd14ad67789",
       "codeHash": "6e1d1614777e5aa9",
-      "partialBytes": 20223
+      "partialBytes": 20677
     },
     {
       "path": "/blog/the-new-maxleiter-com",
@@ -514,9 +514,9 @@
       "canonical": "https://maxleiter.com/blog/the-new-maxleiter-com",
       "ogImage": "https://maxleiter.com/blog/the-new-maxleiter-com/opengraph-image.png",
       "noindex": false,
-      "textHash": "e06f0f2d1429a610",
+      "textHash": "e2495ed406a684f5",
       "codeHash": "e4530c1c22646dc1",
-      "partialBytes": 30483
+      "partialBytes": 30943
     },
     {
       "path": "/blog/the-new-maxleiter-com/embed",
@@ -525,9 +525,9 @@
       "canonical": "https://maxleiter.com/blog/the-new-maxleiter-com",
       "ogImage": "https://maxleiter.com/blog/the-new-maxleiter-com/opengraph-image.png",
       "noindex": true,
-      "textHash": "7253695c5002c153",
+      "textHash": "bb552ae314f54f51",
       "codeHash": "e4530c1c22646dc1",
-      "partialBytes": 26749
+      "partialBytes": 27209
     },
     {
       "path": "/blog/vibecoding-minecraft-mods",
@@ -536,9 +536,9 @@
       "canonical": "https://maxleiter.com/blog/vibecoding-minecraft-mods",
       "ogImage": "https://maxleiter.com/blog/vibecoding-minecraft-mods/opengraph-image.png",
       "noindex": false,
-      "textHash": "db41afa59278bc38",
+      "textHash": "55ec627f232a084b",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 36608
+      "partialBytes": 37068
     },
     {
       "path": "/blog/vibecoding-minecraft-mods/embed",
@@ -547,9 +547,9 @@
       "canonical": "https://maxleiter.com/blog/vibecoding-minecraft-mods",
       "ogImage": "https://maxleiter.com/blog/vibecoding-minecraft-mods/opengraph-image.png",
       "noindex": true,
-      "textHash": "0afd6d6ab52adf74",
+      "textHash": "037b333ea13384fa",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 32857
+      "partialBytes": 33317
     },
     {
       "path": "/blog/weights",
@@ -558,9 +558,9 @@
       "canonical": "https://maxleiter.com/blog/weights",
       "ogImage": "https://maxleiter.com/blog/weights/opengraph-image.png",
       "noindex": false,
-      "textHash": "e2e41c44332822bf",
+      "textHash": "43171ee76f36185d",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 10783
+      "partialBytes": 11243
     },
     {
       "path": "/blog/weights/embed",
@@ -569,9 +569,9 @@
       "canonical": "https://maxleiter.com/blog/weights",
       "ogImage": "https://maxleiter.com/blog/weights/opengraph-image.png",
       "noindex": true,
-      "textHash": "dfb364c68b160084",
+      "textHash": "dc44da7150da6f13",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 7080
+      "partialBytes": 7540
     },
     {
       "path": "/blog/X11",
@@ -580,9 +580,9 @@
       "canonical": "https://maxleiter.com/blog/X11",
       "ogImage": "https://maxleiter.com/blog/X11/opengraph-image.png",
       "noindex": false,
-      "textHash": "469cf44e940db7b7",
+      "textHash": "9823562c681ca871",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 19920
+      "partialBytes": 20380
     },
     {
       "path": "/blog/X11/embed",
@@ -591,9 +591,9 @@
       "canonical": "https://maxleiter.com/blog/X11",
       "ogImage": "https://maxleiter.com/blog/X11/opengraph-image.png",
       "noindex": true,
-      "textHash": "d44f1d69807c2692",
+      "textHash": "fe832442a19024f5",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 16251
+      "partialBytes": 16711
     },
     {
       "path": "/blog/xios",
@@ -602,9 +602,9 @@
       "canonical": "https://maxleiter.com/blog/xios",
       "ogImage": "https://maxleiter.com/blog/xios/opengraph-image.png",
       "noindex": false,
-      "textHash": "46b237517dee6ece",
+      "textHash": "f1338672eec70dbf",
       "codeHash": "ee6baf7ac96b6a76",
-      "partialBytes": 30331
+      "partialBytes": 30791
     },
     {
       "path": "/blog/xios/embed",
@@ -613,9 +613,9 @@
       "canonical": "https://maxleiter.com/blog/xios",
       "ogImage": "https://maxleiter.com/blog/xios/opengraph-image.png",
       "noindex": true,
-      "textHash": "44d991ba53743189",
+      "textHash": "6bcb701d29b5ad0d",
       "codeHash": "ee6baf7ac96b6a76",
-      "partialBytes": 26670
+      "partialBytes": 27130
     },
     {
       "path": "/labs",
@@ -668,9 +668,9 @@
       "canonical": "https://maxleiter.com/notes/fish-directory-colors",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "bccdcfa986bd25fb",
+      "textHash": "041989a4dd5d3255",
       "codeHash": "86b6b2b5c9d67b14",
-      "partialBytes": 23108
+      "partialBytes": 23568
     },
     {
       "path": "/notes/fish-directory-colors/embed",
@@ -679,9 +679,9 @@
       "canonical": "https://maxleiter.com/notes/fish-directory-colors",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "24758beea1ebf750",
+      "textHash": "ef7207c51c01e095",
       "codeHash": "86b6b2b5c9d67b14",
-      "partialBytes": 19349
+      "partialBytes": 19809
     },
     {
       "path": "/notes/gemini-script",
@@ -690,9 +690,9 @@
       "canonical": "https://maxleiter.com/notes/gemini-script",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "ea1ace0091c90359",
+      "textHash": "cdf202017ac4839e",
       "codeHash": "23e7fdd7ebfe9984",
-      "partialBytes": 26143
+      "partialBytes": 26603
     },
     {
       "path": "/notes/gemini-script/embed",
@@ -701,9 +701,9 @@
       "canonical": "https://maxleiter.com/notes/gemini-script",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "75019779155cde10",
+      "textHash": "64124bcba936281a",
       "codeHash": "23e7fdd7ebfe9984",
-      "partialBytes": 22435
+      "partialBytes": 22895
     },
     {
       "path": "/notes/git-checkout-script",
@@ -712,9 +712,9 @@
       "canonical": "https://maxleiter.com/notes/git-checkout-script",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "0d6681c906292c20",
+      "textHash": "a5f499c4c20f73b4",
       "codeHash": "f61b7e38ecde7d51",
-      "partialBytes": 12034
+      "partialBytes": 12494
     },
     {
       "path": "/notes/git-checkout-script/embed",
@@ -723,9 +723,9 @@
       "canonical": "https://maxleiter.com/notes/git-checkout-script",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "2eb67c9f78b34f44",
+      "textHash": "19d29d66113a8a84",
       "codeHash": "f61b7e38ecde7d51",
-      "partialBytes": 8288
+      "partialBytes": 8748
     },
     {
       "path": "/notes/slack-message-fetch",
@@ -734,9 +734,9 @@
       "canonical": "https://maxleiter.com/notes/slack-message-fetch",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "221c8edf067e5c63",
+      "textHash": "4b897d993a880a34",
       "codeHash": "07575870c059bb7f",
-      "partialBytes": 13610
+      "partialBytes": 14070
     },
     {
       "path": "/notes/slack-message-fetch/embed",
@@ -745,9 +745,9 @@
       "canonical": "https://maxleiter.com/notes/slack-message-fetch",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "d8805fb17d2c5b56",
+      "textHash": "3d8bc656b63cb8fc",
       "codeHash": "07575870c059bb7f",
-      "partialBytes": 9866
+      "partialBytes": 10326
     },
     {
       "path": "/notes/swr-state",
@@ -756,9 +756,9 @@
       "canonical": "https://maxleiter.com/notes/swr-state",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "c20f8dff53562a89",
+      "textHash": "195c2042c730503a",
       "codeHash": "303e9eb9b11da209",
-      "partialBytes": 15214
+      "partialBytes": 15674
     },
     {
       "path": "/notes/swr-state/embed",
@@ -767,9 +767,9 @@
       "canonical": "https://maxleiter.com/notes/swr-state",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "ebc8b6c78a692a4f",
+      "textHash": "97d31ff77ff72e2e",
       "codeHash": "303e9eb9b11da209",
-      "partialBytes": 11508
+      "partialBytes": 11968
     },
     {
       "path": "/notes/updating-jsonb-drizzle",
@@ -778,9 +778,9 @@
       "canonical": "https://maxleiter.com/notes/updating-jsonb-drizzle",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "1edaf9bdd1c3168e",
+      "textHash": "ce9d2a5a56bf4f5c",
       "codeHash": "5958df93156120d0",
-      "partialBytes": 12831
+      "partialBytes": 13291
     },
     {
       "path": "/notes/updating-jsonb-drizzle/embed",
@@ -789,9 +789,9 @@
       "canonical": "https://maxleiter.com/notes/updating-jsonb-drizzle",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "1b00cddc84bb5249",
+      "textHash": "4fd9dbc34d7ebe17",
       "codeHash": "5958df93156120d0",
-      "partialBytes": 9078
+      "partialBytes": 9538
     },
     {
       "path": "/notes/vscode-default-dir",
@@ -800,9 +800,9 @@
       "canonical": "https://maxleiter.com/notes/vscode-default-dir",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "f1b04e7be6ef7d0c",
+      "textHash": "4abc544523eb5b02",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 9382
+      "partialBytes": 9842
     },
     {
       "path": "/notes/vscode-default-dir/embed",
@@ -811,9 +811,9 @@
       "canonical": "https://maxleiter.com/notes/vscode-default-dir",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "517969f3c95a3717",
+      "textHash": "766a8e266f6d73b7",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 5619
+      "partialBytes": 6079
     },
     {
       "path": "/notes/wasm-edge-and-node",
@@ -822,9 +822,9 @@
       "canonical": "https://maxleiter.com/notes/wasm-edge-and-node",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "4306306796ce0930",
+      "textHash": "b2afacb53e98a12e",
       "codeHash": "15473062d2e7e712",
-      "partialBytes": 14265
+      "partialBytes": 14725
     },
     {
       "path": "/notes/wasm-edge-and-node/embed",
@@ -833,9 +833,9 @@
       "canonical": "https://maxleiter.com/notes/wasm-edge-and-node",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "5c432cf3b29ad57f",
+      "textHash": "63a9da9aaa23ed3f",
       "codeHash": "15473062d2e7e712",
-      "partialBytes": 10504
+      "partialBytes": 10964
     },
     {
       "path": "/projects",
