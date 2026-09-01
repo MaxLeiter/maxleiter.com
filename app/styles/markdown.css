@@ -149,6 +149,9 @@ article blockquote p:not(:last-child) {
 article *:not(pre) > code {
   font-family: var(--font-mono);
   font-size: 1rem;
+  /* A long identifier in prose has no break opportunity of its own. Without
+     this it pushes the page wide on a phone and the whole article pans. */
+  overflow-wrap: anywhere;
 }
 
 article *:not(pre) > code::before,
@@ -237,6 +240,8 @@ article details {
 article .table-scroll {
   overflow-x: auto;
   margin-block: 1.5rem;
+  /* Reaching the table's edge must not hand the swipe on to the page. */
+  overscroll-behavior-x: contain;
 }
 
 article table {
