@@ -285,3 +285,9 @@ article tbody tr:has(td:first-child strong) td {
     overflow-x: auto;
   }
 }
+
+/* A rule in prose gets the same air above as below; the generic 1em block gap
+   left it hugging the paragraph before it. */
+article hr {
+  margin-block: 2rem;
+}
