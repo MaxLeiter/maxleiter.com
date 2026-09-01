@@ -32,6 +32,29 @@ export const THEME_SCRIPT =
   `e=t=='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;` +
   `d.dataset.theme=e;d.style.colorScheme=e}catch(_){}`
 
+/**
+ * Native instant navigation for browsers that implement Speculation Rules.
+ *
+ * `moderate` prerenders on hover (~200ms) and on pointer-down, so the click
+ * lands on a document that is already rendered -- strictly better than any
+ * script-driven swap, because there is no fetch, no parse and no reflow left
+ * to do. Browsers that do not understand the script type ignore it, and
+ * `runtime.ts` loads the JS router for them instead.
+ *
+ * `/_assets/*` is excluded because prerendering a stylesheet or a JS chunk is
+ * meaningless; only documents are worth speculating on.
+ */
+const SPECULATION_RULES = JSON.stringify({
+  prerender: [
+    {
+      where: {
+        and: [{ href_matches: '/*' }, { not: { href_matches: '/_assets/*' } }],
+      },
+      eagerness: 'moderate',
+    },
+  ],
+})
+
 /** Cross-document view transitions, with the reduced-motion opt-out. */
 export const VIEW_TRANSITION_CSS = `
 @view-transition{navigation:auto}
@@ -49,7 +72,12 @@ export interface Fonts {
 export interface ShellOptions {
   head: PageHead
   body: string
-  css: string
+  /**
+   * Split so a same-document navigation can swap only what changed.
+   * `base` is identical on every page and the router never touches it;
+   * `page` is that route's conditional fragments and is all a swap replaces.
+   */
+  css: { base: string; page: string }
   fonts: Fonts
   assets: AssetManifest
   /** Island name -> hashed module URL, for the runtime's lazy import. */
@@ -203,24 +231,31 @@ function preloadTags(hrefs: string[]): ReactElement[] {
   ))
 }
 
+function islandsScript(islands: Record<string, string>): string {
+  if (Object.keys(islands).length === 0) return ''
+  return `<script type="application/json" id="__islands">${JSON.stringify(
+    islands,
+  )}</script>`
+}
+
 export function renderShell(options: ShellOptions): string {
   const { head, body, css, fonts, assets, islands, siteUrl } = options
 
   const headHtml = [
     renderToStaticMarkup(<>{headTags(head, siteUrl)}</>),
     renderToStaticMarkup(<>{preloadTags(fonts.preload)}</>),
-    `<style>${fonts.css}\n${css}\n${VIEW_TRANSITION_CSS}</style>`,
+    // Two tags, not one. The base sheet, the fonts and the view-transition
+    // rules are byte-identical on every page, so a same-document navigation
+    // leaves `#css-base` alone and swaps only `#css-page`.
+    `<style id="css-base">${fonts.css}\n${css.base}\n${VIEW_TRANSITION_CSS}</style>`,
+    `<style id="css-page">${css.page}</style>`,
     `<script>${THEME_SCRIPT}</script>`,
   ].join('')
 
-  const scripts: string[] = []
-  if (Object.keys(islands).length > 0) {
-    scripts.push(
-      `<script type="application/json" id="__islands">${JSON.stringify(
-        islands,
-      )}</script>`,
-    )
-  }
+  const scripts: string[] = [
+    islandsScript(islands),
+    `<script type="speculationrules">${SPECULATION_RULES}</script>`,
+  ]
   if (options.runtime) {
     const inline = options.runtime.replace(/<\/script/gi, '<\\/script')
     scripts.push(`<script type="module">${inline}</script>`)
@@ -237,6 +272,27 @@ export function renderShell(options: ShellOptions): string {
     `<head>${headHtml}</head>` +
     `<body>${body}${scripts.join('')}</body>` +
     '</html>'
+  )
+}
+
+/**
+ * The same page with everything a soft navigation already has removed: no
+ * fonts, no base sheet, no runtime, no analytics tag, no theme script.
+ *
+ * The router fetches this instead of the full document, so a navigation
+ * transfers the body and that route's CSS fragments rather than re-sending the
+ * ~30KB of shell every page repeats. It is still a parseable HTML document, so
+ * `DOMParser` sorts the head tags from the body markup with no bespoke format
+ * to keep in sync -- and the head is rendered by the very same `headTags`, so
+ * the two can never disagree about a canonical or an og: tag.
+ */
+export function renderPartial(options: ShellOptions): string {
+  const { head, body, css, islands, siteUrl } = options
+  const headHtml = renderToStaticMarkup(<>{headTags(head, siteUrl)}</>)
+  return (
+    `<!doctype html><html><head>${headHtml}` +
+    `<style id="css-page">${css.page}</style></head>` +
+    `<body>${body}${islandsScript(islands)}</body></html>`
   )
 }
 

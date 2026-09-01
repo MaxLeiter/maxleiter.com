@@ -38,3 +38,19 @@ export function transitionNameForUrl(url: string): string | null {
   const [, section, slug] = match
   return transitionName(section === 'notes' ? 'note' : 'blog', slug)
 }
+
+/**
+ * True when some element already claims `name` as a live inline style.
+ *
+ * Browser-only, and shared: both owners of an outgoing name need it -- the
+ * runtime's `pageswap` handler for cross-document navigations, and the
+ * router's click handler for same-document ones. Two elements holding one
+ * `view-transition-name` cancels the transition outright, so whoever is about
+ * to assign one has to ask first.
+ */
+export function isNameLive(name: string): boolean {
+  for (const el of document.querySelectorAll<HTMLElement>('[style]')) {
+    if (el.style.viewTransitionName === name) return true
+  }
+  return false
+}

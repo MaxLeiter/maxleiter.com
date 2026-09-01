@@ -117,7 +117,16 @@ function getSnappedRect(
   }
 }
 
-/** True when the pointer went down on the title bar rather than a button. */
+/**
+ * True when the pointer went down on the title bar itself rather than on one
+ * of its controls.
+ *
+ * Anchors count as controls, not just buttons. Maximize is a real `<a>` so
+ * Chrome runs the cross-document view transition for it; while this excluded
+ * only `button`, a pointer-down on Maximize started a window drag, the drag
+ * took pointer capture, the capture swallowed the click, and Maximize silently
+ * did nothing.
+ */
 function isHeaderDrag(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null
   return Boolean(el?.closest('.window-header') && !el.closest('button, a'))

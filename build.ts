@@ -557,6 +557,7 @@ async function main(): Promise<void> {
   const server = (await import(`${entryFile}?t=${Date.now()}`)) as {
     renderAll: (ctx: BuildContext) => Promise<RenderedPage[]>
     wrapPage: (page: RenderedPage, options: WrapOptions) => string
+    wrapPartial: (page: RenderedPage, options: WrapOptions) => string
     islandManifest: () => string[]
     highlightCss: () => string
     renderFeedHtml: (
@@ -616,10 +617,15 @@ async function main(): Promise<void> {
    * server-rendered markup. Narrowing this to rendered markup would silently
    * drop the lightbox trigger's rules.
    */
-  const cssFor = (body: string): { css: string; used: string[] } => {
+  const cssFor = (
+    body: string,
+  ): { css: { base: string; page: string }; used: string[] } => {
     const used = fragments.filter((item) => item.test.test(body))
     return {
-      css: [css.css, ...used.map((item) => item.css)].join('\n'),
+      // Kept apart rather than concatenated: the base sheet is byte-identical
+      // on every page, so the shell can emit it as its own `#css-base` tag and
+      // a soft navigation replaces only `#css-page`.
+      css: { base: css.css, page: used.map((item) => item.css).join('\n') },
       used: used.map((item) => item.name),
     }
   }
@@ -656,10 +662,31 @@ async function main(): Promise<void> {
       // rather than special-cased here: `/404` also has to exist as
       // `404.html`, because Vercel's static builder injects an error-phase
       // route to that name ahead of ours.
+      // The soft-navigation variant: same head and body, none of the shell
+      // the destination already has. Written beside every `index.html`, so
+      // the router can ask for it by convention with no manifest lookup.
+      const partial = server.wrapPartial(page, {
+        css: sheet.css,
+        fonts,
+        assets: ctx.assets,
+        siteUrl: ctx.site.url,
+        islands: Object.fromEntries(
+          page.islands
+            .filter((name) => client.islands[name])
+            .map((name) => [name, client.islands[name]]),
+        ),
+      })
+
       for (const target of [page.path, ...(page.aliases ?? [])]) {
         const file = path.join(ctx.staticDir, staticPathFor(target))
         await fs.mkdir(path.dirname(file), { recursive: true })
         await fs.writeFile(file, markup)
+        if (file.endsWith(`${path.sep}index.html`)) {
+          await fs.writeFile(
+            file.replace(/index\.html$/, 'index.partial.html'),
+            partial,
+          )
+        }
       }
     }
 

@@ -13,20 +13,33 @@
  * writing `textContent` behind preact's back is one owner too many.
  */
 
-import { transitionNameForUrl } from '../transitions'
+import { isNameLive, transitionNameForUrl } from '../transitions'
 
-type Mount = (el: HTMLElement, props: unknown) => void
+/** The generated island entry returns its own teardown. */
+type Mount = (el: HTMLElement, props: unknown) => void | (() => void)
 
-const modules: Record<string, string> = (() => {
+/** Island name -> hashed module URL, merged across every page visited. */
+const modules: Record<string, string> = {}
+
+function readIslandModules(): void {
   const el = document.getElementById('__islands')
   try {
-    return el ? JSON.parse(el.textContent || '{}') : {}
+    if (el) Object.assign(modules, JSON.parse(el.textContent || '{}'))
   } catch {
-    return {}
+    // A malformed map means no islands mount; the fallbacks still render.
   }
-})()
+}
+readIslandModules()
 
 const mounted = new WeakSet<HTMLElement>()
+const unmounts = new Set<() => void>()
+
+/**
+ * Bumped by every teardown. A dynamic import started before a navigation must
+ * not hydrate into the detached element it was scheduled for once the page has
+ * been swapped out from under it.
+ */
+let generation = 0
 
 async function mount(el: HTMLElement): Promise<void> {
   if (mounted.has(el)) return
@@ -39,8 +52,11 @@ async function mount(el: HTMLElement): Promise<void> {
   } catch {
     props = undefined
   }
+  const era = generation
   const mod = (await import(/* @vite-ignore */ url)) as { default: Mount }
-  mod.default(el, props)
+  if (era !== generation) return
+  const dispose = mod.default(el, props)
+  if (typeof dispose === 'function') unmounts.add(dispose)
 }
 
 /**
@@ -106,9 +122,39 @@ function schedule(el: HTMLElement): void {
   idle(() => void mount(el))
 }
 
-for (const el of document.querySelectorAll<HTMLElement>('[data-island]')) {
-  schedule(el)
+function scheduleIslands(): void {
+  for (const el of document.querySelectorAll<HTMLElement>('[data-island]')) {
+    schedule(el)
+  }
 }
+
+/**
+ * Unmounts every island before the router replaces the body.
+ *
+ * Islands register listeners on `window` and `document` -- the desktop's Ctrl+W
+ * handler, its breakpoint and clock subscriptions -- which outlive their own
+ * DOM. Without this they would accumulate one set per navigation.
+ */
+function unmountIslands(): void {
+  generation++
+  for (const dispose of unmounts) {
+    try {
+      dispose()
+    } catch {
+      // A failed teardown must not stop the rest, or the navigation.
+    }
+  }
+  unmounts.clear()
+  visibleObserver?.disconnect()
+  visibleObserver = null
+}
+
+function adoptIslands(): void {
+  readIslandModules()
+  scheduleIslands()
+}
+
+scheduleIslands()
 
 /* ------------------------------------------------------------- palette -- */
 
@@ -195,13 +241,6 @@ document.addEventListener('click', (event) => {
  */
 let namedForTransition: HTMLElement | null = null
 
-function isNameLive(name: string): boolean {
-  for (const el of document.querySelectorAll<HTMLElement>('[style]')) {
-    if (el.style.viewTransitionName === name) return true
-  }
-  return false
-}
-
 addEventListener('pageswap', (event) => {
   if (namedForTransition) {
     namedForTransition.style.viewTransitionName = ''
@@ -221,3 +260,37 @@ addEventListener('pageswap', (event) => {
   el.style.viewTransitionName = name
   namedForTransition = el
 })
+
+/* -------------------------------------------------------------- router -- */
+
+/**
+ * Instant navigation, by whichever mechanism the browser actually has.
+ *
+ * Chrome and Edge can do it natively: the Speculation Rules script every page
+ * carries prerenders a link on hover, and `@view-transition` animates the
+ * cross-document navigation. That is strictly better than anything script can
+ * do -- the next page is fully rendered before the click -- so on that path
+ * this file installs nothing and the router is never even downloaded.
+ *
+ * Everywhere else the router is fetched lazily and takes over navigation with
+ * a same-document swap, which at least removes the browser's loading indicator
+ * and the mobile blank-page flash.
+ *
+ * Both checks are capability checks. `supports('speculationrules')` says the
+ * prerender rules will be honoured; `PageRevealEvent` says the inbound half of
+ * a cross-document view transition exists. Neither asks who the browser is:
+ * a browser that ships both tomorrow gets the native path with no code change.
+ */
+const nativeInstantNav =
+  HTMLScriptElement.supports?.('speculationrules') === true &&
+  'PageRevealEvent' in window
+
+if (!nativeInstantNav) {
+  void import('./router')
+    .then((router) => {
+      router.installRouter({ teardown: unmountIslands, setup: adoptIslands })
+    })
+    .catch(() => {
+      // No router means plain cross-document navigation, which always works.
+    })
+}

@@ -263,6 +263,75 @@ package.json scripts, post-cutover: `dev` (`bun run framework/dev.ts`), `build`
   registration order. The name itself comes from `transitionName(kind, slug)` in
   `framework/transitions.ts` — never spelled out at a call site.
 
+### Same-document router (`framework/client/router.ts`)
+
+- **Capability detection only, never user-agent sniffing.** No `navigator.userAgent`,
+  `navigator.platform`, `navigator.vendor` or brand string appears anywhere in
+  `framework/` or `app/`. Every branch asks whether the API exists:
+  `HTMLScriptElement.supports('speculationrules')`, `'PageRevealEvent' in window`,
+  `typeof document.startViewTransition`, `navigator.connection`,
+  `window.requestIdleCallback`. A browser that ships a feature tomorrow takes
+  the better path with no code change, and none of this can rot.
+- Instant navigation has TWO paths, chosen by that detection at runtime start:
+  - **Native** (Chrome and Edge today): every page carries a
+    `<script type="speculationrules">` that prerenders same-origin documents at
+    `eagerness: "moderate"` (hover ~200ms, pointer-down), and `@view-transition`
+    animates the cross-document navigation. The router is NOT installed and its
+    chunk is never downloaded. This path is strictly better — the next document
+    is fully rendered before the click.
+  - **Router** (everything else): `runtime.ts` lazily `import()`s
+    `./router`, which intercepts clicks and swaps the document in place. It
+    removes the loading indicator and the mobile blank flash, which is as close
+    to the native path as script can get.
+- The router is therefore a separate lazily-imported chunk on purpose. Keep it
+  that way: a static import would put it in the inline runtime on every page,
+  including every page that will never use it.
+- The runtime intercepts same-origin `<a>` clicks and navigates without a
+  document load, so the browser never shows its loading indicator and never
+  blanks the page. That is the whole reason it exists; on mobile the blank is
+  the worst part of a cross-document navigation.
+- A link is handled ONLY if it is same-origin, primary-button, modifier-free,
+  has no `target`, no `download`, no `rel="external"`, is not a pure hash
+  change, and is not inside `[data-no-router]`. Everything else stays a real
+  browser navigation, which is what keeps cmd-click, middle-click and "open in
+  new tab" behaving natively. `data-no-router` is the opt-out on any element,
+  and it applies to the whole subtree.
+- `popstate` replays through the same path and restores the scroll offset saved
+  in `history.state.scroll`; the outgoing offset is written with
+  `replaceState` before each push.
+- Every page is emitted TWICE: `index.html`, and `index.partial.html` beside it
+  carrying only what a swap replaces — title, the per-page meta and canonical
+  tags, that route's CSS fragments, its `#__islands` JSON and its body. The
+  router asks for the partial by convention and falls back to the full document
+  if it 404s or is not HTML, so an older deploy still navigates correctly.
+- The page stylesheet is therefore TWO tags: `<style id="css-base">` (fonts,
+  base sheet, view-transition rules — byte-identical on every page, and the
+  router never touches it) and `<style id="css-page">` (that route's fragments,
+  which a swap replaces). Do not merge them back into one.
+- Executable scripts are stripped from the fetched document before it is
+  adopted. The runtime is inlined into every page and is already running, so
+  re-running it would double every listener; the theme script has already
+  applied; analytics stays live in the JS realm without its tag. `<script
+  type="application/json">` survives, because `#__islands` is data.
+- `<html data-theme>` is never touched by a swap. It is viewer state, not page
+  content, so a soft navigation must not reset it to the server-rendered value.
+- Islands are unmounted BEFORE the body is replaced, and the generated hydrate
+  wrapper returns `() => root.unmount()` to make that possible. Islands register
+  listeners on `window` and `document` that outlive their own DOM (the desktop's
+  Ctrl+W handler, its breakpoint and clock subscriptions), so without this they
+  accumulate one set per navigation. A dynamic island import that resolves after
+  a swap is discarded by a generation counter rather than hydrating a detached
+  element.
+- Prefetch has three triggers, all going through one promise-keyed cache so a
+  click consumes an in-flight request rather than starting a second: hover
+  (`pointerenter`/`touchstart`), `pointerdown` (~100ms before the click), and
+  links entering the viewport (one shared IntersectionObserver at 200px, on
+  idle, at most 4 in flight, cache capped at 10). All three are skipped entirely
+  when `navigator.connection.saveData` is set or `effectiveType` is 2g or
+  slow-2g.
+- The `pageswap` handler still exists and still owns cross-document
+  transitions, for every navigation the router does NOT intercept.
+
 ## Platform module contracts (platform agent)
 
 All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:

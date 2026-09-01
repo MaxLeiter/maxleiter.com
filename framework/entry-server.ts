@@ -3,7 +3,7 @@ import { getPages } from './routes'
 import { takeIslandManifest } from './islands'
 import { collectLanguages, getHighlighter, highlightCss } from './highlight'
 import { absoluteUrl } from './content'
-import { renderBody, renderShell, type Fonts } from './render'
+import { renderBody, renderPartial, renderShell, type Fonts } from './render'
 import { renderPostHtml } from './mdx'
 import { resetArticleImages } from '../app/mdx/static-components'
 
@@ -105,7 +105,8 @@ export async function renderAll(ctx: BuildContext): Promise<RenderedPage[]> {
 }
 
 export interface WrapOptions {
-  css: string
+  /** Base sheet (identical site-wide) and this route's fragments. */
+  css: { base: string; page: string }
   fonts: Fonts
   assets: Record<string, string>
   islands: Record<string, string>
@@ -116,6 +117,10 @@ export interface WrapOptions {
 
 export const wrapPage = (page: RenderedPage, options: WrapOptions): string =>
   renderShell({ head: page.head, body: page.body, ...options })
+
+/** The soft-navigation variant of the same page; see `renderPartial`. */
+export const wrapPartial = (page: RenderedPage, options: WrapOptions): string =>
+  renderPartial({ head: page.head, body: page.body, ...options })
 
 /**
  * `feeds.ts` renders one feed item at a time and `collectLanguages` scans every
