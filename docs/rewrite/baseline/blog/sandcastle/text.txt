@@ -63,8 +63,60 @@ It uses some API routes that speak to the Linux machine to list the available fi
 But it also runs X11 applications and streams them to the browser:
 GIMP, gnome-calculator, Firefox, and a system monitor running
 Here's an LLM-generated architecture diagram:
-Browser (React) Next.js Vercel Sandbox (microVM)┌──────────────────┐ ┌──────────────────┐ ┌──────────────────────┐│ Desktop UI │◄────────────►│ API Routes │◄───────────►│ :14081 Services API ││ Window Manager │ │ /api/sandbox/* │ │ - file CRUD ││ Taskbar │ │ /api/auth/* │ │ - .desktop scanner ││ App Launcher │ │ /api/files/* │ │ - process launcher ││ (Cmd+K) │ │ /api/apps/* │ │ ││ │ │ │ │ ││ Terminal ────────┼──── WSS ─────┼──────────────────┼────────────►│ :14081 PTY Relay ││ (ghostty-web) │ │ │ │ - bash over WS ││ │ │ Sandbox SDK │ │ ││ Code Server ─────┼── iframe ───┼──────────────────┼────────────►│ :14082 code-server ││ │ │ (@vercel/sandbox)│ │ - VS Code in browser││ │ │ │ │ ││ Xpra Canvas ─────┼── WSS ─────┼──────────────────┼────────────►│ :14080 Xpra Server ││ (X11 apps) │ │ │ │ - X11 app streaming││ │ │ │ │ ││ File Manager ────┼── fetch ────┼──► proxy ────────┼────────────►│ :14083 Reserved │└──────────────────┘ └────────┬─────────┘ └──────────────────────┘ │ ┌────────▼─────────┐ │ Neon Postgres │ │ - users │ │ - workspaces │ │ - warm_pool │ │ - config │ └──────────────────┘
-Browser (React) Next.js Vercel Sandbox (microVM)┌──────────────────┐ ┌──────────────────┐ ┌──────────────────────┐│ Desktop UI │◄────────────►│ API Routes │◄───────────►│ :14081 Services API ││ Window Manager │ │ /api/sandbox/* │ │ - file CRUD ││ Taskbar │ │ /api/auth/* │ │ - .desktop scanner ││ App Launcher │ │ /api/files/* │ │ - process launcher ││ (Cmd+K) │ │ /api/apps/* │ │ ││ │ │ │ │ ││ Terminal ────────┼──── WSS ─────┼──────────────────┼────────────►│ :14081 PTY Relay ││ (ghostty-web) │ │ │ │ - bash over WS ││ │ │ Sandbox SDK │ │ ││ Code Server ─────┼── iframe ───┼──────────────────┼────────────►│ :14082 code-server ││ │ │ (@vercel/sandbox)│ │ - VS Code in browser││ │ │ │ │ ││ Xpra Canvas ─────┼── WSS ─────┼──────────────────┼────────────►│ :14080 Xpra Server ││ (X11 apps) │ │ │ │ - X11 app streaming││ │ │ │ │ ││ File Manager ────┼── fetch ────┼──► proxy ────────┼────────────►│ :14083 Reserved │└──────────────────┘ └────────┬─────────┘ └──────────────────────┘ │ ┌────────▼─────────┐ │ Neon Postgres │ │ - users │ │ - workspaces │ │ - warm_pool │ │ - config │ └──────────────────┘
+Browser (React) Next.js Vercel Sandbox (microVM)
+┌──────────────────┐ ┌──────────────────┐ ┌──────────────────────┐
+│ Desktop UI │◄────────────►│ API Routes │◄───────────►│ :14081 Services API │
+│ Window Manager │ │ /api/sandbox/* │ │ - file CRUD │
+│ Taskbar │ │ /api/auth/* │ │ - .desktop scanner │
+│ App Launcher │ │ /api/files/* │ │ - process launcher │
+│ (Cmd+K) │ │ /api/apps/* │ │ │
+│ │ │ │ │ │
+│ Terminal ────────┼──── WSS ─────┼──────────────────┼────────────►│ :14081 PTY Relay │
+│ (ghostty-web) │ │ │ │ - bash over WS │
+│ │ │ Sandbox SDK │ │ │
+│ Code Server ─────┼── iframe ───┼──────────────────┼────────────►│ :14082 code-server │
+│ │ │ (@vercel/sandbox)│ │ - VS Code in browser│
+│ │ │ │ │ │
+│ Xpra Canvas ─────┼── WSS ─────┼──────────────────┼────────────►│ :14080 Xpra Server │
+│ (X11 apps) │ │ │ │ - X11 app streaming│
+│ │ │ │ │ │
+│ File Manager ────┼── fetch ────┼──► proxy ────────┼────────────►│ :14083 Reserved │
+└──────────────────┘ └────────┬─────────┘ └──────────────────────┘
+│
+┌────────▼─────────┐
+│ Neon Postgres │
+│ - users │
+│ - workspaces │
+│ - warm_pool │
+│ - config │
+└──────────────────┘
+Browser (React) Next.js Vercel Sandbox (microVM)
+┌──────────────────┐ ┌──────────────────┐ ┌──────────────────────┐
+│ Desktop UI │◄────────────►│ API Routes │◄───────────►│ :14081 Services API │
+│ Window Manager │ │ /api/sandbox/* │ │ - file CRUD │
+│ Taskbar │ │ /api/auth/* │ │ - .desktop scanner │
+│ App Launcher │ │ /api/files/* │ │ - process launcher │
+│ (Cmd+K) │ │ /api/apps/* │ │ │
+│ │ │ │ │ │
+│ Terminal ────────┼──── WSS ─────┼──────────────────┼────────────►│ :14081 PTY Relay │
+│ (ghostty-web) │ │ │ │ - bash over WS │
+│ │ │ Sandbox SDK │ │ │
+│ Code Server ─────┼── iframe ───┼──────────────────┼────────────►│ :14082 code-server │
+│ │ │ (@vercel/sandbox)│ │ - VS Code in browser│
+│ │ │ │ │ │
+│ Xpra Canvas ─────┼── WSS ─────┼──────────────────┼────────────►│ :14080 Xpra Server │
+│ (X11 apps) │ │ │ │ - X11 app streaming│
+│ │ │ │ │ │
+│ File Manager ────┼── fetch ────┼──► proxy ────────┼────────────►│ :14083 Reserved │
+└──────────────────┘ └────────┬─────────┘ └──────────────────────┘
+│
+┌────────▼─────────┐
+│ Neon Postgres │
+│ - users │
+│ - workspaces │
+│ - warm_pool │
+│ - config │
+└──────────────────┘
 Pieces of the castle
 Xpra
 Xpra does a lot of the heavy lifting here. From their about section:
@@ -81,8 +133,14 @@ this was the perfect opportunity.
 Hiding window decorations
 Early on, I encountered a fun problem where X11 apps rendered their own window decorations (the traffic light icons for closing and the window title, mainly):
 To fix this for most applications, I (AKA Claude) was able to write a system init script that does the following:
-# We hide GTK's CSD via three mechanisms:# 1. gtk-decoration-layout= (empty) -- removes window control buttons# 2. Custom gtk.css -- collapses the headerbar to zero height# 3. CSD shadow/border removal -- prevents extra padding around windows
-# We hide GTK's CSD via three mechanisms:# 1. gtk-decoration-layout= (empty) -- removes window control buttons# 2. Custom gtk.css -- collapses the headerbar to zero height# 3. CSD shadow/border removal -- prevents extra padding around windows
+# We hide GTK's CSD via three mechanisms:
+# 1. gtk-decoration-layout= (empty) -- removes window control buttons
+# 2. Custom gtk.css -- collapses the headerbar to zero height
+# 3. CSD shadow/border removal -- prevents extra padding around windows
+# We hide GTK's CSD via three mechanisms:
+# 1. gtk-decoration-layout= (empty) -- removes window control buttons
+# 2. Custom gtk.css -- collapses the headerbar to zero height
+# 3. CSD shadow/border removal -- prevents extra padding around windows
 Some apps still have window decorations, but the GNOME apps I like to use all look great now.
 D-Bus and notifications
 On a normal Linux desktop, applications don't talk to each other directly. They use a message bus called D-Bus.

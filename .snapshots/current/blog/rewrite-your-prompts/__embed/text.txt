@@ -1,0 +1,50 @@
+Sept 14, 2025
+You should be rewriting your prompts
+We talk about overfitting models but never overfitting prompts to models
+I've been "lucky" to work with a lot of different LLMs over the past few years (there is, in fact, a reason we made the AI SDK).
+When a new model is publicly released there's a good chance we've already tried it and evaluated it for use with v0 within a few hours.
+Our results do not always improve as expected, even when we use newer and strictly better models1.
+Another example of this is when gpt-5 was released in Cursor. People hated it, but the zeitgeist has since shifted.
+You can read about what OpenAI and Cursor fixed in OpenAI's gpt-5 cookbook.
+So what should you do when a new model comes out? Rewrite your prompts. Otherwise it's an apples-to-oranges comparison.
+My three and a half arguments for this are:
+Prompt Format
+Position Bias
+Model Biases
+Work with the model biases, not against
+Reason #1: Prompt Format
+An early obvious example of where differences between models come into play is markdown vs XML.
+Anecdatally, OpenAI models (especially older ones) were great with markdown prompts. It makes sense — there's a ton of markdown out there on the internet and it doesn't involve a crazy number of tokens or a special DSL.
+But when Claude 3.5 hit the scene, Anthropic used XML in their system prompt.
+Trying to use the same prompt with gpt-4 did not work nearly as well.
+In "Building with Anthropic Claude: Prompt Workshop with Zack Witten" from August 2024, Anthropic employee Zack Witten answers the question "Why XML and not Markdown?":
+Another great question. Claude was trained with a lot of XML in its training data and so it's sort of seen more of that than it's seen of other formats, so it just works a little bit better
+While OpenAI hasn't said anything as explicit as that (that I have ever seen), it seems like every system prompt they've used for ChatGPT has been markdown based, and all of their original prompting tutorials are markdown based as well.
+Reason #2: Position Bias (AKA location matters)
+Models don't treat every part of a prompt equally, in what is known as position bias. Some models weigh the beginning more, others the end, and as you'll see below it's not even entirely consistent for the same model depending on input.
+I first realized this back in September 2023 when I was working with a fine-tuned open-source model.
+It responded best when our RAG examples were reversed, with the most relevant examples at the end of the list. OpenAI and Anthropic models performed better when the most relevant example was first.
+You can see the difference between Qwen and Llama models use of context (across different languages) here:
+From "Position of Uncertainty: A Cross-Linguistic Study of Position Bias in
+Large Language Models" (2025)
+From the chart, Qwen performs better when the relevant context is towards the end, while Llama behaves the opposite.
+As you can see, there isn't a one-size-fits-all "best" position in context; the above paper found differences depending on the language as well.
+Reason #3: Model Biases
+Even if you get the format and position right, different models have different biases.
+Some are quite obvious, like Chinese models being censored to avoid Tiananmen Square, but others are more subtle and show up in how it responds and makes decisions.
+Training data, RLHF, and other post-training adjustments all contribute to this "intrinsic" behavior.
+The key point is that you're often prompting against these biases.
+You'll add "Be concise" or "DO NOT BE LAZY" to try and steer the model because you're fighting the model's defaults. But since the defaults can and do change,
+your prompts can suddenly be redundant, increasing the cost and decreasing the accuracy (see: Reason #2) of its responses.
+Reason #3a: Work with the model biases, not against
+Another note on model biases is that you should lean into them.
+The tricky part with this is the only way to figure out a model's defaults is to have actual usage and careful monitoring (or have evals that let you spot it).
+Instead of forcing the model to behave in ways it ignores,
+adapt your prompts and post-processing to embrace its defaults. You'll save tokens and get better results.
+If the model keeps hallucinating some JSON fields, maybe you should support (or even encourage) those fields instead of trying to prompt the model against them.
+So you can overfit prompts
+At least for now, models aren't perfectly interchangeable. Prompts overfit to models the same way models overfit to data.
+If you're switching models, rewrite your prompts. Test them. Probably eval them. Align them with the defaults of the new model instead of fighting against them.
+That's how you get a good prompt.
+Footnotes
+"strictly" is a scary word to use here, but I'd argue e.g. gpt-4 is strictly better than gpt-3.5 (except for chess, maybe.) ↩

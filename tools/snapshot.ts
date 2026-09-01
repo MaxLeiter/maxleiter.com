@@ -1,8 +1,18 @@
 /**
- * Snapshot every route of a running maxleiter.com build.
+ * Snapshot every route of a maxleiter.com build.
  *
+ * Two sources, same output format:
+ *
+ *   # a running server (the Next baseline)
  *   bun run tools/snapshot.ts --base http://localhost:3457 \
  *     --out docs/rewrite/baseline --raw .cache/baseline-raw
+ *
+ *   # a static build product (the bespoke build)
+ *   bun run tools/snapshot.ts --dir .vercel/output/static \
+ *     --out .cache/snapshot-current --raw .cache/current-raw
+ *
+ * `--dir` reads `.vercel/output/static` the way Vercel serves it, which
+ * avoids depending on a dev server and the live-reload script it injects.
  *
  * Writes, per HTML route, `<out>/<route>/index.html` (normalized),
  * `head.json` and `text.txt`; raw responses go to `<raw>/` (gitignored).
@@ -14,9 +24,9 @@
  * Runs under bun and node >= 20 (global fetch, ESM, no runtime-specific APIs).
  */
 
-import { mkdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, extname, join, resolve } from 'node:path'
 import { maskUrl, normalizeHtml } from './normalize-html.ts'
 import type { HeadRecord, ViewTransitionRecord } from './normalize-html.ts'
 
@@ -43,6 +53,93 @@ const TEXT_FILES = [
   { path: '/feed.xml', file: 'feed.xml' },
   { path: '/api/search-index', file: 'search-index.json' },
 ]
+
+const CONTENT_TYPES: Record<string, string> = {
+  '.html': 'text/html; charset=utf-8',
+  '.xml': 'application/xml',
+  '.txt': 'text/plain',
+  '.json': 'application/json',
+  '.png': 'image/png',
+}
+
+/**
+ * URL -> file inside `.vercel/output/static`, matching how Vercel serves the
+ * tree: directory-index resolution plus the rewrites in `config.json`.
+ *
+ * The special cases are deliberate route moves in the bespoke build. They live
+ * here so the baseline keeps addressing every route by its ORIGINAL URL and
+ * the diff compares content instead of reporting one big rename.
+ */
+export function staticFileForPath(urlPath: string): {
+  file: string
+  status: number
+} {
+  const [pathname, query] = urlPath.split('?')
+
+  // The 404 body is served for anything the filesystem does not match.
+  if (pathname === NOT_FOUND_PROBE) {
+    return { file: '404/index.html', status: 404 }
+  }
+  // config.json rewrites `?embed` to the directory variant.
+  if (query === 'embed=true') {
+    return {
+      file: `${pathname.replace(/^\//, '')}/embed/index.html`,
+      status: 200,
+    }
+  }
+  // The search index moved from a Next route handler to a root JSON file.
+  if (pathname === '/api/search-index') {
+    return { file: 'search-index.json', status: 200 }
+  }
+  // Metadata images are real files now, not generated routes.
+  if (pathname.endsWith('/opengraph-image')) {
+    return { file: `${pathname.replace(/^\//, '')}.png`, status: 200 }
+  }
+  if (pathname === '/') return { file: 'index.html', status: 200 }
+
+  const rel = pathname.replace(/^\//, '')
+  const last = rel.split('/').pop() ?? ''
+  if (last.includes('.')) return { file: rel, status: 200 }
+  return { file: `${rel}/index.html`, status: 200 }
+}
+
+interface FetchResult {
+  status: number
+  contentType: string
+  body: Uint8Array
+}
+
+/** Reads a route from either a live server or a static build directory. */
+type Fetcher = (urlPath: string) => Promise<FetchResult>
+
+function httpFetcher(base: string): Fetcher {
+  return async (urlPath) => {
+    const res = await fetch(`${base}${urlPath}`, { redirect: 'manual' })
+    return {
+      status: res.status,
+      contentType: res.headers.get('content-type') ?? '',
+      body: new Uint8Array(await res.arrayBuffer()),
+    }
+  }
+}
+
+function dirFetcher(staticDir: string): Fetcher {
+  return async (urlPath) => {
+    const { file, status } = staticFileForPath(urlPath)
+    try {
+      const body = await readFile(join(staticDir, file))
+      return {
+        status,
+        contentType: CONTENT_TYPES[extname(file)] ?? 'application/octet-stream',
+        body: new Uint8Array(body),
+      }
+    } catch {
+      // Missing file: Vercel would fall through to the 404 page. Report the
+      // miss instead, so a route the build forgot shows up as a failure.
+      return { status: 404, contentType: 'text/plain', body: new Uint8Array() }
+    }
+  }
+}
 
 export type RouteKind = 'page' | 'embed' | 'file' | 'binary'
 
@@ -83,22 +180,28 @@ export interface SnapshotManifest {
 
 interface Args {
   base: string
+  /** When set, read this static build directory instead of `base`. */
+  dir: string | null
   out: string
   raw: string
   concurrency: number
   only: string | null
   /** `all` probes every per-post OG image, `one` just the first, `none` skips. */
   og: 'all' | 'one' | 'none'
+  /** Resolved from `dir` or `base` in main(). */
+  fetch: Fetcher
 }
 
 function parseArgs(argv: string[]): Args {
   const args: Args = {
     base: 'http://localhost:3457',
+    dir: null,
     out: 'docs/rewrite/baseline',
     raw: '.cache/baseline-raw',
     concurrency: 8,
     only: null,
     og: 'all',
+    fetch: httpFetcher('http://localhost:3457'),
   }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
@@ -108,6 +211,7 @@ function parseArgs(argv: string[]): Args {
       return v
     }
     if (a === '--base') args.base = next().replace(/\/$/, '')
+    else if (a === '--dir') args.dir = next()
     else if (a === '--out') args.out = next()
     else if (a === '--raw') args.raw = next()
     else if (a === '--concurrency') args.concurrency = Number(next())
@@ -120,8 +224,9 @@ function parseArgs(argv: string[]): Args {
       args.og = v
     } else if (a === '--help' || a === '-h') {
       process.stdout.write(
-        'usage: snapshot.ts [--base URL] [--out DIR] [--raw DIR] ' +
-          '[--concurrency N] [--only SUBSTRING] [--og all|one|none]\n',
+        'usage: snapshot.ts [--base URL | --dir STATIC_DIR] [--out DIR] ' +
+          '[--raw DIR] [--concurrency N] [--only SUBSTRING] ' +
+          '[--og all|one|none]\n',
       )
       process.exit(0)
     } else throw new Error(`unknown flag: ${a}`)
@@ -159,10 +264,12 @@ async function writeFileEnsuring(
   await writeFile(path, data)
 }
 
-async function fetchSitemapPaths(base: string): Promise<string[]> {
-  const res = await fetch(`${base}/sitemap.xml`)
-  if (!res.ok) throw new Error(`sitemap.xml returned ${res.status}`)
-  const xml = await res.text()
+async function fetchSitemapPaths(fetcher: Fetcher): Promise<string[]> {
+  const res = await fetcher('/sitemap.xml')
+  if (res.status !== 200) {
+    throw new Error(`sitemap.xml returned ${res.status}`)
+  }
+  const xml = new TextDecoder().decode(res.body)
   const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
   const paths = locs.map((u) => {
     const url = new URL(u)
@@ -211,8 +318,8 @@ async function snapshotPage(
   kind: 'page' | 'embed',
   expectStatus = 200,
 ): Promise<PageResult> {
-  const res = await fetch(`${args.base}${path}`, { redirect: 'manual' })
-  const raw = await res.text()
+  const res = await args.fetch(path)
+  const raw = new TextDecoder().decode(res.body)
   const dir = dirForPath(path)
 
   await writeFileEnsuring(join(args.raw, dir, 'index.html'), raw)
@@ -222,7 +329,7 @@ async function snapshotPage(
     kind,
     dir,
     status: res.status,
-    contentType: res.headers.get('content-type') ?? '',
+    contentType: res.contentType,
     bytes: Buffer.byteLength(raw),
     sha256: sha256(raw),
   }
@@ -246,6 +353,13 @@ async function snapshotPage(
     join(outDir, 'head.json'),
     `${JSON.stringify(norm.head, null, 2)}\n`,
   )
+  // Only pages with fences get a code.json, so most routes stay two files.
+  if (norm.code.blocks.length > 0) {
+    await writeFileEnsuring(
+      join(outDir, 'code.json'),
+      `${JSON.stringify(norm.code, null, 2)}\n`,
+    )
+  }
   // CSS is reference material, not a diff target: keep it out of the tree.
   await writeFileEnsuring(join(args.raw, dir, 'styles.css'), norm.css)
 
@@ -269,8 +383,8 @@ async function snapshotTextFile(
   path: string,
   file: string,
 ): Promise<RouteRecord> {
-  const res = await fetch(`${args.base}${path}`)
-  const body = await res.text()
+  const res = await args.fetch(path)
+  const body = new TextDecoder().decode(res.body)
   const dir = dirForPath(path)
   await writeFileEnsuring(join(args.raw, dir, file), body)
 
@@ -279,11 +393,11 @@ async function snapshotTextFile(
     kind: 'file',
     dir,
     status: res.status,
-    contentType: res.headers.get('content-type') ?? '',
+    contentType: res.contentType,
     bytes: Buffer.byteLength(body),
     sha256: sha256(body),
   }
-  if (!res.ok) {
+  if (res.status !== 200) {
     record.error = `HTTP ${res.status}`
     return record
   }
@@ -298,8 +412,8 @@ async function snapshotTextFile(
 }
 
 async function snapshotBinary(args: Args, path: string): Promise<RouteRecord> {
-  const res = await fetch(`${args.base}${path}`)
-  const buf = new Uint8Array(await res.arrayBuffer())
+  const res = await args.fetch(path)
+  const buf = res.body
   // The requested URL carries Next's per-build metadata hash; the record keys
   // on the masked form so routes.json is stable across builds.
   const stable = maskUrl(path)
@@ -309,11 +423,11 @@ async function snapshotBinary(args: Args, path: string): Promise<RouteRecord> {
     kind: 'binary',
     dir,
     status: res.status,
-    contentType: res.headers.get('content-type') ?? '',
+    contentType: res.contentType,
     bytes: buf.byteLength,
     sha256: sha256(buf),
   }
-  if (!res.ok) {
+  if (res.status !== 200) {
     record.error = `HTTP ${res.status}`
     return record
   }
@@ -348,7 +462,7 @@ async function pool<T, R>(
 }
 
 export async function snapshot(args: Args): Promise<SnapshotManifest> {
-  const sitemapPaths = await fetchSitemapPaths(args.base)
+  const sitemapPaths = await fetchSitemapPaths(args.fetch)
   const pagePaths = [...new Set([...EXTRA_PAGES, ...sitemapPaths])].sort()
   const contentPaths = pagePaths.filter(
     (p) => p.startsWith('/blog/') || p.startsWith('/notes/'),
@@ -444,7 +558,7 @@ export async function snapshot(args: Args): Promise<SnapshotManifest> {
   records.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
 
   const manifest: SnapshotManifest = {
-    base: args.base,
+    base: args.dir === null ? args.base : args.dir,
     generatedAt: new Date().toISOString(),
     routes: records,
   }
@@ -465,7 +579,10 @@ async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2))
   args.out = resolve(args.out)
   args.raw = resolve(args.raw)
-  process.stdout.write(`snapshotting ${args.base} -> ${args.out}\n`)
+  const source = args.dir === null ? args.base : resolve(args.dir)
+  args.fetch =
+    args.dir === null ? httpFetcher(args.base) : dirFetcher(resolve(args.dir))
+  process.stdout.write(`snapshotting ${source} -> ${args.out}\n`)
   const manifest = await snapshot(args)
   const failed = manifest.routes.filter((r) => r.error)
   const hard = failed.filter((r) => r.kind === 'page' || r.kind === 'embed')

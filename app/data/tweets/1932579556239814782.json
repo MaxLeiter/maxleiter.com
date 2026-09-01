@@ -1,0 +1,189 @@
+{
+  "__typename": "Tweet",
+  "favorite_count": 85,
+  "lang": "en",
+  "possibly_sensitive": false,
+  "created_at": "2025-06-10T23:24:06.000Z",
+  "display_text_range": [
+    0,
+    34
+  ],
+  "entities": {
+    "media": [
+      {
+        "display_url": "pic.x.com/k7YqiSe1af",
+        "expanded_url": "https://x.com/evilrabbit_/status/1932579556239814782/photo/1",
+        "indices": [
+          35,
+          58
+        ],
+        "url": "https://t.co/k7YqiSe1af"
+      }
+    ],
+    "user_mentions": [
+      {
+        "id_str": "1711764162290847745",
+        "indices": [
+          12,
+          15
+        ],
+        "name": "v0",
+        "screen_name": "v0"
+      }
+    ]
+  },
+  "id_str": "1932579556239814782",
+  "text": "This is how @v0 is getting cooked. https://t.co/k7YqiSe1af",
+  "user": {
+    "id_str": "3375985313",
+    "name": "Evil Rabbit",
+    "screen_name": "evilrabbit_",
+    "is_blue_verified": true,
+    "profile_image_shape": "Circle",
+    "verified": false,
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/1998237655063257088/o5zyt_vG_normal.jpg",
+    "highlighted_label": {
+      "badge": {
+        "url": "https://pbs.twimg.com/profile_images/1767351110228918272/3Pndc5OT_bigger.png"
+      },
+      "description": "Vercel",
+      "url": {
+        "url": "https://twitter.com/vercel",
+        "url_type": "DeepLink"
+      },
+      "user_label_display_type": "Badge",
+      "user_label_type": "BusinessLabel"
+    }
+  },
+  "edit_control": {
+    "edit_tweet_ids": [
+      "1932579556239814782"
+    ],
+    "editable_until_msecs": "1749601446000",
+    "edits_remaining": "5",
+    "is_edit_eligible": true
+  },
+  "mediaDetails": [
+    {
+      "display_url": "pic.x.com/k7YqiSe1af",
+      "expanded_url": "https://x.com/evilrabbit_/status/1932579556239814782/photo/1",
+      "ext_media_availability": {
+        "status": "Available"
+      },
+      "indices": [
+        35,
+        58
+      ],
+      "media_url_https": "https://pbs.twimg.com/media/GtHm3RPbMAQE9Ad.jpg",
+      "original_info": {
+        "focus_rects": [
+          {
+            "h": 860,
+            "w": 1536,
+            "x": 0,
+            "y": 30
+          },
+          {
+            "h": 1536,
+            "w": 1536,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 1751,
+            "w": 1536,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 2048,
+            "w": 1024,
+            "x": 256,
+            "y": 0
+          },
+          {
+            "h": 2048,
+            "w": 1536,
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "height": 2048,
+        "width": 1536
+      },
+      "sizes": {
+        "large": {
+          "h": 2048,
+          "resize": "fit",
+          "w": 1536
+        },
+        "medium": {
+          "h": 1200,
+          "resize": "fit",
+          "w": 900
+        },
+        "small": {
+          "h": 680,
+          "resize": "fit",
+          "w": 510
+        },
+        "thumb": {
+          "h": 150,
+          "resize": "crop",
+          "w": 150
+        }
+      },
+      "type": "photo",
+      "url": "https://t.co/k7YqiSe1af"
+    }
+  ],
+  "photos": [
+    {
+      "backgroundColor": {
+        "red": 204,
+        "green": 214,
+        "blue": 221
+      },
+      "cropCandidates": [
+        {
+          "h": 860,
+          "w": 1536,
+          "x": 0,
+          "y": 30
+        },
+        {
+          "h": 1536,
+          "w": 1536,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 1751,
+          "w": 1536,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "h": 2048,
+          "w": 1024,
+          "x": 256,
+          "y": 0
+        },
+        {
+          "h": 2048,
+          "w": 1536,
+          "x": 0,
+          "y": 0
+        }
+      ],
+      "expandedUrl": "https://x.com/evilrabbit_/status/1932579556239814782/photo/1",
+      "url": "https://pbs.twimg.com/media/GtHm3RPbMAQE9Ad.jpg",
+      "width": 1536,
+      "height": 2048
+    }
+  ],
+  "conversation_count": 7,
+  "news_action_type": "conversation",
+  "isEdited": false,
+  "isStaleEdit": false
+}

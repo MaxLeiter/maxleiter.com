@@ -1,0 +1,49 @@
+~
+/blog
+/formatting
+✕
+Sep 6, 2025
+Formatting code should be unnecessary
+and we knew this back in the 80s
+I had a (maybe slightly overqualified) computer science teacher back in highschool, Mr. Paige.
+He worked on the Ada compiler and
+has been programming since the early 80s.
+One day I complained about linter tooling that
+was driving me nuts. I said something to the effect of, "it's 2016, how are we still dealing with this sort of thing?"
+Turns out, that problem was solved four decades ago (well, three at that point). Back when he was working on Ada,
+they didn't store text sources at all — they used an IR called DIANA.
+Everyone had their own pretty-printing settings for viewing it however they wanted.
+We've been debating some linter settings at work recently and I keep thinking back to
+Mr. Paige. It's 2025, how are we still dealing with this sort of thing?
+Well, to answer that it would help to know what we're missing.
+I believe he was working with the Rational R1000, of which there isn't a ton of info
+(like all things Ada, it was used by the DoD):
+The R1000 had a lot of bleeding-edge features: incremental compilation, semantic analysis, version control, and first-class debugging all built-in. It was a workstation similar to the Xerox Alto but using Ada instead of Smalltalk.
+Fun Fact:
+The R1000 is fairly undocumented and very rare, but it was used in the writing
+of software for the ISS, the F-22, presumably countless other government
+projects, and led to the birth of UML by Grady
+Booch.
+DIANA (Descriptive Intermediate Attributed Notation for Ada) was a key component of Ada that enabled a lot of the more advanced features.
+Taken from Experiences with Code Generation
+(1984)
+Instead of storing plain-text source code, the R1000 wrote DIANA.
+The compiler and the IDE built into the machine both understood DIANA too, so you could view the source however you wanted.
+Spaces vs. tabs didn't matter because neither affects the semantics and the editor on the system let you modify the program tree directly (known today as projectional editing).
+Grady Booch summarizes it well:
+R1000 was effectively a DIANA machine. We didn't store source code: source code was simply a pretty-printing of the DIANA tree.
+Imagine that.
+No wasted time due to formatting discussions or fighting linters,
+without forcing everyone into the same editor setup (looking at you, eslint-config-airbnb).
+And there were other benefits:
+Using DIANA with hardware acceleration made it possible to do incremental compilation (unheard of at the time, for strongly typed languages), easy refactoring (though that word had not yet been invented), and incredibly fast integration (essential for the large systems that we being built with Ada).
+Today, we don't need to worry about hardware-accelerated compilation (hopefully),
+and we have better tools for refactoring (thanks, Claude). But with formatting, we regressed.
+I'm not advocating for everyone to use projectional editing and a live environment (although I think they're awesome and we should be exploring them more),
+but surely we can figure out something that fits into todays programming paradigms.
+Further reading
+This post was meant to be me saying "it'd be easier if we just pushed minified code", but I had too much fun
+researching the R1000 during it. Here are some of the documents I looked at:
+Experiences with Code Generation (1985): https://www2.eecs.berkeley.edu/Pubs/TechRpts/1985/CSD-85-249.pdf
+Ada Compiler Validation Summary Report: Rational Environment (1985): https://apps.dtic.mil/sti/tr/pdf/ADA157830.pdf
+Grady Booch's blog post about the 5th anniversary on Rational's acquisition (2008): https://web.archive.org/web/20160304051102/https://www.ibm.com/developerworks/community/blogs/gradybooch/entry/rational_anniversary?lang=en#pagePlaceBar

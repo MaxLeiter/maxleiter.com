@@ -1,0 +1,515 @@
+<!doctype html>
+<html data-theme="dark" lang="en" style="color-scheme:dark">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#000000" name="theme-color">
+    <title>
+      Running Wayland, X11, GNOME, and KDE natively on an iPad | Max Leiter
+    </title>
+    <meta content="X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition" name="description">
+    <meta content="index, follow" name="robots">
+    <meta content="index, follow" name="googlebot">
+    <link href="https://maxleiter.com/blog/xios" rel="canonical">
+    <link href="https://maxleiter.com/feed.xml" rel="alternate" type="application/rss+xml">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition" property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/blog/xios/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="630" property="og:image:height">
+    <meta content="article" property="og:type">
+    <meta content="2026-07-28T07:00:00.000Z" property="article:published_time">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition" name="twitter:description">
+    <meta content="https://maxleiter.com/blog/xios/opengraph-image" name="twitter:image">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="630" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+    <link as="font" crossorigin="" href="/_assets/GeistSans-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <link as="font" crossorigin="" href="/_assets/GeistMono-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <style>
+      /* css */
+    </style>
+    <script>
+      try{var t=localStorage.theme||'system',d=document.documentElement,e=t=='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;d.dataset.theme=e;d.style.colorScheme=e}catch(_){}
+    </script>
+  </head>
+  <body>
+    <link as="image" fetchpriority="high" imagesizes="(max-width: 700px) 100vw, 700px" imagesrcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fog.png&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fog.png&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fog.png&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fog.png&amp;w=1920&amp;q=75 1920w" rel="preload">
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <header class="h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10" style="background-color:var(--bg-window-alpha);backdrop-filter:blur(12px)">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm font-mono text-[var(--gray)]">
+          <a class="hover:text-[var(--fg)] transition-colors" href="/">
+            ~
+          </a>
+          <div class="flex items-center gap-2">
+            <span>
+              /
+            </span>
+            <a class="hover:text-[var(--fg)] transition-colors" href="/blog">
+              blog
+            </a>
+          </div>
+          <div class="flex items-center gap-2">
+            <span>
+              /
+            </span>
+            <a class="hover:text-[var(--fg)] transition-colors" href="/blog/xios">
+              xios
+            </a>
+          </div>
+        </nav>
+        <div class="flex items-center gap-1">
+          <a aria-label="Minimize window" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" href="/?openPost=xios" title="Minimize">
+            <svg fill="none" height="12" viewbox="0 0 16 16" width="12">
+              <rect height="8" stroke="currentColor" stroke-width="1.5" width="8" x="4" y="4">
+              </rect>
+            </svg>
+          </a>
+          <a aria-label="Close Running Wayland, X11, GNOME, and KDE natively on an iPad" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" href="/">
+            ✕
+          </a>
+        </div>
+      </header>
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto" style="view-transition-name:blog-post-xios">
+          <div class="mb-1">
+            <time class="font-mono text-sm" datetime="2026-07-28T07:00:00.000Z" style="color:var(--gray)">
+              Jul 28, 2026
+            </time>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            Running Wayland, X11, GNOME, and KDE natively on an iPad
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <p>
+              I
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://knightos.org" rel="noopener noreferrer" tabindex="0" target="_blank">
+                like
+              </a>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://maxleiter.com/blog/MSHW0184" rel="noopener noreferrer" tabindex="0" target="_blank">
+                running
+              </a>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://maxleiter.com/x11" rel="noopener noreferrer" tabindex="0" target="_blank">
+                software
+              </a>
+              on devices that aren't "supposed" to run it.
+            </p>
+            <p>
+              I own the hardware. I should control the software. And for
+              <em>
+                reasons
+              </em>
+              , Apple makes phenomenal hardware and operating systems, but locks them down.
+            </p>
+            <p>
+              I've been bitter for a long time. Six years ago, when I should’ve been studying for finals, I
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://maxleiter.com/x11" rel="noopener noreferrer" tabindex="0" target="_blank">
+                ported X11
+              </a>
+              to my jailbroken iPad because I wanted to try using it as a "real" personal computer:
+            </p>
+            <img alt="" decoding="async" fetchpriority="high" height="500" loading="eager" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fog.png&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fog.png&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fog.png&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fog.png&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fog.png&amp;w=1920&amp;q=75 1920w" width="500">
+            <p>
+              That first version worked, but also sucked: the X server ran on the iPad, but I used a VNC client to interact with it and a lot of software did not compile. I was using vim and xterm and it looked like something from the 90s.
+            </p>
+            <p>
+              With more experience, and with LLMs, I was able to get significantly further.
+            </p>
+            <p>
+              There is a "slop wiki" available at
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://xios.maxleiter.com" rel="noopener noreferrer" tabindex="0" target="_blank">
+                https://xios.maxleiter.com
+              </a>
+              with more information, and the code is on
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/MaxLeiter/jailbreak/tree/main/x11/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                GitHub
+              </a>
+              .
+            </p>
+            <p>
+              Some screenshots:
+            </p>
+            <div class="&lt;cssmod>_grid" data-shot-grid="true">
+              <figure class="&lt;cssmod>_shot">
+                <img alt="" decoding="async" height="450" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fplasma.png&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fplasma.png&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fplasma.png&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fplasma.png&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fplasma.png&amp;w=1920&amp;q=75 1920w" width="550">
+                <figcaption>
+                  KDE Plasma with Kate, Konsole, and Dolphin running
+                </figcaption>
+              </figure>
+              <figure class="&lt;cssmod>_shot">
+                <img alt="" decoding="async" height="1104" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fopencode-kgx.jpg&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fopencode-kgx.jpg&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fopencode-kgx.jpg&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fopencode-kgx.jpg&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fopencode-kgx.jpg&amp;w=1920&amp;q=75 1920w" width="1500">
+                <figcaption>
+                  opencode, in GNOME Console on iosc
+                </figcaption>
+              </figure>
+              <figure class="&lt;cssmod>_shot">
+                <video controls="" playsinline="" preload="metadata">
+                  <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/native-switch.webm" type="video/webm">
+                </video>
+                <figcaption>
+                  Native mode: switching between GNOME Calculator and Terminal
+                </figcaption>
+              </figure>
+              <figure class="&lt;cssmod>_shot">
+                <video controls="" playsinline="" preload="metadata">
+                  <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/gnome.webm" type="video/webm">
+                </video>
+                <figcaption>
+                  GNOME Desktop
+                </figcaption>
+              </figure>
+            </div>
+            <div data-island="shot-grid" data-on="visible" data-props="{&quot;items&quot;:[{&quot;src&quot;:&quot;https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/plasma.png&quot;,&quot;full&quot;:&quot;/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fplasma.png&amp;w=1920&amp;q=75&quot;,&quot;alt&quot;:&quot;&quot;,&quot;caption&quot;:&quot;KDE Plasma with Kate, Konsole, and Dolphin running&quot;},{&quot;src&quot;:&quot;https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/opencode-kgx.jpg&quot;,&quot;full&quot;:&quot;/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fopencode-kgx.jpg&amp;w=1920&amp;q=75&quot;,&quot;alt&quot;:&quot;&quot;,&quot;caption&quot;:&quot;opencode, in GNOME Console on iosc&quot;}],&quot;classes&quot;:{&quot;trigger&quot;:&quot;mIMb0a_trigger&quot;,&quot;lightbox&quot;:&quot;mIMb0a_lightbox&quot;,&quot;lightboxFigure&quot;:&quot;mIMb0a_lightboxFigure&quot;,&quot;lightboxMedia&quot;:&quot;mIMb0a_lightboxMedia&quot;,&quot;lightboxCaption&quot;:&quot;mIMb0a_lightboxCaption&quot;,&quot;counter&quot;:&quot;mIMb0a_counter&quot;,&quot;control&quot;:&quot;mIMb0a_control&quot;,&quot;close&quot;:&quot;mIMb0a_close&quot;,&quot;prev&quot;:&quot;mIMb0a_prev&quot;,&quot;next&quot;:&quot;mIMb0a_next&quot;}}">
+            </div>
+            <h3 id="x11">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#x11" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              X11
+            </h3>
+            <p>
+              If you're unfamiliar with X11, this post assumes a basic understanding, but TL;DR: it’s a window server and protocol that many devices use. It describes how things (i.e. windows) are drawn on the screen. A window manager tells X11 (or Wayland, a modern X11 alternative) where a window should be drawn and X handles notifying clients to draw it.
+            </p>
+            <p>
+              <del>
+                Apple even used it for a while
+              </del>
+              <sup>
+                <a aria-describedby="footnote-label" class="&lt;cssmod>_link &lt;cssmod>_underline" data-footnote-ref="true" href="#user-content-fn-1" id="user-content-fnref-1" tabindex="0">
+                  1
+                </a>
+              </sup>
+              Apple supported it for a while, before moving to
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://developer.apple.com/documentation/coregraphics/quartz-display-services" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Quartz
+              </a>
+              (and if you’ve ever used
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://www.xquartz.org/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                XQuartz
+              </a>
+              , thats for rendering X windows on a quartz display).
+            </p>
+            <p>
+              On macOS, iOS, and windows, your window server and desktop environment are decided for you. On Linux, you can choose (or omit) your dock, notifications, menubars, window management; really whatever you want can be swapped around.
+            </p>
+            <p>
+              Because Apple devices are Unix, it’s always bothered me you couldn’t just compile and run those packages on iOS devices. Back in 2020 when I was first working on this, I didn't see a path for doing 'real work' on an iPad without a proper desktop due to iOS not being great for multiple windows. I also had a linux homebox that I wanted to forward windows from.
+            </p>
+            <p>
+              One difference between 2020 and now is that modern Linux desktops are now overwhelmingly using
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://wayland.freedesktop.org/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Wayland
+              </a>
+              . Wayland is the newer display protocol versus X11, although "newer" is relative because it’s almost 20 years old. But its a lot easier to support.
+            </p>
+            <p>
+              So after consulting the oracle (Claude) it quickly became obvious this second attempt wasn't so much "can I draw X windows?" as it was "maybe this can actually be useful?" (useful for me- I don't expect the TAM for jailbroken devices is very large.)
+            </p>
+            <h3 id="xios">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#xios" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              xiOS
+            </h3>
+            <p>
+              When I set upon this the first time, I was familiar with linux and software development, but I’ve learned a lot since then. About things. About things like build systems. I originally compiled everything on device, package-by-package with no uniform system. It sucked and I’m not happy with old-Max.
+            </p>
+            <p>
+              Thankfully, a little while after my ill-fated exploration, the folks at
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/ProcursusTeam" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Procursus
+              </a>
+              built a apt packaging system and some X/linux-y packages. I used procursus to bootstrap my work, then I sent a looped army of LLMs at it.
+            </p>
+            <p>
+              After a few
+              <del>
+                days
+              </del>
+              weeks of hitting enter and tab (and some occasional manual direction/reminders), and after building/porting over
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://repo.maxleiter.com/#xios" rel="noopener noreferrer" tabindex="0" target="_blank">
+                500 packages
+              </a>
+              , I have:
+            </p>
+            <br>
+            <ul>
+              <li>
+                Native Metal/IOSurface display handoff, so the iPad app presents compositor frames without copying pixels (through something like VNC)
+              </li>
+              <li>
+                A Wayland compositor,
+                <code>
+                  iosc
+                </code>
+                , with a lightweight tablet-ish desktop shell (inspired by
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/owl-compositor/owl" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  owl
+                </a>
+                )
+              </li>
+              <li>
+                Hardware-accelerated Wayland clients via
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/google/angle" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  ANGLE
+                </a>
+                -on-Metal
+              </li>
+              <li>
+                X11 and Xwayland support
+              </li>
+              <li>
+                GTK and Qt stacks cross-compiled for iOS
+              </li>
+              <li>
+                KWin, KDE Frameworks, Plasma Desktop, and Plasma Mobile
+              </li>
+              <li>
+                UIKit integration: touch, keyboard, clipboard, launchers, session switching, VoiceOver, and system bridges
+              </li>
+              <li>
+                Hardware/system bridges for things software expects, like battery, brightness, sensors, audio, volume,
+              </li>
+              <li>
+                Bun with JIT support, letting you run webservers, Node applications, and tools like OpenCode
+              </li>
+              <li>
+                A successful
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://ladybird.org/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  LadyBird
+                </a>
+                side-quest:
+              </li>
+            </ul>
+            <img alt="" decoding="async" height="450" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fladybird.png&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fladybird.png&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fladybird.png&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fladybird.png&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fxios%2Fladybird.png&amp;w=1920&amp;q=75 1920w" width="300">
+            <p>
+              Some items above work better than others, but its all definitely functional.
+            </p>
+            <video controls="" height="372" width="600">
+              <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/gimp-on-ipad.webm" type="video/webm">
+            </video>
+            <figcaption>
+              <p>
+                GIMP running on the iPad
+              </p>
+            </figcaption>
+            <h4 id="native-app-mode">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#native-app-mode" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              "Native" app mode
+            </h4>
+            <p>
+              You can use the xios app to have a proper desktop display. But you can also run individual desktop app instances in their own pacakged apps so they appear on your homescreen and have their own display.
+            </p>
+            <video controls="" height="400" width="300">
+              <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/xios/native-switch.webm" type="video/webm">
+            </video>
+            <figcaption>
+              <p>
+                GNOME Calculator and Terminal
+              </p>
+            </figcaption>
+            <h3 id="great-for-loops">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#great-for-loops" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Great for loops
+            </h3>
+            <p>
+              A reason this was possible is because it was fantastic for looping LLMs. Add a package, compile it, build fails, fix build, recompile, continue.
+            </p>
+            <p>
+              In Claude's words:
+            </p>
+            <blockquote>
+              <p>
+                A lot of the project was not “port GNOME” in the grand heroic sense. It was more like: why did this one library try to mmap something iOS refuses to mmap, and why did that make Plasma die in a completely different process? Which is, unfortunately, the good stuff.
+              </p>
+            </blockquote>
+            <p>
+              and
+            </p>
+            <blockquote>
+              <ul>
+                <li>
+                  cross-compile this package
+                </li>
+                <li>
+                  inspect why the deb is missing a dylib
+                </li>
+                <li>
+                  patch this Meson option
+                </li>
+                <li>
+                  figure out why the process launches over SSH but not launchd
+                </li>
+                <li>
+                  check whether the app actually has
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://developer.apple.com/documentation/security/asn-1" rel="noopener noreferrer" tabindex="0" target="_blank">
+                    DER
+                  </a>
+                  entitlements
+                </li>
+                <li>
+                  read the crash log
+                </li>
+                <li>
+                  compare the package contents
+                </li>
+                <li>
+                  try again
+                </li>
+                <li>
+                  try again, but less wrong
+                </li>
+              </ul>
+            </blockquote>
+            <p>
+              Claude also wrote some tools for itself along the way. The most useful one is
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/MaxLeiter/jailbreak/blob/main/x11/bin/xios-device" rel="noopener noreferrer" tabindex="0" target="_blank">
+                <code>
+                  xios-device
+                </code>
+              </a>
+              , a wrapper around ssh and rsync:
+            </p>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+              xios-device doctor           # host tools, SSH, on-device helpers
+              xios-device session gnome    # start a session
+              xios-device app kgx          # launch a client into it
+              xios-device input click 400 300
+              xios-device shot             # screenshot + logs, into artifacts/
+            </pre>
+            <p>
+              Whenever an agent struggled to debug something, it added the necessary tools and debugging logic.
+            </p>
+            <h3 id="isnt-jailbreaking-dead">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#isnt-jailbreaking-dead" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Isn't jailbreaking dead?
+            </h3>
+            <p>
+              Pretty much. There are new jailbreaks for iPadOS/iOS 16 and 17, but only for old devices.
+            </p>
+            <p>
+              The most modern device you can jailbreak (afaik) are the M2 iPad Pros if they are on iOS 16.5 or below.
+              <sup>
+                <a aria-describedby="footnote-label" class="&lt;cssmod>_link &lt;cssmod>_underline" data-footnote-ref="true" href="#user-content-fn-2" id="user-content-fnref-2" tabindex="0">
+                  2
+                </a>
+              </sup>
+            </p>
+            <p>
+              I think its tragic that LLMs could bring about the golden age of jailbreaking, years after jailbreaking is actually useful for the majority of people.
+            </p>
+            <h3 id="how-can-i-try-this">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#how-can-i-try-this" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              How can I try this?
+            </h3>
+            <p>
+              I have a deb repository you can add to Cydia/Sileo/your jailbreak package manager of choice:
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://repo.maxleiter.com" rel="noopener noreferrer" tabindex="0" target="_blank">
+                https://repo.maxleiter.com
+              </a>
+            </p>
+            <section class="footnotes" data-footnotes="true">
+              <h2 class="sr-only" id="footnote-label">
+                <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#footnote-label" tabindex="-1">
+                  <span class="icon icon-link">
+                  </span>
+                </a>
+                Footnotes
+              </h2>
+              <ol>
+                <li id="user-content-fn-1">
+                  <p>
+                    Thanks hackernews user lukeh for
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://news.ycombinator.com/item?id=49105164" rel="noopener noreferrer" tabindex="0" target="_blank">
+                      correcting me
+                    </a>
+                    <a aria-label="Back to reference 1" class="&lt;cssmod>_link &lt;cssmod>_underline data-footnote-backref" data-footnote-backref="" href="#user-content-fnref-1" tabindex="0">
+                      ↩
+                    </a>
+                  </p>
+                </li>
+                <li id="user-content-fn-2">
+                  <p>
+                    If you have one - please let me know!
+                    <a aria-label="Back to reference 2" class="&lt;cssmod>_link &lt;cssmod>_underline data-footnote-backref" data-footnote-backref="" href="#user-content-fnref-2" tabindex="0">
+                      ↩
+                    </a>
+                  </p>
+                </li>
+              </ol>
+            </section>
+          </div>
+        </article>
+      </main>
+      <div data-island="palette" data-on="interaction" hidden="">
+        <div aria-label="Search" aria-modal="true" class="fixed inset-0 backdrop-blur-sm z-[9999] flex items-start justify-center pt-20 px-4" role="dialog" style="background-color:rgba(0, 0, 0, 0.7)">
+          <div class="w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden" style="background-color:var(--bg);border-color:var(--border-color);border-width:1px">
+            <div class="border-b px-4 py-3" style="border-color:var(--border-color)">
+              <input aria-activedescendant="palette-option-0" aria-autocomplete="list" aria-controls="palette-results" aria-expanded="true" aria-label="Search" autocomplete="off" class="w-full bg-transparent outline-none font-mono" data-palette-input="true" placeholder="Search posts, projects, or navigate..." role="combobox" spellcheck="false" style="font-size:16px;color:var(--fg);opacity:0.9;--placeholder-color:var(--fg)" type="text" value="">
+            </div>
+            <div class="max-h-96 overflow-y-auto px-2 py-2">
+              <div aria-label="Results" data-palette-results="true" id="palette-results" role="listbox">
+                <button aria-label="Navigation: Blog" aria-selected="true" class="w-full text-left px-4 py-3 rounded transition-colors font-mono" id="palette-option-0" role="option" style="background-color:rgba(255, 255, 255, 0.15);color:var(--fg)" tabindex="-1" type="button">
+                  <div class="text-xs font-mono uppercase mb-1" style="color:var(--gray)">
+                    Navigation
+                  </div>
+                  <div style="color:var(--fg);opacity:0.9">
+                    Blog
+                  </div>
+                </button>
+                <button aria-label="Navigation: Projects" aria-selected="false" class="w-full text-left px-4 py-3 rounded transition-colors font-mono" id="palette-option-1" role="option" style="background-color:transparent;color:var(--fg)" tabindex="-1" type="button">
+                  <div class="text-xs font-mono uppercase mb-1" style="color:var(--gray)">
+                    Navigation
+                  </div>
+                  <div style="color:var(--fg);opacity:0.9">
+                    Projects
+                  </div>
+                </button>
+                <button aria-label="Navigation: About" aria-selected="false" class="w-full text-left px-4 py-3 rounded transition-colors font-mono" id="palette-option-2" role="option" style="background-color:transparent;color:var(--fg)" tabindex="-1" type="button">
+                  <div class="text-xs font-mono uppercase mb-1" style="color:var(--gray)">
+                    Navigation
+                  </div>
+                  <div style="color:var(--fg);opacity:0.9">
+                    About
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script id="__islands" type="application/json">
+      {"desktop":"/_assets/island.desktop.3B33D6HU.js","file-tree":"/_assets/island.file-tree.NTJ3EU45.js","palette":"/_assets/island.palette.N3VUTFBB.js","shot-grid":"/_assets/island.shot-grid.X2HSHAGA.js"}
+    </script>
+    <script src="/_assets/runtime.35VRSIQ3.js" type="module">
+    </script>
+    <script defer="" src="/_vercel/insights/script.js">
+    </script>
+  </body>
+</html>

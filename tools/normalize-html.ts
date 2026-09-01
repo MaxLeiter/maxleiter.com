@@ -61,10 +61,29 @@ export interface NormalizeOptions {
   normalizeCssModuleClasses?: boolean
 }
 
+/**
+ * The code blocks on a page, in document order.
+ *
+ * `blocks[i]` is the whitespace-normalized text of one <pre>. Runs of
+ * consecutive identical blocks are collapsed into a single entry and counted
+ * in `occurrences[i]`, because the Next baseline renders every fence twice,
+ * once per shiki theme, with one copy hidden by CSS. shiki in the bespoke
+ * build emits it once, so `occurrences` is how the two builds are made
+ * comparable without pretending a real duplicate never existed.
+ *
+ * `occurrences` also lets a consumer subtract code words from the page text
+ * exactly, which is how the prose comparison excludes code.
+ */
+export interface CodeRecord {
+  blocks: string[]
+  occurrences: number[]
+}
+
 export interface NormalizeResult {
   html: string
   head: HeadRecord
   text: string
+  code: CodeRecord
   /** Concatenated contents of every <style>, in document order. */
   css: string
   viewTransitions: ViewTransitionRecord[]
@@ -107,6 +126,11 @@ export const URL_RULES: { re: RegExp; to: string }[] = [
   { re: /twitter-image-[A-Za-z0-9]+/g, to: 'twitter-image' },
   // ...and a cache-busting query to the same URLs, and to the favicon.
   { re: /(opengraph-image|twitter-image)\?[^"'\s]+/g, to: '$1' },
+  // The bespoke build emits these as real files, so the URL gains a `.png`.
+  // Masking the extension pairs the two builds' images up, which keeps the
+  // 1200x630 dimension check alive on all 24 of them. The rename itself is
+  // an intended platform change, tracked outside the diff.
+  { re: /(opengraph-image|twitter-image)\.png/g, to: '$1' },
   { re: /(\/favicon\.ico)\?[^"'\s]+/g, to: '$1' },
   // Bespoke build: /_assets/runtime.3f9a1b2c.js
   {
@@ -517,6 +541,22 @@ function extractHead(doc: P5Node, state: WalkState): HeadRecord {
   return record
 }
 
+/**
+ * A server-rendered island shell that is hidden until its module mounts:
+ * `<div data-island="palette" hidden>`. Its markup is a fallback, not page
+ * content, so it counts as neither prose nor code.
+ */
+function isInertIslandShell(el: P5Element): boolean {
+  let hidden = false
+  let island = false
+  for (const a of el.attrs) {
+    const name = a.name.toLowerCase()
+    if (name === 'hidden') hidden = true
+    else if (name === 'data-island') island = true
+  }
+  return hidden && island
+}
+
 function extractText(node: P5Node, out: string[]): void {
   if (isText(node)) {
     out.push(node.value)
@@ -525,18 +565,71 @@ function extractText(node: P5Node, out: string[]): void {
   if (isElement(node)) {
     const tag = node.tagName.toLowerCase()
     if (NON_TEXT_TAGS.has(tag)) return
+    // Skip inert island shells: the bespoke build server-renders the command
+    // palette into every page as `<div data-island hidden>` so Cmd+K can
+    // reveal it before the module loads, and its nav labels are text no
+    // reader sees. Deliberately NOT keyed on `hidden` alone — Next streams
+    // Suspense content through `<div hidden>` buffers that a script then
+    // relocates into the page, and that content IS visible. Excluding those
+    // hid the whole react-tweet card from the baseline.
+    if (isInertIslandShell(node)) return
     const block = BLOCK_TAGS.has(tag)
     if (block) out.push('\n')
-    if (RAW_TEXT_TAGS.has(tag)) {
-      out.push(textOf(node))
-      out.push('\n')
-      return
-    }
+    // <pre> is NOT flattened with textOf() here. The two builds structure code
+    // blocks differently: bright wraps each line in a <div>, shiki emits
+    // <span class="line"> plus real newline text nodes. Concatenating
+    // descendants with no separator glued bright's lines together, producing
+    // fake tokens like `page.tsxexport` that then read as content loss.
+    // Recursing instead lets BLOCK_TAGS put a newline after each <div>.
     for (const child of children(node)) extractText(child, out)
     if (block) out.push('\n')
     return
   }
   for (const child of children(node)) extractText(child, out)
+}
+
+/** Collapse a code block's text: trim each line, drop blank lines. */
+function tidyCode(raw: string): string {
+  return raw
+    .split('\n')
+    .map((l) => l.replace(/\s+/g, ' ').trim())
+    .filter((l) => l.length > 0)
+    .join('\n')
+}
+
+/** Every <pre> on the page, in document order, runs of duplicates collapsed. */
+function extractCode(node: P5Node): CodeRecord {
+  const found: string[] = []
+
+  const walk = (n: P5Node): void => {
+    if (isElement(n)) {
+      const tag = n.tagName.toLowerCase()
+      if (NON_TEXT_TAGS.has(tag)) return
+      // Same rule as extractText: an inert island shell is not on the page.
+      if (isInertIslandShell(n)) return
+      if (tag === 'pre') {
+        const parts: string[] = []
+        extractText(n, parts)
+        const tidied = tidyCode(parts.join(''))
+        if (tidied) found.push(tidied)
+        return
+      }
+    }
+    for (const child of children(n)) walk(child)
+  }
+  walk(node)
+
+  const blocks: string[] = []
+  const occurrences: number[] = []
+  for (const block of found) {
+    if (blocks.length > 0 && blocks[blocks.length - 1] === block) {
+      occurrences[occurrences.length - 1]++
+    } else {
+      blocks.push(block)
+      occurrences.push(1)
+    }
+  }
+  return { blocks, occurrences }
 }
 
 function findBody(node: P5Node): P5Node | null {
@@ -582,8 +675,9 @@ export function normalizeHtml(
     printNode(child, 0, path, state, lines)
   }
 
+  const body = findBody(doc) ?? doc
   const textParts: string[] = []
-  extractText(findBody(doc) ?? doc, textParts)
+  extractText(body, textParts)
   const text = textParts
     .join('')
     .replace(/[ \t\r\f\v]+/g, ' ')
@@ -596,6 +690,7 @@ export function normalizeHtml(
     html: `${lines.join('\n')}\n`,
     head,
     text: `${text}\n`,
+    code: extractCode(body),
     css: state.css.join('\n/* --- */\n'),
     viewTransitions: state.vts,
     dropped: state.dropped,

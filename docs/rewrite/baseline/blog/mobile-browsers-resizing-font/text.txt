@@ -10,8 +10,16 @@ I was able to reproduce the issue and found that it only happened on iOS devices
 After adventuring down a small rabbit hole, I can share that mobile devices (mostly tablets/phones) support the text-size-adjust CSS property that automatically adjusts the font size of text to make it more readable.
 This is a great feature for most websites, but it can be problematic for code blocks. It's worth noting that all browsers support this feature (although WebKit requires a prefix), but it seems like they use different heuristics to determine when to apply it.
 Here's a solution:
-html,body { -webkit-text-size-adjust: none; text-size-adjust: none;}
-html,body { -webkit-text-size-adjust: none; text-size-adjust: none;}
+html,
+body {
+-webkit-text-size-adjust: none;
+text-size-adjust: none;
+}
+html,
+body {
+-webkit-text-size-adjust: none;
+text-size-adjust: none;
+}
 This disables the feature and makes the font size consistent across all browsers.
 Be careful though, because this will disable the feature for your entire site.
 You may want to specifically opt certain elements out to let the feature work as intended.

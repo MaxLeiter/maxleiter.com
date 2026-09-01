@@ -1,0 +1,199 @@
+<!doctype html>
+<html data-theme="dark" lang="en" style="color-scheme:dark">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#000000" name="theme-color">
+    <title>
+      gemini.sh script | Max Leiter
+    </title>
+    <meta content="A script for concatenating files in a directory for copying to an LLM" name="description">
+    <meta content="noindex, nofollow" name="robots">
+    <meta content="noindex, nofollow" name="googlebot">
+    <link href="https://maxleiter.com/notes/gemini-script" rel="canonical">
+    <link href="https://maxleiter.com/feed.xml" rel="alternate" type="application/rss+xml">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="A script for concatenating files in a directory for copying to an LLM" property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="630" property="og:image:height">
+    <meta content="Max Leiter's site" property="og:image:alt">
+    <meta content="article" property="og:type">
+    <meta content="2024-04-14T07:00:00.000Z" property="article:published_time">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="A script for concatenating files in a directory for copying to an LLM" name="twitter:description">
+    <meta content="https://maxleiter.com/opengraph-image" name="twitter:image">
+    <meta content="Max Leiter's site" name="twitter:image:alt">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="630" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+    <link as="font" crossorigin="" href="/_assets/GeistSans-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <link as="font" crossorigin="" href="/_assets/GeistMono-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <style>
+      /* css */
+    </style>
+    <script>
+      try{var t=localStorage.theme||'system',d=document.documentElement,e=t=='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;d.dataset.theme=e;d.style.colorScheme=e}catch(_){}
+    </script>
+  </head>
+  <body>
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto" style="view-transition-name:note-gemini-script">
+          <div class="mb-1">
+            <time class="font-mono text-sm" datetime="2024-04-14T07:00:00.000Z" style="color:var(--gray)">
+              Apr 14, 2024
+            </time>
+            <span class="font-mono text-xs ml-4 capitalize" style="color:var(--gray)">
+              snippet
+            </span>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            gemini.sh script
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            A script for concatenating files in a directory for copying to an LLM
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <aside class="&lt;cssmod>_note">
+              <div class="&lt;cssmod>_icon">
+                <svg class="feather feather-info" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="var(--info-stroke-circle-color, currentColor)">
+                  </circle>
+                  <line stroke="var(--info-stroke-line-color, currentColor)" x1="12" x2="12" y1="16" y2="12">
+                  </line>
+                  <line stroke="var(--info-stroke-line-color, currentColor)" x1="12" x2="12.01" y1="8" y2="8">
+                  </line>
+                </svg>
+              </div>
+              <div class="&lt;cssmod>_content">
+                <b>
+                  Note:
+                </b>
+                <p>
+                  As of late 2024/early 2025, I recommend using the great repomix tool:
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/yamadashy/repomix" rel="noopener noreferrer" tabindex="0" target="_blank">
+                    https://github.com/yamadashy/repomix
+                  </a>
+                </p>
+              </div>
+            </aside>
+            <p>
+              I've been messing with gemini-1.5-pro with the 1 million token context window for a while now and found this script very useful for grabbing entire repos. It ignores most binary files and concatenates the rest into a single file.
+            </p>
+            <p>
+              You'll need to have `parallel` installed for this to work (`brew install parallel` on macOS).
+            </p>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+              #!/bin/bash
+              # written by Claude 3 Opus and Gemini-1.5-pro.
+              
+              set -e
+              
+              # Check for correct number of arguments
+              if [ "$#" -ne 2 ]; then
+                  echo "Usage: gemini.sh <directory> <output file>"
+                  exit 1
+              fi
+              
+              # Check if directory exists
+              if [ ! -d "$1" ]; then
+                  echo "Directory $1 does not exist"
+                  exit 1
+              fi
+              
+              # Check if can replace output file
+              if [ -f "$2" ]; then
+                  read -p "File $2 already exists. Overwrite? [y/n] " -n 1 -r
+                  echo
+                  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                      exit 1
+                  fi
+              
+                  rm "$2"
+              fi
+              
+              # Function to check if a file should be ignored
+              is_ignored() {
+                  local file="$1"
+                  local gitignore=$(git rev-parse --show-toplevel)/.gitignore 2>/dev/null
+                  if [[ -f "$gitignore" ]]; then
+                      git check-ignore -q "$file" && return 0
+                  fi
+              
+                  if [[ $file == *.git* ]]; then
+                      return 0
+                  fi
+              
+                  # ignore run folder
+                  if [[ $file == run/* ]]; then
+                      return 0
+                  fi
+              
+                  if [[ $file == *.bin/* || $file == *build/* || $file == *dist/* ]]; then
+                      return 0
+                  fi
+              
+                  if [[ $file == *.gradle/* || $file == *.idea/* || $file == *.vscode/* ]]; then
+                      return 0
+                  fi
+              
+                  # ignore .bin files
+                  if [[ $file == *.bin ]]; then
+                      return 0
+                  fi
+                  
+                  local mimetype=$(file --mime-type -b "$file")
+                  if [[ $mimetype == image/* || $mimetype == *binary* || $mimetype == video/* || $mimetype == audio/* ]]; then
+                      return 0
+                  fi
+              
+                  if [[ $file == *.wasm ]]; then
+                      return 0
+                  fi
+              
+                  if [[ $file == .DS_Store ]]; then
+                      return 0
+                  fi
+              
+                  if [[ $mimetype == application/zip* ]]; then
+                      return 0
+                  fi
+                  return 1
+              }
+              
+              # Export the function so it can be used by parallel
+              export -f is_ignored
+              find "$1" -type f -print0 | parallel -0 -k '
+                  if is_ignored {}; then
+                      exit
+                  fi
+                  echo "/** {} **/"
+                  cat {}
+                  echo ""
+              ' >>"$2"
+              
+              
+              echo "Gemini complete"
+              exit 0
+            </pre>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script id="__islands" type="application/json">
+      {"desktop":"/_assets/island.desktop.3B33D6HU.js","file-tree":"/_assets/island.file-tree.NTJ3EU45.js","palette":"/_assets/island.palette.N3VUTFBB.js","shot-grid":"/_assets/island.shot-grid.X2HSHAGA.js"}
+    </script>
+    <script src="/_assets/runtime.35VRSIQ3.js" type="module">
+    </script>
+    <script defer="" src="/_vercel/insights/script.js">
+    </script>
+  </body>
+</html>

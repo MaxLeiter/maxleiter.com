@@ -1,0 +1,15 @@
+July 11, 2024snippet
+Updating JSONB fields with Drizzle
+hint: just use `sql` and COALESCE.
+I recently made a jsonb column in a postgres database and it took me a bit
+to figure out how to update a single value without overwriting the entire
+field. If you know a better way please let me know.
+import * as schema from './schema'
+export async function updateThing(id: string, title: string) {
+return db
+.update(schema.thing)
+.set({
+metadata: sql`COALESCE(${schema.thing.metadata}, '{}')::jsonb || ${JSON.stringify({ title })}::jsonb`,
+})
+.where(eq(schema.thing.id, id))
+}

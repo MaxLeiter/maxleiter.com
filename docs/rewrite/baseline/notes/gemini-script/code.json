@@ -1,0 +1,8 @@
+{
+  "blocks": [
+    "#!/bin/bash\n# written by Claude 3 Opus and Gemini-1.5-pro.\nset -e\n# Check for correct number of arguments\nif [ \"$#\" -ne 2 ]; then\necho \"Usage: gemini.sh <directory> <output file>\"\nexit 1\nfi\n# Check if directory exists\nif [ ! -d \"$1\" ]; then\necho \"Directory $1 does not exist\"\nexit 1\nfi\n# Check if can replace output file\nif [ -f \"$2\" ]; then\nread -p \"File $2 already exists. Overwrite? [y/n] \" -n 1 -r\necho\nif [[ ! $REPLY =~ ^[Yy]$ ]]; then\nexit 1\nfi\nrm \"$2\"\nfi\n# Function to check if a file should be ignored\nis_ignored() {\nlocal file=\"$1\"\nlocal gitignore=$(git rev-parse --show-toplevel)/.gitignore 2>/dev/null\nif [[ -f \"$gitignore\" ]]; then\ngit check-ignore -q \"$file\" && return 0\nfi\nif [[ $file == *.git* ]]; then\nreturn 0\nfi\n# ignore run folder\nif [[ $file == run/* ]]; then\nreturn 0\nfi\nif [[ $file == *.bin/* || $file == *build/* || $file == *dist/* ]]; then\nreturn 0\nfi\nif [[ $file == *.gradle/* || $file == *.idea/* || $file == *.vscode/* ]]; then\nreturn 0\nfi\n# ignore .bin files\nif [[ $file == *.bin ]]; then\nreturn 0\nfi\nlocal mimetype=$(file --mime-type -b \"$file\")\nif [[ $mimetype == image/* || $mimetype == *binary* || $mimetype == video/* || $mimetype == audio/* ]]; then\nreturn 0\nfi\nif [[ $file == *.wasm ]]; then\nreturn 0\nfi\nif [[ $file == .DS_Store ]]; then\nreturn 0\nfi\nif [[ $mimetype == application/zip* ]]; then\nreturn 0\nfi\nreturn 1\n}\n# Export the function so it can be used by parallel\nexport -f is_ignored\nfind \"$1\" -type f -print0 | parallel -0 -k '\nif is_ignored {}; then\nexit\nfi\necho \"/** {} **/\"\ncat {}\necho \"\"\n' >>\"$2\"\necho \"Gemini complete\"\nexit 0"
+  ],
+  "occurrences": [
+    2
+  ]
+}

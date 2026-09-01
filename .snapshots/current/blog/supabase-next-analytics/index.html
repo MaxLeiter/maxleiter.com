@@ -1,0 +1,660 @@
+<!doctype html>
+<html data-theme="dark" lang="en" style="color-scheme:dark">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#000000" name="theme-color">
+    <title>
+      Live updating page views with Supabase and Next.js | Max Leiter
+    </title>
+    <meta content="A step-by-step guide to page views and server analytics" name="description">
+    <meta content="index, follow" name="robots">
+    <meta content="index, follow" name="googlebot">
+    <link href="https://maxleiter.com/blog/supabase-next-analytics" rel="canonical">
+    <link href="https://maxleiter.com/feed.xml" rel="alternate" type="application/rss+xml">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="A step-by-step guide to page views and server analytics" property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/blog/supabase-next-analytics/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="630" property="og:image:height">
+    <meta content="article" property="og:type">
+    <meta content="2022-05-15T07:00:00.000Z" property="article:published_time">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="A step-by-step guide to page views and server analytics" name="twitter:description">
+    <meta content="https://maxleiter.com/blog/supabase-next-analytics/opengraph-image" name="twitter:image">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="630" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+    <link as="font" crossorigin="" href="/_assets/GeistSans-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <link as="font" crossorigin="" href="/_assets/GeistMono-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <style>
+      /* css */
+    </style>
+    <script>
+      try{var t=localStorage.theme||'system',d=document.documentElement,e=t=='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;d.dataset.theme=e;d.style.colorScheme=e}catch(_){}
+    </script>
+  </head>
+  <body>
+    <link as="image" fetchpriority="high" imagesizes="(max-width: 700px) 100vw, 700px" imagesrcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsignup.png%3Fwidth%3D500%26height%3D300&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsignup.png%3Fwidth%3D500%26height%3D300&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsignup.png%3Fwidth%3D500%26height%3D300&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsignup.png%3Fwidth%3D500%26height%3D300&amp;w=1920&amp;q=75 1920w" rel="preload">
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <header class="h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10" style="background-color:var(--bg-window-alpha);backdrop-filter:blur(12px)">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm font-mono text-[var(--gray)]">
+          <a class="hover:text-[var(--fg)] transition-colors" href="/">
+            ~
+          </a>
+          <div class="flex items-center gap-2">
+            <span>
+              /
+            </span>
+            <a class="hover:text-[var(--fg)] transition-colors" href="/blog">
+              blog
+            </a>
+          </div>
+          <div class="flex items-center gap-2">
+            <span>
+              /
+            </span>
+            <a class="hover:text-[var(--fg)] transition-colors" href="/blog/supabase-next-analytics">
+              supabase-next-analytics
+            </a>
+          </div>
+        </nav>
+        <div class="flex items-center gap-1">
+          <a aria-label="Minimize window" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" href="/?openPost=supabase-next-analytics" title="Minimize">
+            <svg fill="none" height="12" viewbox="0 0 16 16" width="12">
+              <rect height="8" stroke="currentColor" stroke-width="1.5" width="8" x="4" y="4">
+              </rect>
+            </svg>
+          </a>
+          <a aria-label="Close Live updating page views with Supabase and Next.js" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" href="/">
+            ✕
+          </a>
+        </div>
+      </header>
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto" style="view-transition-name:blog-post-supabase-next-analytics">
+          <div class="mb-1">
+            <time class="font-mono text-sm" datetime="2022-05-15T07:00:00.000Z" style="color:var(--gray)">
+              May 15, 2022
+            </time>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            Live updating page views with Supabase and Next.js
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            A step-by-step guide to page views and server analytics
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <details>
+              <summary>
+                Please read
+              </summary>
+              <p>
+                This post was written for the (now stable) beta Next.js middleware. If you want your own analytics, I recommend looking at
+                <a href="https://vercel.com/analytics">
+                  Vercel's solution.
+                </a>
+              </p>
+            </details>
+            <p>
+              This post starts with a brief introduction. If you want to jump down to the tutorial, click
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="/blog/supabase-next-analytics#how" tabindex="0">
+                here
+              </a>
+              . You can also see the live updating views in action in the top right of this page! The analytics events themselves require no JavaScript and occur completely on the server thanks to the
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://nextjs.org/docs/advanced-features/middleware" rel="noopener noreferrer" tabindex="0" target="_blank">
+                new (in beta) Next.js middleware
+              </a>
+              . If you have JavaScript enabled, the view count should live update thanks to Supabase Realtime. You can try it by opening the page in a new tab and eyeing the view count.
+            </p>
+            <p>
+              <strong>
+                Contents
+              </strong>
+            </p>
+            <ul>
+              <li>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="/blog/supabase-next-analytics#motivations" tabindex="0">
+                  Motivations
+                </a>
+              </li>
+              <li>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="/blog/supabase-next-analytics#how" tabindex="0">
+                  How to do it
+                </a>
+                <ul>
+                  <li>
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="/blog/supabase-next-analytics#supabase-setting-up-the-database-and-realtime" tabindex="0">
+                      Supabase: Setting up the Database and Realtime
+                    </a>
+                  </li>
+                  <li>
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="/blog/supabase-next-analytics#nextjs-adding-server-side-analytics" tabindex="0">
+                      Next.js: Adding server-side analytics
+                    </a>
+                  </li>
+                  <li>
+                    <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="/blog/supabase-next-analytics#nextjs-adding-a-live-updating-view-counter" tabindex="0">
+                      Next.js: Adding a live updating view counter
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="/blog/supabase-next-analytics#next-steps" tabindex="0">
+                  Next steps
+                </a>
+              </li>
+            </ul>
+            <h2 id="motivations">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#motivations" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Motivations
+            </h2>
+            <p>
+              When possible, I avoid requiring JavaScript and exposing my users to unnecessary tracking. The problem is that I decided I wanted to track views on my blog, and
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://nextjs.org/analytics" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Next.js analytics
+              </a>
+              don't provide the vanity metrics I'm looking for. I previously used
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://matomo.org/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Matomo
+              </a>
+              analyzing my nginx log, and while matomo is a fantastic piece of open-source software, I don't want to mess with the PHP API (or use PHP for the first time in ~7 years) in order to get post views on the front-end.
+            </p>
+            <p>
+              Coincidentally, Supabase
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://techcrunch.com/2022/05/10/supabase-raises-80m-series-b-for-its-open-source-firebase-alternative/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                announced their Series B
+              </a>
+              a few days ago, and that pushed me to finally give it a try and see how their product works. If you're unfamiliar with Supabase, they're an open-source Firebase alternative with a hosted option: you get a postgres database and fancy dashboard and CLI for creating tables, edge functions, authentication and more. They also make it incredibly easy to subscribe to database updates, making syncing and connectivity a breeze.
+            </p>
+            <p>
+              So far, I love everything about it except the dashboard: everything is
+              <em>
+                so slow
+              </em>
+              . Creating a new, unnamed SQL query can take 5 seconds:
+            </p>
+            <video controls="">
+              <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/slow.webm" type="video/webm">
+              <source src="https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/supabase/slow.mp4" type="video/mp4">
+            </video>
+            <p>
+              Dashboard slowness aside, this tutorial will walk you through using Supabase and Next.js middleware to have live-updating view counts and server-side analytics.
+            </p>
+            <h2 id="how">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#how" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              How
+            </h2>
+            <p>
+              Note that this tutorial expects you to already have a Next.js project. If you don't, I recommend following the official
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://nextjs.org/learn/basics/create-nextjs-app" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Next.js tutorial
+              </a>
+              .
+            </p>
+            <h3 id="supabase-setting-up-the-database-and-realtime">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#supabase-setting-up-the-database-and-realtime" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Supabase: Setting up the Database and Realtime
+            </h3>
+            <ol>
+              <li>
+                <p>
+                  Register an account with Supabase here:
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://app.supabase.io/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                    https://app.supabase.io/
+                  </a>
+                </p>
+              </li>
+              <li>
+                <p>
+                  Create a Supabase project and fill out the new project form.
+                </p>
+                <p>
+                  <img alt="A screenshot of the Supabase page with the New Project button clicked" decoding="async" fetchpriority="high" height="300" loading="eager" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsignup.png%3Fwidth%3D500%26height%3D300&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsignup.png%3Fwidth%3D500%26height%3D300&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsignup.png%3Fwidth%3D500%26height%3D300&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsignup.png%3Fwidth%3D500%26height%3D300&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsignup.png%3Fwidth%3D500%26height%3D300&amp;w=1920&amp;q=75 1920w" width="500">
+                </p>
+                <blockquote>
+                  <p>
+                    If the above step confuses you, you need to click your organization in the dropdown of the 'new project' button. That took me a little too long to figure out...
+                  </p>
+                </blockquote>
+                <p>
+                  <img alt="A screenshot of the Supabase new project page" decoding="async" height="450" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-project.png&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-project.png&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-project.png&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-project.png&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-project.png&amp;w=1920&amp;q=75 1920w" width="550">
+                </p>
+              </li>
+              <li>
+                <p>
+                  Navigate to the `Table Editor` in the left nav bar and click new table. Fill it out to match below, and be sure to click the gear icon to deselect allowing null:
+                  <img alt="A screenshot of the new table field showing 4 columns: an int8 ID, a text slug, an int8 views with a default value of 1, and an updated_at date column with a default value of &quot;now()&quot;." decoding="async" height="495" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-table.png%3Fwidth%3D600%26height%3D495&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-table.png%3Fwidth%3D600%26height%3D495&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-table.png%3Fwidth%3D600%26height%3D495&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-table.png%3Fwidth%3D600%26height%3D495&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-table.png%3Fwidth%3D600%26height%3D495&amp;w=1920&amp;q=75 1920w" width="600">
+                  Alternatively, if you're comfortable with SQL, you can write and save a SQL query that you can use again in the future. It may look something like this:
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  CREATE TABLE analytics (
+                      id bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+                      slug text UNIQUE NOT NULL,
+                      views bigint DEFAULT 1 NOT NULL,
+                      updated_at timestamp DEFAULT NOW() NOT NULL
+                  );
+                </pre>
+                <p>
+                  You can input the query in the `SQL Editor` tab in the left nav bar a few options below the `Table Editor`.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Now, we need to add a stored procedure (AKA a stored SQL function we can call from the Supabase API). Navigate to the `Database` tab in the left nav bar and select the `Functions` menu item inside:
+                </p>
+                <img alt="A screenshot showing the functions menu item location in the sidebar" decoding="async" height="450" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsidebar-functions.png&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsidebar-functions.png&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsidebar-functions.png&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsidebar-functions.png&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fsidebar-functions.png&amp;w=1920&amp;q=75 1920w" width="550">
+                <blockquote>
+                  <p>
+                    Note that Supabase offers Database Functions and Edge Functions — we're using Database Functions!
+                  </p>
+                </blockquote>
+              </li>
+              <li>
+                <p>
+                  Click `Create a new Function` in the top right and and fill the settings out to match below. We're establishing a name we can use to reference the function, the schema (AKA what tables it has access to), the return value (`void` in this case), and a single argument that is the page path.
+                  <img alt="A screenshot of the function creation view" decoding="async" height="495" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-function.png%3Fwidth%3D600%26height%3D495&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-function.png%3Fwidth%3D600%26height%3D495&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-function.png%3Fwidth%3D600%26height%3D495&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-function.png%3Fwidth%3D600%26height%3D495&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fcreate-function.png%3Fwidth%3D600%26height%3D495&amp;w=1920&amp;q=75 1920w" width="600">
+                </p>
+                <p>
+                  The query is as follows:
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  BEGIN
+                      IF EXISTS (SELECT FROM analytics WHERE slug=page_slug) THEN
+                          UPDATE analytics
+                          SET views = views + 1,
+                              updated_at = now()
+                          WHERE slug = page_slug;
+                      ELSE
+                          INSERT into analytics(slug) VALUES (page_slug);
+                      END IF;
+                  END;
+                </pre>
+                <p>
+                  The function updates the row if it exists (if the `page_slug` argument is in the `slug` column), otherwise it creates a new row.
+                </p>
+                <p>
+                  P.S. I believe I found this query somewhere online but now I can't find the original source — if you recognize it please let me know so I can provide credit!
+                </p>
+              </li>
+              <li>
+                <p>
+                  Now we need to enable
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/supabase/realtime" rel="noopener noreferrer" tabindex="0" target="_blank">
+                    Realtime
+                  </a>
+                  so Supabase broadcasts our changes when we subscribe. Navigate to the `Database` item in the navigation bar and select `Replication` in the side menu. You should see the following page:
+                  <img alt="A screenshot of the empty replication page, showing prepopulated a `supabase_realtime` row" decoding="async" height="450" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Freplication.png%3Fwidth%3D600%26height%3D450&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Freplication.png%3Fwidth%3D600%26height%3D450&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Freplication.png%3Fwidth%3D600%26height%3D450&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Freplication.png%3Fwidth%3D600%26height%3D450&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Freplication.png%3Fwidth%3D600%26height%3D450&amp;w=1920&amp;q=75 1920w" width="600">
+                </p>
+              </li>
+              <li>
+                <p>
+                  Click the `0 tables` button the `Source` column and toggle the new table you created (I called mine `analytics`):
+                  <img alt="The analytics table has been enabled in the replication page" decoding="async" height="450" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fenable-replication.png%3Fwidth%3D600%26height%3D450&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fenable-replication.png%3Fwidth%3D600%26height%3D450&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fenable-replication.png%3Fwidth%3D600%26height%3D450&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fenable-replication.png%3Fwidth%3D600%26height%3D450&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fsupabase%2Fenable-replication.png%3Fwidth%3D600%26height%3D450&amp;w=1920&amp;q=75 1920w" width="600">
+                </p>
+              </li>
+              <li>
+                <p>
+                  Finally, navigate to the `Settings` at the bottom of the navigation and select the `API` submenu. Copy down the `anon public` API key, the `service_role` API key, and the project URL in the `Configuration` box: we'll need them in the next section.
+                </p>
+              </li>
+            </ol>
+            <blockquote>
+              <p>
+                <strong>
+                  Do not
+                </strong>
+                ever expose or share your `service_role` key — it bypasses row-level security and should only ever be used and seen by your server or you.
+              </p>
+            </blockquote>
+            <h3 id="nextjs-adding-server-side-analytics">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#nextjs-adding-server-side-analytics" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Next.js: Adding server-side analytics
+            </h3>
+            <ol>
+              <li>
+                <p>
+                  First, we need to add the API keys and project URL to our environment, which will let us access them in our code. If you're hosting with
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://vercel.com" rel="noopener noreferrer" tabindex="0" target="_blank">
+                    Vercel
+                  </a>
+                  , I recommend using their CLI or dashboard to add the keys, which you can read about
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://vercel.com/docs/concepts/projects/environment-variables" rel="noopener noreferrer" tabindex="0" target="_blank">
+                    here
+                  </a>
+                  . Otherwise, create or modify your `.env` file to contain the following:
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  NEXT_PUBLIC_SUPABASE_URL=<your URL>
+                  NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon_public_key>
+                  SUPABASE_SERVICE_KEY=<service_role_key>
+                </pre>
+                <p>
+                  If you're just creating the .env, be sure to add it to your `.gitignore` so it won't be pushed online.
+                </p>
+                <blockquote>
+                  <p>
+                    For security, Next.js doesn't automatically expose your environment variables to the client. If you want to do that, you need to prefix the key with `NEXT_PUBLIC_`. This is a great feature, but don't let it stop you from manually verifying you aren't exposing your service key elsewhere.
+                  </p>
+                </blockquote>
+              </li>
+              <li>
+                <p>
+                  Add the `@supabase/supabase-js` package from npm to your project:
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  yarn add @supabase/supabase-js
+                </pre>
+                <p>
+                  or
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  npm install @supabase/supabase-js
+                </pre>
+              </li>
+              <li>
+                <p>
+                  Create two files, `supabase/public.js` and `supabase/private.js`, where you want to; I put them in `lib`. `Private` will contain a connection with the `service_role` key while `public` will use the anon one. Two files aren't necessary, but I like distinguishing them so I can be sure which I'm using.
+                </p>
+                <p>
+                  They should each look something like this:
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  import { createClient } from '@supabase/supabase-js'
+                  
+                  if (
+                    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+                    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+                  ) {
+                    throw new Error('Missing env vars SUPABASE_URL or SUPABASE_ANON_KEY')
+                  }
+                  
+                  const publicClient = createClient(
+                    process.env.NEXT_PUBLIC_SUPABASE_URL,
+                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+                  )
+                  
+                  export default publicClient
+                </pre>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  import { createClient } from '@supabase/supabase-js'
+                  
+                  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                    throw new Error(
+                      'Missing env vars SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
+                    )
+                  }
+                  
+                  const privateClient = createClient(
+                    process.env.SUPABASE_URL,
+                    process.env.SUPABASE_SERVICE_ROLE_KEY
+                  )
+                  
+                  export default privateClient
+                </pre>
+                <p>
+                  The only difference between `private` and `public` is the second argument passed to `createClient`: change that depending on which you want to use.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Create an
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://nextjs.org/docs/api-routes/introduction" rel="noopener noreferrer" tabindex="0" target="_blank">
+                    API route
+                  </a>
+                  for submitting views. You could do this directly from the middleware but adding it as a serverless function gives you more freedom to extend it in the future. Also note that anyone can trigger this function, so you may want to protect it by adding a new environment variable and sending that with the request from the middleware. Then, only your server requests will ever have that value and can be verified as legitimate.
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  import { NextApiRequest, NextApiResponse } from 'next'
+                  import supabase from '@lib/supabase/private'
+                  
+                  const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+                    if (req.method === 'POST') {
+                      // `increment_views` is the name we assigned to the function in Supabase, and page_slug is the argument we defined.
+                      await supabase.rpc('increment_views', { page_slug: req.body.slug })
+                      return res.status(200).send('Success')
+                    } else {
+                      return res.status(400).send('Invalid request method')
+                    }
+                  }
+                  
+                  export default handler
+                </pre>
+                <blockquote>
+                  <p>
+                    The above code is in TypeScript; if you want JavaScript, you can remove the first `import` and change the function definition to `const handler = async (req, res) =>`. I included this to try and encourage you to try TypeScript if you aren't already; it's very helpful for exploring unfamiliar APIs, like the Next.js requests and responses.
+                  </p>
+                </blockquote>
+              </li>
+              <li>
+                <p>
+                  Create a `pages/_middleware.{jsx,tsx}` file. The middleware will run on the server before every page request; nothing inside it is ever exposed to the client so we can safely use our private Supabase lib. However, we'll actually just send a POST request to our API handler instead.
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  import { NextMiddleware, NextResponse } from 'next/server'
+                  const PUBLIC_FILE = /\.(.*)$/
+                  
+                  export const middleware: NextMiddleware = async (req, event) => {
+                    const pathname = req.nextUrl.pathname
+                    // we ignore running this middleware when the request is to a serverless function or a file in public/.
+                    // This is purely optional.
+                    const isPageRequest =
+                      !PUBLIC_FILE.test(pathname) && !pathname.startsWith('/api')
+                  
+                    const sendAnalytics = async () => {
+                      const slug = pathname.slice(pathname.indexOf('/')) || '/'
+                  
+                      // Change your production URL!
+                      const URL =
+                        process.env.NODE_ENV === 'production'
+                          ? 'https://maxleiter.com/api/view'
+                          : 'http://localhost:3000/api/view'
+                      const res = await fetch(`${URL}`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          slug,
+                        }),
+                      })
+                  
+                      if (res.status !== 200) {
+                        console.error('Failed to send analytics', res)
+                      }
+                    }
+                  
+                    // event.waitUntil is the real magic here:
+                    // it won't wait for sendAnalytics() to finish before continuing the response,
+                    // so we avoid delaying the user.
+                    if (isPageRequest) event.waitUntil(sendAnalytics())
+                    return NextResponse.next()
+                  }
+                </pre>
+              </li>
+              <li>
+                <p>
+                  You should now verify your views table is updating by loading pages and viewing the Supabase dashboard. If it's not updating, verify your connection details and try exploring the Supabase logs.
+                </p>
+              </li>
+            </ol>
+            <h3 id="nextjs-adding-a-live-updating-view-counter">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#nextjs-adding-a-live-updating-view-counter" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Next.js: Adding a live-updating view counter
+            </h3>
+            <ol>
+              <li>
+                <p>
+                  Now we can finally add our updating view count. In your React component, import your
+                  <em>
+                    public
+                  </em>
+                  Supabase client.
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  import supabase from '@lib/supabase/public'
+                </pre>
+              </li>
+              <li>
+                <p>
+                  Make views a member of your state:
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  import supabase from '@lib/supabase/public'
+                  
+                  const Component = () => {
+                      // You may want to pass in an initial value for views if you're using getStaticPaths or similar.
+                      // That way, it won't start at 0 when the client loads.
+                      const [views, setViews] = useState(0)
+                      return (...)
+                  }
+                </pre>
+              </li>
+              <li>
+                <p>
+                  Add a `useEffect` hook to subscribe and unsubscribe to changes on mount or unmount respectfully. This is
+                  <em>
+                    all it takes
+                  </em>
+                  to subscribe to recieve the changes made to the `analytics` table.
+                </p>
+                <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                  import supabase from '@lib/supabase/public'
+                  
+                  const Component = () => {
+                    // You may want to pass in an initial value for views if you're using getStaticPaths or similar.
+                    // That way, it won't start at 0 when the client loads.
+                    const [views, setViews] = useState(0)
+                  
+                    // Subscribe to view updates.
+                    // Note that `id` is something I store manually on page creation so I can associate
+                    // each page with itself from the DB.
+                    // In practice, I recommend looking into subscribing to low level changes:
+                    // https://supabase.com/docs/reference/javascript/subscribe#listening-to-row-level-changes
+                    useEffect(() => {
+                      const sub = supabase
+                        .from('analytics')
+                        .on('UPDATE', (payload) => {
+                          if (payload.new.id === id) {
+                            setViews(payload.new.views)
+                          }
+                        })
+                        .subscribe()
+                  
+                      // The return function of a useEffect is fired on unmount
+                      return () => {
+                        sub.unsubscribe()
+                      }
+                    }, [id])
+                  
+                    return (
+                      <div>
+                        {views} {views.length === 1 ? 'view' : 'views'}
+                      </div>
+                    )
+                  }
+                </pre>
+              </li>
+              <li>
+                <p>
+                  And there you have it! Automatically updating analytics that don't require JavaScript to be recorded! You can verify it works by opening the page in a new tab.
+                </p>
+              </li>
+            </ol>
+            <h3 id="next-steps">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#next-steps" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Next steps
+            </h3>
+            <p>
+              There's quite a lot you can do from here, but here are some recommendations:
+            </p>
+            <ol>
+              <li>
+                Only allow unique visitors, perhaps by storing IP hashes or using localStorage. This could probably be accomplished with Supabase Edge functions?
+              </li>
+              <li>
+                Build a visualization page for interacting and querying the results
+              </li>
+              <li>
+                Expand your analytics to include things like keeping track of the `referer` value.
+              </li>
+              <li>
+                Ignore certain user agents to reflect a more accurate view count
+              </li>
+            </ol>
+          </div>
+        </article>
+      </main>
+      <div data-island="palette" data-on="interaction" hidden="">
+        <div aria-label="Search" aria-modal="true" class="fixed inset-0 backdrop-blur-sm z-[9999] flex items-start justify-center pt-20 px-4" role="dialog" style="background-color:rgba(0, 0, 0, 0.7)">
+          <div class="w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden" style="background-color:var(--bg);border-color:var(--border-color);border-width:1px">
+            <div class="border-b px-4 py-3" style="border-color:var(--border-color)">
+              <input aria-activedescendant="palette-option-0" aria-autocomplete="list" aria-controls="palette-results" aria-expanded="true" aria-label="Search" autocomplete="off" class="w-full bg-transparent outline-none font-mono" data-palette-input="true" placeholder="Search posts, projects, or navigate..." role="combobox" spellcheck="false" style="font-size:16px;color:var(--fg);opacity:0.9;--placeholder-color:var(--fg)" type="text" value="">
+            </div>
+            <div class="max-h-96 overflow-y-auto px-2 py-2">
+              <div aria-label="Results" data-palette-results="true" id="palette-results" role="listbox">
+                <button aria-label="Navigation: Blog" aria-selected="true" class="w-full text-left px-4 py-3 rounded transition-colors font-mono" id="palette-option-0" role="option" style="background-color:rgba(255, 255, 255, 0.15);color:var(--fg)" tabindex="-1" type="button">
+                  <div class="text-xs font-mono uppercase mb-1" style="color:var(--gray)">
+                    Navigation
+                  </div>
+                  <div style="color:var(--fg);opacity:0.9">
+                    Blog
+                  </div>
+                </button>
+                <button aria-label="Navigation: Projects" aria-selected="false" class="w-full text-left px-4 py-3 rounded transition-colors font-mono" id="palette-option-1" role="option" style="background-color:transparent;color:var(--fg)" tabindex="-1" type="button">
+                  <div class="text-xs font-mono uppercase mb-1" style="color:var(--gray)">
+                    Navigation
+                  </div>
+                  <div style="color:var(--fg);opacity:0.9">
+                    Projects
+                  </div>
+                </button>
+                <button aria-label="Navigation: About" aria-selected="false" class="w-full text-left px-4 py-3 rounded transition-colors font-mono" id="palette-option-2" role="option" style="background-color:transparent;color:var(--fg)" tabindex="-1" type="button">
+                  <div class="text-xs font-mono uppercase mb-1" style="color:var(--gray)">
+                    Navigation
+                  </div>
+                  <div style="color:var(--fg);opacity:0.9">
+                    About
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script id="__islands" type="application/json">
+      {"desktop":"/_assets/island.desktop.3B33D6HU.js","file-tree":"/_assets/island.file-tree.NTJ3EU45.js","palette":"/_assets/island.palette.N3VUTFBB.js","shot-grid":"/_assets/island.shot-grid.X2HSHAGA.js"}
+    </script>
+    <script src="/_assets/runtime.35VRSIQ3.js" type="module">
+    </script>
+    <script defer="" src="/_vercel/insights/script.js">
+    </script>
+  </body>
+</html>

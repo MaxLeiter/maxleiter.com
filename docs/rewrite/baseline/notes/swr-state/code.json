@@ -1,0 +1,10 @@
+{
+  "blocks": [
+    "import useSWR from 'swr'\nexport function MyComponent() {\nconst { data, error } = useSWR<string>('/api/data', fetcher, {\nrefreshInterval: 1000,\nfallbackData: { name: 'swr' },\n})\n}",
+    "import useSWR, { mutate } from 'swr'\nexport function useModal() {\nconst { data: isVisible, mutate: setVisible } = useSWR<boolean>(\n'state:modal',\n{\nfallbackData: false,\n},\n)\nreturn {\nisVisible,\nsetVisible,\n}\n}\n// For when you can't use hooks\nexport const mutateModal = (isVisible) => {\nmutate('state:modal', isVisible)\n}"
+  ],
+  "occurrences": [
+    2,
+    2
+  ]
+}

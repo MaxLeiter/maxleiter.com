@@ -4,12 +4,22 @@
  *   bun run tools/diff-html.ts [baselineDir] [newDir] [--ignore FILE]
  *
  * Defaults: `docs/rewrite/baseline` vs `.cache/snapshot-current`.
- * Reports three diffs per route, in order of how much they matter:
+ * Reports five diffs per route, in order of how much they matter:
  *
  *   1. head  — tag-for-tag, keyed on `meta[name=...]` / `link[rel=...]`.
  *              This is the SEO contract; any change here is a real change.
- *   2. text  — the visible text of the page. Must match exactly.
- *   3. html  — structural diff of the normalized markup.
+ *   2. prose — words that appear in one build and not at all in the other,
+ *              counting only running text: `<pre>` is subtracted out.
+ *   3. code  — the ordered list of code blocks, per-theme duplicates already
+ *              collapsed. Together prose and code are the content gate, and
+ *              splitting them is what makes both immune to the fact that the
+ *              two builds mark up fences completely differently.
+ *   4. text  — line diff of all visible text, code included.
+ *   5. html  — structural diff of the normalized markup.
+ *
+ * `informationalKinds` in the ignore file marks streams that are printed but
+ * never fatal; `text` and `html` are marked so during the reimplementation,
+ * because the two builds render code blocks and wrappers differently.
  *
  * Exits non-zero when anything not covered by `tools/diff-ignore.json`
  * differs. Runs under bun and node >= 20.
@@ -19,7 +29,19 @@ import { readFile, readdir, stat } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { diffLines } from 'diff'
 
-export type DiffKind = 'head' | 'text' | 'html' | 'file' | 'route'
+export type DiffKind =
+  | 'head'
+  | 'prose'
+  | 'code'
+  | 'text'
+  | 'html'
+  | 'file'
+  | 'route'
+
+interface CodeRecordLike {
+  blocks: string[]
+  occurrences: number[]
+}
 
 export interface IgnoreRule {
   /** Human-readable justification. Required: every exception is documented. */
@@ -38,6 +60,102 @@ export interface IgnoreFile {
   allowMissingRoutes?: string[]
   /** Routes added by the new build on purpose, e.g. `/blog/x/embed`. */
   allowNewRoutes?: string[]
+  /**
+   * Streams that are printed but never fail the run. Use only for a stream
+   * whose differences are structural-by-design and covered by a stricter
+   * check elsewhere, and say which check in `informationalReasons`.
+   */
+  informationalKinds?: DiffKind[]
+  informationalReasons?: Record<string, string>
+}
+
+/** Words: letters only, 4+ characters. Code punctuation is not a word. */
+function words(text: string): Map<string, number> {
+  const counts = new Map<string, number>()
+  for (const w of text.match(/[A-Za-z][A-Za-z'’-]{3,}/g) ?? []) {
+    counts.set(w, (counts.get(w) ?? 0) + 1)
+  }
+  return counts
+}
+
+/**
+ * Page words minus the words inside <pre>, so the prose stream sees only
+ * running text. `code.occurrences` matters: the Next baseline renders every
+ * fence twice, so its page text contains each code word twice, and
+ * subtracting one copy would leave a phantom behind.
+ */
+function proseWords(
+  text: string,
+  code: CodeRecordLike | null,
+): Map<string, number> {
+  const counts = words(text)
+  if (!code) return counts
+  code.blocks.forEach((block, i) => {
+    const n = code.occurrences[i] ?? 1
+    for (const [w, c] of words(block)) {
+      const left = (counts.get(w) ?? 0) - c * n
+      if (left > 0) counts.set(w, left)
+      else counts.delete(w)
+    }
+  })
+  return counts
+}
+
+/** Words present in one build and absent from the other. Real content loss. */
+function proseChanges(
+  baseText: string,
+  currText: string,
+  baseCode: CodeRecordLike | null,
+  currCode: CodeRecordLike | null,
+): Change[] {
+  const a = proseWords(baseText, baseCode)
+  const b = proseWords(currText, currCode)
+  const out: Change[] = []
+  for (const [w, n] of a) {
+    if (!b.has(w)) out.push({ side: '-', line: `${w} (x${n} in baseline)` })
+  }
+  for (const [w, n] of b) {
+    if (!a.has(w)) out.push({ side: '+', line: `${w} (x${n} in new build)` })
+  }
+  return out
+}
+
+/**
+ * Compare the ordered list of code blocks. Each build's per-theme duplicates
+ * are already collapsed by the normalizer, so this compares the code a reader
+ * actually sees. A missing, extra, reordered or edited block fails.
+ */
+function codeChanges(
+  base: CodeRecordLike | null,
+  curr: CodeRecordLike | null,
+): Change[] {
+  const a = base?.blocks ?? []
+  const b = curr?.blocks ?? []
+  const out: Change[] = []
+  if (a.length !== b.length) {
+    out.push({ side: '-', line: `${a.length} code blocks in baseline` })
+    out.push({ side: '+', line: `${b.length} code blocks in new build` })
+  }
+  const n = Math.max(a.length, b.length)
+  for (let i = 0; i < n; i++) {
+    if (a[i] === b[i]) continue
+    const label = `block ${i + 1}`
+    if (a[i] === undefined) {
+      out.push({ side: '+', line: `${label} added: ${firstLine(b[i])}` })
+    } else if (b[i] === undefined) {
+      out.push({ side: '-', line: `${label} removed: ${firstLine(a[i])}` })
+    } else {
+      out.push({ side: '-', line: `${label}: ${firstLine(a[i])}` })
+      out.push({ side: '+', line: `${label}: ${firstLine(b[i])}` })
+    }
+  }
+  return out
+}
+
+function firstLine(block: string): string {
+  const [head = ''] = block.split('\n')
+  const rest = block.split('\n').length - 1
+  return `${head.slice(0, 90)}${rest > 0 ? ` (+${rest} more lines)` : ''}`
 }
 
 interface Matcher {
@@ -201,11 +319,18 @@ export async function diffSnapshots(
   }
   const baseManifest = JSON.parse(baseManifestRaw) as RoutesManifest
 
+  // A missing current snapshot used to degrade into a confusing half-run.
+  // Fail loudly instead: an absent snapshot is never something to report on.
   const currManifestRaw = await readIfExists(join(currentDir, 'routes.json'))
-  const currManifest =
-    currManifestRaw === null
-      ? null
-      : (JSON.parse(currManifestRaw) as RoutesManifest)
+  if (currManifestRaw === null) {
+    throw new Error(
+      `no routes.json in ${currentDir}. Snapshot the build first:\n` +
+        '  pnpm gate                     (build, snapshot, then verify)\n' +
+        '  bun run tools/snapshot.ts --dir .vercel/output/static ' +
+        `--out ${currentDir}`,
+    )
+  }
+  const currManifest = JSON.parse(currManifestRaw) as RoutesManifest
 
   const allowMissing = (ignore.allowMissingRoutes ?? []).map(matcher)
   const allowNew = (ignore.allowNewRoutes ?? []).map(matcher)
@@ -313,6 +438,23 @@ export async function diffSnapshots(
       if (changes.length > 0) sections.push({ kind: 'head', changes })
     }
 
+    const baseCodeRaw = await readIfExists(join(baseRouteDir, 'code.json'))
+    const currCodeRaw = await readIfExists(join(currRouteDir, 'code.json'))
+    const baseCode =
+      baseCodeRaw === null ? null : (JSON.parse(baseCodeRaw) as CodeRecordLike)
+    const currCode =
+      currCodeRaw === null ? null : (JSON.parse(currCodeRaw) as CodeRecordLike)
+
+    if (baseCode !== null || currCode !== null) {
+      const changes = filterIgnored(
+        codeChanges(baseCode, currCode),
+        route.path,
+        'code',
+        rules,
+      )
+      if (changes.length > 0) sections.push({ kind: 'code', changes })
+    }
+
     const baseText = await readIfExists(join(baseRouteDir, 'text.txt'))
     const currText = await readIfExists(join(currRouteDir, 'text.txt'))
     if (baseText !== null && currText !== null) {
@@ -323,6 +465,14 @@ export async function diffSnapshots(
         rules,
       )
       if (changes.length > 0) sections.push({ kind: 'text', changes })
+
+      const prose = filterIgnored(
+        proseChanges(baseText, currText, baseCode, currCode),
+        route.path,
+        'prose',
+        rules,
+      )
+      if (prose.length > 0) sections.push({ kind: 'prose', changes: prose })
     }
 
     const baseHtml = await readIfExists(join(baseRouteDir, 'index.html'))
@@ -344,12 +494,13 @@ export async function diffSnapshots(
   return { reports, unusedRules, routeIssues }
 }
 
-function printReports(reports: RouteReport[]): void {
+function printReports(reports: RouteReport[], info: Set<DiffKind>): void {
   for (const report of reports) {
     process.stdout.write(`\n=== ${report.route}\n`)
     for (const section of report.sections) {
+      const tag = info.has(section.kind) ? ' [informational]' : ''
       process.stdout.write(
-        `--- ${section.kind} (${section.changes.length} lines)\n`,
+        `--- ${section.kind}${tag} (${section.changes.length} lines)\n`,
       )
       for (const c of section.changes.slice(0, MAX_LINES_PER_SECTION)) {
         process.stdout.write(`${c.side} ${c.line}\n`)
@@ -384,7 +535,18 @@ async function main(): Promise<void> {
   const ignore: IgnoreFile =
     ignoreRaw === null ? { rules: [] } : (JSON.parse(ignoreRaw) as IgnoreFile)
 
-  process.stdout.write(`baseline: ${baselineDir}\ncurrent:  ${currentDir}\n`)
+  // Print each snapshot's source and capture time. A snapshot left over from
+  // an earlier build otherwise compares silently and reports phantom diffs.
+  const describe = async (dir: string): Promise<string> => {
+    const raw = await readIfExists(join(dir, 'routes.json'))
+    if (raw === null) return 'NOT SNAPSHOTTED'
+    const m = JSON.parse(raw) as { base?: string; generatedAt?: string }
+    return `${m.base ?? '?'} @ ${m.generatedAt ?? '?'}`
+  }
+  process.stdout.write(
+    `baseline: ${baselineDir}\n          ${await describe(baselineDir)}\n` +
+      `current:  ${currentDir}\n          ${await describe(currentDir)}\n`,
+  )
 
   const { reports, unusedRules, routeIssues } = await diffSnapshots(
     baselineDir,
@@ -392,7 +554,9 @@ async function main(): Promise<void> {
     ignore,
   )
 
-  printReports(reports)
+  const info = new Set<DiffKind>(ignore.informationalKinds ?? [])
+
+  printReports(reports, info)
 
   for (const issue of routeIssues) process.stdout.write(`\nROUTE: ${issue}\n`)
 
@@ -402,15 +566,34 @@ async function main(): Promise<void> {
       process.stdout.write(`  ${r.pattern} — ${r.reason}\n`)
   }
 
-  const total = reports.reduce(
-    (n, r) => n + r.sections.reduce((m, s) => m + s.changes.length, 0),
-    0,
-  )
+  let blocking = 0
+  let informational = 0
+  const blockingRoutes = new Set<string>()
+  for (const r of reports) {
+    for (const s of r.sections) {
+      if (info.has(s.kind)) informational += s.changes.length
+      else {
+        blocking += s.changes.length
+        blockingRoutes.add(r.route)
+      }
+    }
+  }
+
+  if (info.size > 0) {
+    process.stdout.write('\ninformational streams (printed, never fatal):\n')
+    for (const k of info) {
+      const why = ignore.informationalReasons?.[k] ?? 'no reason recorded'
+      process.stdout.write(`  ${k}: ${why}\n`)
+    }
+  }
+
   process.stdout.write(
-    `\n${reports.length} routes with diffs, ${total} changed lines, ` +
-      `${routeIssues.length} route issues\n`,
+    `\n${reports.length} routes with diffs. ` +
+      `blocking: ${blocking} lines across ${blockingRoutes.size} routes. ` +
+      `informational: ${informational} lines. ` +
+      `route issues: ${routeIssues.length}.\n`,
   )
-  if (reports.length > 0 || routeIssues.length > 0) process.exitCode = 1
+  if (blocking > 0 || routeIssues.length > 0) process.exitCode = 1
   else process.stdout.write('OK: no unexpected differences\n')
 }
 

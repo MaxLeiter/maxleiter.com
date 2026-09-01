@@ -1,0 +1,8 @@
+{
+  "blocks": [
+    "html,\nbody {\n-webkit-text-size-adjust: none;\ntext-size-adjust: none;\n}"
+  ],
+  "occurrences": [
+    2
+  ]
+}

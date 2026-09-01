@@ -19,18 +19,29 @@
     "prefer-arrow-callback": "error",
     "prefer-template": "error",
     "no-useless-concat": "error",
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
     "no-else-return": "error",
     "no-empty-function": "error",
     "no-empty-pattern": "error",
     "no-lone-blocks": "error",
     "no-unneeded-ternary": "error",
     "no-useless-return": "error",
-    "object-shorthand": ["error", "always"],
+    "object-shorthand": [
+      "error",
+      "always"
+    ],
     "no-unsafe-optional-chaining": "error",
     "no-unused-expressions": [
       "error",
-      { "allowShortCircuit": true, "allowTernary": true }
+      {
+        "allowShortCircuit": true,
+        "allowTernary": true
+      }
     ]
   },
   "env": {
@@ -42,5 +53,25 @@
     "build/**",
     "public/**",
     "next-env.d.ts"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "build.ts",
+        "framework/**",
+        "app/pages/**",
+        "app/islands/**",
+        "app/components/static/**",
+        "app/mdx/static-components.tsx"
+      ],
+      "rules": {
+        "jsx-a11y/anchor-is-valid": "off",
+        "jsx-a11y/no-noninteractive-tabindex": "off",
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/media-has-caption": "off",
+        "nextjs/no-html-link-for-pages": "off",
+        "nextjs/no-img-element": "off"
+      }
+    }
   ]
 }

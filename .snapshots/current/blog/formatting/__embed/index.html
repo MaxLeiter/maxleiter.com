@@ -1,0 +1,219 @@
+<!doctype html>
+<html data-theme="dark" lang="en" style="color-scheme:dark">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#000000" name="theme-color">
+    <title>
+      Formatting code should be unnecessary | Max Leiter
+    </title>
+    <meta content="and we knew this back in the 80s" name="description">
+    <meta content="noindex, nofollow" name="robots">
+    <meta content="noindex, nofollow" name="googlebot">
+    <link href="https://maxleiter.com/blog/formatting" rel="canonical">
+    <link href="https://maxleiter.com/feed.xml" rel="alternate" type="application/rss+xml">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="and we knew this back in the 80s" property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/blog/formatting/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="630" property="og:image:height">
+    <meta content="article" property="og:type">
+    <meta content="2025-09-06T07:00:00.000Z" property="article:published_time">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="and we knew this back in the 80s" name="twitter:description">
+    <meta content="https://maxleiter.com/blog/formatting/opengraph-image" name="twitter:image">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="630" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+    <link as="font" crossorigin="" href="/_assets/GeistSans-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <link as="font" crossorigin="" href="/_assets/GeistMono-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <style>
+      /* css */
+    </style>
+    <script>
+      try{var t=localStorage.theme||'system',d=document.documentElement,e=t=='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;d.dataset.theme=e;d.style.colorScheme=e}catch(_){}
+    </script>
+  </head>
+  <body>
+    <link as="image" fetchpriority="high" imagesizes="(max-width: 700px) 100vw, 700px" imagesrcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Frational.jpg%3Fw%3D400&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Frational.jpg%3Fw%3D400&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Frational.jpg%3Fw%3D400&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Frational.jpg%3Fw%3D400&amp;w=1920&amp;q=75 1920w" rel="preload">
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto" style="view-transition-name:blog-post-formatting">
+          <div class="mb-1">
+            <time class="font-mono text-sm" datetime="2025-09-06T07:00:00.000Z" style="color:var(--gray)">
+              Sep 6, 2025
+            </time>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            Formatting code should be unnecessary
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            and we knew this back in the 80s
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <p>
+              I had a (maybe slightly overqualified) computer science teacher back in highschool, Mr. Paige. He worked on the
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://en.wikipedia.org/wiki/Ada_(programming_language)" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Ada
+              </a>
+              compiler and has been programming since the early 80s.
+            </p>
+            <p>
+              One day I complained about linter tooling that was driving me nuts. I said something to the effect of, "it's 2016, how are we still dealing with this sort of thing?"
+            </p>
+            <p>
+              Turns out, that problem was solved four decades ago (well, three at that point). Back when he was working on Ada, they didn't store text sources at all — they used an
+              <abbr title="Intermediate representation">
+                IR
+              </abbr>
+              called
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://archive.org/details/dianaintermediat0000unse/page/n7/mode/2up" rel="noopener noreferrer" tabindex="0" target="_blank">
+                DIANA
+              </a>
+              . Everyone had their own pretty-printing settings for viewing it however they wanted.
+            </p>
+            <p>
+              We've been debating some linter settings at work recently and I keep thinking back to Mr. Paige. It's 2025, how are we still dealing with this sort of thing?
+            </p>
+            <hr>
+            <p>
+              Well, to answer that it would help to know what we're missing.
+            </p>
+            <p>
+              I believe he was working with the
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://en.wikipedia.org/wiki/Rational_R1000" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Rational R1000
+              </a>
+              , of which there isn't a ton of info (like all things Ada, it was used by the DoD):
+            </p>
+            <p>
+              <img alt="" decoding="async" fetchpriority="high" height="450" loading="eager" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Frational.jpg%3Fw%3D400&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Frational.jpg%3Fw%3D400&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Frational.jpg%3Fw%3D400&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Frational.jpg%3Fw%3D400&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Frational.jpg%3Fw%3D400&amp;w=1920&amp;q=75 1920w" width="400">
+            </p>
+            <p>
+              The R1000 had a lot of bleeding-edge features: incremental compilation, semantic analysis, version control, and first-class debugging all built-in. It was a workstation similar to the
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://en.wikipedia.org/wiki/Xerox_Alto" rel="noopener noreferrer" tabindex="0" target="_blank">
+                Xerox Alto
+              </a>
+              but using Ada instead of Smalltalk.
+            </p>
+            <aside class="&lt;cssmod>_note">
+              <div class="&lt;cssmod>_icon">
+                <svg class="feather feather-info" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="var(--info-stroke-circle-color, currentColor)">
+                  </circle>
+                  <line stroke="var(--info-stroke-line-color, currentColor)" x1="12" x2="12" y1="16" y2="12">
+                  </line>
+                  <line stroke="var(--info-stroke-line-color, currentColor)" x1="12" x2="12.01" y1="8" y2="8">
+                  </line>
+                </svg>
+              </div>
+              <div class="&lt;cssmod>_content">
+                <b>
+                  Fun Fact:
+                </b>
+                <p>
+                  The R1000 is fairly undocumented and very rare, but it was used in the writing of software for the ISS, the F-22, presumably countless other government projects, and led to the
+                  <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://en.wikipedia.org/wiki/Grady_Booch#Booch_method" rel="noopener noreferrer" tabindex="0" target="_blank">
+                    birth of UML by Grady Booch
+                  </a>
+                  .
+                </p>
+              </div>
+            </aside>
+            <p>
+              DIANA (Descriptive Intermediate Attributed Notation for Ada) was a key component of Ada that enabled a lot of the more advanced features.
+            </p>
+            <p>
+              <img alt="A diagram scanned from a type-written page. It shows a diagram of Ada Source => Syntax &amp; Semantics => DIANA => Normalization phase => Middle End => simple IR optimization phase => IR => Code Gen. => Executable Image" decoding="async" height="450" loading="lazy" sizes="(max-width: 700px) 100vw, 700px" src="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Fada.png&amp;w=1200&amp;q=75" srcset="/_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Fada.png&amp;w=640&amp;q=75 640w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Fada.png&amp;w=828&amp;q=75 828w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Fada.png&amp;w=1200&amp;q=75 1200w, /_vercel/image?url=https%3A%2F%2Ftddeuevmbjbaaeoi.public.blob.vercel-storage.com%2Fblog%2Fformatting%2Fada.png&amp;w=1920&amp;q=75 1920w" width="550">
+            </p>
+            <figcaption>
+              <p>
+                Taken from
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://www2.eecs.berkeley.edu/Pubs/TechRpts/1985/CSD-85-249.pdf" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  Experiences with Code Generation (1984)
+                </a>
+              </p>
+            </figcaption>
+            <p>
+              Instead of storing plain-text source code, the R1000 wrote DIANA. The compiler and the IDE built into the machine both understood DIANA too, so you could view the source however you wanted. Spaces vs. tabs didn't matter because neither affects the semantics and the editor on the system let you modify the program tree directly (known today as
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://martinfowler.com/bliki/ProjectionalEditing.html" rel="noopener noreferrer" tabindex="0" target="_blank">
+                projectional editing
+              </a>
+              ).
+            </p>
+            <p>
+              Grady Booch
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://web.archive.org/web/20160304051102/https://www.ibm.com/developerworks/community/blogs/gradybooch/entry/rational_anniversary?lang=en#pagePlaceBar" rel="noopener noreferrer" tabindex="0" target="_blank">
+                summarizes it well
+              </a>
+              :
+            </p>
+            <blockquote>
+              <p>
+                R1000 was effectively a DIANA machine. We didn't store source code: source code was simply a pretty-printing of the DIANA tree.
+              </p>
+            </blockquote>
+            <p>
+              Imagine that. No wasted time due to formatting discussions or fighting linters, without forcing everyone into the same editor setup (looking at you, eslint-config-airbnb).
+            </p>
+            <p>
+              And there were other benefits:
+            </p>
+            <blockquote>
+              <p>
+                Using DIANA with hardware acceleration made it possible to do incremental compilation (unheard of at the time, for strongly typed languages), easy refactoring (though that word had not yet been invented), and incredibly fast integration (essential for the large systems that we being built with Ada).
+              </p>
+            </blockquote>
+            <p>
+              Today, we don't need to worry about hardware-accelerated compilation (hopefully), and we have better tools for refactoring (thanks, Claude). But with formatting, we regressed. I'm not advocating for everyone to use projectional editing and a live environment (although I think they're awesome and we should be exploring them more), but surely we can figure out something that fits into todays programming paradigms.
+            </p>
+            <h3 id="further-reading">
+              <a aria-hidden="true" class="&lt;cssmod>_link &lt;cssmod>_underline" href="#further-reading" tabindex="-1">
+                <span class="icon icon-link">
+                </span>
+              </a>
+              Further reading
+            </h3>
+            <p>
+              This post was meant to be me saying "it'd be easier if we just pushed minified code", but I had too much fun researching the R1000 during it. Here are some of the documents I looked at:
+            </p>
+            <ul>
+              <li>
+                Experiences with Code Generation (1985):
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://www2.eecs.berkeley.edu/Pubs/TechRpts/1985/CSD-85-249.pdf" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  https://www2.eecs.berkeley.edu/Pubs/TechRpts/1985/CSD-85-249.pdf
+                </a>
+              </li>
+              <li>
+                Ada Compiler Validation Summary Report: Rational Environment (1985):
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://apps.dtic.mil/sti/tr/pdf/ADA157830.pdf" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  https://apps.dtic.mil/sti/tr/pdf/ADA157830.pdf
+                </a>
+              </li>
+              <li>
+                Grady Booch's blog post about the 5th anniversary on Rational's acquisition (2008):
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://web.archive.org/web/20160304051102/https://www.ibm.com/developerworks/community/blogs/gradybooch/entry/rational_anniversary?lang=en#pagePlaceBar" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  https://web.archive.org/web/20160304051102/https://www.ibm.com/developerworks/community/blogs/gradybooch/entry/rational_anniversary?lang=en#pagePlaceBar
+                </a>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script id="__islands" type="application/json">
+      {"desktop":"/_assets/island.desktop.3B33D6HU.js","file-tree":"/_assets/island.file-tree.NTJ3EU45.js","palette":"/_assets/island.palette.N3VUTFBB.js","shot-grid":"/_assets/island.shot-grid.X2HSHAGA.js"}
+    </script>
+    <script src="/_assets/runtime.35VRSIQ3.js" type="module">
+    </script>
+    <script defer="" src="/_vercel/insights/script.js">
+    </script>
+  </body>
+</html>

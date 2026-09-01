@@ -2,13 +2,179 @@
   "$comment": [
     "Intended differences between the Next.js baseline and the bespoke build.",
     "Every rule needs a `reason`. `pattern` and `routes` are substrings, or",
-    "`re:<javascript regexp>`. `kind` is head | text | html | file | route.",
+    "`re:<javascript regexp>`. `kind` is head | prose | code | text | html | file.",
     "diff-html.ts prints rules that matched nothing, so stale entries surface.",
-    "This file is intentionally EMPTY of content rules for Phase 0: the",
-    "baseline must diff clean against itself with no exceptions at all.",
-    "Phase 1+ agents add rules here as intended divergences land."
+    "",
+    "Titles on /blog/<slug> and /notes/<slug> are a DELIBERATE deviation from",
+    "the baseline, decided by the coordinator: posts and notes now get the",
+    "'%s | Max Leiter' template of CONTRACT item 14. It fixes two Next defects",
+    "at once, since generateMetadata skipped the template and notes/[slug]",
+    "exported no metadata at all, leaving all 8 note pages sharing the single",
+    "title 'Notes | Max Leiter'. Index and static page titles must still match",
+    "the baseline exactly, so the rule below is scoped to slug routes.",
+    "",
+    "Note pages no longer lose their meta description: they inherit the",
+    "notes-layout description, exactly as the baseline does. No rule needed.",
+    "",
+    "Deliberately NOT ignored, so they keep failing until fixed: the tweet card",
+    "chrome on /blog/seeing-the-future (defect, core restoring the full card",
+    "including the source link)."
   ],
-  "rules": [],
+  "informationalKinds": [
+    "text",
+    "html"
+  ],
+  "informationalReasons": {
+    "text": "A line diff of all visible text cannot tell code-block re-lineation from content loss: bright wrapped each fence line in a div and emitted the whole fence twice, once per theme, with one copy hidden by CSS; shiki emits it once with CSS custom properties. Superseded by two blocking streams that split the problem: prose (running text with <pre> subtracted out) and code (the ordered list of code blocks, per-theme duplicates collapsed). Kept on as printed reference.",
+    "html": "Phase 1 is a reimplementation: different class names, different nesting, islands instead of client components. A line diff of the markup is reference material, not a gate. The gates are head, prose, code and file."
+  },
+  "rules": [
+    {
+      "kind": "head",
+      "routes": "__snapshot_probe_404",
+      "pattern": "re:.",
+      "reason": "The 404 page was redesigned. The baseline emitted two <title> tags ('404: This page could not be found.' and 'Max Leiter'); the new one emits '404 | Max Leiter' plus a description, a canonical and robots noindex,nofollow."
+    },
+    {
+      "kind": "prose",
+      "routes": "__snapshot_probe_404",
+      "pattern": "re:.",
+      "reason": "Same 404 redesign: 'This page could not be found.' became 'That page does not exist. Go home.'"
+    },
+    {
+      "kind": "prose",
+      "routes": "embed",
+      "pattern": "re:.",
+      "reason": "Embed variants lose the breadcrumb toolbar text (the section name and the slug), which is the point of the embed route. In the baseline ?embed=true served byte-identical HTML and stripped the toolbar with a client script, so the words were still in the markup. Broad by design: every embed page's article body is checked strictly through its canonical twin, which stores the shared baseline."
+    },
+    {
+      "kind": "file",
+      "routes": "/feed.xml",
+      "pattern": "re:.",
+      "reason": "A line diff of a 350 KB XML file is not a useful gate. Verified at item level instead: 48 items became 38, the 10 removed are exactly the published:false posts and notes (design doc 9.5), none were added, external posts survive, and channel title/description/link/language/atom:link are identical. Three intended body changes account for the rest: lastBuildDate is pinned to the newest item's date instead of build time, which makes the build reproducible; description links no longer carry target/rel attributes; and raw <Image .../> JSX no longer leaks into item bodies, because bodies now go through the real MDX pipeline instead of marked."
+    },
+    {
+      "kind": "file",
+      "routes": "/sitemap.xml",
+      "pattern": "re:.",
+      "reason": "Verified at URL level: the new sitemap adds /blog, /labs, /notes and /talks, the four top-level pages the baseline omitted, and loses nothing. The rest of the diff is element formatting."
+    },
+    {
+      "kind": "file",
+      "routes": "/blog/HFSViewer/opengraph-image",
+      "pattern": "re:.",
+      "reason": "A fix. The baseline returned 404 here because the OG route fetched posts/<slug>.mdx from GitHub at request time and this post's file is introducing-HFSViewer.mdx. The new build prerenders it locally at 1200x630 like the other 23."
+    },
+    {
+      "kind": "head",
+      "pattern": "as=\"font\"",
+      "reason": "Fonts moved from /_next/static/media to /_assets and are preloaded by hand. The baseline's equivalent preloads pointed at /_next/ and are stripped by the normalizer, so only the added lines show."
+    },
+    {
+      "kind": "head",
+      "pattern": ">> (inline css)",
+      "reason": "The single inline stylesheet moved position within <head>. Its content is deliberately not compared; see the note in normalize-html.ts."
+    },
+    {
+      "kind": "head",
+      "pattern": "script  >> sha256:e785bdaf57ce",
+      "reason": "The new blocking theme script required by CONTRACT. Pinned to its exact content hash, so any change to the script fails the run."
+    },
+    {
+      "kind": "head",
+      "pattern": "next-size-adjust",
+      "reason": "A Next-specific meta tag with no equivalent in the bespoke build."
+    },
+    {
+      "kind": "head",
+      "pattern": "link[rel=stylesheet]",
+      "reason": "Next emitted an extra preloaded stylesheet link on some routes; the bespoke build inlines all CSS instead."
+    },
+    {
+      "kind": "head",
+      "routes": "re:^/(blog|notes)/",
+      "pattern": "meta[property=og:type]",
+      "reason": "Posts and notes are now og:type=article. The baseline said website on every page, articles included."
+    },
+    {
+      "kind": "head",
+      "routes": "re:^/(blog|notes)/",
+      "pattern": "article:published_time",
+      "reason": "Added for articles per CONTRACT Head.publishedTime. The baseline emitted no published time anywhere."
+    },
+    {
+      "kind": "head",
+      "pattern": "link[rel=alternate]",
+      "reason": "The RSS alternate link is now on every page. The baseline had it only on the homepage, because pages setting alternates.canonical dropped the inherited alternates.types."
+    },
+    {
+      "kind": "head",
+      "pattern": "og:image:height",
+      "reason": "Corrected from 600 to 630. Every OG PNG has always been 1200x630; the baseline metadata mis-declared the height."
+    },
+    {
+      "kind": "head",
+      "pattern": "twitter:image:height",
+      "reason": "The same 600 to 630 correction as og:image:height."
+    },
+    {
+      "kind": "head",
+      "pattern": "twitter:image:type",
+      "reason": "Dropped. Not a tag the Twitter card spec defines, and og:image:type carries the same information."
+    },
+    {
+      "kind": "head",
+      "pattern": "og:image:type",
+      "reason": "Now emitted consistently on every page. The baseline emitted it only on pages that set a per-page OG image."
+    },
+    {
+      "kind": "head",
+      "routes": "embed",
+      "pattern": "meta[name=robots]",
+      "reason": "Embed variants are now noindex,nofollow. In the baseline ?embed=true served byte-identical HTML with 'index, follow', so every post was indexable at two URLs."
+    },
+    {
+      "kind": "head",
+      "routes": "embed",
+      "pattern": "meta[name=googlebot]",
+      "reason": "The same noindex,nofollow fix as meta[name=robots] on embed variants."
+    },
+    {
+      "kind": "head",
+      "routes": "re:^/notes",
+      "pattern": "link[rel=canonical] href=\"https://maxleiter.com/notes",
+      "reason": "The notes index and all 8 note pages had no canonical at all in the baseline. The href prefix is pinned, so a canonical pointing anywhere else still fails."
+    },
+    {
+      "kind": "head",
+      "routes": "re:^/$",
+      "pattern": "link[rel=canonical] href=\"https://maxleiter.com\" rel=\"canonical\"",
+      "reason": "The homepage had no canonical in the baseline. Pinned to the exact expected value."
+    },
+    {
+      "kind": "head",
+      "pattern": "link[rel=preload] as=\"image\"",
+      "reason": "Intended. React 19 auto-preloads any <img> without loading=\"lazy\", which is how the baseline got 24 of these across 7 posts. The bespoke build marks only the first article image eager with fetchpriority=high and lazy-loads the rest, so the LCP image is still prioritised without 23 competing eager fetches. Note that Change.line carries no +/- sign, so this rule hides added preloads as well as removed ones; that is intentional here, since the first-image preload is the new build's own."
+    },
+    {
+      "kind": "head",
+      "routes": "re:^/(blog|notes)/[^/]+",
+      "pattern": "re:^title  >>",
+      "reason": "Deliberate deviation from the baseline, decided by the coordinator: posts and notes get CONTRACT item 14's '%s | Max Leiter' template. Fixes two Next defects, since generateMetadata skipped the template on posts and notes/[slug] exported no metadata at all, giving all 8 note pages the identical title 'Notes | Max Leiter'. Scoped to slug routes and their embed variants, so index and static page titles must still match the baseline exactly."
+    },
+    {
+      "kind": "head",
+      "routes": "re:^/notes/",
+      "pattern": "content=\"Short-form thoughts, code snippets, and tips.\"",
+      "reason": "Baseline side of the per-note description change. The baseline gave all 8 notes this one notes-layout string, because notes/[slug] exports no metadata at all. The 4 notes with no frontmatter description still fall back to it, so only 4 routes drop it."
+    },
+    {
+      "kind": "head",
+      "routes": "re:^/notes/",
+      "pattern": "re:content=\"(A script for concatenating files in a directory for copying to an LLM|a bash script for generating branch names|SWR for state management|hint: just use `sql` and COALESCE\\.)\"",
+      "reason": "New side of the same change: the 4 notes that do have a frontmatter description now use it, which the coordinator decided is an intended improvement. Pinned to those exact 4 strings rather than matching any description, so a note silently falling back to a generic string still fails. If a note's frontmatter description is edited this rule goes unused, diff-html reports it as stale, and the new value shows up for review."
+    }
+  ],
   "allowMissingRoutes": [],
   "allowNewRoutes": []
 }

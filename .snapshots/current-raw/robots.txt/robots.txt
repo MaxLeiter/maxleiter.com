@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://maxleiter.com
+Sitemap: https://maxleiter.com/sitemap.xml

@@ -1,0 +1,211 @@
+<!doctype html>
+<html data-theme="dark" lang="en" style="color-scheme:dark">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#000000" name="theme-color">
+    <title>
+      Adding ambient light support to Linux and GNOME | Max Leiter
+    </title>
+    <meta content="A quick dive into Linux kernel drivers" name="description">
+    <meta content="noindex, nofollow" name="robots">
+    <meta content="noindex, nofollow" name="googlebot">
+    <link href="https://maxleiter.com/blog/MSHW0184" rel="canonical">
+    <link href="https://maxleiter.com/feed.xml" rel="alternate" type="application/rss+xml">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="A quick dive into Linux kernel drivers" property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/blog/MSHW0184/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="630" property="og:image:height">
+    <meta content="article" property="og:type">
+    <meta content="2020-12-15T08:00:00.000Z" property="article:published_time">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="A quick dive into Linux kernel drivers" name="twitter:description">
+    <meta content="https://maxleiter.com/blog/MSHW0184/opengraph-image" name="twitter:image">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="630" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+    <link as="font" crossorigin="" href="/_assets/GeistSans-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <link as="font" crossorigin="" href="/_assets/GeistMono-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <style>
+      /* css */
+    </style>
+    <script>
+      try{var t=localStorage.theme||'system',d=document.documentElement,e=t=='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;d.dataset.theme=e;d.style.colorScheme=e}catch(_){}
+    </script>
+  </head>
+  <body>
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto" style="view-transition-name:blog-post-MSHW0184">
+          <div class="mb-1">
+            <time class="font-mono text-sm" datetime="2020-12-15T08:00:00.000Z" style="color:var(--gray)">
+              Dec 15, 2020
+            </time>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            Adding ambient light support to Linux and GNOME
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            A quick dive into Linux kernel drivers
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <p>
+              A couple of a weeks ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale. I love making devices run software they shouldn't, so I got to work dual-booting Linux on it. To my surprise, almost everything worked with the default Fedora 33 kernel, not including the touchscreen, the ambient light sensor, and the camera. After compiling and loading the great
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/linux-surface/linux-surface" rel="noopener noreferrer" tabindex="0" target="_blank">
+                linux-surface
+              </a>
+              kernel the touchscreen started to work but I found a
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/linux-surface/linux-surface/issues/121" rel="noopener noreferrer" tabindex="0" target="_blank">
+                GitHub issue
+              </a>
+              someone had made detailing that the ambient light sensor (a MSHW0184) isn't detected. This normally wouldn't matter a lot, but I'd discovered that GNOME supported adjusting the screen brightness based on the ambient light through
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                iio-sensor-proxy
+              </a>
+              .
+            </p>
+            <p>
+              I knew nothing (and still know very little) about the Linux kernel or drivers, but this seemed like a great place to start. Luckily, GitHub user archseer discovered that the MSHW0184 registers align with the APDS9960 device, which already has an upstream kernel driver, and he mentioned all that should be needed is a small change to allow the driver to detect the new device.
+            </p>
+            <p>
+              Here I realized I had to do some research into how the kernel loads drivers. I knew that drivers could either be statically built into the kernel, or built as kernel modules so they can be dynamically loaded when they're needed. But how does the kernel know when to load specific drivers for certain hardware? You register the ID with a matching table.
+            </p>
+            <p>
+              Initially, I tried adding the MSHW0184 device ID to the existing match table in the APDS9960 driver for the i2c protocol. This consisted of the following one-line change:
+            </p>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+              static const struct i2c_device_id apds9960_id[] = {
+                                  { "apds9960", 0 },
+              +                   { "MSHW0184, 0 }
+                                  {}
+              }
+            </pre>
+            <p>
+              However, this didn't work and I realized the conventions seemed a little odd: no other i2c device ids in other drivers contained capitals or were ambient light sensing devices. Thankfully, someone on IRC helped me out:
+            </p>
+            <blockquote>
+              <p>
+                00:53 <djrscally> That's an acpi ID
+                <br>
+                00:53 <djrscally> You probably need to add an ACPI match table
+              </p>
+            </blockquote>
+            <p>
+              A few minutes later (well, probably closer to 30 minutes after compiling and testing the kernel on-device) I had the following, largely copied from other ACPI drivers:
+            </p>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+              
+              + static const struct acpi_device_id apds9960_acpi_match[] = {
+                  +	{ "MSHW0184" },
+                  +	{ }
+                  +};
+              + MODULE_DEVICE_TABLE(acpi, apds9960_acpi_match);
+              
+                static struct i2c_driver apds9960_driver = {
+                  .driver = {
+                      .name	= APDS9960_DRV_NAME,
+                      .of_match_table = apds9960_of_match,
+                      .pm	= &apds9960_pm_ops,
+              +       .acpi_match_table = apds9960_acpi_match,
+                  },
+                  .probe		= apds9960_probe,
+                  .remove		= apds9960_remove
+              
+            </pre>
+            <p>
+              I recompiled the kernel module, rebooted, and verified the driver was matched with lsmod and ensured the driver paired with the device by navigating to the IIO device (finding the path to the device took a lot more work than I'd like to admit) and reading in the `in_intensity_clear_raw` file:
+            </p>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+               max@surface ~> cat sys/bus/iio/devices/iio:device0/in_intensity_clear_raw
+                  33
+            </pre>
+            <p>
+              The joy I felt seeing that file exist and the output was monumental. I had something to work with!
+            </p>
+            <p>
+              I wasn't done yet though — GNOME still didn't show me an option to automatically adjust the screen brightness. After someone else verified they also had the device loaded with the modified driver but not in GNOME I determined the problem was somewhere in iio-sensor-proxy. I cloned the iio-sensor-proxy repository and started digging.
+            </p>
+            <p>
+              The first thing I always do when I clone a new repo is expand and quickly look over every folder (assuming the repo is a reasonable size) and that served me well here. I found the following file `80-iio-sensor-proxy.rules`:
+            </p>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+              # iio-sensor-proxy
+              # IIO sensor to D-Bus proxy
+              
+              ACTION=="remove", GOTO="iio_sensor_proxy_end"
+              
+              # Set the sensor type for all the types we recognise
+              SUBSYSTEM=="hwmon", TEST=="light", ENV{IIO_SENSOR_PROXY_TYPE}+="hwmon-als"
+              SUBSYSTEM=="iio", TEST=="in_accel_x_raw", TEST=="in_accel_y_raw", TEST=="in_accel_z_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-accel"
+              SUBSYSTEM=="iio", TEST=="scan_elements/in_accel_x_en", TEST=="scan_elements/in_accel_y_en", TEST=="scan_elements/in_accel_z_en", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-buffer-accel"
+              SUBSYSTEM=="iio", TEST=="scan_elements/in_rot_from_north_magnetic_tilt_comp_en", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-buffer-compass"
+              SUBSYSTEM=="iio", TEST=="in_illuminance_input", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-als"
+              SUBSYSTEM=="iio", TEST=="in_illuminance0_input", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-als"
+              SUBSYSTEM=="iio", TEST=="in_illuminance_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-als"
+              SUBSYSTEM=="iio", TEST=="scan_elements/in_intensity_both_en", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-buffer-als"
+              SUBSYSTEM=="iio", TEST=="in_proximity_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-proximity"
+              SUBSYSTEM=="input", ENV{ID_INPUT_ACCELEROMETER}=="1", ENV{IIO_SENSOR_PROXY_TYPE}+="input-accel"
+              
+              ENV{IIO_SENSOR_PROXY_TYPE}=="", GOTO="iio_sensor_proxy_end"
+              
+              # We got here because we have a sensor type, which means we need the service
+              TAG+="systemd", ENV{SYSTEMD_WANTS}+="iio-sensor-proxy.service"
+            </pre>
+            <p>
+              As you might be able to figure out, each TEST file is checked for existence and is used to determine whether or not the device should be used by iio-sensor-proxy.
+            </p>
+            <p>
+              I hadn't seen any of the seemingly relevant files, in
+              <em>
+                illuminance
+              </em>
+              *, so I added my own line:
+            </p>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+              SUBSYSTEM=="iio", TEST=="in_intensity_clear_raw", ENV{IIO_SENSOR_PROXY_TYPE}+="iio-poll-als"
+            </pre>
+            <p>
+              After another small iio-sensor-proxy change and running again the device was now discovered by iio-sensor-proxy! The full merge request can be seen
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/-/merge_requests/319" rel="noopener noreferrer" tabindex="0" target="_blank">
+                here
+              </a>
+              . The option appeared in GNOME and I now have automatic adjusting brightness!
+            </p>
+            <p>
+              It kind of sucks though and isn't very consistent. As it turns out, intensity_clear != illuminance, which is what most programs expect from ambient light sensors, so I need to figure out and perform some math in iio-sensor-proxy to translate the RGBC values to lux.
+            </p>
+            <p>
+              If you've made it this far (or are here to get the code yourself), the modified driver (with basic proximity sensing support too) can be found here:
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://github.com/maxleiter/MSHW0184" rel="noopener noreferrer" tabindex="0" target="_blank">
+                https://github.com/maxleiter/MSHW0184
+              </a>
+              .
+            </p>
+            <p>
+              Major thanks to everyone that helped me in the ##linux-surface IRC channel. It was great to finally get a little low-level with Linux.
+            </p>
+            <hr>
+            <p>
+              *This post was originally written on the old maxleiter.com, and formatting has slightly adjusted
+            </p>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script id="__islands" type="application/json">
+      {"desktop":"/_assets/island.desktop.3B33D6HU.js","file-tree":"/_assets/island.file-tree.NTJ3EU45.js","palette":"/_assets/island.palette.N3VUTFBB.js","shot-grid":"/_assets/island.shot-grid.X2HSHAGA.js"}
+    </script>
+    <script src="/_assets/runtime.35VRSIQ3.js" type="module">
+    </script>
+    <script defer="" src="/_vercel/insights/script.js">
+    </script>
+  </body>
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html data-theme="dark" lang="en" style="color-scheme:dark">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#000000" name="theme-color">
+    <title>
+      Per-directory terminal colors in fish shell | Max Leiter
+    </title>
+    <meta content="Short-form thoughts, code snippets, and tips." name="description">
+    <meta content="noindex, nofollow" name="robots">
+    <meta content="noindex, nofollow" name="googlebot">
+    <link href="https://maxleiter.com/notes/fish-directory-colors" rel="canonical">
+    <link href="https://maxleiter.com/feed.xml" rel="alternate" type="application/rss+xml">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="Short-form thoughts, code snippets, and tips." property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="630" property="og:image:height">
+    <meta content="Max Leiter's site" property="og:image:alt">
+    <meta content="article" property="og:type">
+    <meta content="2026-04-05T07:00:00.000Z" property="article:published_time">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="Short-form thoughts, code snippets, and tips." name="twitter:description">
+    <meta content="https://maxleiter.com/opengraph-image" name="twitter:image">
+    <meta content="Max Leiter's site" name="twitter:image:alt">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="630" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+    <link as="font" crossorigin="" href="/_assets/GeistSans-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <link as="font" crossorigin="" href="/_assets/GeistMono-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <style>
+      /* css */
+    </style>
+    <script>
+      try{var t=localStorage.theme||'system',d=document.documentElement,e=t=='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;d.dataset.theme=e;d.style.colorScheme=e}catch(_){}
+    </script>
+  </head>
+  <body>
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto" style="view-transition-name:note-fish-directory-colors">
+          <div class="mb-1">
+            <time class="font-mono text-sm" datetime="2026-04-05T07:00:00.000Z" style="color:var(--gray)">
+              Apr 5, 2026
+            </time>
+            <span class="font-mono text-xs ml-4 capitalize" style="color:var(--gray)">
+              note
+            </span>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            Per-directory terminal colors in fish shell
+          </h1>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <p>
+              My terminal background color changes based on the current directory. It's a small touch that makes it easy to tell which project I'm in at a glance, which is especially useful when juggling AI agents.
+            </p>
+            <p>
+              It works via a custom fish function called
+              <code>
+                _color_for_dir
+              </code>
+              , which:
+            </p>
+            <ol>
+              <li>
+                Hashes the current
+                <code>
+                  $PWD
+                </code>
+              </li>
+              <li>
+                Maps the hash to a hue (0-359)
+              </li>
+              <li>
+                Converts it to a dark RGB color
+              </li>
+              <li>
+                Sends an
+                <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://invisible-island.net/xterm/ctlseqs/ctlseqs.html" rel="noopener noreferrer" tabindex="0" target="_blank">
+                  OSC 11
+                </a>
+                escape sequence to change the terminal background
+              </li>
+            </ol>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+              # Hash the directory name to a hue
+              set -l hash (echo -n "$PWD" | md5 | tr -d 'a-f ' | cut -c1-8)
+              set -l hue (math "$hash % 360")
+              
+              # ... HSL to RGB conversion ...
+              
+              printf '\e]11;#%02x%02x%02x\a' $ri $gi $bi
+            </pre>
+            <p>
+              It's deterministic, so each directory always gets the same color. The function is triggered on startup and on every
+              <code>
+                cd
+              </code>
+              via a
+              <code>
+                --on-variable PWD
+              </code>
+              event listener.
+            </p>
+            <p>
+              It also skips VS Code's integrated terminal because I generally know what projects I have open
+            </p>
+            <p>
+              Full code:
+            </p>
+            <details>
+              <summary>
+                Click to expand
+              </summary>
+              <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+                function _claude_color_for_dir
+                    # Skip in VS Code's integrated terminal
+                    if test "$TERM_PROGRAM" = vscode
+                        return
+                    end
+                
+                    # Hash the directory name to a hue using MD5 for better distribution
+                    set -l hash (echo -n "$PWD" | md5 | tr -d 'a-f ' | cut -c1-8)
+                    set -l hue (math "$hash % 360")
+                
+                    # Convert hue to a dark but visible RGB (HSL with S=0.7, L=0.18)
+                    set -l s 0.7
+                    set -l l 0.18
+                    set -l c (math "$s * (1 - abs(2 * $l - 1))")
+                    set -l h (math "$hue / 60")
+                    set -l x (math "$c * (1 - abs($h % 2 - 1))")
+                    set -l m (math "$l - $c / 2")
+                
+                    set -l r 0
+                    set -l g 0
+                    set -l b 0
+                    set -l sector (math "floor($h)")
+                
+                    if test $sector -le 0
+                        set r $c; set g $x
+                    else if test $sector -le 1
+                        set r $x; set g $c
+                    else if test $sector -le 2
+                        set g $c; set b $x
+                    else if test $sector -le 3
+                        set g $x; set b $c
+                    else if test $sector -le 4
+                        set r $x; set b $c
+                    else
+                        set r $c; set b $x
+                    end
+                
+                    set -l ri (math "round(($r + $m) * 255)")
+                    set -l gi (math "round(($g + $m) * 255)")
+                    set -l bi (math "round(($b + $m) * 255)")
+                
+                    printf '\e]11;#%02x%02x%02x\a' $ri $gi $bi
+                end
+              </pre>
+            </details>
+          </div>
+        </article>
+      </main>
+    </div>
+    <script id="__islands" type="application/json">
+      {"desktop":"/_assets/island.desktop.3B33D6HU.js","file-tree":"/_assets/island.file-tree.NTJ3EU45.js","palette":"/_assets/island.palette.N3VUTFBB.js","shot-grid":"/_assets/island.shot-grid.X2HSHAGA.js"}
+    </script>
+    <script src="/_assets/runtime.35VRSIQ3.js" type="module">
+    </script>
+    <script defer="" src="/_vercel/insights/script.js">
+    </script>
+  </body>
+</html>

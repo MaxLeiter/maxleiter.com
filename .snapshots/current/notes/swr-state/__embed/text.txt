@@ -1,0 +1,33 @@
+Mar 30, 2024note
+SWR for more than fetching
+SWR for state management
+SWR is a great library for data fetching in React.
+It looks like this:
+import useSWR from 'swr'
+export function MyComponent() {
+const { data, error } = useSWR<string>('/api/data', fetcher, {
+refreshInterval: 1000,
+fallbackData: { name: 'swr' },
+})
+}
+But my favorite use for it is local state management.
+Here's an example of how I use it for modals and dialogs:
+import useSWR, { mutate } from 'swr'
+export function useModal() {
+const { data: isVisible, mutate: setVisible } = useSWR<boolean>(
+'state:modal',
+{
+fallbackData: false,
+},
+)
+return {
+isVisible,
+setVisible,
+}
+}
+// For when you can't use hooks
+export const mutateModal = (isVisible) => {
+mutate('state:modal', isVisible)
+}
+Any hook call with that same `state:modal` key will receive the same data and re-render when it changes.
+It's a good replacement for other global state solutions or context.

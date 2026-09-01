@@ -1,0 +1,61 @@
+~
+/notes
+/fish-directory-colors
+✕
+Apr 5, 2026note
+Per-directory terminal colors in fish shell
+My terminal background color changes based on the current directory.
+It's a small touch that makes it easy to tell which project I'm in at a glance, which is
+especially useful when juggling AI agents.
+It works via a custom fish function called _color_for_dir, which:
+Hashes the current $PWD
+Maps the hash to a hue (0-359)
+Converts it to a dark RGB color
+Sends an OSC 11 escape sequence to change the terminal background
+# Hash the directory name to a hue
+set -l hash (echo -n "$PWD" | md5 | tr -d 'a-f ' | cut -c1-8)
+set -l hue (math "$hash % 360")
+# ... HSL to RGB conversion ...
+printf '\e]11;#%02x%02x%02x\a' $ri $gi $bi
+It's deterministic, so each directory always gets the same color.
+The function is triggered on startup and on every cd via a --on-variable PWD event listener.
+It also skips VS Code's integrated terminal because I generally know what projects I have open
+Full code:
+Click to expand
+function _claude_color_for_dir
+# Skip in VS Code's integrated terminal
+if test "$TERM_PROGRAM" = vscode
+return
+end
+# Hash the directory name to a hue using MD5 for better distribution
+set -l hash (echo -n "$PWD" | md5 | tr -d 'a-f ' | cut -c1-8)
+set -l hue (math "$hash % 360")
+# Convert hue to a dark but visible RGB (HSL with S=0.7, L=0.18)
+set -l s 0.7
+set -l l 0.18
+set -l c (math "$s * (1 - abs(2 * $l - 1))")
+set -l h (math "$hue / 60")
+set -l x (math "$c * (1 - abs($h % 2 - 1))")
+set -l m (math "$l - $c / 2")
+set -l r 0
+set -l g 0
+set -l b 0
+set -l sector (math "floor($h)")
+if test $sector -le 0
+set r $c; set g $x
+else if test $sector -le 1
+set r $x; set g $c
+else if test $sector -le 2
+set g $c; set b $x
+else if test $sector -le 3
+set g $x; set b $c
+else if test $sector -le 4
+set r $x; set b $c
+else
+set r $c; set b $x
+end
+set -l ri (math "round(($r + $m) * 255)")
+set -l gi (math "round(($g + $m) * 255)")
+set -l bi (math "round(($b + $m) * 255)")
+printf '\e]11;#%02x%02x%02x\a' $ri $gi $bi
+end

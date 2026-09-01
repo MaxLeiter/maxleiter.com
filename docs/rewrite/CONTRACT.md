@@ -188,8 +188,11 @@ All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:
   `handle: error` -> `/404`, `images` block with REGEX remotePatterns for the
   blob host, `formats` avif/webp, `sizes` [640,828,1200,1920], `qualities` [75]).
   Also write root `vercel.json` `{ "$schema": ..., "framework": null,
-  "buildCommand": "bun run build.ts", "installCommand": "pnpm install" }` BUT
-  do not remove or alter `next.config.mjs` (cutover agent does).
+  "buildCommand": "node scripts/build.mjs" }`. NEVER set `installCommand`:
+  a bare `pnpm install` override makes Vercel use pnpm 6 (report 03 §8.7).
+  `scripts/build.mjs` esbuild-bundles `build.ts` and runs it under Node 24
+  (`engines.node` = 24.x); `bun run build.ts` is the local path. Do not remove
+  or alter `next.config.mjs` (cutover agent does).
 - `images.tsx` `<Img src width height alt sizes?>`: emits `/_vercel/image?url=&w=&q=75`
   src + srcset for widths in `[640,828,1200,1920]`, `loading="lazy"`,
   `decoding="async"`. Used by the MDX `img`/`Image` components and the homepage
@@ -207,3 +210,21 @@ All take `ctx: BuildContext` and write into `ctx.staticDir` or `ctx.outDir`:
 - Phase 2/3: per-page JS budget: content pages <= runtime only; homepage <= 35KB brotli.
 - Phase 4: `vercel build` (CLI) succeeds from the repo root and `vercel deploy --prebuilt`
   preview passes the checklist in `04-architecture-design.md` §7 Phase 4.
+
+## Decisions log
+
+- 2026-08-31 Titles: posts render `<post title> | Max Leiter`; notes render
+  `<note title> | Max Leiter` (baseline gave every note "Notes | Max Leiter").
+  Index/static page titles match the baseline exactly. Deliberate deviation.
+- 2026-08-31 Descriptions: posts with no/empty description emit NO description
+  tags (matches baseline). Notes without one fall back to
+  "Short-form thoughts, code snippets, and tips.", never the site default.
+- 2026-08-31 Image preloads: React 19's automatic `<link rel=preload as=image>`
+  is dropped. The first `<Img>` in an article renders eager +
+  `fetchpriority="high"`; the rest lazy.
+- 2026-08-31 Tweets: rendered at build from committed JSON in
+  `app/data/tweets/<id>.json` via react-tweet's presentational components,
+  full card incl. source link. Missing cache + failed fetch fails the build.
+- 2026-08-31 Extension-less imports everywhere under `framework/` and `app/`;
+  `tools/` may use `.ts` extensions (runs unbundled). `allowImportingTsExtensions` on.
+- 2026-08-31 A failed import of `framework/platform.ts` is fatal in `build.ts`.

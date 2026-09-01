@@ -1,0 +1,8 @@
+{
+  "blocks": [
+    "import * as schema from './schema'\nexport async function updateThing(id: string, title: string) {\nreturn db\n.update(schema.thing)\n.set({\nmetadata: sql`COALESCE(${schema.thing.metadata}, '{}')::jsonb || ${JSON.stringify({ title })}::jsonb`,\n})\n.where(eq(schema.thing.id, id))\n}"
+  ],
+  "occurrences": [
+    2
+  ]
+}

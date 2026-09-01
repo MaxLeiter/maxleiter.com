@@ -1,0 +1,10 @@
+Jun 6, 2024note
+Set your default directory in VS Code's open dialog
+This is my workflow for opening a project in VS Code:
+Open an empty window of VS Code
+Hit cmd+O
+Navigate to my `~/Documents/...` directory
+Hit enter
+In my opinion, that's a few too many steps. I've made it a little better by
+changing the `files.dialog.defaultPath` setting (added almost exactly one year ago).
+Hope this helps.

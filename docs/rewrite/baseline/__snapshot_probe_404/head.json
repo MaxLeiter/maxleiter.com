@@ -23,6 +23,12 @@
       "text": "(inline css)"
     },
     {
+      "tag": "title",
+      "attrs": {},
+      "text": "404: This page could not be found.",
+      "key": "title"
+    },
+    {
       "tag": "meta",
       "attrs": {
         "content": "noindex",
@@ -37,12 +43,6 @@
         "name": "next-size-adjust"
       },
       "key": "meta[name=next-size-adjust]"
-    },
-    {
-      "tag": "title",
-      "attrs": {},
-      "text": "404: This page could not be found.",
-      "key": "title"
     },
     {
       "tag": "meta",

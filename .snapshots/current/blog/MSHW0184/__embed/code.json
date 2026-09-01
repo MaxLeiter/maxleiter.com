@@ -1,0 +1,16 @@
+{
+  "blocks": [
+    "static const struct i2c_device_id apds9960_id[] = {\n{ \"apds9960\", 0 },\n+ { \"MSHW0184, 0 }\n{}\n}",
+    "+ static const struct acpi_device_id apds9960_acpi_match[] = {\n+ { \"MSHW0184\" },\n+ { }\n+};\n+ MODULE_DEVICE_TABLE(acpi, apds9960_acpi_match);\nstatic struct i2c_driver apds9960_driver = {\n.driver = {\n.name = APDS9960_DRV_NAME,\n.of_match_table = apds9960_of_match,\n.pm = &apds9960_pm_ops,\n+ .acpi_match_table = apds9960_acpi_match,\n},\n.probe = apds9960_probe,\n.remove = apds9960_remove",
+    "max@surface ~> cat sys/bus/iio/devices/iio:device0/in_intensity_clear_raw\n33",
+    "# iio-sensor-proxy\n# IIO sensor to D-Bus proxy\nACTION==\"remove\", GOTO=\"iio_sensor_proxy_end\"\n# Set the sensor type for all the types we recognise\nSUBSYSTEM==\"hwmon\", TEST==\"light\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"hwmon-als\"\nSUBSYSTEM==\"iio\", TEST==\"in_accel_x_raw\", TEST==\"in_accel_y_raw\", TEST==\"in_accel_z_raw\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"iio-poll-accel\"\nSUBSYSTEM==\"iio\", TEST==\"scan_elements/in_accel_x_en\", TEST==\"scan_elements/in_accel_y_en\", TEST==\"scan_elements/in_accel_z_en\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"iio-buffer-accel\"\nSUBSYSTEM==\"iio\", TEST==\"scan_elements/in_rot_from_north_magnetic_tilt_comp_en\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"iio-buffer-compass\"\nSUBSYSTEM==\"iio\", TEST==\"in_illuminance_input\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"iio-poll-als\"\nSUBSYSTEM==\"iio\", TEST==\"in_illuminance0_input\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"iio-poll-als\"\nSUBSYSTEM==\"iio\", TEST==\"in_illuminance_raw\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"iio-poll-als\"\nSUBSYSTEM==\"iio\", TEST==\"scan_elements/in_intensity_both_en\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"iio-buffer-als\"\nSUBSYSTEM==\"iio\", TEST==\"in_proximity_raw\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"iio-poll-proximity\"\nSUBSYSTEM==\"input\", ENV{ID_INPUT_ACCELEROMETER}==\"1\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"input-accel\"\nENV{IIO_SENSOR_PROXY_TYPE}==\"\", GOTO=\"iio_sensor_proxy_end\"\n# We got here because we have a sensor type, which means we need the service\nTAG+=\"systemd\", ENV{SYSTEMD_WANTS}+=\"iio-sensor-proxy.service\"",
+    "SUBSYSTEM==\"iio\", TEST==\"in_intensity_clear_raw\", ENV{IIO_SENSOR_PROXY_TYPE}+=\"iio-poll-als\""
+  ],
+  "occurrences": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}

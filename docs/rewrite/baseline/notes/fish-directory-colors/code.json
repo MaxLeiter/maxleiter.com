@@ -1,0 +1,10 @@
+{
+  "blocks": [
+    "# Hash the directory name to a hue\nset -l hash (echo -n \"$PWD\" | md5 | tr -d 'a-f ' | cut -c1-8)\nset -l hue (math \"$hash % 360\")\n# ... HSL to RGB conversion ...\nprintf '\\e]11;#%02x%02x%02x\\a' $ri $gi $bi",
+    "function _claude_color_for_dir\n# Skip in VS Code's integrated terminal\nif test \"$TERM_PROGRAM\" = vscode\nreturn\nend\n# Hash the directory name to a hue using MD5 for better distribution\nset -l hash (echo -n \"$PWD\" | md5 | tr -d 'a-f ' | cut -c1-8)\nset -l hue (math \"$hash % 360\")\n# Convert hue to a dark but visible RGB (HSL with S=0.7, L=0.18)\nset -l s 0.7\nset -l l 0.18\nset -l c (math \"$s * (1 - abs(2 * $l - 1))\")\nset -l h (math \"$hue / 60\")\nset -l x (math \"$c * (1 - abs($h % 2 - 1))\")\nset -l m (math \"$l - $c / 2\")\nset -l r 0\nset -l g 0\nset -l b 0\nset -l sector (math \"floor($h)\")\nif test $sector -le 0\nset r $c; set g $x\nelse if test $sector -le 1\nset r $x; set g $c\nelse if test $sector -le 2\nset g $c; set b $x\nelse if test $sector -le 3\nset g $x; set b $c\nelse if test $sector -le 4\nset r $x; set b $c\nelse\nset r $c; set b $x\nend\nset -l ri (math \"round(($r + $m) * 255)\")\nset -l gi (math \"round(($g + $m) * 255)\")\nset -l bi (math \"round(($b + $m) * 255)\")\nprintf '\\e]11;#%02x%02x%02x\\a' $ri $gi $bi\nend"
+  ],
+  "occurrences": [
+    2,
+    2
+  ]
+}

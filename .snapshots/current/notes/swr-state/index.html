@@ -1,0 +1,195 @@
+<!doctype html>
+<html data-theme="dark" lang="en" style="color-scheme:dark">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="#000000" name="theme-color">
+    <title>
+      SWR for more than fetching | Max Leiter
+    </title>
+    <meta content="SWR for state management" name="description">
+    <meta content="index, follow" name="robots">
+    <meta content="index, follow" name="googlebot">
+    <link href="https://maxleiter.com/notes/swr-state" rel="canonical">
+    <link href="https://maxleiter.com/feed.xml" rel="alternate" type="application/rss+xml">
+    <meta content="Max Leiter" property="og:title">
+    <meta content="SWR for state management" property="og:description">
+    <meta content="https://maxleiter.com" property="og:url">
+    <meta content="Max Leiter's website" property="og:site_name">
+    <meta content="en_US" property="og:locale">
+    <meta content="https://maxleiter.com/opengraph-image" property="og:image">
+    <meta content="image/png" property="og:image:type">
+    <meta content="1200" property="og:image:width">
+    <meta content="630" property="og:image:height">
+    <meta content="Max Leiter's site" property="og:image:alt">
+    <meta content="article" property="og:type">
+    <meta content="2024-03-30T07:00:00.000Z" property="article:published_time">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@maxleiter" name="twitter:creator">
+    <meta content="Max Leiter" name="twitter:title">
+    <meta content="SWR for state management" name="twitter:description">
+    <meta content="https://maxleiter.com/opengraph-image" name="twitter:image">
+    <meta content="Max Leiter's site" name="twitter:image:alt">
+    <meta content="1200" name="twitter:image:width">
+    <meta content="630" name="twitter:image:height">
+    <link href="https://maxleiter.com/favicons/favicon.ico" rel="shortcut icon">
+    <link href="/favicon.ico" rel="icon" sizes="48x48" type="image/x-icon">
+    <link as="font" crossorigin="" href="/_assets/GeistSans-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <link as="font" crossorigin="" href="/_assets/GeistMono-subset.&lt;hash>.woff2" rel="preload" type="font/woff2">
+    <style>
+      /* css */
+    </style>
+    <script>
+      try{var t=localStorage.theme||'system',d=document.documentElement,e=t=='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;d.dataset.theme=e;d.style.colorScheme=e}catch(_){}
+    </script>
+  </head>
+  <body>
+    <div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
+      <header class="h-10 border-b border-[var(--border-color)] flex items-center justify-between px-4 select-none sticky top-0 z-10" style="background-color:var(--bg-window-alpha);backdrop-filter:blur(12px)">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm font-mono text-[var(--gray)]">
+          <a class="hover:text-[var(--fg)] transition-colors" href="/">
+            ~
+          </a>
+          <div class="flex items-center gap-2">
+            <span>
+              /
+            </span>
+            <a class="hover:text-[var(--fg)] transition-colors" href="/notes">
+              notes
+            </a>
+          </div>
+          <div class="flex items-center gap-2">
+            <span>
+              /
+            </span>
+            <a class="hover:text-[var(--fg)] transition-colors" href="/notes/swr-state">
+              swr-state
+            </a>
+          </div>
+        </nav>
+        <div class="flex items-center gap-1">
+          <a aria-label="Minimize window" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-black/10 dark:hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" href="/?openPost=swr-state" title="Minimize">
+            <svg fill="none" height="12" viewbox="0 0 16 16" width="12">
+              <rect height="8" stroke="currentColor" stroke-width="1.5" width="8" x="4" y="4">
+              </rect>
+            </svg>
+          </a>
+          <a aria-label="Close SWR for more than fetching" class="text-[var(--gray)] hover:text-[var(--fg)] hover:bg-white/10 w-5 h-5 rounded flex items-center justify-center text-xs transition-colors" href="/">
+            ✕
+          </a>
+        </div>
+      </header>
+      <main class="flex-1 overflow-auto p-6">
+        <article class="max-w-3xl mx-auto" style="view-transition-name:note-swr-state">
+          <div class="mb-1">
+            <time class="font-mono text-sm" datetime="2024-03-30T07:00:00.000Z" style="color:var(--gray)">
+              Mar 30, 2024
+            </time>
+            <span class="font-mono text-xs ml-4 capitalize" style="color:var(--gray)">
+              note
+            </span>
+          </div>
+          <h1 class="text-3xl font-mono font-bold mb-2! mt-2! leading-10" style="color:var(--article-color)">
+            SWR for more than fetching
+          </h1>
+          <p class="font-mono text-base mb-4 mt-0!" style="color:var(--article-color)">
+            SWR for state management
+          </p>
+          <div class="prose prose-sm max-w-none dark:prose-invert prose-headings:font-mono prose-p:leading-relaxed prose-a:no-underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:border prose-img:rounded-lg prose-img:border prose-strong:font-semibold" style="--prose-headings:var(--article-color);--prose-body:var(--article-color);--prose-links:var(--link);--prose-code:var(--article-color);--prose-pre-bg:var(--lighter-gray);--prose-pre-border:var(--border-color);--prose-blockquote-border:var(--light-gray);--prose-blockquote-text:var(--gray);--prose-img-border:var(--border-color)">
+            <p>
+              <a class="&lt;cssmod>_link &lt;cssmod>_underline" href="https://swr.vercel.app/" rel="noopener noreferrer" tabindex="0" target="_blank">
+                SWR
+              </a>
+              is a great library for data fetching in React. It looks like this:
+            </p>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+              import useSWR from 'swr'
+              
+              export function MyComponent() {
+                const { data, error } = useSWR<string>('/api/data', fetcher, {
+                  refreshInterval: 1000,
+                  fallbackData: { name: 'swr' },
+                })
+              }
+            </pre>
+            <p>
+              But my favorite use for it is local state management.
+            </p>
+            <p>
+              Here's an example of how I use it for modals and dialogs:
+            </p>
+            <pre class="shiki shiki-themes material-theme-palenight solarized-dark __s-191bwv" tabindex="0">
+              import useSWR, { mutate } from 'swr'
+              
+              export function useModal() {
+                const { data: isVisible, mutate: setVisible } = useSWR<boolean>(
+                  'state:modal',
+                  {
+                    fallbackData: false,
+                  },
+                )
+              
+                return {
+                  isVisible,
+                  setVisible,
+                }
+              }
+              
+              // For when you can't use hooks
+              export const mutateModal = (isVisible) => {
+                mutate('state:modal', isVisible)
+              }
+            </pre>
+            <p>
+              Any hook call with that same `state:modal` key will receive the same data and re-render when it changes. It's a good replacement for other global state solutions or context.
+            </p>
+          </div>
+        </article>
+      </main>
+      <div data-island="palette" data-on="interaction" hidden="">
+        <div aria-label="Search" aria-modal="true" class="fixed inset-0 backdrop-blur-sm z-[9999] flex items-start justify-center pt-20 px-4" role="dialog" style="background-color:rgba(0, 0, 0, 0.7)">
+          <div class="w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden" style="background-color:var(--bg);border-color:var(--border-color);border-width:1px">
+            <div class="border-b px-4 py-3" style="border-color:var(--border-color)">
+              <input aria-activedescendant="palette-option-0" aria-autocomplete="list" aria-controls="palette-results" aria-expanded="true" aria-label="Search" autocomplete="off" class="w-full bg-transparent outline-none font-mono" data-palette-input="true" placeholder="Search posts, projects, or navigate..." role="combobox" spellcheck="false" style="font-size:16px;color:var(--fg);opacity:0.9;--placeholder-color:var(--fg)" type="text" value="">
+            </div>
+            <div class="max-h-96 overflow-y-auto px-2 py-2">
+              <div aria-label="Results" data-palette-results="true" id="palette-results" role="listbox">
+                <button aria-label="Navigation: Blog" aria-selected="true" class="w-full text-left px-4 py-3 rounded transition-colors font-mono" id="palette-option-0" role="option" style="background-color:rgba(255, 255, 255, 0.15);color:var(--fg)" tabindex="-1" type="button">
+                  <div class="text-xs font-mono uppercase mb-1" style="color:var(--gray)">
+                    Navigation
+                  </div>
+                  <div style="color:var(--fg);opacity:0.9">
+                    Blog
+                  </div>
+                </button>
+                <button aria-label="Navigation: Projects" aria-selected="false" class="w-full text-left px-4 py-3 rounded transition-colors font-mono" id="palette-option-1" role="option" style="background-color:transparent;color:var(--fg)" tabindex="-1" type="button">
+                  <div class="text-xs font-mono uppercase mb-1" style="color:var(--gray)">
+                    Navigation
+                  </div>
+                  <div style="color:var(--fg);opacity:0.9">
+                    Projects
+                  </div>
+                </button>
+                <button aria-label="Navigation: About" aria-selected="false" class="w-full text-left px-4 py-3 rounded transition-colors font-mono" id="palette-option-2" role="option" style="background-color:transparent;color:var(--fg)" tabindex="-1" type="button">
+                  <div class="text-xs font-mono uppercase mb-1" style="color:var(--gray)">
+                    Navigation
+                  </div>
+                  <div style="color:var(--fg);opacity:0.9">
+                    About
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script id="__islands" type="application/json">
+      {"desktop":"/_assets/island.desktop.3B33D6HU.js","file-tree":"/_assets/island.file-tree.NTJ3EU45.js","palette":"/_assets/island.palette.N3VUTFBB.js","shot-grid":"/_assets/island.shot-grid.X2HSHAGA.js"}
+    </script>
+    <script src="/_assets/runtime.35VRSIQ3.js" type="module">
+    </script>
+    <script defer="" src="/_vercel/insights/script.js">
+    </script>
+  </body>
+</html>

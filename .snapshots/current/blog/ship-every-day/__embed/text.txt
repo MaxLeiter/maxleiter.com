@@ -1,0 +1,19 @@
+Jun 10, 2024
+Ship something every day
+Edit: A better title would've been "commit every day that you work". I don't mean you should work on weekends or not take time off, and
+whatever you work on doesn't need to "ship to prod".
+I don't feel particularly qualified to give advice (I blame imposter syndrome),
+but I do have one tip to share that I think has been useful for me.
+It applies both to professional software dev and personal projects.
+You probably guessed it from the title: ship something every day.
+It doesn't need to be a major feature or even a bug fix. It just needs to be something you can point to.
+Why? A few reasons:
+The dopamine rush of your code being shipped
+Your team sees you're working
+There's more to this than just performance reviews; with remote work, it's easy for you and co-workers to feel isolated.
+It encourages incremental work. Your future self and co-workers will thank you
+Your git commit streak looks good
+Yes, in an ideal world this doesn't matter. But I'm sure people like recruiters look at GitHub profiles, and an empty page isn't a great look. This is a benefit of the habit, not necessarily a reason to start it.
+The satisfaction and mental benefits of getting something done.
+Note:
+People mentioned it seems like I'm advocating for you to push code every day. My point is that you should contribute something: docs, triage, whatever. For me, it's usually code.

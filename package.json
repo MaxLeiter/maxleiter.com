@@ -8,10 +8,19 @@
     "build-next": "next build",
     "build-rss": "node scripts/rss.mts",
     "analyze": "next experimental-analyze",
-    "start": "next start"
+    "start": "next start",
+    "snapshot": "bun run tools/snapshot.ts",
+    "verify": "bun run tools/diff-html.ts",
+    "gate": "bun run build.ts && bun run tools/snapshot.ts --dir .vercel/output/static --out .cache/snapshot-current --raw .cache/current-raw && bun run tools/diff-html.ts",
+    "build:bespoke": "bun run build.ts",
+    "build:bespoke:node": "node scripts/build.mjs",
+    "dev:bespoke": "bun run framework/dev.ts"
   },
   "pre-commit": "lint",
   "license": "MIT",
+  "engines": {
+    "node": "24.x"
+  },
   "browserslist": [
     "chrome 111",
     "edge 111",
@@ -59,6 +68,7 @@
     "marked": "16.4.1",
     "oxfmt": "^0.63.0",
     "oxlint": "^1.78.0",
+    "parse5": "^8.0.1",
     "rehype-autolink-headings": "7.1.0",
     "rehype-slug": "6.0.0",
     "remark-gfm": "4.0.1",
