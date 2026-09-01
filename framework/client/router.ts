@@ -364,12 +364,15 @@ export async function navigate(
       resetLinkObserver()
       swapHead(doc)
       document.body.replaceChildren(...doc.body.childNodes)
-      // A <video> whose <source> children were attached inside the inert
-      // DOMParser document never ran source selection, and Firefox does not
-      // re-run it on adoption: the player shows "No video with supported
-      // format" until load() is called. Chrome takes the native path and never
-      // swaps, so this is the one Firefox-specific line in the router.
-      for (const video of document.body.querySelectorAll('video')) video.load()
+      // A <video> parsed inside the inert DOMParser document does not get a
+      // working load when adopted in Firefox ("No video with supported
+      // format"), and calling load() on it aborts that first attempt, which
+      // leaves "playback aborted due to a network error" in the controls even
+      // though the retry plays. A clone created here, in the live document,
+      // runs source selection exactly once on insertion.
+      for (const video of document.body.querySelectorAll('video')) {
+        video.replaceWith(video.cloneNode(true))
+      }
       if (push) history.pushState({ scroll: 0 }, '', url)
       hooks.setup()
       observeLinks()
