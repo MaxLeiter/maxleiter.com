@@ -42,16 +42,20 @@ export function AboutContent() {
             This site
           </h2>
           <p>
-            This site is built on{' '}
+            This site was previously built with{' '}
             <a
               className={LINK}
               href="https://nextjs.org"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Next.js 16
-            </a>{' '}
-            with the App Router and is deployed via{' '}
+              Next.js
+            </a>
+            , but has been replaced with a{' '}
+            <a className={LINK} href="/blog/thank-u-next">
+              vibe-coded framework
+            </a>
+            . It's deployed via{' '}
             <a
               className={LINK}
               href="https://vercel.com/home"
@@ -59,8 +63,8 @@ export function AboutContent() {
               rel="noopener noreferrer"
             >
               Vercel
-            </a>
-            . You can view the source on{' '}
+            </a>{' '}
+            and you can view the source on{' '}
             <a
               className={LINK}
               href="https://github.com/maxleiter/maxleiter.com"
