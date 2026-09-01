@@ -60,6 +60,7 @@ export const VIEW_TRANSITION_CSS = `
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:180ms}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+html.vt-local{view-transition-name:none}
 `.trim()
 
 export interface Fonts {

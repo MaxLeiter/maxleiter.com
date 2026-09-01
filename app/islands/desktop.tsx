@@ -235,13 +235,21 @@ function withTransition(update: () => void): void {
     update()
     return
   }
+  // Only the window frame takes part. Without this the root also gets a
+  // snapshot and a 180ms cross-fade on every open and close, which is wasted
+  // work for a change confined to one window and flickered visibly in Firefox
+  // (the whole page, backdrop blur included, is rasterised and swapped back).
+  // `.vt-local` sets `view-transition-name: none` on the root; see render.tsx.
+  const root = document.documentElement
+  root.classList.add('vt-local')
   const transition = document.startViewTransition(() => flushSync(update))
   // A transition the browser skips -- a background tab, a second transition
   // starting on top of this one -- rejects these. The window still opens,
   // because the update callback runs either way, so the rejection is noise.
   const ignore = () => undefined
+  const done = () => root.classList.remove('vt-local')
   transition.ready.catch(ignore)
-  transition.finished.catch(ignore)
+  transition.finished.then(done, done)
   transition.updateCallbackDone.catch(ignore)
 }
 

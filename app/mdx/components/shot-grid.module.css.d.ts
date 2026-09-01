@@ -4,7 +4,7 @@ declare const styles: {
   readonly counter: string
   readonly grid: string
   readonly lightbox: string
-  readonly 'lightbox-in': string
+  readonly "lightbox-in": string
   readonly lightboxCaption: string
   readonly lightboxFigure: string
   readonly lightboxMedia: string
