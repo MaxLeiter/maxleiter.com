@@ -9,6 +9,19 @@ export interface Lab {
 
 const LABS: Lab[] = [
   {
+    id: 'md-viewer',
+    name: 'md-viewer',
+    description:
+      'A minimal, native-feeling markdown editor and viewer for macOS',
+    url: 'https://github.com/MaxLeiter/md-viewer',
+  },
+  {
+    id: 'vcup',
+    name: 'vcup',
+    description: 'A dead-simple CLI for uploading files to Vercel Blob',
+    url: 'https://github.com/MaxLeiter/vcup',
+  },
+  {
     id: 'HFSViewer',
     name: 'HFS Viewer',
     description: 'A Swift UI app for opening HFS disk images',
