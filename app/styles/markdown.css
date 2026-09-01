@@ -152,6 +152,10 @@ article pre {
   line-height: 1.8;
   padding: 1rem;
   font-size: 14px;
+  /* rem, not em: the generic `article > * + *` gap is 1em, which on this
+     14px block is 14px while the paragraph after it gets 1em of body text.
+     A fixed margin on both sides collapses with the neighbours evenly. */
+  margin-block: 1.5rem;
 }
 
 /* if article pre has a div above it, remove the border radius up top */
