@@ -47,6 +47,8 @@ const REMOTE_PATTERNS = [
  * `search` is deliberately unconstrained: the MDX image convention encodes
  * intrinsic dimensions as `?w=`/`?h=` on the source URL.
  */
+const PAGE_CACHE_CONTROL = 'public, max-age=60, stale-while-revalidate=86400'
+
 const LOCAL_PATTERNS = [{ pathname: '^/(mc|_assets|favicons)/.*$' }]
 
 function baseRoutes(): Route[] {
@@ -57,6 +59,16 @@ function baseRoutes(): Route[] {
       {
         source: `${ASSET_PREFIX}(.*)`,
         headers: [{ key: 'cache-control', value: IMMUTABLE_CACHE_CONTROL }],
+      },
+      // Everything that is not a hashed asset: pages, partials, the feed.
+      // Vercel's default is `max-age=0, must-revalidate`, which costs a full
+      // round trip before anything renders on every repeat visit. A minute of
+      // freshness covers back/forward and quick re-navigation everywhere, and
+      // Chrome and Firefox serve a stale copy instantly for a day while they
+      // refresh it in the background, so a deploy shows up one page late.
+      {
+        source: `/((?!${ASSET_PREFIX.slice(1)}).*)`,
+        headers: [{ key: 'cache-control', value: PAGE_CACHE_CONTROL }],
       },
     ],
   })
