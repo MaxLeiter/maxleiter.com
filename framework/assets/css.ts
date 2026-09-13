@@ -34,14 +34,16 @@ export interface CssResult {
 /**
  * The sources whose utilities belong to the desktop fragment rather than the
  * base sheet. Everything here renders only on the homepage: the window
- * manager, its chrome, the icon grid, and the window class strings.
- * `window-toolbar` is NOT here, because every page renders it.
+ * manager, its chrome, and the icon grid. `window-toolbar` is NOT here,
+ * because every page renders it -- and neither is `app/lib/window-styles.ts`,
+ * which looks desktop-only but is where that toolbar's class strings live:
+ * excluding it shipped every content page a toolbar with no height or
+ * padding.
  */
 const DESKTOP_SOURCES = [
   'app/islands/desktop.tsx',
   'app/islands/desktop',
   'app/components/static/desktop-icons.tsx',
-  'app/lib/window-styles.ts',
 ]
 
 function tailwindBin(root: string): string {

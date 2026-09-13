@@ -47,6 +47,13 @@ function findRoot(from: string): string {
   }
 }
 
+// The one environment variable the build SETS rather than reads. Frontmatter
+// dates ('Sept 7, 2025') parse in the process timezone, and react-tweet
+// renders tweet timestamps in it, so an unpinned build produced different
+// bytes on Vercel/CI (UTC) than locally (Pacific) -- the gate caught it on
+// CI's first run. Pinned to the timezone the committed snapshot was built in.
+process.env.TZ = 'America/Los_Angeles'
+
 const ROOT = findRoot(path.dirname(fileURLToPath(import.meta.url)))
 const CACHE = path.join(ROOT, '.cache')
 

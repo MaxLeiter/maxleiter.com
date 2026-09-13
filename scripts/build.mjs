@@ -7,6 +7,10 @@ import { mkdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
+// Before anything touches Date: build.ts pins this too, but node caches the
+// timezone lazily and this file runs first on Vercel. See build.ts.
+process.env.TZ = 'America/Los_Angeles'
+
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 const outfile = path.join(root, '.cache', 'build', 'build.mjs')
 
