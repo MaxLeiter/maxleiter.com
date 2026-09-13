@@ -4,7 +4,9 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import zlib from 'node:zlib'
 import { createBuildContext } from '../content'
+import { buildClient } from '../assets/client'
 import { prepareFonts } from '../assets/fonts'
 import { formatPlatformResult, runPlatformSteps } from '.'
 import { writeFeeds } from './feeds'
@@ -127,6 +129,27 @@ async function unpublishedSlugs(): Promise<string[]> {
   }
   return slugs
 }
+
+/** Every `.ts`/`.tsx` under `dir`, recursively. */
+async function sourceFiles(dir: string): Promise<string[]> {
+  const found: string[] = []
+  const walk = async (current: string): Promise<void> => {
+    for (const entry of await fs.readdir(current, { withFileTypes: true })) {
+      const full = path.join(current, entry.name)
+      if (entry.isDirectory()) await walk(full)
+      else if (/\.tsx?$/.test(entry.name)) found.push(full)
+    }
+  }
+  await walk(dir)
+  return found
+}
+
+/**
+ * Import and re-export specifiers, with whether each is type-only. Spans
+ * multi-line clauses because `[^'"]` matches newlines.
+ */
+const IMPORT_RE =
+  /^(?:import|export)\s+(type\s+)?(?:[^'"]*?\sfrom\s+)?['"]([^'"]+)['"]/gm
 
 function pngSize(buffer: Buffer): { width: number; height: number } {
   const signature = Buffer.from([
@@ -341,6 +364,59 @@ async function main(): Promise<void> {
     assert.equal(result.fonts.preload.length, 2)
     assert.match(result.fonts.css, /--font-geist-sans/)
     assert.match(result.fonts.css, /--font-geist-mono/)
+  })
+
+  // 8. Source invariants the linter cannot express (oxlint has no
+  // no-restricted-imports), previously enforced by docblocks alone.
+
+  // framework/shared/ may import nothing but node builtins and React types:
+  // the build, the client bundle and tools/ all reach those files.
+  const sharedViolations: string[] = []
+  for (const file of await sourceFiles(
+    path.join(root, 'framework', 'shared'),
+  )) {
+    const source = await fs.readFile(file, 'utf8')
+    for (const match of source.matchAll(IMPORT_RE)) {
+      const [, typeOnly, spec] = match
+      if (spec.startsWith('node:')) continue
+      if (spec === 'react' && typeOnly) continue
+      sharedViolations.push(`${path.relative(root, file)}: '${spec}'`)
+    }
+  }
+  check('framework/shared/ imports only node builtins and React types', () => {
+    assert.deepEqual(sharedViolations, [], sharedViolations.join(', '))
+  })
+
+  // Feature detection, never user-agent sniffing. `navigator.connection` is
+  // fine; the identity surfaces are not.
+  const uaPattern = new RegExp(
+    'navigator\\s*\\.\\s*(userAgent|userAgentData|platform|vendor)',
+  )
+  const uaViolations: string[] = []
+  for (const dir of ['framework', 'app']) {
+    for (const file of await sourceFiles(path.join(root, dir))) {
+      const source = await fs.readFile(file, 'utf8')
+      const hit = uaPattern.exec(source)
+      if (hit) uaViolations.push(`${path.relative(root, file)}: ${hit[0]}`)
+    }
+  }
+  check('no user-agent sniffing in framework/ or app/', () => {
+    assert.deepEqual(uaViolations, [], uaViolations.join(', '))
+  })
+
+  // The runtime rides inlined in every document, which is why it has a size
+  // budget. 1135 B brotli when this was written; the headroom is for small
+  // fixes, and a static import of preact or the router blows straight past it.
+  const client = await buildClient({
+    root,
+    staticDir: ctx.staticDir,
+    islands: [],
+  })
+  const runtimeBrotli = zlib.brotliCompressSync(
+    Buffer.from(client.runtime),
+  ).length
+  check('the inline runtime stays under its 1536 B brotli budget', () => {
+    assert.ok(runtimeBrotli <= 1536, `${runtimeBrotli} B brotli`)
   })
 
   await fs.rm(outDir, { recursive: true, force: true })

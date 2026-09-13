@@ -7,6 +7,7 @@
     "build:bun": "bun run build.ts",
     "check": "tsc --noEmit",
     "lint": "oxlint . && oxfmt --write '**/*.{js,ts,tsx}'",
+    "lint:check": "oxlint . && oxfmt --check '**/*.{js,ts,tsx}'",
     "test": "bun run framework/platform/test.ts",
     "snapshot": "bun run build.ts && bun run tools/snapshot.ts --write",
     "gate": "bun run build.ts && bun run tools/snapshot.ts"

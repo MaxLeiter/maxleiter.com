@@ -1,0 +1,55 @@
+# The gate is the whole safety story of a bespoke framework, and a gate only
+# someone remembers to run is not a gate. This runs everything CLAUDE.md says
+# to run before calling a change done, plus the byte-parity check between the
+# bun and node builds, which is the repo's core determinism claim.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the pinned version from `packageManager` in package.json.
+      - uses: pnpm/action-setup@v4
+
+      # `pnpm test` and `pnpm gate` run under bun; the build itself is
+      # runtime-agnostic and the parity step below proves it.
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm check
+
+      # Not `pnpm lint`: that runs `oxfmt --write`, which mutates the tree.
+      - run: pnpm lint:check
+
+      - run: pnpm test
+
+      # Builds with bun, then compares the output against docs/snapshot.json.
+      - run: pnpm gate
+
+      - name: bun and node builds are byte-identical
+        run: |
+          # -print0: public/mc/images has filenames with spaces.
+          hash_tree() { (cd .vercel/output && find . -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1); }
+          bun_hash=$(hash_tree)
+          pnpm build
+          node_hash=$(hash_tree)
+          echo "bun:  $bun_hash"
+          echo "node: $node_hash"
+          test "$bun_hash" = "$node_hash"

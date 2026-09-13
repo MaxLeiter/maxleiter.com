@@ -402,7 +402,18 @@ tests" and swallows the failure it signals through `process.exitCode`. It checks
 the things a build alone cannot — that a rebuild of the feed, sitemap and search
 index is byte-identical (the `rss` package clock-stamps `lastBuildDate`), that
 the OG PNGs really are 1200x630, that the font subsets actually shrank, and that
-`vercel.json` still pins the install command.
+`vercel.json` still pins the install command. It also enforces three source
+invariants oxlint cannot express (it has no `no-restricted-imports`): the
+`framework/shared/` import rule, no user-agent sniffing anywhere in
+`framework/` or `app/`, and the inline runtime's size budget — 1,536 B brotli,
+against 1,135 B when the budget was set, so a static import of preact or the
+router fails the check instead of quietly riding into every page.
+
+CI (`.github/workflows/ci.yml`) runs `check`, `lint:check` (the `--check` form
+of the format pass, because `pnpm lint` rewrites files), `test` and `gate` on
+every push and pull request, then builds with bun and node and asserts the two
+trees are byte-identical — the determinism claim the whole build rests on,
+checked with real hashes instead of stated in prose.
 
 ## Decisions
 
