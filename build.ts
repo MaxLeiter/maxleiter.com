@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { constants as fsConstants, existsSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -498,6 +499,21 @@ async function main(): Promise<void> {
   ])
   Object.assign(ctx.assets, client.assets)
 
+  // Everything a partial does NOT carry, hashed. The router hard-navigates
+  // when a fetched document's shell-id differs from the running page's, so a
+  // deploy that changes the runtime, the base sheet or the fonts is never
+  // swapped under the old shell. Content-derived, not a build stamp: a
+  // rebuild with an unchanged shell keeps the id, so soft navigation
+  // survives a content-only deploy.
+  const shellId = createHash('sha256')
+    .update(client.runtime)
+    .update('\0')
+    .update(css.css)
+    .update('\0')
+    .update(fonts.css)
+    .digest('hex')
+    .slice(0, 12)
+
   const fragments = await step('css fragments', async () => {
     const all: Fragment[] = []
     for (const sheet of PLAIN_SHEETS) {
@@ -551,6 +567,7 @@ async function main(): Promise<void> {
         css: sheet.css,
         fonts,
         siteUrl: ctx.site.url,
+        shellId,
         runtime: client.runtime,
         // Only this page's islands, so a content page does not carry a map
         // entry for the desktop it will never mount.
@@ -572,6 +589,7 @@ async function main(): Promise<void> {
         css: sheet.css,
         fonts,
         siteUrl: ctx.site.url,
+        shellId,
         islands: Object.fromEntries(
           page.islands
             .filter((name) => client.islands[name])

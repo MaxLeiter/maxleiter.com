@@ -118,6 +118,8 @@ export interface WrapOptions {
   fonts: Fonts
   islands: Record<string, string>
   siteUrl: string
+  /** See `ShellOptions.shellId`; computed by `build.ts` from what it hashes. */
+  shellId: string
 }
 
 /**
@@ -162,6 +164,7 @@ export async function renderFeedHtml(
   return renderPostHtml(post.body, {
     cacheDir: ctx.cacheDir,
     highlighter: await feedHighlighter,
+    siteUrl: ctx.site.url,
   })
 }
 

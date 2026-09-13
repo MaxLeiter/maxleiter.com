@@ -251,8 +251,30 @@ still navigates correctly.
 Executable scripts are stripped from the fetched document before it is adopted:
 the runtime is already running, the theme script has already applied, and
 re-running either would double every listener. `<script type="application/json">`
-survives, because `#__islands` is data. `<html data-theme>` is never touched by a
-swap, because it is viewer state rather than page content.
+and `application/ld+json` survive, because `#__islands` and `#jsonld` are data.
+`<html data-theme>` and `<meta name="theme-color">` are never touched by a
+swap, because they are viewer state rather than page content.
+
+The router owns scroll and focus. `history.scrollRestoration` is `manual`:
+left on `auto`, the browser restores on popstate immediately, against the old
+page's height, and fights the offset the router stashes in `history.state`. A
+fresh navigation scrolls to the URL's `#fragment` target when it has one and
+the top otherwise; a history replay restores its saved offset. After every
+swap the new `<main>` takes focus (`tabindex="-1"`, `preventScroll`), which
+resumes keyboard order on the new page and makes screen readers announce it.
+The newest navigation wins: a call that finds a fresher sequence number
+returns instead of swapping, because a guard that simply dropped the second
+call also dropped popstate and left the address bar disagreeing with the page.
+
+Deploy skew: every document and partial carries `<meta name="shell-id">`, a
+hash of exactly what a partial does not re-send -- the inlined runtime, the
+base sheet and the font CSS. The router hard-navigates when the fetched
+document's id differs from the running page's, so a partial from a newer
+deploy is never swapped under an older shell. The hash is content-derived,
+not a build stamp, so a content-only deploy keeps soft navigation intact.
+The prefetch cache expires entries after five minutes for the same reason:
+it exists to bridge a hover and its click, not to keep a long-lived tab on
+yesterday's page.
 
 Islands are unmounted *before* the body is replaced, and the hydrate wrapper
 returns `() => root.unmount()` to make that possible. Islands register listeners
@@ -290,7 +312,10 @@ size budget.
 - Theme: the server renders `<html data-theme="dark" style="color-scheme:dark">`
   and a ~200 B blocking inline script in `<head>` corrects it from
   `localStorage.theme` or `prefers-color-scheme` before first paint.
-  `[data-theme='light']` is the light selector everywhere.
+  `[data-theme='light']` is the light selector everywhere. The script also
+  corrects `<meta name="theme-color">` (shipped dark, like the document), and
+  the runtime's toggle keeps it in step; the pair of values must match `--bg`
+  in `global.css`.
 
 ## Types
 
@@ -383,6 +408,13 @@ the OG PNGs really are 1200x630, that the font subsets actually shrank, and that
 
 Still-true decisions, newest first. A decision that stops being true should be
 deleted from this list rather than annotated.
+
+**OG and Twitter cards carry the page's own title and URL.** The Next site
+emitted the constant site name as `og:title` and the origin as `og:url` on
+every page, so a shared post rendered as "Max Leiter"; the parity migration
+preserved that faithfully. Fixed on purpose in September 2026, together with
+adding `BlogPosting` JSON-LD (`#jsonld`, article pages only, swapped by the
+router like the page stylesheet).
 
 **One router on every browser; no Speculation Rules native path.** See
 Navigation for what the native path cost and the two browser facts it taught.

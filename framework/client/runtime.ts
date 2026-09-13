@@ -165,7 +165,13 @@ function openPalette(): void {
 }
 
 addEventListener('keydown', (event) => {
-  if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+  // toLowerCase, so Caps Lock ('K') still opens it; shift stays excluded so
+  // Cmd+Shift+K keeps meaning whatever the browser says it means.
+  if (
+    (event.metaKey || event.ctrlKey) &&
+    !event.shiftKey &&
+    event.key.toLowerCase() === 'k'
+  ) {
     event.preventDefault()
     openPalette()
   }
@@ -197,6 +203,11 @@ document.addEventListener('click', (event) => {
     }
     root.dataset.theme = next
     root.style.colorScheme = next
+    // Keep the browser chrome's tint in step. Same pair as THEME_SCRIPT and
+    // `--bg` in global.css.
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', next === 'light' ? '#fff' : '#000000')
     // Open windows iframe same-origin embeds, so their documents are ours to
     // write. Each booted from localStorage before this click and would keep
     // the old theme until reloaded.
@@ -271,6 +282,9 @@ if (!framed) {
     if (!link || (link.target && link.target !== '_self')) return
     if (link.hasAttribute('download') || link.closest('[data-no-router]'))
       return
+    if ((link.getAttribute('rel') || '').split(/\s+/).includes('external')) {
+      return
+    }
     const url = new URL(link.href, location.href)
     if (url.origin !== location.origin || url.hash) return
     event.preventDefault()

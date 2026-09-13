@@ -232,7 +232,7 @@ const feedCompilers = new Map<string, Promise<MdxCompiler>>()
 
 export function renderPostHtml(
   source: string,
-  options: { cacheDir: string; highlighter: Highlighter },
+  options: { cacheDir: string; highlighter: Highlighter; siteUrl: string },
 ): Promise<string> {
   // One compiler for the whole feed, so 32 items share the in-process compile
   // map rather than re-running `run()` per call.
@@ -241,17 +241,33 @@ export function renderPostHtml(
     compiler = createMdxCompiler(options.cacheDir, options.highlighter)
     feedCompilers.set(options.cacheDir, compiler)
   }
-  return compiler.then((c) => c.renderHtml(source, feedComponents))
+  return compiler.then((c) =>
+    c.renderHtml(source, feedComponents(options.siteUrl)),
+  )
 }
 
-const feedComponents: MdxComponents = {
+/**
+ * A feed item travels without an origin: readers resolve `/blog/x` against
+ * themselves or not at all, so every root-relative href and src is made
+ * absolute here. In-page `#fragment` links are left alone.
+ */
+const absolute = (siteUrl: string, url: string | undefined) =>
+  url?.startsWith('/') ? `${siteUrl}${url}` : url
+
+const feedComponents = (siteUrl: string): MdxComponents => ({
   // Feed readers strip most attributes; anything interactive degrades to its
   // children or disappears, which is the right outcome in an RSS body.
   // Every image carries `loading="lazy"`: without it React 19 hoists a
   // `<link rel="preload" as="image">` in front of each one, which is pure noise
   // inside a feed description.
+  a: ({ href, children }: { href?: string; children?: unknown }) =>
+    createElement('a', { href: absolute(siteUrl, href) }, children as never),
   img: ({ src, alt }: { src?: string; alt?: string }) =>
-    createElement('img', { src, alt: alt ?? '', loading: 'lazy' }),
+    createElement('img', {
+      src: absolute(siteUrl, src),
+      alt: alt ?? '',
+      loading: 'lazy',
+    }),
   Note: ({ children }: { children?: unknown }) =>
     createElement('blockquote', null, children as never),
   Details: ({ summary, children }: { summary?: string; children?: unknown }) =>
@@ -271,9 +287,17 @@ const feedComponents: MdxComponents = {
   ShotGrid: ({ children }: { children?: unknown }) =>
     createElement('div', null, children as never),
   Shot: ({ src, alt }: { src?: string; alt?: string }) =>
-    createElement('img', { src, alt: alt ?? '', loading: 'lazy' }),
+    createElement('img', {
+      src: absolute(siteUrl, src),
+      alt: alt ?? '',
+      loading: 'lazy',
+    }),
   Image: ({ src, alt }: { src?: string; alt?: string }) =>
-    createElement('img', { src, alt: alt ?? '', loading: 'lazy' }),
+    createElement('img', {
+      src: absolute(siteUrl, src),
+      alt: alt ?? '',
+      loading: 'lazy',
+    }),
   Tweet: ({ id }: { id?: string }) =>
     createElement(
       'p',
@@ -287,7 +311,7 @@ const feedComponents: MdxComponents = {
   MinecraftInventory: () => null,
   InfoIcon: () => null,
   HomeIcon: () => null,
-}
+})
 
 /**
  * MDX reports through a VFileMessage whose `message` is empty and whose

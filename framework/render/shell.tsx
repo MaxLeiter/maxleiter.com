@@ -24,11 +24,17 @@ const defaultOgImage = (siteUrl: string) => `${siteUrl}/opengraph-image.png`
  * Runs before first paint and corrects the server-rendered `dark` to whatever
  * the visitor actually wants. Replaces next-themes' injected script; there is
  * no hydration to reconcile, which was the only hard part of that component.
+ *
+ * Also corrects `<meta name="theme-color">`, which ships dark like the rest of
+ * the document. The values must match `--bg` in global.css; the runtime's
+ * theme toggle writes the same pair.
  */
 export const THEME_SCRIPT =
   `try{var t=localStorage.theme||'system',d=document.documentElement,` +
   `e=t=='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t;` +
-  `d.dataset.theme=e;d.style.colorScheme=e}catch(_){}`
+  `d.dataset.theme=e;d.style.colorScheme=e;` +
+  `var m=document.querySelector('meta[name=theme-color]');` +
+  `if(m)m.setAttribute('content',e=='light'?'#fff':'#000000')}catch(_){}`
 
 /**
  * Same-document view transitions: the router's page swap and the desktop's
@@ -45,6 +51,26 @@ export interface Fonts {
   css: string
   /** Absolute paths of woff2 files to preload. */
   preload: string[]
+}
+
+/**
+ * A post's structured data. Emitted with `id="jsonld"` so the router can swap
+ * it, and with `<` escaped so post titles cannot close the script tag.
+ */
+function jsonLdScript(head: PageHead): string {
+  if (head.ogType !== 'article') return ''
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: head.title ?? DEFAULT_TITLE,
+    ...(head.description ? { description: head.description } : {}),
+    url: head.canonical,
+    ...(head.publishedTime ? { datePublished: head.publishedTime } : {}),
+    ...(head.ogImage ? { image: head.ogImage } : {}),
+    author: { '@type': 'Person', name: DEFAULT_TITLE },
+  }
+  const json = JSON.stringify(data).replace(/</g, '\\u003c')
+  return `<script type="application/ld+json" id="jsonld">${json}</script>`
 }
 
 export interface ShellOptions {
@@ -73,6 +99,13 @@ export interface ShellOptions {
    * links another post would otherwise open it nested inside the window.
    */
   embed?: boolean
+  /**
+   * Hash of everything a partial does NOT carry: the runtime, the base sheet
+   * and the font CSS. The router compares the incoming document's value with
+   * the running page's and falls back to a hard navigation on a mismatch, so
+   * a partial from a newer deploy is never swapped under an older shell.
+   */
+  shellId: string
 }
 
 /**
@@ -82,7 +115,7 @@ export interface ShellOptions {
  */
 export type PartialOptions = Pick<
   ShellOptions,
-  'head' | 'body' | 'css' | 'islands' | 'siteUrl'
+  'head' | 'body' | 'css' | 'islands' | 'siteUrl' | 'shellId'
 >
 
 function headTags(head: PageHead, siteUrl: string): ReactElement[] {
@@ -117,7 +150,11 @@ function headTags(head: PageHead, siteUrl: string): ReactElement[] {
       href={`${siteUrl}/feed.xml`}
       key="rss"
     />,
-    <meta property="og:title" content={DEFAULT_TITLE} key="og:title" />,
+    // The page's own title and canonical, not the site's. The Next site
+    // shipped the constant site name and origin here, so every shared link
+    // rendered as "Max Leiter"; the parity migration preserved that bug and
+    // this is the deliberate fix.
+    <meta property="og:title" content={title} key="og:title" />,
     ...(description
       ? [
           <meta
@@ -127,7 +164,7 @@ function headTags(head: PageHead, siteUrl: string): ReactElement[] {
           />,
         ]
       : []),
-    <meta property="og:url" content={siteUrl} key="og:url" />,
+    <meta property="og:url" content={head.canonical} key="og:url" />,
     <meta property="og:site_name" content={SITE_NAME} key="og:site_name" />,
     <meta property="og:locale" content="en_US" key="og:locale" />,
     <meta property="og:image" content={ogImage} key="og:image" />,
@@ -167,7 +204,7 @@ function headTags(head: PageHead, siteUrl: string): ReactElement[] {
       key="twitter:card"
     />,
     <meta name="twitter:creator" content="@maxleiter" key="twitter:creator" />,
-    <meta name="twitter:title" content={DEFAULT_TITLE} key="twitter:title" />,
+    <meta name="twitter:title" content={title} key="twitter:title" />,
     ...(description
       ? [
           <meta
@@ -235,6 +272,8 @@ export function renderShell(options: ShellOptions): string {
 
   const headHtml = [
     renderToStaticMarkup(<>{headTags(head, siteUrl)}</>),
+    `<meta name="shell-id" content="${options.shellId}">`,
+    jsonLdScript(head),
     options.embed ? '<base target="_top">' : '',
     renderToStaticMarkup(<>{preloadTags(fonts.preload)}</>),
     // Two tags, not one. The base sheet, the fonts and the view-transition
@@ -275,6 +314,7 @@ export function renderPartial(options: PartialOptions): string {
   const headHtml = renderToStaticMarkup(<>{headTags(head, siteUrl)}</>)
   return (
     `<!doctype html><html><head>${headHtml}` +
+    `<meta name="shell-id" content="${options.shellId}">${jsonLdScript(head)}` +
     `<style id="css-page">${css.page}</style></head>` +
     `<body>${body}${islandsScript(islands)}</body></html>`
   )
