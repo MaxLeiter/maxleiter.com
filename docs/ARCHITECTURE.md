@@ -144,6 +144,22 @@ page needs. Two `<style>` tags, not one: `#css-base` is byte-identical on every
 page and a soft navigation never touches it, while `#css-page` is that route's
 fragments and is all a swap replaces.
 
+The base sheet is the Tailwind build minus the desktop's utilities. `buildCss`
+runs Tailwind twice — the full source set, and once more with `@source not`
+over the window manager's four files — then splits the FULL sheet by atom:
+one declaration plus the headers above it, matched by text against the slim
+output. Atoms rather than blocks, because the slim output diverges
+structurally in two ways that block pairing mis-splits: the shared `:root`
+theme variables sit in one block whose body differs, and the minifier groups
+selectors differently when neighbors disappear (`.bg-\(--bg\)` from the
+desktop shorthand merges into the same rule as the shared
+`.bg-\[var\(--bg\)\]`, which is why grouped selectors are split apart too —
+`.a,.b{d}` is exactly `.a{d}.b{d}`). Both halves keep the full sheet's
+cascade order, and both are re-minified through esbuild, which doubles as a
+syntax check on the emitted CSS. The desktop half ships as a `desktop`
+fragment gated on `data-island="desktop"`, so only the homepage pays its
+~7 KB raw / ~1.1 KB gz.
+
 Every fragment is a plain stylesheet whose scoping is written into the class
 names — `.tree-`, `.shot-`, `.mc-`, `.mdx-note`, `.rt-` — and `PLAIN_SHEETS` in
 `build.ts` pairs each with the marker that gates it. The markers are
@@ -289,7 +305,10 @@ links entering the viewport. All three are skipped when
 
 The runtime is inlined into every page so the first page needs no extra request
 before links become instant. It rides in every document, which is why it has a
-size budget.
+size budget. The router chunk it lazily imports is declared as
+`<link rel="modulepreload">` in the head, so its fetch starts at head parse
+instead of after the body-end module executes — which shrinks the window where
+a fast first click has to ride the `hold` fallback.
 
 ## Output conventions
 

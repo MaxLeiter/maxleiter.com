@@ -499,21 +499,6 @@ async function main(): Promise<void> {
   ])
   Object.assign(ctx.assets, client.assets)
 
-  // Everything a partial does NOT carry, hashed. The router hard-navigates
-  // when a fetched document's shell-id differs from the running page's, so a
-  // deploy that changes the runtime, the base sheet or the fonts is never
-  // swapped under the old shell. Content-derived, not a build stamp: a
-  // rebuild with an unchanged shell keeps the id, so soft navigation
-  // survives a content-only deploy.
-  const shellId = createHash('sha256')
-    .update(client.runtime)
-    .update('\0')
-    .update(css.css)
-    .update('\0')
-    .update(fonts.css)
-    .digest('hex')
-    .slice(0, 12)
-
   const fragments = await step('css fragments', async () => {
     const all: Fragment[] = []
     for (const sheet of PLAIN_SHEETS) {
@@ -525,8 +510,37 @@ async function main(): Promise<void> {
     if (highlight) {
       all.push(fragment('shiki', await minifyCss(highlight), ['class="shiki']))
     }
+    // The window manager's utilities, split out of the base sheet by
+    // `buildCss`. Only the homepage renders the island, so only it pays for
+    // them. Running the emitted CSS through esbuild is also a syntax check:
+    // an unbalanced brace out of the splitter fails the build loudly here.
+    if (css.desktop) {
+      all.push(
+        fragment('desktop', await minifyCss(css.desktop), [
+          'data-island="desktop"',
+        ]),
+      )
+    }
     return all.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name))
   })
+
+  // The base half gets the same esbuild pass, for the same syntax check.
+  const baseCss = await minifyCss(css.css)
+
+  // Everything a partial does NOT carry, hashed. The router hard-navigates
+  // when a fetched document's shell-id differs from the running page's, so a
+  // deploy that changes the runtime, the base sheet or the fonts is never
+  // swapped under the old shell. Content-derived, not a build stamp: a
+  // rebuild with an unchanged shell keeps the id, so soft navigation
+  // survives a content-only deploy.
+  const shellId = createHash('sha256')
+    .update(client.runtime)
+    .update('\0')
+    .update(baseCss)
+    .update('\0')
+    .update(fonts.css)
+    .digest('hex')
+    .slice(0, 12)
 
   /**
    * Base sheet plus only the fragments this page references.
@@ -545,7 +559,7 @@ async function main(): Promise<void> {
       // Kept apart rather than concatenated: the base sheet is byte-identical
       // on every page, so the shell can emit it as its own `#css-base` tag and
       // a soft navigation replaces only `#css-page`.
-      css: { base: css.css, page: used.map((item) => item.css).join('\n') },
+      css: { base: baseCss, page: used.map((item) => item.css).join('\n') },
       used: used.map((item) => item.name),
     }
   }
@@ -569,6 +583,7 @@ async function main(): Promise<void> {
         siteUrl: ctx.site.url,
         shellId,
         runtime: client.runtime,
+        runtimePreload: client.preloads,
         // Only this page's islands, so a content page does not carry a map
         // entry for the desktop it will never mount.
         islands: Object.fromEntries(

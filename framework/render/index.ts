@@ -120,6 +120,8 @@ export interface WrapOptions {
   siteUrl: string
   /** See `ShellOptions.shellId`; computed by `build.ts` from what it hashes. */
   shellId: string
+  /** See `ShellOptions.runtimePreload`. Ignored by `wrapPartial`. */
+  runtimePreload?: string[]
 }
 
 /**

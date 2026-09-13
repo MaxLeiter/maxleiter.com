@@ -28,6 +28,14 @@ export interface ClientResult {
    * not (see `ShellOptions.runtime`).
    */
   runtime: string
+  /**
+   * The chunk URLs the inlined runtime imports -- in practice the router.
+   * The shell emits these as `<link rel="modulepreload">` so the fetch
+   * starts at head parse instead of after the body-end module executes,
+   * which shrinks the window where a fast first click rides the `hold`
+   * fallback.
+   */
+  preloads: string[]
 }
 
 /**
@@ -143,11 +151,16 @@ export async function buildClient(options: {
   // Inline modules resolve relative specifiers against the page URL, so the
   // shared-chunk imports esbuild wrote as `./chunk.X.js` become absolute.
   const runtimeFile = assets['runtime.js']
+  const preloads: string[] = []
   const runtime = runtimeFile
     ? (
         await fs.readFile(path.join(outdir, path.basename(runtimeFile)), 'utf8')
-      ).replace(/(["'])\.\/(chunk\.[A-Z0-9]+\.js)\1/g, '$1/_assets/$2$1')
+      ).replace(/(["'])\.\/(chunk\.[A-Z0-9]+\.js)\1/g, (_, quote, chunk) => {
+        const url = `/_assets/${chunk}`
+        if (!preloads.includes(url)) preloads.push(url)
+        return `${quote}${url}${quote}`
+      })
     : ''
 
-  return { assets, islands: islandUrls, outputs, runtime }
+  return { assets, islands: islandUrls, outputs, runtime, preloads }
 }

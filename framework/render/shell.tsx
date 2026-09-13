@@ -94,6 +94,13 @@ export interface ShellOptions {
    */
   runtime: string
   /**
+   * Chunk URLs the inlined runtime imports (the router), emitted as
+   * `<link rel="modulepreload">` so the fetch starts at head parse rather
+   * than after the body-end module runs. Full documents only: a partial's
+   * destination page already has the router.
+   */
+  runtimePreload?: string[]
+  /**
    * The document is the `/embed` variant, loaded in a desktop window's iframe.
    * Every link in it must navigate the top page, not the frame: a post that
    * links another post would otherwise open it nested inside the window.
@@ -276,6 +283,9 @@ export function renderShell(options: ShellOptions): string {
     jsonLdScript(head),
     options.embed ? '<base target="_top">' : '',
     renderToStaticMarkup(<>{preloadTags(fonts.preload)}</>),
+    (options.runtimePreload ?? [])
+      .map((href) => `<link rel="modulepreload" href="${href}">`)
+      .join(''),
     // Two tags, not one. The base sheet, the fonts and the view-transition
     // rules are byte-identical on every page, so a same-document navigation
     // leaves `#css-base` alone and swaps only `#css-page`.
