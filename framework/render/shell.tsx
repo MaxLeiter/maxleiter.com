@@ -31,33 +31,12 @@ export const THEME_SCRIPT =
   `d.dataset.theme=e;d.style.colorScheme=e}catch(_){}`
 
 /**
- * Native instant navigation for browsers that implement Speculation Rules.
- *
- * `moderate` prerenders on hover (~200ms) and on pointer-down, so the click
- * lands on a document that is already rendered -- strictly better than any
- * script-driven swap, because there is no fetch, no parse and no reflow left
- * to do. Browsers that do not understand the script type ignore it, and
- * `runtime.ts` loads the JS router for them instead.
- *
- * `/_assets/*` is excluded because prerendering a stylesheet or a JS chunk is
- * meaningless; only documents are worth speculating on.
+ * Same-document view transitions: the router's page swap and the desktop's
+ * window open/close. Reduced motion is honoured by the router, which skips
+ * `startViewTransition` entirely rather than animating at zero duration.
  */
-const SPECULATION_RULES = JSON.stringify({
-  prerender: [
-    {
-      where: {
-        and: [{ href_matches: '/*' }, { not: { href_matches: '/_assets/*' } }],
-      },
-      eagerness: 'moderate',
-    },
-  ],
-})
-
-/** Cross-document view transitions, with the reduced-motion opt-out. */
 export const VIEW_TRANSITION_CSS = `
-@view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:180ms}
-@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 html.vt-local{view-transition-name:none}
 `.trim()
 
@@ -83,10 +62,9 @@ export interface ShellOptions {
   /** `ctx.site.url`; the one place the shell learns the origin. */
   siteUrl: string
   /**
-   * The built runtime's source, inlined as a module. Chrome skips the inbound
-   * cross-document view transition when the destination has an external
-   * `<script type="module" src>` in its head, but runs it for an inline
-   * module (bisected 2026-08-31, Chrome 151). About 1.1KB brotli.
+   * The built runtime's source, inlined as a module so the first page needs no
+   * extra request before links become instant. About 1.1KB brotli, and that is
+   * the size budget: it rides in every document.
    */
   runtime: string
   /**
@@ -267,13 +245,7 @@ export function renderShell(options: ShellOptions): string {
     `<script>${THEME_SCRIPT}</script>`,
   ].join('')
 
-  // Body, not head. It is only ever consumed by browsers on the native
-  // navigation path, which never swap the body, so it is always present
-  // exactly where it is used.
-  const scripts: string[] = [
-    islandsScript(islands),
-    `<script type="speculationrules">${SPECULATION_RULES}</script>`,
-  ]
+  const scripts: string[] = [islandsScript(islands)]
   const inlineRuntime = options.runtime.replace(/<\/script/gi, '<\\/script')
   scripts.push(`<script type="module">${inlineRuntime}</script>`)
   scripts.push('<script defer src="/_vercel/insights/script.js"></script>')

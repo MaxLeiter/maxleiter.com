@@ -99,32 +99,24 @@ bytes are smaller.
 
 ## Navigation and transitions
 
-Pages animate between each other with cross-document view transitions. That's
-CSS, no script.
+Every page lazily imports [`client/router.ts`](./client/router.ts), which
+intercepts same-origin clicks and swaps the document in place, animated with a
+same-document view transition. This kills the loading indicator and the white
+flash mobile browsers show between pages. It only touches plain left-clicks on
+same-origin links with no `target`, `download` or `rel="external"`, so cmd-click
+and middle-click still work.
 
-Chrome and Edge get the nice version. Every page has a speculation rules script
-that prerenders same-origin links on hover and pointer-down, so by the time you
-click, the next page is already rendered. Nothing else loads. The router below
-is never downloaded.
+Every route is written twice, `index.html` and `index.partial.html`, and the
+router fetches the partial. That's the title, meta tags, the page's CSS fragment
+and the body, about 3 KB. A missing partial falls back to the full document.
+Links are prefetched on hover, pointer-down and when they scroll into view, so
+the click usually finds the partial already in hand.
 
-Every other browser lazily imports [`client/router.ts`](./client/router.ts),
-which intercepts same-origin clicks and swaps the document in place. This
-exists to kill the loading indicator and the white flash mobile browsers show
-between pages. It only touches plain left-clicks on same-origin links with no
-`target`, `download` or `rel="external"`, so cmd-click and middle-click still
-work. Every route is written twice, `index.html` and `index.partial.html`, and
-the router fetches the partial. That's the title, meta tags, the page's CSS
-fragment and the body, about a quarter the size of the full page. A missing
-partial falls back to the full document.
-
-Which path a browser takes is decided by checking whether the features exist,
-not by reading the user agent.
-
-One thing that took a while to figure out. Chrome skips the inbound half of a
-cross-document view transition when the destination has an external module
-script in `<head>`. Inline module scripts don't trigger it. So the runtime is
-inlined into every page instead of linked. This is the actual reason it has a
-size budget.
+Chrome and Edge used to get a different path, Speculation Rules prerender plus a
+cross-document view transition. It was faster when the prerender fired, but it
+re-fetched the whole document on every link and turned into an ordinary hard
+navigation whenever it didn't fire. One router everywhere was simpler and
+lighter.
 
 ## Content
 

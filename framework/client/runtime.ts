@@ -13,8 +13,6 @@
  * writing `textContent` behind preact's back is one owner too many.
  */
 
-import { isNameLive, transitionNameForUrl } from '../shared/transitions'
-
 /** The generated island entry returns its own teardown. */
 type Mount = (el: HTMLElement, props: unknown) => void | (() => void)
 
@@ -228,110 +226,29 @@ document.addEventListener('click', (event) => {
   }
 })
 
-/* ----------------------------------------------------- view transitions -- */
-
-/**
- * The single owner of outgoing `view-transition-name` assignment.
- *
- * Elements opt in declaratively with `data-vt-name`, and this handler names at
- * most one of them: the one matching the name the destination article will
- * carry. Pages with no candidate just cross-fade.
- *
- * It stands down entirely when something already holds that name as a live
- * inline style. That is how the desktop's open post window wins over the card
- * behind it: the window frame renders its own `view-transition-name`, and the
- * reader is looking at the window, so the window is what should morph. Two
- * elements holding one name cancels the transition outright, which is why this
- * has to be a single decision rather than two listeners overwriting each other
- * in a load-bearing registration order.
- *
- * It also clears only the element it named itself, never every candidate on the
- * page: a blanket clear wipes a name another owner set.
- */
-let namedForTransition: HTMLElement | null = null
-
-/**
- * Back and forward on a phone get no transition. The browser already animates
- * the swipe-back gesture, and a morph on top of it reads as the page lurching.
- * Both halves have to agree: a skip in `pageswap` drops the outbound capture,
- * and the `pagereveal` skip covers a back/forward restore from bfcache or
- * prerender where no `pageswap` ran on this document.
- */
-const skipTraversal = (type: string | undefined): boolean =>
-  type === 'traverse' && matchMedia('(max-width: 767px)').matches
-
-addEventListener('pagereveal', (event) => {
-  const activation = (
-    navigation as { activation?: { navigationType?: string } }
-  ).activation
-  const transition = (event as { viewTransition?: { skipTransition(): void } })
-    .viewTransition
-  if (transition && skipTraversal(activation?.navigationType)) {
-    transition.skipTransition()
-  }
-})
-
-addEventListener('pageswap', (event) => {
-  const swap = event as {
-    activation?: { navigationType?: string; entry?: { url?: string } }
-    viewTransition?: { skipTransition(): void }
-  }
-  if (swap.viewTransition && skipTraversal(swap.activation?.navigationType)) {
-    swap.viewTransition.skipTransition()
-  }
-  if (namedForTransition) {
-    namedForTransition.style.viewTransitionName = ''
-    namedForTransition = null
-  }
-
-  const url = swap.activation?.entry?.url
-  const name = url ? transitionNameForUrl(url) : null
-  if (!name || isNameLive(name)) return
-
-  const el = document.querySelector<HTMLElement>(
-    `[data-vt-name="${CSS.escape(name)}"]`,
-  )
-  if (!el) return
-  el.style.viewTransitionName = name
-  namedForTransition = el
-})
-
 /* -------------------------------------------------------------- router -- */
 
 /**
- * Instant navigation, by whichever mechanism the browser actually has.
+ * Instant navigation: the router, lazily imported, on every browser.
  *
- * Chrome and Edge can do it natively: the Speculation Rules script every page
- * carries prerenders a link on hover, and `@view-transition` animates the
- * cross-document navigation. That is strictly better than anything script can
- * do -- the next page is fully rendered before the click -- so on that path
- * this file installs nothing and the router is never even downloaded.
+ * An earlier version let Chrome and Edge use Speculation Rules prerender with a
+ * cross-document view transition and installed the router only elsewhere. The
+ * prerender was faster when it fired, but its failure mode was a full hard
+ * navigation (a quick click, touch input, Chrome's prerender budget) and it
+ * re-fetched the whole document, inlined CSS and runtime included, on every
+ * link. The router's worst case is a 3KB partial, the same on every browser,
+ * and it is one code path instead of two.
  *
- * Everywhere else the router is fetched lazily and takes over navigation with
- * a same-document swap, which at least removes the browser's loading indicator
- * and the mobile blank-page flash.
- *
- * All three checks are capability checks, and the middle one is load-bearing.
- * WebKit hardcodes `supports('speculationrules')` to true for its prefetch-only
- * support, so iOS Safari claimed the native path, never installed the router,
- * and showed its loading bar on every navigation. `document.prerendering` is
- * the property the prerendering spec actually defines, and WebKit does not
- * have it. `PageRevealEvent` says the inbound half of a cross-document view
- * transition exists. None of the three asks who the browser is: one that ships
- * all three tomorrow gets the native path with no code change.
+ * Keep the import lazy: a static one would put the router in this inline
+ * runtime on every page.
  */
-const nativeInstantNav =
-  HTMLScriptElement.supports?.('speculationrules') === true &&
-  'prerendering' in document &&
-  'PageRevealEvent' in window
-
 // A framed document is an `/embed` inside a desktop window. Its links carry
 // `<base target="_top">` and must reach the browser untouched; the router
 // reads the anchor's own `target`, which `<base>` does not set, and would
 // swap the new page into the frame.
 const framed = window.self !== window.top
 
-if (!nativeInstantNav && !framed) {
+if (!framed) {
   /**
    * Holds a click that lands before the router chunk arrives.
    *

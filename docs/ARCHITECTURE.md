@@ -188,7 +188,7 @@ and mounts it on Cmd/Ctrl+K or a `[data-open-palette]` click.
   as props. They used to be passed through `data-props` because the client
   bundle had no CSS-module plugin and would have minted different hashes.
 - The runtime also owns, with no island: the theme toggle, Cmd/Ctrl+K, delegated
-  `[data-track]` analytics, and outgoing view-transition names. For
+  `[data-track]` analytics, and the lazy import of the router. For
   `[data-track]`, `data-track` is the event *name* and every other data
   attribute becomes a payload key, camelCased by the dataset API: write
   `data-section`, not `data-track-section`. `data-vt-name` is excluded from that
@@ -196,43 +196,41 @@ and mounts it on Cmd/Ctrl+K or a `[data-open-palette]` click.
 - The menubar clock is not the runtime's. `#menubar-clock` exists only on the
   homepage, where the desktop island hydrates over it and owns it; a second
   interval writing `textContent` behind preact's back is one owner too many.
-- View-transition names have a single owner: the runtime's `pageswap` handler.
-  Elements opt in with `data-vt-name`, it names at most one of them, and it
-  stands down when something already holds that name as a live inline style,
-  which is how an open post window wins over the card behind it. Two elements
-  holding one name cancels the transition outright, so this cannot be two
-  listeners racing on registration order. The name comes from
-  `transitionName(kind, slug)` in `framework/shared/transitions.ts`, never from
-  a string spelled out at a call site.
+- View-transition names have a single owner: the router's click handler.
+  Elements opt in with `data-vt-name`, it names the one that was clicked, and
+  it stands down when something already holds that name as a live inline
+  style, which is how an open post window wins over the card behind it. Two
+  elements holding one name cancels the transition outright. The name comes
+  from `transitionName(kind, slug)` in `framework/shared/transitions.ts`, never
+  from a string spelled out at a call site.
 
 ## Navigation
 
-Instant navigation has two paths, chosen by capability detection at runtime
-start. **Never user-agent sniffing** — no `navigator.userAgent`, `platform`,
-`vendor` or brand string appears anywhere in `framework/` or `app/`.
+Every browser gets the same router. `runtime.ts` lazily imports
+`client/router.ts`, which intercepts same-origin clicks, fetches the
+destination's partial and swaps the document in place under
+`document.startViewTransition`. Keep it a lazy import: a static one would put it
+in the inline runtime on every page. **Never user-agent sniffing** — no
+`navigator.userAgent`, `platform`, `vendor` or brand string appears anywhere in
+`framework/` or `app/`.
 
-The native path requires all three of `HTMLScriptElement.supports('speculationrules')`,
-`'prerendering' in document` and `'PageRevealEvent' in window`. The middle check
-is load-bearing rather than belt-and-braces: **WebKit hardcodes
-`supports('speculationrules')` to true** for its prefetch-only support, so on
-that check alone iOS Safari claimed the native path, never installed the router,
-and showed its loading bar on every navigation. `document.prerendering` is the
-property the prerendering spec actually defines, and WebKit does not have it.
-
-- **Native** (Chrome, Edge today): every page carries a
-  `<script type="speculationrules">` that prerenders same-origin documents at
-  `eagerness: "moderate"`, and `@view-transition` animates the cross-document
-  navigation. The router is not installed and its chunk is never downloaded.
-  This path is strictly better, because the next document is fully rendered
-  before the click.
-- **Router** (everything else): `runtime.ts` lazily imports `client/router.ts`,
-  which intercepts same-origin clicks and swaps the document in place. That
-  removes the loading indicator and the mobile blank flash. Keep it a lazy
-  import: a static one would put it in the inline runtime on every page,
-  including every page that will never use it.
+An earlier version had a second, native path for Chrome and Edge: a
+`<script type="speculationrules">` prerendered links on hover and
+`@view-transition{navigation:auto}` animated the cross-document navigation, with
+the router installed only where those were missing. It was removed because
+every link re-fetched the full document (inlined CSS and runtime included, 10 to
+15 KB compressed against the partial's 3 KB), and because its failure mode was a
+plain hard navigation whenever prerender did not fire: a click inside the hover
+delay, touch input, Chrome's prerender budget. Two things learned on that path
+are worth keeping in mind if it is ever revisited: WebKit hardcodes
+`HTMLScriptElement.supports('speculationrules')` to true for prefetch-only
+support, so `'prerendering' in document` is the check that actually separates
+prerender-capable browsers; and Chrome skips the inbound half of a
+cross-document view transition when the destination has an external module
+script in `<head>`.
 
 Because that import is lazy, there is a window where a click would still be a
-real navigation. On the non-native path the runtime registers one capture-phase
+real navigation. The runtime registers one capture-phase
 click listener immediately, which holds an eligible link, and hands it to
 `navigate()` the moment the chunk resolves. Its eligibility rules are the
 conservative half of the router's own `routableLink`: anything it misses stays a
@@ -267,10 +265,9 @@ an in-flight request rather than starting a second: hover, `pointerdown`, and
 links entering the viewport. All three are skipped when
 `navigator.connection.saveData` is set or `effectiveType` is 2g or slow-2g.
 
-**Chrome skips the inbound half of a cross-document view transition when the
-destination has an external module script in `<head>`.** An inline module does
-not trigger it. That is the actual reason the runtime is inlined into every page
-rather than linked, and the reason it has a size budget.
+The runtime is inlined into every page so the first page needs no extra request
+before links become instant. It rides in every document, which is why it has a
+size budget.
 
 ## Output conventions
 
@@ -387,8 +384,8 @@ the OG PNGs really are 1200x630, that the font subsets actually shrank, and that
 Still-true decisions, newest first. A decision that stops being true should be
 deleted from this list rather than annotated.
 
-**The native-navigation gate requires `'prerendering' in document`.** See
-Navigation. Confirmed at WebKit source level, and on device.
+**One router on every browser; no Speculation Rules native path.** See
+Navigation for what the native path cost and the two browser facts it taught.
 
 **`framework/` is laid out by build stage:** `shared/`, `content/`, `render/`,
 `assets/`, `platform/`, `client/`. The names say when a module runs, so a file's

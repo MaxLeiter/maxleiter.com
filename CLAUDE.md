@@ -67,10 +67,11 @@ churn you cannot explain, that is the signal, not a formality.
   `.ts` extensions, because it runs unbundled where the alias may not resolve.
 - **Feature detection, never user-agent sniffing.** No `navigator.userAgent`,
   `platform`, `vendor` or brand string anywhere in `framework/` or `app/`.
-  The native-navigation gate needs all three of `supports('speculationrules')`,
-  `'prerendering' in document` and `'PageRevealEvent' in window`: WebKit
-  hardcodes the first to true for prefetch-only support, so dropping the second
-  sends iOS Safari down the native path and its loading bar comes back.
+- **The router runs on every browser.** There is no Chrome-only native path
+  any more: Speculation Rules prerender re-fetched the whole document per link
+  and fell back to a hard navigation whenever prerender did not fire. Do not
+  add `<script type="speculationrules">` or `@view-transition{navigation:auto}`
+  back without re-reading the Navigation section of the architecture doc.
 - **A new stylesheet needs an entry in `PLAIN_SHEETS`** in `build.ts`, with an
   attribute-shaped marker (`class="thing-`, not `thing`). A sheet with no entry
   ships on no page at all.
@@ -79,9 +80,9 @@ churn you cannot explain, that is the signal, not a formality.
   file.
 - **`vercel.json` is generated** by `framework/platform/vercel.ts` on every
   build. Editing it by hand is silently reverted.
-- **The runtime is inlined into every page on purpose.** Chrome skips the
-  inbound half of a cross-document view transition when the destination has an
-  external module script in `<head>`. That is why it has a size budget.
+- **The runtime is inlined into every page on purpose**, so the first page
+  needs no extra request before links become instant. It rides in every
+  document, which is why it has a size budget.
 - **`app/styles/global.css` carries a trimmed copy of Tailwind's preflight.**
   Recheck it against `node_modules/tailwindcss/preflight.css` on a Tailwind
   major upgrade.

@@ -45,11 +45,9 @@ export function transitionNameForUrl(url: string): string | null {
 /**
  * True when some element already claims `name` as a live inline style.
  *
- * Browser-only, and shared: both owners of an outgoing name need it -- the
- * runtime's `pageswap` handler for cross-document navigations, and the
- * router's click handler for same-document ones. Two elements holding one
- * `view-transition-name` cancels the transition outright, so whoever is about
- * to assign one has to ask first.
+ * Browser-only. The router asks before handing a clicked card the outgoing
+ * name, because the desktop's open post window may already hold it. Two
+ * elements holding one `view-transition-name` cancels the transition outright.
  */
 export function isNameLive(name: string): boolean {
   for (const el of document.querySelectorAll<HTMLElement>('[style]')) {

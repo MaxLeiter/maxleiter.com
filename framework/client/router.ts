@@ -206,9 +206,7 @@ function resetLinkObserver(): void {
  * It stands down when something already holds that name, which is how the
  * desktop's open post window wins over the card behind it: the window frame
  * renders `view-transition-name` itself, and two elements holding one name
- * cancels the transition outright. Same single-owner rule as the `pageswap`
- * handler in runtime.ts, which still covers navigations this router does not
- * intercept.
+ * cancels the transition outright.
  */
 function claimTransitionName(source: Element | null, url: string): () => void {
   const noop = () => undefined
@@ -328,7 +326,10 @@ export interface NavigateOptions {
   scroll?: number
   /** The element that started this, for the transition-name handoff. */
   source?: Element | null
-  /** False for back/forward on a phone; see `skipTraversal` in runtime.ts. */
+  /**
+   * False for back/forward on a phone: the browser already animates the swipe
+   * gesture, and a morph on top of it reads as the page lurching.
+   */
   transition?: boolean
 }
 
