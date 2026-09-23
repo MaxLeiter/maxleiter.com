@@ -144,6 +144,14 @@ page needs. Two `<style>` tags, not one: `#css-base` is byte-identical on every
 page and a soft navigation never touches it, while `#css-page` is that route's
 fragments and is all a swap replaces.
 
+Tailwind's sources are `app/` and the three framework stages that emit markup,
+`render/`, `client/` and `shared/`. It mints a utility for any source token that
+names one, comments and object keys included, so scanning the build-only stages
+shipped `.filter`, `.shadow`, `.container` and `.shrink` to every page, from
+esbuild's `{ filter: /.../ }` and prose like "the build container". The same
+thing still happens inside `app/`: `.table`, `.static`, `.inline`, `.blur` and
+`.transition` are in the base sheet and in no page's markup.
+
 The base sheet is the Tailwind build minus the desktop's utilities. `buildCss`
 runs Tailwind twice — the full source set, and once more with `@source not`
 over the window manager's four files — then splits the FULL sheet by atom:
@@ -421,12 +429,14 @@ tests" and swallows the failure it signals through `process.exitCode`. It checks
 the things a build alone cannot — that a rebuild of the feed, sitemap and search
 index is byte-identical (the `rss` package clock-stamps `lastBuildDate`), that
 the OG PNGs really are 1200x630, that the font subsets actually shrank, and that
-`vercel.json` still pins the install command. It also enforces three source
+`vercel.json` still pins the install command. It also enforces four source
 invariants oxlint cannot express (it has no `no-restricted-imports`): the
 `framework/shared/` import rule, no user-agent sniffing anywhere in
-`framework/` or `app/`, and the inline runtime's size budget — 1,536 B brotli,
-against 1,135 B when the budget was set, so a static import of preact or the
-router fails the check instead of quietly riding into every page.
+`framework/` or `app/`, no `font-variant-*` or `font-feature-settings` in
+`app/` asking for an OpenType feature the font subsets dropped, and the inline
+runtime's size budget — 1,536 B brotli, against 1,135 B when the budget was
+set, so a static import of preact or the router fails the check instead of
+quietly riding into every page.
 
 CI (`.github/workflows/ci.yml`) runs `check`, `lint:check` (the `--check` form
 of the format pass, because `pnpm lint` rewrites files), `test` and `gate` on
@@ -493,9 +503,14 @@ is already server-rendered and already reads as links.
 subset used to name eight whole Unicode blocks, 1,208 codepoints, of which Geist
 covers 262; it is now Latin-1 plus 35 explicit codepoints, which is the union of
 everything above U+00FF in the built output and in the sources that mint text at
-runtime. The weight axis is clamped to the three weights the CSS asks for. Both
-faces are preloaded on every page, so this is the largest single item on a first
-visit: 64.3 KB to 40.4 KB.
+runtime. The weight axis is clamped to the three weights the CSS asks for, and
+the OpenType features to the ones browsers apply by default plus `tnum`; Geist's
+stylistic sets, fractions and superscripts were ~140 unused glyphs per face.
+Each face is two files with disjoint `unicode-range`s: a preloaded core (ASCII,
+the four Latin-1 characters the output uses, the extras) and the other 92
+Latin-1 characters, which a browser fetches only for a page that renders one,
+at the cost of kerning across that boundary. The preload is the largest single
+item on a first visit: 64.3 KB, then 40.4 KB, now 25.5 KB.
 
 **Tailwind's preflight is trimmed, not disabled.** `app/styles/global.css`
 carries the two thirds of it the site has elements for. The rest — every

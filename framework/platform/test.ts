@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import zlib from 'node:zlib'
 import { createBuildContext } from '../content'
 import { buildClient } from '../assets/client'
-import { prepareFonts } from '../assets/fonts'
+import { LAYOUT_FEATURES, prepareFonts } from '../assets/fonts'
 import { formatPlatformResult, runPlatformSteps } from '.'
 import { writeFeeds } from './feeds'
 import type { RouteInfo } from '../shared/types'
@@ -130,14 +130,17 @@ async function unpublishedSlugs(): Promise<string[]> {
   return slugs
 }
 
-/** Every `.ts`/`.tsx` under `dir`, recursively. */
-async function sourceFiles(dir: string): Promise<string[]> {
+/** Every `.ts`/`.tsx` (or whatever `pattern` matches) under `dir`. */
+async function sourceFiles(
+  dir: string,
+  pattern = /\.tsx?$/,
+): Promise<string[]> {
   const found: string[] = []
   const walk = async (current: string): Promise<void> => {
     for (const entry of await fs.readdir(current, { withFileTypes: true })) {
       const full = path.join(current, entry.name)
       if (entry.isDirectory()) await walk(full)
-      else if (/\.tsx?$/.test(entry.name)) found.push(full)
+      else if (pattern.test(entry.name)) found.push(full)
     }
   }
   await walk(dir)
@@ -402,6 +405,55 @@ async function main(): Promise<void> {
   }
   check('no user-agent sniffing in framework/ or app/', () => {
     assert.deepEqual(uaViolations, [], uaViolations.join(', '))
+  })
+
+  // The subsets keep only LAYOUT_FEATURES, so a style asking for any other
+  // feature renders as if it were not there. Tailwind's numeric utilities
+  // and the plain CSS keywords are the same words, so one scan covers both.
+  const featureKeywords: Record<string, string> = {
+    'tabular-nums': 'tnum',
+    'proportional-nums': 'pnum',
+    'lining-nums': 'lnum',
+    'oldstyle-nums': 'onum',
+    'diagonal-fractions': 'frac',
+    'stacked-fractions': 'afrc',
+    ordinal: 'ordn',
+    'slashed-zero': 'zero',
+    'small-caps': 'smcp',
+    'all-small-caps': 'c2sc',
+    'petite-caps': 'pcap',
+    'all-petite-caps': 'c2pc',
+    'titling-caps': 'titl',
+    unicase: 'unic',
+    'discretionary-ligatures': 'dlig',
+    'historical-ligatures': 'hlig',
+  }
+  const keywordRe = new RegExp(
+    `(?<![\\w-])(${Object.keys(featureKeywords).join('|')})(?![\\w-])`,
+    'g',
+  )
+  const featureViolations: string[] = []
+  for (const file of await sourceFiles(
+    path.join(root, 'app'),
+    /\.(tsx?|css)$/,
+  )) {
+    const source = await fs.readFile(file, 'utf8')
+    const tags = [...source.matchAll(keywordRe)].map(
+      ([, word]) => featureKeywords[word],
+    )
+    for (const [, tag] of source.matchAll(
+      /(?<=(?:font-feature-settings|fontFeatureSettings)\s*:[^;}\]]*)['"](\w{4})['"]/g,
+    )) {
+      tags.push(tag)
+    }
+    for (const tag of new Set(tags)) {
+      if (!LAYOUT_FEATURES.includes(tag)) {
+        featureViolations.push(`${path.relative(root, file)}: ${tag}`)
+      }
+    }
+  }
+  check('app/ asks only for OpenType features the font subsets keep', () => {
+    assert.deepEqual(featureViolations, [], featureViolations.join(', '))
   })
 
   // The runtime rides inlined in every document, which is why it has a size

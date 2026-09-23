@@ -9,17 +9,28 @@ import type { BuildContext } from '../shared/types'
  *
  * `geist@1.5.1` ships two variable woff2 files covering the full Latin
  * Extended + Greek + Cyrillic range across a 100-900 weight axis, ~58 KB each.
- * Two things are cut: every codepoint the site does not render, and the weight
- * axis outside the range its CSS asks for. Both faces are preloaded on every
- * page, so this is the largest item on a first visit and it is on the critical
- * path.
+ * Three things are cut: every codepoint the site does not render, the weight
+ * axis outside the range its CSS asks for, and every OpenType feature no rule
+ * turns on. Each face is two files (see SLICES), and the core one is preloaded
+ * on every page, so this is the largest item on a first visit and it is on
+ * the critical path.
  *
  * The subsets are committed to `app/fonts/` so a clean build does no work.
  * A change to SUBSET_SPEC bumps the manifest hash and regenerates them.
  */
 
-/** Basic Latin + Latin-1 Supplement, kept whole. */
-const LATIN1: readonly [number, number] = [0x0020, 0x00ff]
+/** Basic Latin. */
+const ASCII: readonly [number, number] = [0x0020, 0x007e]
+
+/** Latin-1 Supplement, split between the two slices. */
+const LATIN1_SUPPLEMENT: readonly [number, number] = [0x00a0, 0x00ff]
+
+/**
+ * The Latin-1 Supplement characters the built output renders: no-break space,
+ * ® ° and ·. They go in the core file; the other 92 would add ~7 KB to it per
+ * face for accented letters no page uses.
+ */
+const LATIN1_RENDERED: readonly number[] = [0x00a0, 0x00ae, 0x00b0, 0x00b7]
 
 /**
  * Everything above Latin-1 the site renders, plus a small margin.
@@ -65,12 +76,35 @@ const SUBSET_EXTRAS: readonly number[] = [
  */
 const WEIGHT_AXIS = { min: 400, max: 700 } as const
 
+/**
+ * The OpenType features kept: what a browser applies to Latin text by
+ * default, plus `tnum` for the two `tabular-nums` rules.
+ *
+ * Geist also carries ss01-ss09, frac, sups, case, dlig, aalt and more: ~140
+ * alternate glyphs per face that no rule asks for, 6 KB across the two. A
+ * `font-variant-*` or `font-feature-settings`
+ * needing a feature missing here silently does nothing, which is why the
+ * platform test checks app/ against this list.
+ */
+export const LAYOUT_FEATURES: readonly string[] = [
+  'ccmp',
+  'locl',
+  'mark',
+  'mkmk',
+  'kern',
+  'liga',
+  'clig',
+  'calt',
+  'rvrn',
+  'tnum',
+]
+
 /** Bumped whenever the subset definition changes, to invalidate the artifacts. */
-const SUBSET_SPEC = 2
+const SUBSET_SPEC = 3
 
 interface FontSource {
-  /** Logical name, also the committed filename stem and the asset key. */
-  name: string
+  /** Filename stem: `GeistSans` becomes `GeistSans-subset.woff2`. */
+  stem: string
   /** Path under node_modules/geist/dist/fonts. */
   source: string
   /** CSS `font-family` the site's tokens point at. */
@@ -79,14 +113,61 @@ interface FontSource {
 
 const FONTS: readonly FontSource[] = [
   {
-    name: 'GeistSans-subset',
+    stem: 'GeistSans',
     source: 'geist-sans/Geist-Variable.woff2',
     family: 'Geist Variable',
   },
   {
-    name: 'GeistMono-subset',
+    stem: 'GeistMono',
     source: 'geist-mono/GeistMono-Variable.woff2',
     family: 'Geist Mono Variable',
+  },
+]
+
+interface Slice {
+  /** Filename suffix after the stem. */
+  suffix: string
+  codepoints: readonly number[]
+  /** The `unicode-range` descriptor. The slices' ranges must be disjoint. */
+  unicodeRange: string
+  /** Preloaded on every page, or fetched only where its characters render. */
+  preload: boolean
+}
+
+function range([from, to]: readonly [number, number]): number[] {
+  return Array.from({ length: to - from + 1 }, (_, i) => from + i)
+}
+
+const LATIN1_REST = range(LATIN1_SUPPLEMENT).filter(
+  (code) => !LATIN1_RENDERED.includes(code),
+)
+
+/**
+ * Where two faces of one family overlap, the browser takes the last one
+ * declared that covers the character, so a character claimed by both would
+ * load whichever file happens to come second. The core claims the complement
+ * of the latin1 file rather than its own list: a character in neither still
+ * reaches the core face and falls through to the system font, and the
+ * descriptor in every document's head stays short.
+ *
+ * Which system font it falls through to is not ours to pick. Geist Mono has
+ * no ┐ ┘ ┤ ┬ ┴ ┼, and macOS chooses their fallback partly from the primary
+ * file's cmap: with Latin-1 split out, Chrome draws them at 600/700 in
+ * full-width Hiragino rather than Monaco. Every diagram renders them at 400, where the
+ * fallback is Menlo either way; a bold one would come out misaligned.
+ */
+const SLICES: readonly Slice[] = [
+  {
+    suffix: 'subset',
+    codepoints: [...range(ASCII), ...LATIN1_RENDERED, ...SUBSET_EXTRAS],
+    unicodeRange: unicodeRange(LATIN1_REST, { invert: true }),
+    preload: true,
+  },
+  {
+    suffix: 'latin1',
+    codepoints: LATIN1_REST,
+    unicodeRange: unicodeRange(LATIN1_REST),
+    preload: false,
   },
 ]
 
@@ -95,7 +176,7 @@ export interface FontResult {
   css: string
   /** Absolute paths (site-relative URLs) to preload in `<head>`. */
   preload: string[]
-  /** Per-font byte counts, for reporting. */
+  /** Per-file byte counts against the source face, for reporting. */
   sizes: { name: string; before: number; after: number }[]
 }
 
@@ -103,6 +184,8 @@ interface SubsetOptions {
   targetFormat: 'woff2' | 'woff' | 'sfnt'
   /** Partial instancing: keep the axis, narrow its range. */
   variationAxes?: Record<string, { min: number; max: number }>
+  /** Allowlist of layout features. Omitted, subset-font keeps all of them. */
+  keepFeatures?: readonly string[]
 }
 
 type SubsetFont = (
@@ -111,13 +194,37 @@ type SubsetFont = (
   options: SubsetOptions,
 ) => Promise<Buffer>
 
-function subsetText(): string {
-  const chars: string[] = []
-  for (let code = LATIN1[0]; code <= LATIN1[1]; code++) {
-    chars.push(String.fromCodePoint(code))
+/**
+ * The codepoints as a `unicode-range` descriptor, `U+a1-ad,U+af,...`, or with
+ * `invert` every other codepoint in Unicode.
+ */
+function unicodeRange(
+  codepoints: readonly number[],
+  { invert = false } = {},
+): string {
+  let runs: [number, number][] = []
+  for (const code of [...codepoints].sort((a, b) => a - b)) {
+    const last = runs.at(-1)
+    if (last && code === last[1] + 1) last[1] = code
+    else runs.push([code, code])
   }
-  for (const code of SUBSET_EXTRAS) chars.push(String.fromCodePoint(code))
-  return chars.join('')
+  if (invert) {
+    const gaps: [number, number][] = []
+    let next = 0
+    for (const [from, to] of runs) {
+      if (from > next) gaps.push([next, from - 1])
+      next = to + 1
+    }
+    if (next <= 0x10ffff) gaps.push([next, 0x10ffff])
+    runs = gaps
+  }
+  return runs
+    .map(([from, to]) =>
+      from === to
+        ? `U+${from.toString(16)}`
+        : `U+${from.toString(16)}-${to.toString(16)}`,
+    )
+    .join(',')
 }
 
 function hash(buffer: Buffer | string): string {
@@ -156,10 +263,6 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
   await fs.mkdir(fontDir, { recursive: true })
   await fs.mkdir(assetDir, { recursive: true })
 
-  const text = subsetText()
-  const specKey = hash(
-    `${SUBSET_SPEC}:${WEIGHT_AXIS.min}-${WEIGHT_AXIS.max}:${text}`,
-  )
   const manifestPath = path.join(fontDir, 'subset-manifest.json')
   let manifest: Record<string, string> = {}
   try {
@@ -179,40 +282,51 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
   for (const font of FONTS) {
     const sourcePath = path.join(geistFontDir(ctx.root), font.source)
     const original = await fs.readFile(sourcePath)
-    const subsetPath = path.join(fontDir, `${font.name}.woff2`)
 
-    const stale = manifest[font.name] !== specKey || !(await exists(subsetPath))
-    if (stale) {
-      if (!subsetFont) {
-        const required = createRequire(import.meta.url)
-        subsetFont = required('subset-font') as SubsetFont
+    for (const slice of SLICES) {
+      const name = `${font.stem}-${slice.suffix}`
+      const subsetPath = path.join(fontDir, `${name}.woff2`)
+      const text = String.fromCodePoint(...slice.codepoints)
+      const specKey = hash(
+        `${SUBSET_SPEC}:${WEIGHT_AXIS.min}-${WEIGHT_AXIS.max}:` +
+          `${LAYOUT_FEATURES.join(',')}:${text}`,
+      )
+
+      const stale = manifest[name] !== specKey || !(await exists(subsetPath))
+      if (stale) {
+        if (!subsetFont) {
+          const required = createRequire(import.meta.url)
+          subsetFont = required('subset-font') as SubsetFont
+        }
+        const subset = await subsetFont(original, text, {
+          targetFormat: 'woff2',
+          variationAxes: { wght: WEIGHT_AXIS },
+          keepFeatures: LAYOUT_FEATURES,
+        })
+        await fs.writeFile(subsetPath, subset)
+        manifest[name] = specKey
       }
-      const subset = await subsetFont(original, text, {
-        targetFormat: 'woff2',
-        variationAxes: { wght: { min: WEIGHT_AXIS.min, max: WEIGHT_AXIS.max } },
+
+      const subset = await fs.readFile(subsetPath)
+      const url = `/_assets/${name}.${hash(subset)}.woff2`
+      await fs.writeFile(path.join(ctx.staticDir, url.slice(1)), subset)
+      ctx.assets[`${name}.woff2`] = url
+
+      sizes.push({
+        name,
+        before: original.byteLength,
+        after: subset.byteLength,
       })
-      await fs.writeFile(subsetPath, subset)
-      manifest[font.name] = specKey
+      if (slice.preload) preload.push(url)
+      faces.push(
+        // The descriptor has to match the instanced axis, or the browser asks
+        // for a weight the file cannot render and synthesises one.
+        `@font-face{font-family:'${font.family}';font-style:normal;` +
+          `font-weight:${WEIGHT_AXIS.min} ${WEIGHT_AXIS.max};font-display:swap;` +
+          `src:url('${url}') format('woff2');` +
+          `unicode-range:${slice.unicodeRange}}`,
+      )
     }
-
-    const subset = await fs.readFile(subsetPath)
-    const url = `/_assets/${font.name}.${hash(subset)}.woff2`
-    await fs.writeFile(path.join(ctx.staticDir, url.slice(1)), subset)
-    ctx.assets[`${font.name}.woff2`] = url
-
-    sizes.push({
-      name: font.name,
-      before: original.byteLength,
-      after: subset.byteLength,
-    })
-    preload.push(url)
-    faces.push(
-      // The descriptor has to match the instanced axis, or the browser asks
-      // for a weight the file cannot render and synthesises one.
-      `@font-face{font-family:'${font.family}';font-style:normal;` +
-        `font-weight:${WEIGHT_AXIS.min} ${WEIGHT_AXIS.max};font-display:swap;` +
-        `src:url('${url}') format('woff2')}`,
-    )
   }
 
   // Write only on change: the dev server watches app/, and rewriting an

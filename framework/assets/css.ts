@@ -53,9 +53,17 @@ function tailwindBin(root: string): string {
 }
 
 /**
+ * Only the framework stages that emit markup. Tailwind mints a utility for any
+ * source token that names one, comments and object keys included: esbuild's
+ * `{ filter: /.../ }` in assets/ is `.filter`, "the build container" is
+ * `.container`, and each rides in the base sheet on every page.
+ */
+const FRAMEWORK_MARKUP_SOURCES = ['render', 'client', 'shared']
+
+/**
  * Tailwind is invoked on a generated entry rather than on `global.css` itself,
- * so the `@source` globs can point at `app/` and `framework/` without editing
- * a file the Next build still reads.
+ * so the `@source` globs can point at `app/` and the framework's markup stages
+ * without editing a file the Next build still reads.
  *
  * The entry sits in a directory of its own. Tailwind 4 adds the input file's
  * own directory as an automatic source root, so an entry written straight into
@@ -81,7 +89,9 @@ async function writeTailwindEntry(
     [
       `@import '${rel('app', 'styles', 'global.css')}';`,
       `@source '${rel('app')}';`,
-      `@source '${rel('framework')}';`,
+      ...FRAMEWORK_MARKUP_SOURCES.map(
+        (dir) => `@source '${rel('framework', dir)}';`,
+      ),
       ...excluded.map((source) => `@source not '${rel(source)}';`),
       '',
     ].join('\n'),
