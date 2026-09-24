@@ -22,6 +22,7 @@ import { createHash } from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { decodeEntities } from '../framework/shared/html.ts'
 import { staticPathFor } from '../framework/shared/routing.ts'
 import type { RouteManifest } from '../framework/shared/types.ts'
 
@@ -58,36 +59,13 @@ interface Snapshot {
 const sha = (value: string) =>
   createHash('sha256').update(value).digest('hex').slice(0, 16)
 
-const ENTITIES: Record<string, string> = {
-  amp: '&',
-  lt: '<',
-  gt: '>',
-  quot: '"',
-  apos: "'",
-  nbsp: ' ',
-}
-
-function decode(html: string): string {
-  return html.replace(
-    /&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g,
-    (whole, body: string) => {
-      if (body.startsWith('#x') || body.startsWith('#X')) {
-        return String.fromCodePoint(parseInt(body.slice(2), 16))
-      }
-      if (body.startsWith('#')) {
-        return String.fromCodePoint(Number(body.slice(1)))
-      }
-      return ENTITIES[body] ?? whole
-    },
-  )
-}
-
 /** The first capture of `pattern`, decoded, or the empty string. */
 function attr(html: string, pattern: RegExp): string {
-  return decode(pattern.exec(html)?.[1] ?? '').trim()
+  return decodeEntities(pattern.exec(html)?.[1] ?? '').trim()
 }
 
-const stripTags = (html: string) => decode(html.replace(/<[^>]*>/g, ' '))
+const stripTags = (html: string) =>
+  decodeEntities(html.replace(/<[^>]*>/g, ' '))
 const collapse = (text: string) => text.replace(/\s+/g, ' ').trim()
 
 function bodyOf(html: string): string {

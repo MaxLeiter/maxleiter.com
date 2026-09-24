@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import zlib from 'node:zlib'
 import * as esbuild from 'esbuild'
 import { createBuildContext } from '@framework/content/index'
-import { buildCss } from '@framework/assets/css'
+import { buildCss, pruneCss, usedNames } from '@framework/assets/css'
 import { buildClient } from '@framework/assets/client'
 import { prepareFonts } from '@framework/assets/fonts'
 import {
@@ -106,7 +106,7 @@ function fragment(
   name: string,
   css: string,
   markers: readonly string[],
-  order = 1,
+  order: number,
 ): Fragment {
   return {
     name,
@@ -506,33 +506,86 @@ async function main(): Promise<void> {
   ])
   Object.assign(ctx.assets, client.assets)
 
-  const fragments = await step('css fragments', async () => {
-    const all: Fragment[] = []
-    for (const sheet of PLAIN_SHEETS) {
-      const text = await minifyCss(await readSheet(sheet.file))
-      all.push(fragment(sheet.name, text, sheet.markers, sheet.order))
-    }
-    // shiki's rules key on the class its transformer puts on every `<pre>`.
-    const highlight = server.highlightCss()
-    if (highlight) {
-      all.push(fragment('shiki', await minifyCss(highlight), ['class="shiki']))
-    }
-    // The window manager's utilities, split out of the base sheet by
-    // `buildCss`. Only the homepage renders the island, so only it pays for
-    // them. Running the emitted CSS through esbuild is also a syntax check:
-    // an unbalanced brace out of the splitter fails the build loudly here.
-    if (css.desktop) {
-      all.push(
-        fragment('desktop', await minifyCss(css.desktop), [
-          'data-island="desktop"',
-        ]),
-      )
-    }
-    return all.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name))
-  })
+  const { baseCss, fragments, pruned } = await step(
+    'css fragments',
+    async () => {
+      // Pruned against everything the whole build can emit, not one page's: the
+      // base sheet has to be byte-identical on every page, and a fragment is
+      // the same text wherever it ships.
+      const used = usedNames({
+        bodies: pages.map((page) => page.body),
+        scripts: await Promise.all(
+          client.outputs
+            .filter((output) => output.file.endsWith('.js'))
+            .map((output) =>
+              fs.readFile(
+                path.join(ctx.staticDir, '_assets', output.file),
+                'utf8',
+              ),
+            ),
+        ),
+      })
 
-  // The base half gets the same esbuild pass, for the same syntax check.
-  const baseCss = await minifyCss(css.css)
+      const gated = [
+        ...(await Promise.all(
+          PLAIN_SHEETS.map(async (sheet) => ({
+            ...sheet,
+            css: await readSheet(sheet.file),
+          })),
+        )),
+        // shiki's rules key on the class its transformer puts on every `<pre>`.
+        {
+          name: 'shiki',
+          css: server.highlightCss(),
+          markers: ['class="shiki'],
+          order: 1,
+        },
+        // The window manager's utilities, split out of the base sheet by
+        // `buildCss`. Only the homepage renders the island, so only it pays
+        // for them.
+        {
+          name: 'desktop',
+          css: css.desktop,
+          markers: ['data-island="desktop"'],
+          order: 1,
+        },
+      ]
+
+      // Minified on both sides of the prune: the pruner reads minified CSS,
+      // and the second pass is the syntax check -- an unbalanced brace out of
+      // the splitter or the pruner fails the build loudly here.
+      const minifyAll = async (sheets: Record<string, string>) =>
+        Object.fromEntries(
+          await Promise.all(
+            Object.entries(sheets).map(
+              async ([name, text]) => [name, await minifyCss(text)] as const,
+            ),
+          ),
+        )
+      const input: Record<string, string> = { base: css.css }
+      for (const sheet of gated) input[sheet.name] = sheet.css
+      const result = pruneCss(await minifyAll(input), used)
+      const output = await minifyAll(result.sheets)
+
+      return {
+        baseCss: output.base,
+        // An empty sheet is one the prune emptied, or a desktop split with
+        // nothing in it; either way no page needs a tag for it.
+        fragments: gated
+          .filter((sheet) => output[sheet.name])
+          .map((sheet) =>
+            fragment(
+              sheet.name,
+              output[sheet.name],
+              sheet.markers,
+              sheet.order,
+            ),
+          )
+          .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name)),
+        pruned: result.dropped,
+      }
+    },
+  )
 
   // Everything a partial does NOT carry, hashed. The router hard-navigates
   // when a fetched document's shell-id differs from the running page's, so a
@@ -689,12 +742,22 @@ async function main(): Promise<void> {
     const nameWidth = Math.max(...fragments.map((item) => item.name.length), 8)
     console.log('\ncss bytes')
     console.log(
-      `  ${'base (tailwind)'.padEnd(nameWidth)}  ${String(css.tailwindBytes).padStart(8)}`,
+      `  ${'base'.padEnd(nameWidth)}  ${String(Buffer.byteLength(baseCss)).padStart(8)}`,
     )
     for (const item of fragments) {
       const bytes = String(Buffer.byteLength(item.css)).padStart(8)
       const on = fragmentPages.get(item.name) ?? 0
       console.log(`  ${item.name.padEnd(nameWidth)}  ${bytes}  on ${on} pages`)
+    }
+    // Classes and custom properties a sheet has and no output uses. A Tailwind
+    // utility here was minted from a word in a source file; anything
+    // hand-written is dead code worth deleting from its sheet. Tailwind's own
+    // `--tw-*` variables come and go with its utilities, so they are omitted.
+    for (const [name, names] of Object.entries(pruned)) {
+      const shown = names.filter((item) => !item.startsWith('--tw-'))
+      if (shown.length > 0) {
+        console.log(`  pruned from ${name}: ${shown.join(' ')}`)
+      }
     }
 
     if (client.outputs.length > 0) {

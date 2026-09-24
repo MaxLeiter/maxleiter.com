@@ -54,7 +54,7 @@ churn you cannot explain, that is the signal, not a formality.
 ## Rules that are easy to break
 
 - **`framework/shared/**` may import nothing but node builtins and React
-  types.** The build, the client bundle and `tools/` all reach those three
+  types.** The build, the client bundle and `tools/` all reach those four
   files. There is no lint rule for it (oxlint has no `no-restricted-imports`);
   each file says so in its docblock.
 - **Nothing the client bundle reaches may import `node:fs` or gray-matter.**
@@ -75,6 +75,12 @@ churn you cannot explain, that is the signal, not a formality.
 - **A new stylesheet needs an entry in `PLAIN_SHEETS`** in `build.ts`, with an
   attribute-shaped marker (`class="thing-`, not `thing`). A sheet with no entry
   ships on no page at all.
+- **A class must be spelled out somewhere the build can see it.** Every sheet
+  is pruned against the output: class attributes, island `data-props`, and
+  string literals in client code. A class composed at runtime from parts
+  (`'shot-' + kind`) has its rules dropped, and so does a custom property
+  whose name is only ever assembled. The build log lists what each sheet
+  lost.
 - **Class names are written scoped.** There is no CSS-module compiler. A
   component and its island use the same literal strings from the same `.css`
   file.

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 import zlib from 'node:zlib'
 import { createBuildContext } from '../content'
 import { buildClient } from '../assets/client'
+import { pruneCss, usedNames } from '../assets/css'
 import { LAYOUT_FEATURES, prepareFonts } from '../assets/fonts'
 import { formatPlatformResult, runPlatformSteps } from '.'
 import { writeFeeds } from './feeds'
@@ -469,6 +470,42 @@ async function main(): Promise<void> {
   ).length
   check('the inline runtime stays under its 1536 B brotli budget', () => {
     assert.ok(runtimeBrotli <= 1536, `${runtimeBrotli} B brotli`)
+  })
+
+  // 9. The CSS pruner, on an input small enough to state the answer for.
+  // `--tw-a` is read only from the other sheet, so pruning sheets one at a
+  // time would drop its registration; `--ink` is read only by an inline
+  // style; the last rule closes on the final character, where a node must
+  // still be emitted once.
+  const used = usedNames({
+    bodies: [
+      ' <p class="a x &amp;b" style="color:var(--ink)"' +
+        ' data-props="{&quot;trigger&quot;:&quot;d&quot;}">',
+    ],
+    scripts: ['e("i",{className:"3xl:p-8"})'],
+  })
+  const pruned = pruneCss(
+    {
+      base:
+        '@property --tw-a{syntax:"*";inherits:false}' +
+        '@property --tw-b{syntax:"*";inherits:false}' +
+        ':root{--ink:red;--dead:blue}' +
+        '.a,.b{color:red}.x:not(.b){color:blue}' +
+        '.\\33 xl\\:p-8{padding:2rem}.c{--tw-b:1;filter:var(--tw-b)}',
+      page: '.d{box-shadow:var(--tw-a)}',
+    },
+    used,
+  )
+  check('pruneCss keeps exactly the rules the output can use', () => {
+    assert.ok(used.classes.has('&b') && used.classes.has('d'))
+    assert.ok(used.classes.has('3xl:p-8') && used.variables.has('--ink'))
+    assert.equal(
+      pruned.sheets.base,
+      '@property --tw-a{syntax:"*";inherits:false}:root{--ink:red}' +
+        '.a{color:red}.x:not(.b){color:blue}.\\33 xl\\:p-8{padding:2rem}',
+    )
+    assert.equal(pruned.sheets.page, '.d{box-shadow:var(--tw-a)}')
+    assert.deepEqual(pruned.dropped, { base: ['--dead', '--tw-b', 'b', 'c'] })
   })
 
   await fs.rm(outDir, { recursive: true, force: true })

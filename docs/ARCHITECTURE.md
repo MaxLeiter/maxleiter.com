@@ -35,6 +35,7 @@ framework/
     routing.ts              URL -> file. Redirects, the ?embed rewrite, MIME.
                             One table, read by vercel.ts, dev.ts and the gate
     transitions.ts          transitionName(kind, slug) and its URL inverse
+    html.ts                 decodeEntities, shared by the CSS pruner and the gate
   content/                  everything that reads the repo
     index.ts                posts, notes and projects -> BuildContext
     tweets.ts               committed tweet payloads
@@ -111,8 +112,9 @@ per-step times in the report do not sum to the total.
    `react`/`react-dom` aliased to `preact/compat`, code-split and content-hashed
    into `/_assets/`.
 
-6. **css fragments** — each conditional slice of the stylesheet is read,
-   minified, and given the markup marker that proves a page needs it.
+6. **css fragments** — each conditional slice of the stylesheet is read and
+   minified, every sheet is pruned against the classes the build emits, and
+   each fragment is given the markup marker that proves a page needs it.
 
 7. **write html** — each page gets the base sheet plus only the fragments its
    markup references, wrapped in the shell. Written twice: `index.html` and
@@ -144,13 +146,26 @@ page needs. Two `<style>` tags, not one: `#css-base` is byte-identical on every
 page and a soft navigation never touches it, while `#css-page` is that route's
 fragments and is all a swap replaces.
 
-Tailwind's sources are `app/` and the three framework stages that emit markup,
-`render/`, `client/` and `shared/`. It mints a utility for any source token that
-names one, comments and object keys included, so scanning the build-only stages
-shipped `.filter`, `.shadow`, `.container` and `.shrink` to every page, from
-esbuild's `{ filter: /.../ }` and prose like "the build container". The same
-thing still happens inside `app/`: `.table`, `.static`, `.inline`, `.blur` and
-`.transition` are in the base sheet and in no page's markup.
+Every sheet, base and fragments alike, is pruned against the output
+(`pruneCss` in `assets/css.ts`). The build collects every class it can emit —
+class attributes, island `data-props`, and the string literals of the client
+bundles, which is where the classes islands and the router add at runtime
+live — and every custom property its bodies and scripts name. It drops each
+selector that needs a class outside that set, then each custom property that
+no remaining rule reads and the output never names. Dead CSS comes from two
+places, and neither is visible from the sources. Tailwind mints a utility for
+any source token that names one, comments and object keys included: esbuild's
+`{ filter: /.../ }` is `.filter`, "route table" is `.table`, "the build
+container" is `.container`. And hand-written rules outlive the markup they
+styled: react-tweet's quoted-tweet and video rules on a site with neither,
+seventeen variables in `global.css` nothing reads. The build log lists what
+each sheet lost, minus Tailwind's own `--tw-*` variables.
+
+The sheets are pruned together, not one at a time, because a variable crosses
+sheets: the desktop fragment's utilities read `@property` rules that live in
+the base sheet, and dropping a registration changes the variable's initial
+value and whether it inherits. Classes inside `:not()`, `:is()` and `:where()`
+never count against a selector, which errs toward keeping.
 
 The base sheet is the Tailwind build minus the desktop's utilities. `buildCss`
 runs Tailwind twice — the full source set, and once more with `@source not`
@@ -449,6 +464,15 @@ checked with real hashes instead of stated in prose.
 Still-true decisions, newest first. A decision that stops being true should be
 deleted from this list rather than annotated.
 
+**Every sheet is pruned against the build's own output.** The first attempt
+narrowed Tailwind's sources to the framework stages that emit markup, which
+removed four junk utilities, missed the ones minted inside `app/`, and would
+silently drop the CSS of any markup that later came from another directory.
+Pruning the output catches every source of junk, including hand-written sheets,
+and scanning too much now costs nothing. It took 5.4 KB raw and about 0.58 KB
+brotli off every document, and 4.3 KB of react-tweet rules and variables for
+quoted tweets and video the site's tweets never use.
+
 **OG and Twitter cards carry the page's own title and URL.** The Next site
 emitted the constant site name as `og:title` and the origin as `og:url` on
 every page, so a shared post rendered as "Max Leiter"; the parity migration
@@ -462,7 +486,7 @@ Navigation for what the native path cost and the two browser facts it taught.
 **`framework/` is laid out by build stage:** `shared/`, `content/`, `render/`,
 `assets/`, `platform/`, `client/`. The names say when a module runs, so a file's
 folder answers "what depends on this" before you open it. `shared/` carries the
-strongest rule in the repo, stated in a docblock at the top of each of its three
+strongest rule in the repo, stated in a docblock at the top of each of its four
 files: nothing there may import anything but node builtins and React types,
 which is what lets the build, the client bundle and `tools/` all reach it.
 oxlint has no `no-restricted-imports`, so the docblocks are the enforcement.

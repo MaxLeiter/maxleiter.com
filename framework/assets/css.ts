@@ -3,6 +3,7 @@ import { createRequire } from 'node:module'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { promisify } from 'node:util'
+import { decodeEntities } from '../shared/html'
 
 const run = promisify(execFile)
 
@@ -28,7 +29,6 @@ export interface CssResult {
    * content page was carrying for markup only `/` renders.
    */
   desktop: string
-  tailwindBytes: number
 }
 
 /**
@@ -53,17 +53,9 @@ function tailwindBin(root: string): string {
 }
 
 /**
- * Only the framework stages that emit markup. Tailwind mints a utility for any
- * source token that names one, comments and object keys included: esbuild's
- * `{ filter: /.../ }` in assets/ is `.filter`, "the build container" is
- * `.container`, and each rides in the base sheet on every page.
- */
-const FRAMEWORK_MARKUP_SOURCES = ['render', 'client', 'shared']
-
-/**
  * Tailwind is invoked on a generated entry rather than on `global.css` itself,
- * so the `@source` globs can point at `app/` and the framework's markup stages
- * without editing a file the Next build still reads.
+ * so the `@source` globs can point at `app/` and `framework/` without editing
+ * a file the Next build still reads.
  *
  * The entry sits in a directory of its own. Tailwind 4 adds the input file's
  * own directory as an automatic source root, so an entry written straight into
@@ -89,9 +81,7 @@ async function writeTailwindEntry(
     [
       `@import '${rel('app', 'styles', 'global.css')}';`,
       `@source '${rel('app')}';`,
-      ...FRAMEWORK_MARKUP_SOURCES.map(
-        (dir) => `@source '${rel('framework', dir)}';`,
-      ),
+      `@source '${rel('framework')}';`,
       ...excluded.map((source) => `@source not '${rel(source)}';`),
       '',
     ].join('\n'),
@@ -126,7 +116,7 @@ export async function buildCss(options: {
   ])
 
   const { base, extra } = splitCss(full, slim)
-  return { css: base, desktop: extra, tailwindBytes: Buffer.byteLength(base) }
+  return { css: base, desktop: extra }
 }
 
 /* ------------------------------------------------- splitting the sheet -- */
@@ -275,6 +265,7 @@ function parseNodes(css: string): CssNode[] {
     const start = i
     let depth = 0
     let quote = ''
+    let closed = false
     for (; i < css.length; i++) {
       const ch = css[i]
       if (quote) {
@@ -294,6 +285,7 @@ function parseNodes(css: string): CssNode[] {
             body: css.slice(open + 1, i),
           })
           i++
+          closed = true
           break
         }
       } else if (ch === ';' && depth === 0) {
@@ -301,17 +293,17 @@ function parseNodes(css: string): CssNode[] {
         // Statements keep their text in `header` for atom identity.
         nodes[nodes.length - 1].header = css.slice(start, i + 1).trim()
         i++
+        closed = true
         break
       }
     }
-    if (i >= css.length && depth !== 0) {
-      throw new Error('unbalanced braces in tailwind output')
-    }
-    if (i >= css.length && start < css.length && depth === 0) {
-      const tail = css.slice(start).trim()
-      if (tail) nodes.push({ header: tail, body: undefined })
-      break
-    }
+    // Checked by flag, not by `i` reaching the end: a node that closes on the
+    // last character leaves `i` there too, and testing `i` would push it a
+    // second time as a statement.
+    if (closed) continue
+    if (depth !== 0) throw new Error('unbalanced braces in tailwind output')
+    const tail = css.slice(start).trim()
+    if (tail) nodes.push({ header: tail, body: undefined })
   }
   return nodes
 }
@@ -368,4 +360,181 @@ function splitDeclarations(body: string): string[] {
   const last = body.slice(start).trim()
   if (last) decls.push(last)
   return decls
+}
+
+/* -------------------------------------------------- pruning the sheet -- */
+
+/** What the build's output can use: classes, and custom properties it names. */
+export interface Used {
+  classes: ReadonlySet<string>
+  variables: ReadonlySet<string>
+}
+
+/**
+ * Every class the build can put on an element, and every custom property its
+ * markup and scripts name.
+ *
+ * Markup is only one source of classes. Island `data-props` carry classes an
+ * island applies at runtime and no markup has (the shot grid's `trigger`), and
+ * the client bundles' string literals are every class an island or the router
+ * can add. Splitting script text on quotes and whitespace yields a superset of
+ * those literals, which errs toward keeping a rule, never toward dropping one.
+ * Variables are read the same way from anywhere in a body or a script: an
+ * inline `style` or a `getPropertyValue` reads a property no sheet does.
+ */
+export function usedNames(sources: {
+  bodies: readonly string[]
+  scripts: readonly string[]
+}): Used {
+  const classes = new Set<string>()
+  const variables = new Set<string>()
+  const add = (text: string) => {
+    for (const token of text.split(/[\s"'`]+/)) if (token) classes.add(token)
+  }
+  const name = (text: string) => {
+    for (const [variable] of text.matchAll(/--[\w-]+/g)) variables.add(variable)
+  }
+  for (const body of sources.bodies) {
+    for (const [, value] of body.matchAll(
+      /\s(?:class|data-props)="([^"]*)"/g,
+    )) {
+      add(decodeEntities(value))
+    }
+    name(body)
+  }
+  for (const script of sources.scripts) {
+    add(script)
+    name(script)
+  }
+  return { classes, variables }
+}
+
+/** `\33 xl\:p-8` -> `3xl:p-8`. */
+function unescapeCss(name: string): string {
+  return name.replace(/\\(?:([0-9a-fA-F]{1,6}) ?|(.))/g, (_, hex, ch) =>
+    hex ? String.fromCodePoint(Number.parseInt(hex, 16)) : ch,
+  )
+}
+
+/**
+ * The classes a selector cannot match without. Anything inside parentheses or
+ * brackets is skipped: `:not(.a)` matches more when `.a` is absent,
+ * `:is(.a,.b)` needs only one of the two, and `[title=".a"]` is no class.
+ */
+function requiredClasses(selector: string): string[] {
+  let outside = ''
+  let depth = 0
+  for (let i = 0; i < selector.length; i++) {
+    const ch = selector[i]
+    if (ch === '\\') {
+      if (depth === 0) outside += selector.slice(i, i + 2)
+      i++
+    } else if (ch === '(' || ch === '[') depth++
+    else if (ch === ')' || ch === ']') depth--
+    else if (depth === 0) outside += ch
+  }
+  return [...outside.matchAll(/\.((?:\\[0-9a-fA-F]{1,6} ?|\\.|[\w-])+)/g)].map(
+    ([, name]) => unescapeCss(name),
+  )
+}
+
+/** Predicates for `filterRules`; an omitted one keeps everything. */
+interface Keep {
+  selector?: (selector: string) => boolean
+  declaration?: (declaration: string) => boolean
+  /** A leaf at-rule such as `@property --tw-blur`. */
+  atRule?: (header: string) => boolean
+}
+
+/**
+ * The sheet with every selector, declaration and leaf at-rule `keep` rejects
+ * removed, and every block left empty removed with it. Only ever deletes:
+ * grouped selectors stay grouped and untouched rules stay byte-identical,
+ * where splitting into atoms and reassembling would ungroup `.a,.b{}`.
+ */
+function filterRules(css: string, keep: Keep): string {
+  let out = ''
+  for (const node of parseNodes(css)) {
+    if (node.body === undefined) {
+      out += node.header
+    } else if (node.header.startsWith('@keyframes')) {
+      // `0%` and `to` are not element selectors.
+      out += `${node.header}{${node.body}}`
+    } else if (node.body.includes('{')) {
+      const inner = filterRules(node.body, keep)
+      if (inner) out += `${node.header}{${inner}}`
+    } else {
+      const { selector = () => true, declaration = () => true } = keep
+      const header = node.header.startsWith('@')
+        ? (keep.atRule?.(node.header) ?? true) && node.header
+        : splitSelectors(node.header).filter(selector).join(',')
+      const body = splitDeclarations(node.body).filter(declaration)
+      if (header && body.length > 0) out += `${header}{${body.join(';')}}`
+    }
+  }
+  return out
+}
+
+/**
+ * Drops every selector that needs a class the output never uses, then every
+ * custom property that no remaining rule in ANY of the sheets reads and the
+ * output never names.
+ *
+ * The sheets are pruned together because a variable crosses sheets: the
+ * desktop fragment's shadow utilities read `@property` rules that live in the
+ * base sheet, and dropping a registration changes the variable's initial
+ * value and whether it inherits.
+ */
+export function pruneCss(
+  sheets: Record<string, string>,
+  used: Used,
+): { sheets: Record<string, string>; dropped: Record<string, string[]> } {
+  const names = Object.keys(sheets)
+  const out = { ...sheets }
+  // Per sheet: the classes its selectors needed, then its dead variables.
+  const lost: Record<string, Set<string>> = {}
+  for (const name of names) {
+    lost[name] = new Set()
+    out[name] = filterRules(sheets[name], {
+      selector: (selector) => {
+        const needed = requiredClasses(selector).filter(
+          (c) => !used.classes.has(c),
+        )
+        for (const c of needed) lost[name].add(c)
+        return needed.length === 0
+      },
+    })
+  }
+
+  // To a fixed point: `--a: var(--b)` keeps `--b` alive until `--a` goes.
+  for (let changed = true; changed;) {
+    changed = false
+    const read = new Set(used.variables)
+    for (const name of names) {
+      for (const [, v] of out[name].matchAll(/var\((--[\w-]+)/g)) read.add(v)
+    }
+    for (const name of names) {
+      const live = (variable: string | undefined) => {
+        if (variable === undefined || read.has(variable)) return true
+        lost[name].add(variable)
+        return false
+      }
+      const next = filterRules(out[name], {
+        declaration: (decl) => live(decl.match(/^(--[\w-]+)\s*:/)?.[1]),
+        atRule: (header) =>
+          !header.startsWith('@property ') ||
+          live(header.slice('@property '.length).trim()),
+      })
+      if (next !== out[name]) {
+        out[name] = next
+        changed = true
+      }
+    }
+  }
+
+  const dropped: Record<string, string[]> = {}
+  for (const name of names) {
+    if (lost[name].size > 0) dropped[name] = [...lost[name]].sort()
+  }
+  return { sheets: out, dropped }
 }

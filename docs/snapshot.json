@@ -10,7 +10,7 @@
       "noindex": false,
       "textHash": "3ea2190adc145fb1",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 57005
+      "partialBytes": 51265
     },
     {
       "path": "/404",
@@ -65,7 +65,7 @@
       "noindex": false,
       "textHash": "279c5065da5624ac",
       "codeHash": "02a6e93a53e7b727",
-      "partialBytes": 101121
+      "partialBytes": 101090
     },
     {
       "path": "/blog/build-a-blog-with-nextjs-13/embed",
@@ -76,7 +76,7 @@
       "noindex": true,
       "textHash": "56b09cb8306dd9d5",
       "codeHash": "02a6e93a53e7b727",
-      "partialBytes": 97388
+      "partialBytes": 97357
     },
     {
       "path": "/blog/contributing-to-oss",
@@ -142,7 +142,7 @@
       "noindex": false,
       "textHash": "b28668a58fba93a1",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 17969
+      "partialBytes": 17938
     },
     {
       "path": "/blog/formatting/embed",
@@ -153,7 +153,7 @@
       "noindex": true,
       "textHash": "288dd1e40eb51a4d",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 14252
+      "partialBytes": 14221
     },
     {
       "path": "/blog/framework",
@@ -208,7 +208,7 @@
       "noindex": false,
       "textHash": "65cc5fd9b6f16ac6",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 13620
+      "partialBytes": 13589
     },
     {
       "path": "/blog/HFSViewer/embed",
@@ -219,7 +219,7 @@
       "noindex": true,
       "textHash": "3f57e2fb51d5046e",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 9922
+      "partialBytes": 9891
     },
     {
       "path": "/blog/introducing-drift",
@@ -384,7 +384,7 @@
       "noindex": false,
       "textHash": "c8214af71dbc8ea3",
       "codeHash": "51ad4f3a15cddfcc",
-      "partialBytes": 41814
+      "partialBytes": 41783
     },
     {
       "path": "/blog/sandcastle/embed",
@@ -395,7 +395,7 @@
       "noindex": true,
       "textHash": "d4f28c8bb8442629",
       "codeHash": "51ad4f3a15cddfcc",
-      "partialBytes": 38085
+      "partialBytes": 38054
     },
     {
       "path": "/blog/seeing-the-future",
@@ -406,7 +406,7 @@
       "noindex": false,
       "textHash": "4b905c6cb87473ed",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 33204
+      "partialBytes": 28862
     },
     {
       "path": "/blog/seeing-the-future/embed",
@@ -417,7 +417,7 @@
       "noindex": true,
       "textHash": "3c04a5a0d9415593",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 29462
+      "partialBytes": 25120
     },
     {
       "path": "/blog/ship-every-day",
@@ -428,7 +428,7 @@
       "noindex": false,
       "textHash": "daaca142c329f36e",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 10276
+      "partialBytes": 10245
     },
     {
       "path": "/blog/ship-every-day/embed",
@@ -439,7 +439,7 @@
       "noindex": true,
       "textHash": "6c37dbc7c30bf387",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 6560
+      "partialBytes": 6529
     },
     {
       "path": "/blog/sluggified-urls",
@@ -516,7 +516,7 @@
       "noindex": false,
       "textHash": "e2495ed406a684f5",
       "codeHash": "e4530c1c22646dc1",
-      "partialBytes": 31532
+      "partialBytes": 31501
     },
     {
       "path": "/blog/the-new-maxleiter-com/embed",
@@ -527,7 +527,7 @@
       "noindex": true,
       "textHash": "bb552ae314f54f51",
       "codeHash": "e4530c1c22646dc1",
-      "partialBytes": 27798
+      "partialBytes": 27767
     },
     {
       "path": "/blog/vibecoding-minecraft-mods",
@@ -692,7 +692,7 @@
       "noindex": false,
       "textHash": "cdf202017ac4839e",
       "codeHash": "23e7fdd7ebfe9984",
-      "partialBytes": 27074
+      "partialBytes": 27043
     },
     {
       "path": "/notes/gemini-script/embed",
@@ -703,7 +703,7 @@
       "noindex": true,
       "textHash": "64124bcba936281a",
       "codeHash": "23e7fdd7ebfe9984",
-      "partialBytes": 23366
+      "partialBytes": 23335
     },
     {
       "path": "/notes/git-checkout-script",
