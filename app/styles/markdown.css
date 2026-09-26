@@ -203,8 +203,10 @@ article details {
   margin-bottom: var(--gap-half);
 }
 
-.react-tweet-theme {
-  max-height: 600px;
+/* `article img` above reaches react-tweet's avatars and badges and its margin
+   shoves them down inside their overflow:hidden boxes. */
+article .react-tweet-theme img {
+  margin: 0;
 }
 
 /* Tables: no outer box, a quiet uppercase header, hairline row dividers. */
