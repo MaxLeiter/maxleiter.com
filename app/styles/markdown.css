@@ -142,10 +142,6 @@ article blockquote p:not(:last-child) {
 
 /* Code Snippets */
 
-.token-line:not(:last-child) {
-  min-height: 1.4rem;
-}
-
 article *:not(pre) > code {
   font-family: var(--font-mono);
   font-size: 1rem;
@@ -180,14 +176,6 @@ article div + pre {
   border-top-right-radius: 0;
 }
 
-/* Linkable Headers */
-
-.header-link {
-  /* padding-top: var(--header-height); */
-  color: inherit;
-  text-decoration: none;
-}
-
 article a {
   text-decoration: none;
   word-wrap: break-word;
@@ -206,17 +194,6 @@ sup {
   padding-top: var(--header-height);
 }
 
-.header-link::after {
-  opacity: 0;
-  content: '#';
-  margin-left: var(--gap-half);
-  color: var(--gray);
-}
-
-.header-link:hover::after {
-  opacity: 1;
-}
-
 article ol li p:first-child {
   display: inline;
 }
@@ -224,12 +201,6 @@ article ol li p:first-child {
 article details {
   margin-top: var(--gap-half);
   margin-bottom: var(--gap-half);
-}
-
-@media screen and (max-width: 760px) {
-  .header-link::after {
-    opacity: 0.5;
-  }
 }
 
 .react-tweet-theme {

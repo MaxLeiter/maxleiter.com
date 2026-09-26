@@ -42,8 +42,9 @@ const LATIN1_RENDERED: readonly number[] = [0x00a0, 0x00ae, 0x00b0, 0x00b7]
  * that mint text at runtime, widened to the rest of each small family so a new
  * post does not immediately need a rebuild.
  *
- * Emoji (⚠ ❗ 🎉 🤷 and U+FE0F) and ツ are deliberately absent: Geist has no
- * glyphs for them, so they fall through to the system font either way.
+ * Emoji (⚠ ❗ 🎉 🤷 and U+FE0F), ツ, ⌘, ✕ and ▸ are deliberately absent:
+ * Geist has no glyphs for them, so they fall through to the system font
+ * either way. The diagram glyphs Geist Mono lacks are drawn (`drawn` below).
  */
 const SUBSET_EXTRAS: readonly number[] = [
   // General Punctuation: – — ‘ ’ ‚ “ ” „ • … and the zero-width joiner
@@ -53,16 +54,11 @@ const SUBSET_EXTRAS: readonly number[] = [
   0x2122,
   // Arrows: ← ↑ → ↓ ↩
   0x2190, 0x2191, 0x2192, 0x2193, 0x21a9,
-  // Miscellaneous Technical: ⌘, in the palette's shortcut hint
-  0x2318,
-  // Box Drawing, light set. The ASCII-art diagrams in posts/ use all of these,
-  // and U+2500 alone appears 668 times in the built output.
-  0x2500, 0x2502, 0x250c, 0x2510, 0x2514, 0x2518, 0x251c, 0x2524, 0x252c,
-  0x2534, 0x253c,
-  // Geometric Shapes: ▲ ▸ ► ▼ ◄
-  0x25b2, 0x25b8, 0x25ba, 0x25bc, 0x25c4,
-  // Dingbats: ✕
-  0x2715,
+  // Box Drawing, the part of the light set Geist Mono has: ─ │ ┌ └ ├.
+  // U+2500 alone appears 668 times in the built output.
+  0x2500, 0x2502, 0x250c, 0x2514, 0x251c,
+  // Geometric Shapes: ▲ ▼
+  0x25b2, 0x25bc,
 ]
 
 /**
@@ -109,6 +105,12 @@ interface FontSource {
   source: string
   /** CSS `font-family` the site's tokens point at. */
   family: string
+  /**
+   * Has a committed face of diagram glyphs the source lacks, drawn by
+   * scripts/box-drawing.py: `<stem>-box.woff2`, and `<stem>-box.json` naming
+   * its codepoints and the core subset it was cut from.
+   */
+  drawn?: boolean
 }
 
 const FONTS: readonly FontSource[] = [
@@ -121,6 +123,7 @@ const FONTS: readonly FontSource[] = [
     stem: 'GeistMono',
     source: 'geist-mono/GeistMono-Variable.woff2',
     family: 'Geist Mono Variable',
+    drawn: true,
   },
 ]
 
@@ -128,10 +131,6 @@ interface Slice {
   /** Filename suffix after the stem. */
   suffix: string
   codepoints: readonly number[]
-  /** The `unicode-range` descriptor. The slices' ranges must be disjoint. */
-  unicodeRange: string
-  /** Preloaded on every page, or fetched only where its characters render. */
-  preload: boolean
 }
 
 function range([from, to]: readonly [number, number]): number[] {
@@ -143,32 +142,24 @@ const LATIN1_REST = range(LATIN1_SUPPLEMENT).filter(
 )
 
 /**
- * Where two faces of one family overlap, the browser takes the last one
- * declared that covers the character, so a character claimed by both would
- * load whichever file happens to come second. The core claims the complement
- * of the latin1 file rather than its own list: a character in neither still
- * reaches the core face and falls through to the system font, and the
- * descriptor in every document's head stays short.
+ * The first slice is the core: preloaded on every page, and claiming every
+ * codepoint no other face of its family claims. Every other face is fetched
+ * only where its characters render, and claims exactly its own codepoints.
  *
- * Which system font it falls through to is not ours to pick. Geist Mono has
- * no ┐ ┘ ┤ ┬ ┴ ┼, and macOS chooses their fallback partly from the primary
- * file's cmap: with Latin-1 split out, Chrome draws them at 600/700 in
- * full-width Hiragino rather than Monaco. Every diagram renders them at 400, where the
- * fallback is Menlo either way; a bold one would come out misaligned.
+ * Where two faces of one family overlap, the browser takes the last one
+ * declared that covers the character, so the ranges are kept disjoint by
+ * construction rather than by order. A character in no face still reaches the
+ * core and falls through to the system font, and the descriptor in every
+ * document's head stays short. Which system font is not ours to pick: macOS
+ * chooses partly from the primary file's cmap, which is why diagram glyphs
+ * are drawn rather than left to fallback.
  */
 const SLICES: readonly Slice[] = [
   {
     suffix: 'subset',
     codepoints: [...range(ASCII), ...LATIN1_RENDERED, ...SUBSET_EXTRAS],
-    unicodeRange: unicodeRange(LATIN1_REST, { invert: true }),
-    preload: true,
   },
-  {
-    suffix: 'latin1',
-    codepoints: LATIN1_REST,
-    unicodeRange: unicodeRange(LATIN1_REST),
-    preload: false,
-  },
+  { suffix: 'latin1', codepoints: LATIN1_REST },
 ]
 
 export interface FontResult {
@@ -252,6 +243,39 @@ function geistFontDir(root: string): string {
   return path.join(path.dirname(entry), 'fonts')
 }
 
+const DRAW = 'uv run --with fonttools --with brotli scripts/box-drawing.py'
+
+/**
+ * The committed face of drawn glyphs, with the codepoints its sidecar names.
+ * The glyphs are cut from the core subset's own bars, so a core that has
+ * changed since -- a `geist` upgrade, a new weight axis -- fails the build
+ * rather than serving corners drawn to someone else's metrics.
+ */
+async function readDrawn(
+  fontDir: string,
+  stem: string,
+  core: { name: string; data: Buffer },
+): Promise<{ name: string; codepoints: readonly number[]; data: Buffer }> {
+  const name = `${stem}-box`
+  const file = path.join(fontDir, `${name}.woff2`)
+  const [data, sidecar] = await Promise.all([
+    fs.readFile(file),
+    fs.readFile(path.join(fontDir, `${name}.json`), 'utf8'),
+  ]).catch(() => {
+    throw new Error(`${name} is missing: run \`${DRAW}\``)
+  })
+  const { codepoints, from } = JSON.parse(sidecar) as {
+    codepoints: number[]
+    from: string
+  }
+  if (from !== hash(core.data)) {
+    throw new Error(
+      `${name} was drawn from an older ${core.name}: run \`${DRAW}\``,
+    )
+  }
+  return { name, codepoints, data }
+}
+
 /**
  * Subset both Geist faces (writing the committed artifacts if absent), copy
  * them into `${ctx.staticDir}/_assets` under a content hash, register them in
@@ -282,6 +306,11 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
   for (const font of FONTS) {
     const sourcePath = path.join(geistFontDir(ctx.root), font.source)
     const original = await fs.readFile(sourcePath)
+    const family: {
+      name: string
+      codepoints: readonly number[]
+      data: Buffer
+    }[] = []
 
     for (const slice of SLICES) {
       const name = `${font.stem}-${slice.suffix}`
@@ -306,25 +335,38 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
         await fs.writeFile(subsetPath, subset)
         manifest[name] = specKey
       }
+      family.push({
+        name,
+        codepoints: slice.codepoints,
+        data: await fs.readFile(subsetPath),
+      })
+    }
 
-      const subset = await fs.readFile(subsetPath)
-      const url = `/_assets/${name}.${hash(subset)}.woff2`
-      await fs.writeFile(path.join(ctx.staticDir, url.slice(1)), subset)
-      ctx.assets[`${name}.woff2`] = url
+    const [core] = family
+    if (font.drawn) family.push(await readDrawn(fontDir, font.stem, core))
+
+    const claimed = family.slice(1).flatMap((face) => face.codepoints)
+    for (const face of family) {
+      const url = `/_assets/${face.name}.${hash(face.data)}.woff2`
+      await fs.writeFile(path.join(ctx.staticDir, url.slice(1)), face.data)
+      ctx.assets[`${face.name}.woff2`] = url
 
       sizes.push({
-        name,
+        name: face.name,
         before: original.byteLength,
-        after: subset.byteLength,
+        after: face.data.byteLength,
       })
-      if (slice.preload) preload.push(url)
+      if (face === core) preload.push(url)
+      const claims =
+        face === core
+          ? unicodeRange(claimed, { invert: true })
+          : unicodeRange(face.codepoints)
       faces.push(
         // The descriptor has to match the instanced axis, or the browser asks
         // for a weight the file cannot render and synthesises one.
         `@font-face{font-family:'${font.family}';font-style:normal;` +
           `font-weight:${WEIGHT_AXIS.min} ${WEIGHT_AXIS.max};font-display:swap;` +
-          `src:url('${url}') format('woff2');` +
-          `unicode-range:${slice.unicodeRange}}`,
+          `src:url('${url}') format('woff2');unicode-range:${claims}}`,
       )
     }
   }

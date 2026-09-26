@@ -19,8 +19,12 @@ export interface ClientResult {
   assets: Record<string, string>
   /** Island name -> hashed public URL, for the page's `__islands` JSON. */
   islands: Record<string, string>
-  /** Per-output byte counts, for the build report. */
-  outputs: { file: string; bytes: number }[]
+  /**
+   * Every output file: its size for the build report, the files it imports
+   * statically or lazily, and the entry it is (`runtime`, `island.<name>`),
+   * if any. The imports are what say which chunks only one island can load.
+   */
+  outputs: { file: string; bytes: number; imports: string[]; entry?: string }[]
   /**
    * The runtime's source with chunk imports made absolute, for inlining into
    * every page as a module. An external module script in `<head>` makes
@@ -132,19 +136,30 @@ export async function buildClient(options: {
 
   const assets: Record<string, string> = {}
   const islandUrls: Record<string, string> = {}
-  const outputs: { file: string; bytes: number }[] = []
+  const outputs: ClientResult['outputs'] = []
 
   for (const [file, meta] of Object.entries(result.metafile.outputs)) {
     const base = path.basename(file)
-    outputs.push({ file: base, bytes: meta.bytes })
-    if (!meta.entryPoint) continue
-    // `runtime.3f9a.js` -> `runtime`, `island.palette.3f9a.js` -> `palette`.
+    // `island.palette.3f9a.js` -> `island.palette`. Only the entries declared
+    // above count: esbuild also marks every chunk a lazy import() targets as
+    // an entry point, and treating those as roots makes a chunk only the
+    // desktop loads look loadable by anything.
     const logical = base.replace(/\.[A-Z0-9]+\.js$/i, '')
+    const entry = Object.hasOwn(entryPoints, logical) ? logical : undefined
+    outputs.push({
+      file: base,
+      bytes: meta.bytes,
+      imports: meta.imports
+        .filter((item) => !item.external)
+        .map((item) => path.basename(item.path)),
+      entry,
+    })
+    if (!entry) continue
     const url = `/_assets/${base}`
-    if (logical === 'runtime') {
+    if (entry === 'runtime') {
       assets['runtime.js'] = url
-    } else if (logical.startsWith('island.')) {
-      islandUrls[logical.slice('island.'.length)] = url
+    } else {
+      islandUrls[entry.slice('island.'.length)] = url
     }
   }
 

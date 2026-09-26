@@ -8,43 +8,12 @@ import { decodeEntities } from '../shared/html'
 const run = promisify(execFile)
 
 /**
- * The base stylesheet, inlined into every `<head>`: the Tailwind build over
- * `app/styles/`.
- *
- * Feature-specific slices (the tweet card, the shot grid, the file tree, the
- * Minecraft inventory, the diff table, the shiki rules) are composed on top per
- * page by `build.ts`, which only appends the ones that page's markup actually
- * references.
- *
- * Inlining costs no render-blocking request, which is the right trade for a
- * site whose typical visit is a single page arriving from search.
+ * The stylesheet: `buildCss` runs Tailwind over `app/styles/`, which emits
+ * every utility the sources so much as name, and the rest of this file cuts
+ * that down to what the rendered output uses (`pruneCss`) and splits off what
+ * only one page can use (`subtractCss`). `build.ts` holds the output they
+ * are measured against.
  */
-
-export interface CssResult {
-  /** The base sheet: every rule a page without the desktop can need. */
-  css: string
-  /**
-   * Utilities only the desktop's sources mint, as a fragment build.ts gates
-   * on the homepage's markup. Measured at 7.3 KB raw / 1.1 KB gz that every
-   * content page was carrying for markup only `/` renders.
-   */
-  desktop: string
-}
-
-/**
- * The sources whose utilities belong to the desktop fragment rather than the
- * base sheet. Everything here renders only on the homepage: the window
- * manager, its chrome, and the icon grid. `window-toolbar` is NOT here,
- * because every page renders it -- and neither is `app/lib/window-styles.ts`,
- * which looks desktop-only but is where that toolbar's class strings live:
- * excluding it shipped every content page a toolbar with no height or
- * padding.
- */
-const DESKTOP_SOURCES = [
-  'app/islands/desktop.tsx',
-  'app/islands/desktop',
-  'app/components/static/desktop-icons.tsx',
-]
 
 function tailwindBin(root: string): string {
   const require_ = createRequire(path.join(root, 'package.json'))
@@ -62,14 +31,9 @@ function tailwindBin(root: string): string {
  * `.cache/` made the stylesheet depend on which bundles happened to be cached
  * there: a cold build and a warm build produced different utility sets.
  */
-async function writeTailwindEntry(
-  root: string,
-  cacheDir: string,
-  name: string,
-  excluded: readonly string[],
-) {
+async function writeTailwindEntry(root: string, cacheDir: string) {
   const entryDir = path.join(cacheDir, 'tailwind-src')
-  const entry = path.join(entryDir, name)
+  const entry = path.join(entryDir, 'input.css')
   await fs.mkdir(entryDir, { recursive: true })
   const rel = (...parts: string[]) =>
     path
@@ -82,7 +46,6 @@ async function writeTailwindEntry(
       `@import '${rel('app', 'styles', 'global.css')}';`,
       `@source '${rel('app')}';`,
       `@source '${rel('framework')}';`,
-      ...excluded.map((source) => `@source not '${rel(source)}';`),
       '',
     ].join('\n'),
   )
@@ -92,47 +55,20 @@ async function writeTailwindEntry(
 export async function buildCss(options: {
   root: string
   cacheDir: string
-}): Promise<CssResult> {
+}): Promise<string> {
   const { root, cacheDir } = options
-
-  // Two passes: the full sheet, and the sheet with the desktop's sources
-  // excluded. The atoms the slim pass lacks are exactly the desktop-only
-  // rules, and `splitCss` extracts them from the FULL sheet so both halves
-  // keep the full sheet's cascade order.
-  const build = async (name: string, excluded: readonly string[]) => {
-    const entry = await writeTailwindEntry(root, cacheDir, name, excluded)
-    const output = path.join(cacheDir, `${name.replace(/\.css$/, '')}-out.css`)
-    await run(
-      process.execPath,
-      [tailwindBin(root), '--input', entry, '--output', output, '--minify'],
-      { cwd: root },
-    )
-    return fs.readFile(output, 'utf8')
-  }
-
-  const [full, slim] = await Promise.all([
-    build('input.css', []),
-    build('input-slim.css', DESKTOP_SOURCES),
-  ])
-
-  const { base, extra } = splitCss(full, slim)
-  return { css: base, desktop: extra }
+  const entry = await writeTailwindEntry(root, cacheDir)
+  const output = path.join(cacheDir, 'input-out.css')
+  await run(
+    process.execPath,
+    [tailwindBin(root), '--input', entry, '--output', output, '--minify'],
+    { cwd: root },
+  )
+  return fs.readFile(output, 'utf8')
 }
 
-/* ------------------------------------------------- splitting the sheet -- */
+/* ---------------------------------------------- subtracting a sheet -- */
 
-/**
- * Splits the full sheet into the atoms the slim sheet also has (`base`) and
- * the ones it lacks (`extra`), both in the full sheet's order.
- *
- * An atom is one declaration or statement plus the headers above it -- e.g.
- * `@layer utilities > @media (min-width:120rem) > .3xl\:p-8 > padding:2rem` --
- * matched by text. Matching atoms rather than blocks is what makes this
- * robust against the two ways the slim output diverges structurally: shared
- * `:root` theme variables sit in ONE block whose body differs, and utilities
- * regroup under repeated `@supports`/`@media` wrappers when their neighbors
- * disappear. Block-level pairing mis-splits both; path text survives both.
- */
 interface CssNode {
   /** Selector or at-rule prelude. Empty for a bare statement. */
   header: string
@@ -140,7 +76,13 @@ interface CssNode {
   body?: string
 }
 
-/** One declaration or statement, with the headers above it. */
+/**
+ * One declaration or statement plus the headers above it -- e.g.
+ * `@layer utilities > @media (min-width:120rem) > .3xl\:p-8 > padding:2rem` --
+ * matched by text. Subtracting atoms rather than blocks is what survives a
+ * part that differs from the whole inside a block: a grouped selector that
+ * lost one member, a `:root` block that lost one variable.
+ */
 interface Atom {
   /** Identity for matching: trail, header and text, NUL-joined. */
   key: string
@@ -151,24 +93,24 @@ interface Atom {
   decl: string | null
 }
 
-function splitCss(full: string, slim: string): { base: string; extra: string } {
+/**
+ * The atoms of `whole` that `part` lacks, in `whole`'s order, so they keep
+ * their place in the cascade. `part` is `whole` with rules deleted, which is
+ * what `pruneCss` produces.
+ */
+export function subtractCss(whole: string, part: string): string {
   const available = new Map<string, number>()
-  for (const atom of atomize(slim)) {
+  for (const atom of atomize(part)) {
     available.set(atom.key, (available.get(atom.key) ?? 0) + 1)
   }
-
-  const base = new Emitter()
-  const extra = new Emitter()
-  for (const atom of atomize(full)) {
-    const count = available.get(atom.key) ?? 0
-    if (count > 0) {
+  return emit(
+    atomize(whole).filter((atom) => {
+      const count = available.get(atom.key) ?? 0
+      if (count === 0) return true
       available.set(atom.key, count - 1)
-      base.add(atom)
-    } else {
-      extra.add(atom)
-    }
-  }
-  return { base: base.finish(), extra: extra.finish() }
+      return false
+    }),
+  )
 }
 
 function atomize(css: string): Atom[] {
@@ -185,11 +127,9 @@ function atomize(css: string): Atom[] {
       } else if (node.body.includes('{')) {
         walk(parseNodes(node.body), [...trail, node.header])
       } else {
-        // Grouped selectors are split apart: the minifier merges
-        // `.bg-\(--bg\)` (desktop shorthand) and `.bg-\[var\(--bg\)\]`
-        // (shared) into ONE rule in the full sheet only, so matching whole
-        // headers would classify the shared class as desktop-only and strip
-        // it from every content page. `.a,.b{d}` is exactly `.a{d}.b{d}`.
+        // Grouped selectors are split apart: a part can keep one member of a
+        // group, and matching whole headers would then subtract the member
+        // it kept. `.a,.b{d}` is exactly `.a{d}.b{d}`.
         const selectors = node.header.startsWith('@')
           ? [node.header]
           : splitSelectors(node.header)
@@ -214,40 +154,33 @@ function atomize(css: string): Atom[] {
  * Reassembles atoms into CSS, opening and closing headers as the context
  * path changes between consecutive atoms.
  */
-class Emitter {
-  private out = ''
-  private path: string[] = []
-
-  private closeTo(next: string[]): void {
+function emit(atoms: readonly Atom[]): string {
+  let out = ''
+  let open: string[] = []
+  const moveTo = (next: string[]): void => {
     let shared = 0
     while (
-      shared < this.path.length &&
+      shared < open.length &&
       shared < next.length &&
-      this.path[shared] === next[shared]
+      open[shared] === next[shared]
     ) {
       shared++
     }
-    this.out += '}'.repeat(this.path.length - shared)
-    for (const segment of next.slice(shared)) this.out += `${segment}{`
-    this.path = next
+    out += '}'.repeat(open.length - shared)
+    for (const segment of next.slice(shared)) out += `${segment}{`
+    open = next
   }
-
-  add(atom: Atom): void {
+  for (const atom of atoms) {
     if (atom.decl === null) {
       // A bare statement (`@layer a,b;`) sits directly in its trail.
-      this.closeTo(atom.trail)
-      this.out += atom.header
-      return
+      moveTo(atom.trail)
+      out += atom.header
+    } else {
+      moveTo([...atom.trail, atom.header])
+      out += `${atom.decl};`
     }
-    this.closeTo([...atom.trail, atom.header])
-    this.out += `${atom.decl};`
   }
-
-  finish(): string {
-    this.out += '}'.repeat(this.path.length)
-    this.path = []
-    return this.out
-  }
+  return out + '}'.repeat(open.length)
 }
 
 /** Top-level nodes of one (minified) block body or sheet. */

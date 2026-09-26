@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import zlib from 'node:zlib'
 import { createBuildContext } from '../content'
 import { buildClient } from '../assets/client'
-import { pruneCss, usedNames } from '../assets/css'
+import { pruneCss, subtractCss, usedNames } from '../assets/css'
 import { LAYOUT_FEATURES, prepareFonts } from '../assets/fonts'
 import { formatPlatformResult, runPlatformSteps } from '.'
 import { writeFeeds } from './feeds'
@@ -506,6 +506,20 @@ async function main(): Promise<void> {
     )
     assert.equal(pruned.sheets.page, '.d{box-shadow:var(--tw-a)}')
     assert.deepEqual(pruned.dropped, { base: ['--dead', '--tw-b', 'b', 'c'] })
+  })
+  // What the desktop fragment is made of: a grouped selector that kept one
+  // member subtracts to exactly the other.
+  check('subtractCss leaves exactly what the part lacks, in order', () => {
+    assert.equal(
+      subtractCss(
+        '@layer u{.a,.b{color:red}.c{margin:0}}',
+        '@layer u{.a{color:red}}',
+      ),
+      '@layer u{.b{color:red;}.c{margin:0;}}',
+    )
+    // A rule the part has once and the whole twice leaves one copy.
+    assert.equal(subtractCss('.a{x:1}.a{x:1}', '.a{x:1}'), '.a{x:1;}')
+    assert.equal(subtractCss('.a{x:1}.a{x:1}', ''), '.a{x:1;x:1;}')
   })
 
   await fs.rm(outDir, { recursive: true, force: true })

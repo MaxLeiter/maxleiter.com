@@ -6,8 +6,13 @@ import { fileURLToPath } from 'node:url'
 import zlib from 'node:zlib'
 import * as esbuild from 'esbuild'
 import { createBuildContext } from '@framework/content/index'
-import { buildCss, pruneCss, usedNames } from '@framework/assets/css'
-import { buildClient } from '@framework/assets/client'
+import {
+  buildCss,
+  pruneCss,
+  subtractCss,
+  usedNames,
+} from '@framework/assets/css'
+import { buildClient, type ClientResult } from '@framework/assets/client'
 import { prepareFonts } from '@framework/assets/fonts'
 import {
   formatPlatformResult,
@@ -441,6 +446,129 @@ async function publish(buildOut: string, finalOut: string): Promise<void> {
   }
 }
 
+/** The island whose rules get a fragment of their own. */
+const DESKTOP = 'desktop'
+const DESKTOP_MARKER = `data-island="${DESKTOP}"`
+
+/**
+ * Every stylesheet a page can carry, pruned against what the build emits.
+ *
+ * Two views of the output. Everything decides which rules exist at all.
+ * Everything but the desktop -- the pages without its marker, and the scripts
+ * some other entry can load -- decides what the base sheet needs, and the
+ * difference is the desktop's fragment. Both views are pruned against the
+ * whole build, never one page: the base sheet has to be byte-identical on
+ * every page. Minified on both sides of the prune: the pruner reads minified
+ * CSS, and the second pass is the syntax check.
+ */
+async function assembleSheets(input: {
+  tailwind: string
+  highlight: string
+  bodies: readonly string[]
+  client: ClientResult['outputs']
+  assetDir: string
+}): Promise<{
+  baseCss: string
+  fragments: Fragment[]
+  pruned: Record<string, string[]>
+}> {
+  const shared = loadedWithout(input.client, `island.${DESKTOP}`)
+  const scripts = await Promise.all(
+    input.client
+      .filter((output) => output.file.endsWith('.js'))
+      .map(async (output) => ({
+        text: await fs.readFile(path.join(input.assetDir, output.file), 'utf8'),
+        shared: shared.has(output.file),
+      })),
+  )
+  // Each source is tokenized once, into the desktop's view or the rest.
+  const desktop = usedNames({
+    bodies: input.bodies.filter((body) => body.includes(DESKTOP_MARKER)),
+    scripts: scripts.filter((s) => !s.shared).map((s) => s.text),
+  })
+  const elsewhere = usedNames({
+    bodies: input.bodies.filter((body) => !body.includes(DESKTOP_MARKER)),
+    scripts: scripts.filter((s) => s.shared).map((s) => s.text),
+  })
+  const everywhere = {
+    classes: new Set([...elsewhere.classes, ...desktop.classes]),
+    variables: new Set([...elsewhere.variables, ...desktop.variables]),
+  }
+
+  const gated = [
+    ...(await Promise.all(
+      PLAIN_SHEETS.map(async (sheet) => ({
+        ...sheet,
+        css: await readSheet(sheet.file),
+      })),
+    )),
+    // shiki's rules key on the class its transformer puts on every `<pre>`.
+    {
+      name: 'shiki',
+      css: input.highlight,
+      markers: ['class="shiki'],
+      order: 1,
+    },
+  ]
+  const raw: Record<string, string> = { base: input.tailwind }
+  for (const sheet of gated) raw[sheet.name] = sheet.css
+
+  const all = pruneCss(await minifyAll(raw), everywhere)
+  const base = pruneCss(all.sheets, elsewhere).sheets.base
+  const output = await minifyAll({
+    ...all.sheets,
+    base,
+    [DESKTOP]: subtractCss(all.sheets.base, base),
+  })
+
+  const fragments = [
+    ...gated,
+    { name: DESKTOP, markers: [DESKTOP_MARKER], order: 1 },
+  ]
+    // An empty sheet is one the prune emptied: no page needs a tag for it.
+    .filter((sheet) => output[sheet.name])
+    .map((sheet) =>
+      fragment(sheet.name, output[sheet.name], sheet.markers, sheet.order),
+    )
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name))
+  return { baseCss: output.base, fragments, pruned: all.dropped }
+}
+
+/**
+ * The client files some entry other than `entry` can load, following static
+ * and lazy imports. What is left only `entry` ever loads: its own file, and
+ * the chunks esbuild split out of it for its own lazy imports, which is where
+ * most of the desktop's window chrome lives.
+ */
+function loadedWithout(
+  outputs: ClientResult['outputs'],
+  entry: string,
+): Set<string> {
+  const byFile = new Map(outputs.map((output) => [output.file, output]))
+  const seen = new Set<string>()
+  const visit = (file: string): void => {
+    if (seen.has(file)) return
+    seen.add(file)
+    for (const next of byFile.get(file)?.imports ?? []) visit(next)
+  }
+  for (const output of outputs) {
+    if (output.entry && output.entry !== entry) visit(output.file)
+  }
+  return seen
+}
+
+async function minifyAll(
+  sheets: Record<string, string>,
+): Promise<Record<string, string>> {
+  return Object.fromEntries(
+    await Promise.all(
+      Object.entries(sheets).map(
+        async ([name, text]) => [name, await minifyCss(text)] as const,
+      ),
+    ),
+  )
+}
+
 /* ----------------------------------------------------------------- main -- */
 
 async function main(): Promise<void> {
@@ -506,85 +634,14 @@ async function main(): Promise<void> {
   ])
   Object.assign(ctx.assets, client.assets)
 
-  const { baseCss, fragments, pruned } = await step(
-    'css fragments',
-    async () => {
-      // Pruned against everything the whole build can emit, not one page's: the
-      // base sheet has to be byte-identical on every page, and a fragment is
-      // the same text wherever it ships.
-      const used = usedNames({
-        bodies: pages.map((page) => page.body),
-        scripts: await Promise.all(
-          client.outputs
-            .filter((output) => output.file.endsWith('.js'))
-            .map((output) =>
-              fs.readFile(
-                path.join(ctx.staticDir, '_assets', output.file),
-                'utf8',
-              ),
-            ),
-        ),
-      })
-
-      const gated = [
-        ...(await Promise.all(
-          PLAIN_SHEETS.map(async (sheet) => ({
-            ...sheet,
-            css: await readSheet(sheet.file),
-          })),
-        )),
-        // shiki's rules key on the class its transformer puts on every `<pre>`.
-        {
-          name: 'shiki',
-          css: server.highlightCss(),
-          markers: ['class="shiki'],
-          order: 1,
-        },
-        // The window manager's utilities, split out of the base sheet by
-        // `buildCss`. Only the homepage renders the island, so only it pays
-        // for them.
-        {
-          name: 'desktop',
-          css: css.desktop,
-          markers: ['data-island="desktop"'],
-          order: 1,
-        },
-      ]
-
-      // Minified on both sides of the prune: the pruner reads minified CSS,
-      // and the second pass is the syntax check -- an unbalanced brace out of
-      // the splitter or the pruner fails the build loudly here.
-      const minifyAll = async (sheets: Record<string, string>) =>
-        Object.fromEntries(
-          await Promise.all(
-            Object.entries(sheets).map(
-              async ([name, text]) => [name, await minifyCss(text)] as const,
-            ),
-          ),
-        )
-      const input: Record<string, string> = { base: css.css }
-      for (const sheet of gated) input[sheet.name] = sheet.css
-      const result = pruneCss(await minifyAll(input), used)
-      const output = await minifyAll(result.sheets)
-
-      return {
-        baseCss: output.base,
-        // An empty sheet is one the prune emptied, or a desktop split with
-        // nothing in it; either way no page needs a tag for it.
-        fragments: gated
-          .filter((sheet) => output[sheet.name])
-          .map((sheet) =>
-            fragment(
-              sheet.name,
-              output[sheet.name],
-              sheet.markers,
-              sheet.order,
-            ),
-          )
-          .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name)),
-        pruned: result.dropped,
-      }
-    },
+  const { baseCss, fragments, pruned } = await step('css fragments', () =>
+    assembleSheets({
+      tailwind: css,
+      highlight: server.highlightCss(),
+      bodies: pages.map((page) => page.body),
+      client: client.outputs,
+      assetDir: path.join(ctx.staticDir, '_assets'),
+    }),
   )
 
   // Everything a partial does NOT carry, hashed. The router hard-navigates

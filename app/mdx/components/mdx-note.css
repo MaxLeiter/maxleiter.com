@@ -11,7 +11,6 @@
 
 .mdx-note-icon {
   --info-stroke-circle-color: var(--light-gray);
-  --info-stroke-color: var(--fg);
   position: absolute;
   top: 0px;
   left: 0px;

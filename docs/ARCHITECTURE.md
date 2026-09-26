@@ -11,7 +11,7 @@ route is rendered to HTML at build time and served as a file. The output is a
 [Vercel Build Output API](https://vercel.com/docs/build-output-api/v3)
 directory: static files plus a routing table.
 
-78 routes, 4 islands, 12 platform routes, and it builds in about 450 ms. A
+78 routes, 4 islands, 12 platform routes, and it builds in about 350 ms. A
 content page ships roughly 1 KB of JavaScript. The homepage, which has a
 draggable window manager on it, ships about 17 KB brotli, and none of it before
 first paint.
@@ -104,17 +104,19 @@ per-step times in the report do not sum to the total.
    registers island names and mints the shiki style classes; only then can the
    stylesheet and the client bundles be built.
 
-4. **css** — the Tailwind CLI runs over `app/styles/global.css` as a child
-   process, in parallel with rendering. Its output is the base sheet, inlined
-   into every page.
+4. **css** — the Tailwind CLI runs once over `app/styles/global.css` as a
+   child process, in parallel with rendering. Its output is every rule that
+   might ship; step 6 decides which do, and where.
 
 5. **client bundle** — esbuild, one entry per island plus the runtime, with
    `react`/`react-dom` aliased to `preact/compat`, code-split and content-hashed
    into `/_assets/`.
 
 6. **css fragments** — each conditional slice of the stylesheet is read and
-   minified, every sheet is pruned against the classes the build emits, and
-   each fragment is given the markup marker that proves a page needs it.
+   minified, every sheet is pruned against the classes the build emits, the
+   rules only the desktop can use are subtracted from the base sheet into a
+   fragment of their own, and each fragment is given the markup marker that
+   proves a page needs it.
 
 7. **write html** — each page gets the base sheet plus only the fragments its
    markup references, wrapped in the shell. Written twice: `index.html` and
@@ -167,21 +169,24 @@ the base sheet, and dropping a registration changes the variable's initial
 value and whether it inherits. Classes inside `:not()`, `:is()` and `:where()`
 never count against a selector, which errs toward keeping.
 
-The base sheet is the Tailwind build minus the desktop's utilities. `buildCss`
-runs Tailwind twice — the full source set, and once more with `@source not`
-over the window manager's four files — then splits the FULL sheet by atom:
-one declaration plus the headers above it, matched by text against the slim
-output. Atoms rather than blocks, because the slim output diverges
-structurally in two ways that block pairing mis-splits: the shared `:root`
-theme variables sit in one block whose body differs, and the minifier groups
-selectors differently when neighbors disappear (`.bg-\(--bg\)` from the
-desktop shorthand merges into the same rule as the shared
-`.bg-\[var\(--bg\)\]`, which is why grouped selectors are split apart too —
-`.a,.b{d}` is exactly `.a{d}.b{d}`). Both halves keep the full sheet's
-cascade order, and both are re-minified through esbuild, which doubles as a
-syntax check on the emitted CSS. The desktop half ships as a `desktop`
-fragment gated on `data-island="desktop"`, so only the homepage pays its
-~7 KB raw / ~1.1 KB gz.
+The base sheet is the pruned Tailwind build minus what only the desktop can
+use, and that difference is decided from the output too (`assembleSheets` in
+`build.ts`). The sheet is pruned a second time against everything but the
+desktop: the bodies without its `data-island="desktop"` marker, and only the
+client files some other entry can load, following static and lazy imports.
+That second view is the base sheet. What it lost, subtracted from the first by
+atom (`subtractCss`), is the `desktop` fragment, so only the homepage pays for
+it. Two details carry the weight. Reachability, not the entry file: most of
+the window chrome lives in a chunk esbuild split out for the desktop's own
+lazy imports, and esbuild's metafile lists every lazily imported chunk as an
+entry point, so only the entries the build declared count as roots. And atoms,
+not blocks: a grouped selector can lose one member and a `:root` block one
+variable, so the subtraction compares one declaration plus the headers above
+it, which is why `.a,.b{d}` is split into `.a{d}.b{d}`. The desktop half keeps
+the full sheet's order within itself, but it lands after the whole base sheet,
+so a homepage element carrying a desktop-only utility and a shared responsive
+variant of the same property resolves in the fragment's favour; the visual
+comparison over the homepage is what catches that.
 
 Every fragment is a plain stylesheet whose scoping is written into the class
 names — `.tree-`, `.shot-`, `.mc-`, `.mdx-note`, `.rt-` — and `PLAIN_SHEETS` in
@@ -464,6 +469,13 @@ checked with real hashes instead of stated in prose.
 Still-true decisions, newest first. A decision that stops being true should be
 deleted from this list rather than annotated.
 
+**The desktop fragment is derived from the output, not from its sources.** A
+hand-kept list of the desktop's source files, fed to a second Tailwind run,
+once left out the module holding the shared toolbar's classes and shipped
+every content page a toolbar with no height or padding. Reading the split off
+the output cannot misfile a file, and it took 3.4 KB raw off every document,
+because homepage-only classes outside the listed files used to stay in base.
+
 **Every sheet is pruned against the build's own output.** The first attempt
 narrowed Tailwind's sources to the framework stages that emit markup, which
 removed four junk utilities, missed the ones minted inside `app/`, and would
@@ -525,16 +537,30 @@ is already server-rendered and already reads as links.
 
 **Fonts are subset to what the site renders and instanced to 400-700.** The
 subset used to name eight whole Unicode blocks, 1,208 codepoints, of which Geist
-covers 262; it is now Latin-1 plus 35 explicit codepoints, which is the union of
-everything above U+00FF in the built output and in the sources that mint text at
-runtime. The weight axis is clamped to the three weights the CSS asks for, and
-the OpenType features to the ones browsers apply by default plus `tnum`; Geist's
-stylistic sets, fractions and superscripts were ~140 unused glyphs per face.
-Each face is two files with disjoint `unicode-range`s: a preloaded core (ASCII,
-the four Latin-1 characters the output uses, the extras) and the other 92
-Latin-1 characters, which a browser fetches only for a page that renders one,
-at the cost of kerning across that boundary. The preload is the largest single
-item on a first visit: 64.3 KB, then 40.4 KB, now 25.5 KB.
+covers 262; it is now Latin-1 plus 24 explicit codepoints Geist has glyphs for,
+out of everything above U+00FF in the built output and in the sources that mint
+text at runtime. The weight axis is clamped to the three weights the CSS asks
+for, and the OpenType features to the ones browsers apply by default plus
+`tnum`; Geist's stylistic sets, fractions and superscripts were ~140 unused
+glyphs per face. Each face is split into files with disjoint `unicode-range`s:
+a preloaded core (ASCII, the four Latin-1 characters the output uses, the
+extras) and the other 92 Latin-1 characters, which a browser fetches only for
+a page that renders one, at the cost of kerning across that boundary. The
+preload is the largest single item on a first visit: 64.3 KB, then 40.4 KB,
+now 25.5 KB.
+
+**Geist Mono's missing diagram glyphs are drawn, not left to fallback.** It has
+─ │ ┌ └ ├ ▲ ▼ and no ┐ ┘ ┤ ┬ ┴ ┼ ► ◄, so every diagram in a post took those
+from a system font: Menlo at 400, full-width Hiragino at 600 and 700 on macOS,
+0.55em Consolas on Windows, and the lines stopped meeting.
+`scripts/box-drawing.py` cuts the six corners from the same two bars Geist's
+own box glyphs are made of, with the same weight variation, and lays the
+pointers on the ─ bar's centre line so a line runs into the tip. They go into
+an 844-byte committed face that claims exactly those codepoints and loads
+only on a page that uses one. Its sidecar names the codepoints and the hash of
+the core subset they were cut from, and the build fails with the command to
+rerun when the core has changed since. It is Python because fontTools is what
+can write a variable font's `gvar`; the build only copies the result.
 
 **Tailwind's preflight is trimmed, not disabled.** `app/styles/global.css`
 carries the two thirds of it the site has elements for. The rest — every
