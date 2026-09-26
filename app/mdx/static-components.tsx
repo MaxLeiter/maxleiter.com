@@ -172,18 +172,28 @@ function Diff({ children }: { children?: ReactNode }) {
  * pinned to 3.3.1 because this is a deep import into `dist/`, not a public
  * export, and because that sheet is generated from this exact version.
  */
-/**
- * Tweet avatars and media come through the site's image optimizer instead of
- * straight from pbs.twimg.com, which Firefox's tracking protection blocks as a
- * social tracker. The widths are the optimizer's allowed sizes.
+/*
+ * Tweet images come through the site's image optimizer instead of straight
+ * from pbs.twimg.com, which Firefox's tracking protection blocks as a social
+ * tracker. The widths are the optimizer's allowed sizes.
+ *
+ * Profile images (avatars and affiliation badges, quoted tweets included) are
+ * used as-is by react-tweet, so rewriting them in the payload covers every
+ * spot, including the badge, which has no component hook. Media URLs are
+ * derived from the original (`?format=…&name=small`), so those go through
+ * `MediaImg` instead; patches/react-tweet@3.3.1.patch makes quoted tweets
+ * pass it along.
  */
+function proxyProfileImages<T>(tweet: T): T {
+  return JSON.parse(JSON.stringify(tweet), (_key, value: unknown) =>
+    typeof value === 'string' &&
+    value.startsWith('https://pbs.twimg.com/profile_images/')
+      ? optimizedUrl(value, 640)
+      : value,
+  ) as T
+}
+
 const tweetComponents = {
-  AvatarImg: (props: {
-    src: string
-    alt: string
-    width: number
-    height: number
-  }) => <img {...props} alt={props.alt} src={optimizedUrl(props.src, 640)} />,
   MediaImg: (props: {
     src: string
     alt: string
@@ -206,7 +216,10 @@ function makeTweet(tweets: TweetMap) {
           justifyContent: 'center',
         }}
       >
-        <EmbeddedTweet tweet={tweet} components={tweetComponents} />
+        <EmbeddedTweet
+          tweet={proxyProfileImages(tweet)}
+          components={tweetComponents}
+        />
       </div>
     )
   }

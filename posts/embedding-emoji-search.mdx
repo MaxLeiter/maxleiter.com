@@ -53,3 +53,7 @@ Quality on Jev is marginally better, but at 1000-10000x higher cost and ~2x late
 - **On device** is `bge-small-en-v1.5` (35 MB) running in a Web Worker with transformers.js. Each emoji is stored as 384 bits for a quick shortlist and 384 bytes to rank it, 2.1 MB for all of them.
 
 </details>
+
+So when do I think you should use Jev?
+
+If the task is classification with known labels, a classifier or other custom model is a better choice.

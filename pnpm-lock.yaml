@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  react-tweet@3.3.1:
+    hash: tjcs6ajvwy54s3qsuv6dsadowq
+    path: patches/react-tweet@3.3.1.patch
+
 importers:
 
   .:
@@ -73,7 +78,7 @@ importers:
         version: 19.2.8(react@19.2.8)
       react-tweet:
         specifier: 3.3.1
-        version: 3.3.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 3.3.1(patch_hash=tjcs6ajvwy54s3qsuv6dsadowq)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       rehype-autolink-headings:
         specifier: 7.1.0
         version: 7.1.0
@@ -3900,7 +3905,7 @@ snapshots:
       react: 19.2.8
       scheduler: 0.27.0
 
-  react-tweet@3.3.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+  react-tweet@3.3.1(patch_hash=tjcs6ajvwy54s3qsuv6dsadowq)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
     dependencies:
       '@swc/helpers': 0.5.17
       clsx: 2.1.1

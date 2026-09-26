@@ -1,0 +1,14 @@
+diff --git a/dist/twitter-theme/quoted-tweet/quoted-tweet.js b/dist/twitter-theme/quoted-tweet/quoted-tweet.js
+index cb4c253fa90a6301da06ff6d4cfe0ea4c3308ffa..b15f773c1c891fe21ba501c62c99055509341b19 100644
+--- a/dist/twitter-theme/quoted-tweet/quoted-tweet.js
++++ b/dist/twitter-theme/quoted-tweet/quoted-tweet.js
+@@ -17,7 +17,8 @@ export const QuotedTweet = ({ tweet, components })=>{
+             }),
+             ((_tweet_mediaDetails = tweet.mediaDetails) == null ? void 0 : _tweet_mediaDetails.length) ? /*#__PURE__*/ _jsx(TweetMedia, {
+                 quoted: true,
+-                tweet: tweet
++                tweet: tweet,
++                components: components
+             }) : null
+         ]
+     });
