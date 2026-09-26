@@ -1,0 +1,404 @@
+/* The MDX <EmojiSearch>. Rendered at build from app/mdx/island-components.tsx
+   and again by app/islands/emoji-search.tsx, so both use these literals.
+
+   Utilities are used only where the base sheet already carries them. Every
+   page inlines that sheet, so a utility only this widget needs would cost the
+   whole site about 0.5 KB brotli for one post; here it ships only where
+   `class="es-` does. This sheet also resets the `article ul` and `article img`
+   rules in markdown.css: that sheet is unlayered, so it beats any utility on
+   the same property, and only another unlayered class rule can undo it.
+
+   Every box has a fixed size whatever it holds (empty, loading, results), so
+   nothing moves while you type. */
+
+.es-root {
+  --es-local: #3fb950;
+  --es-api: #579dff;
+  --es-jev: #f0a020;
+  --es-tile: 2.75rem;
+  --es-rows: 2;
+  margin-block: 1.5rem;
+}
+
+[data-theme='light'] .es-root {
+  --es-local: #1a7f37;
+  --es-api: #4a55e8;
+  --es-jev: #b35c00;
+}
+
+[data-engine='local'] {
+  --es-accent: var(--es-local);
+}
+
+[data-engine='api'] {
+  --es-accent: var(--es-api);
+}
+
+[data-engine='jev'] {
+  --es-accent: var(--es-jev);
+}
+
+/* ------------------------------------------------------------ search box -- */
+
+.es-input {
+  display: block;
+  width: 100%;
+  height: 3.25rem;
+  padding: 0 1rem;
+  font-size: 1.125rem;
+  color: var(--fg);
+  background: var(--lightest-gray);
+  border: 1px solid var(--light-gray);
+  border-radius: var(--radius);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.es-input:focus {
+  outline: 2px solid var(--link);
+  outline-offset: 1px;
+}
+
+.es-input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+/* ----------------------------------------------------------------- cards -- */
+
+/* Each engine is a card: its numbers (.es-cell) over its results (.es-col),
+   in that order in the markup. A phone stacks the cards. */
+.es-engines {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 1.25rem;
+}
+
+.es-cell {
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  background: var(--lightest-gray);
+  border: 1px solid var(--border-color);
+  border-bottom-width: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.es-col {
+  min-width: 0;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-top-width: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.es-title {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.es-dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--es-accent);
+}
+
+/* Delayed, so an answer that lands within a frame or two never blinks. */
+.es-busy .es-dot {
+  animation: es-pulse 0.9s ease-in-out 0.2s infinite;
+}
+
+@keyframes es-pulse {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.es-name {
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--fg);
+}
+
+.es-ms,
+.es-cost {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  white-space: nowrap;
+  color: var(--fg);
+}
+
+.es-ms {
+  font-size: 1.125rem;
+}
+
+.es-cost {
+  font-size: 0.875rem;
+}
+
+.es-sub,
+.es-net,
+.es-per,
+.es-notes,
+.es-cost-label {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--gray);
+}
+
+.es-cost-label {
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
+.es-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.es-track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--light-gray);
+}
+
+.es-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--es-accent);
+  transition: width 0.3s ease-out;
+}
+
+/* A phone: name and time on one line, network and cost under it. The search
+   box sticks to the top while you scroll the results. */
+@media (max-width: 39.99rem) {
+  .es-search {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin-inline: -0.25rem;
+    padding: 0.5rem 0.25rem;
+    background: var(--bg);
+  }
+
+  .es-cell {
+    display: grid;
+    grid-template:
+      'title ms' auto
+      'net cost' auto / minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: 0.75rem;
+  }
+
+  .es-cell:not([data-engine='local']) {
+    margin-top: 0.5rem;
+  }
+
+  .es-title {
+    grid-area: title;
+  }
+
+  .es-ms {
+    grid-area: ms;
+  }
+
+  .es-cost {
+    grid-area: cost;
+    justify-self: end;
+  }
+
+  .es-net {
+    grid-area: net;
+  }
+
+  .es-sub,
+  .es-cell .es-track,
+  .es-cost-label,
+  .es-per,
+  .es-notes {
+    display: none;
+  }
+}
+
+/* Wider up: three columns, filled two rows at a time, so the numbers and the
+   results each line up across the engines. */
+@media (min-width: 40rem) {
+  .es-root {
+    --es-rows: 3;
+  }
+
+  .es-engines {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    column-gap: 0.75rem;
+  }
+
+  .es-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .es-col {
+    padding: 0.75rem;
+  }
+
+  .es-sub {
+    margin-top: -0.375rem;
+  }
+
+  .es-ms {
+    margin-top: 0.25rem;
+    font-size: 1.875rem;
+    line-height: 1;
+  }
+
+  .es-net {
+    margin-top: -0.25rem;
+  }
+
+  .es-cost {
+    font-size: 1rem;
+  }
+
+  .es-per {
+    margin-top: -0.5rem;
+  }
+}
+
+/* Past the article column once there is room, like the shot grid. 5rem, not
+   3rem: `100vw` counts a classic scrollbar, and `main` scrolls sideways at the
+   first pixel of overflow. */
+@media (min-width: 60rem) {
+  .es-root {
+    --es-breakout: calc((min(64rem, 100vw - 5rem) - 100%) / 2);
+    margin-inline: calc(-1 * var(--es-breakout));
+  }
+}
+
+/* --------------------------------------------------------------- results -- */
+
+/* Exactly --es-rows of tiles tall, whatever is inside. */
+.es-body {
+  height: calc(var(--es-rows) * var(--es-tile) + (var(--es-rows) - 1) * 2px);
+  overflow: hidden;
+}
+
+.es-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: var(--es-tile);
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: opacity 0.15s;
+}
+
+@media (min-width: 40rem) {
+  .es-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* Results for an older query stay up, dimmed once the newer one is slow. */
+.es-stale {
+  opacity: 0.4;
+  transition-delay: 0.2s;
+}
+
+/* Animated emoji repaint every frame. Strict containment keeps each repaint
+   inside its own tile instead of invalidating the grid around it. */
+.es-tile {
+  contain: strict;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--inline-radius);
+}
+
+.es-tile:hover {
+  background: var(--lighter-gray);
+}
+
+.es-glyph {
+  font-family:
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.es-img {
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  object-fit: contain;
+}
+
+.es-missing {
+  max-width: 100%;
+  padding: 0 2px;
+  overflow: hidden;
+  font-size: 0.5625rem;
+  line-height: 1.15;
+  text-align: center;
+  word-break: break-all;
+  color: var(--gray);
+}
+
+/* -------------------------------------------------------------- controls -- */
+
+.es-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--fg);
+  background: var(--lighter-gray);
+  border: 1px solid var(--light-gray);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+
+.es-button:hover {
+  border-color: var(--gray);
+}
+
+.es-button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .es-busy .es-dot {
+    animation: none;
+    opacity: 0.4;
+  }
+
+  .es-fill,
+  .es-grid,
+  .es-button {
+    transition-duration: 0s;
+  }
+}

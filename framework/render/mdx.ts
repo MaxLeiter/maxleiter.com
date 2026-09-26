@@ -309,6 +309,17 @@ const feedComponents = (siteUrl: string): MdxComponents => ({
       ),
     ),
   MinecraftInventory: () => null,
+  // A live demo is nothing without its script; say where it runs instead.
+  EmojiSearch: () =>
+    createElement(
+      'p',
+      null,
+      createElement(
+        'em',
+        null,
+        'An interactive emoji search demo runs here in the web version of this post.',
+      ),
+    ),
   InfoIcon: () => null,
   HomeIcon: () => null,
 })
