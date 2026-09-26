@@ -52,9 +52,9 @@
       "canonical": "https://maxleiter.com/blog",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": false,
-      "textHash": "d80155f7042d1609",
+      "textHash": "ed65b11fe72294bf",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 51403
+      "partialBytes": 51412
     },
     {
       "path": "/blog/build-a-blog-with-nextjs-13",
@@ -129,31 +129,31 @@
       "canonical": "https://maxleiter.com/blog",
       "ogImage": "https://maxleiter.com/opengraph-image.png",
       "noindex": true,
-      "textHash": "43ae33d6e755c3dc",
+      "textHash": "544b85f9493de3c7",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 48267
+      "partialBytes": 48276
     },
     {
       "path": "/blog/embedding-emoji-search",
       "title": "You don't need Jev for good emoji search | Max Leiter",
-      "description": "... or for a lot of other things",
+      "description": "or: semantic emoji search with embeddings",
       "canonical": "https://maxleiter.com/blog/embedding-emoji-search",
       "ogImage": "https://maxleiter.com/blog/embedding-emoji-search/opengraph-image.png",
       "noindex": false,
-      "textHash": "96037870e57c7ca4",
+      "textHash": "03b6163ac607c550",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 41606
+      "partialBytes": 41851
     },
     {
       "path": "/blog/embedding-emoji-search/embed",
       "title": "You don't need Jev for good emoji search | Max Leiter",
-      "description": "... or for a lot of other things",
+      "description": "or: semantic emoji search with embeddings",
       "canonical": "https://maxleiter.com/blog/embedding-emoji-search",
       "ogImage": "https://maxleiter.com/blog/embedding-emoji-search/opengraph-image.png",
       "noindex": true,
-      "textHash": "c1d5b85b134ff964",
+      "textHash": "24c52a03ba231dcb",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 37902
+      "partialBytes": 38147
     },
     {
       "path": "/blog/formatting",
@@ -428,7 +428,7 @@
       "noindex": false,
       "textHash": "4b905c6cb87473ed",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 30508
+      "partialBytes": 30712
     },
     {
       "path": "/blog/seeing-the-future/embed",
@@ -439,7 +439,7 @@
       "noindex": true,
       "textHash": "3c04a5a0d9415593",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 26766
+      "partialBytes": 26970
     },
     {
       "path": "/blog/ship-every-day",

@@ -5,7 +5,7 @@ import Info from '@components/icons/info'
 import Home from '@components/icons/home'
 import { MDXNote } from './components/mdx-note'
 import { createIslandComponents, flattenText } from './island-components'
-import { Img, urlDims } from '@framework/render/images'
+import { Img, optimizedUrl, urlDims } from '@framework/render/images'
 import type { TweetMap } from '@framework/content/tweets'
 import type { DimensionMap } from '@framework/content/dimensions'
 // Deep import on purpose; see the note on makeTweet below.
@@ -172,6 +172,26 @@ function Diff({ children }: { children?: ReactNode }) {
  * pinned to 3.3.1 because this is a deep import into `dist/`, not a public
  * export, and because that sheet is generated from this exact version.
  */
+/**
+ * Tweet avatars and media come through the site's image optimizer instead of
+ * straight from pbs.twimg.com, which Firefox's tracking protection blocks as a
+ * social tracker. The widths are the optimizer's allowed sizes.
+ */
+const tweetComponents = {
+  AvatarImg: (props: {
+    src: string
+    alt: string
+    width: number
+    height: number
+  }) => <img {...props} alt={props.alt} src={optimizedUrl(props.src, 640)} />,
+  MediaImg: (props: {
+    src: string
+    alt: string
+    className?: string
+    draggable?: boolean
+  }) => <img {...props} alt={props.alt} src={optimizedUrl(props.src, 828)} />,
+}
+
 function makeTweet(tweets: TweetMap) {
   return function TweetBlock({ id }: { id: string }) {
     const tweet = tweets[id]
@@ -186,7 +206,7 @@ function makeTweet(tweets: TweetMap) {
           justifyContent: 'center',
         }}
       >
-        <EmbeddedTweet tweet={tweet} />
+        <EmbeddedTweet tweet={tweet} components={tweetComponents} />
       </div>
     )
   }

@@ -40,6 +40,13 @@ const REMOTE_PATTERNS = [
     port: '',
     pathname: '^/blog/.*$',
   },
+  // Tweet avatars and media: see tweetComponents in app/mdx/static-components.
+  {
+    protocol: 'https' as const,
+    hostname: '^pbs\\.twimg\\.com$',
+    port: '',
+    pathname: '^/(profile_images|media)/.*$',
+  },
 ]
 
 /**
