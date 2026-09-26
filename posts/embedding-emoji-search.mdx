@@ -56,7 +56,7 @@ Quality on Jev is marginally better, but at 1000-10000x higher cost and ~2x late
 
 So when do I think you should use Jev?
 
-If the task is matching against a fixed set, like emojis or docs, use embeddings.
+If the task is matching against a known set, like emojis or docs, use embeddings.
 If it's classification with known labels, a small classifier or fine-tuned model will be cheaper and more accurate (and can be trained by e.g. Opus 5.5 pretty easily).
 
 Use Jev when the decision needs actual reasoning: the right answer depends on context or knowledge that won't be captured in embedding space.
