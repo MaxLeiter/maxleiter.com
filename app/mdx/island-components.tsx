@@ -2,15 +2,17 @@ import fs from 'node:fs'
 import path from 'node:path'
 import React from 'react'
 import type { ReactElement, ReactNode } from 'react'
+import EmojiSearchIsland from '@islands/emoji-search'
 import FileTreeIsland from '@islands/file-tree'
 import type { TreeNode } from '@islands/file-tree'
 import type { ShotItem } from '@islands/shot-grid'
 import { Island } from '@framework/render/islands'
 import { optimizedUrl } from '@framework/render/images'
+import { DEFAULT_API_ORIGIN } from '@lib/emoji-search/engines'
 
 /**
- * The MDX components that hydrate: the file tree, the shot grid and the
- * Minecraft inventory.
+ * The MDX components that hydrate: the file tree, the shot grid, the emoji
+ * search demo and the Minecraft inventory.
  *
  * Split out of `static-components.tsx` so the islands work and the build-time
  * rendering work stop colliding in one file. Everything here renders real
@@ -245,6 +247,25 @@ function ShotGrid({ children }: { children?: ReactNode }) {
   )
 }
 
+/* -------------------------------------------------------- emoji search -- */
+
+/**
+ * The fallback is the island's own first render: the search box, the example
+ * chips and three empty columns with their headings, so the page reads right
+ * before hydration and preact patches nothing when it takes over.
+ */
+function EmojiSearch({
+  apiOrigin = DEFAULT_API_ORIGIN,
+}: {
+  apiOrigin?: string
+}) {
+  return (
+    <Island name="emoji-search" on="visible" props={{ apiOrigin }}>
+      <EmojiSearchIsland apiOrigin={apiOrigin} />
+    </Island>
+  )
+}
+
 /* --------------------------------------------------- minecraft inventory -- */
 
 interface MinecraftItem {
@@ -359,6 +380,7 @@ export function createIslandComponents(options: IslandComponentOptions) {
     Folder,
     ShotGrid,
     Shot: makeShot(options.Image),
+    EmojiSearch,
     MinecraftInventory: makeMinecraftInventory(options.root),
   }
 }

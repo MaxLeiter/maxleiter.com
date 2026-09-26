@@ -265,6 +265,15 @@ const PLAIN_SHEETS = [
     markers: ['class="shot-'],
     order: 1,
   },
+  {
+    // The fallback renders the root, input and empty cards, so the classes
+    // the island only adds once results arrive (`.es-grid`, `.es-tile`) ride
+    // on the same marker.
+    name: 'emoji-search',
+    file: 'app/mdx/components/emoji-search.css',
+    markers: ['class="es-'],
+    order: 1,
+  },
 ] as const
 
 /**

@@ -1,0 +1,55 @@
+---
+title: You don't need Jev for good emoji search
+description: ... or for a lot of other things
+slug: embedding-emoji-search
+date: Sep 26, 2026
+---
+
+<EmojiSearch />
+
+There's been a lot of [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) hype lately, and for good reason.
+It's largely novel (to most developers, at least), super cheap, and there's a lot of cool use cases for it.
+
+The issue I see is a lot of people are seeing Jev as a hammer, and lots of _classification_ tasks as nails.
+You want to use Jev when you need some LLM reasoning behind the decision.
+
+For example, take this tweet:
+
+<Tweet id="2103634704888922317" style={{ height: "80%" }} />
+
+To be clear, I don't intend to pick on Gergely or Linear. But I think this is a miss on both their parts.
+
+Two years ago, I built semantic emoji search but with no LLM and just embeddings. And it was faster, cheaper, and occasionally better than Jev ("pareto-mogged", as the kids say).
+
+Now, to [Gergely's point](https://x.com/GergelyOrosz/status/2103873821908353260?s=20), setting up a database and embedding model or an embedding provider are more work than just using Jev.
+And two years ago I would have gladly used Jev instead of working with Opus 3/GPT-4-turbo to scrape all of Vercel's slack emojis and get this working.
+
+But it's not two years ago and models are now more than
+capable of autonomously doing the work for you.
+
+<details>
+<summary>An aside on scraping Slack emojis</summary>
+
+I lacked the admin permissions required to use Slack's [`admin.emoji.list`](https://docs.slack.dev/reference/methods/admin.emoji.list/).
+However, generally all full Slack members can access the "Customize Emojis" page. So I had an LLM write a script I could paste into my devtools to crawl the
+webpage and download the emojis to my laptop. Worked like a charm.
+
+</details>
+
+In the time I've written this and run some errands (~an hour), Claude has spun up a benchmark between Jev and various embedding models available on the [Vercel AI Gateway](https://vercel.com/ai-gateway).
+
+Quality on Jev is marginally better, but at 1000-10000x higher cost and ~2x latency (a lot depends on your input tokens). Claude built the demo above, and for fun I had it add a local in-your-browser model using [binary embeddings](https://emschwartz.me/binary-vector-embeddings-are-so-cool/).
+
+<details>
+<summary>Caveats and how the numbers were measured</summary>
+
+- **What's searched.** 4,668 emoji: the 1,914 standard Unicode ones plus 2,754 community custom emoji from [slackmoji](https://github.com/seanprashad/slackmoji), standing in for a big Slack workspace.
+- **Quality numbers** come from 56 queries I labelled by hand (names, typos like "hallowelen", and intent like "lgtm" or "greatest of all time"). Every engine searches the same catalog and is scored against the same labels, but the labels are my judgement.
+- **Latency** is compute time, measured inside a Vercel function in `iad1`, next to the Postgres database (Neon). Your network adds to both server columns; the demo shows it separately. On-device time depends on your hardware.
+- **Providers.** Embeddings are OpenAI's `text-embedding-3-large` at 1024 dimensions, through AI Gateway. I picked it by recall after trying seven others; the fastest one (~50 ms) found the right emoji far less often. Jev is `typesafe-ai/jev` through AI Gateway, which routes between TypeSafe and a DigitalOcean deployment. For a stretch during testing both returned 503s and those searches just failed.
+- **Jev sees the whole catalog.** It can only choose from options you give it, so every search sends all 4,668 names: 58,187 input tokens, split over two requests. The way around that is to narrow the list first, and at that point you've built embedding search anyway.
+- **Descriptions.** Emoji names are terse, so a cheap model (Gemini Flash Lite) wrote one line per emoji about how people use it, looking at the image for custom ones. That cost $1.67 once and gets embedded for both embedding engines. Jev only gets names: an earlier run with descriptions in its prompt was worse and 2.5x more expensive.
+- **Caching.** A search someone has already run is answered from Vercel's Runtime Cache or CDN without calling the model, the database or Jev, and shows the time and cost from when it was first computed. The on-device model is cached by your browser after the first download, and loads on its own on later visits.
+- **On device** is `bge-small-en-v1.5` (35 MB) running in a Web Worker with transformers.js. Each emoji is stored as 384 bits for a quick shortlist and 384 bytes to rank it, 2.1 MB for all of them.
+
+</details>

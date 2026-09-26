@@ -1,0 +1,242 @@
+{
+  "__typename": "Tweet",
+  "favorite_count": 1670,
+  "lang": "en",
+  "created_at": "2026-09-25T23:56:11.000Z",
+  "display_text_range": [
+    0,
+    257
+  ],
+  "entities": {},
+  "id_str": "2103634704888922317",
+  "text": "Linear is next level: they integrated Jev into the emoji picker already and it’s AMAZING\n\n(This is response on a thread on how Google Docs’ emoji picker has been the same unusable mess for ~20 years; the ✅ icon still unfindable on my free and paid accounts)",
+  "user": {
+    "id_str": "30192824",
+    "name": "Gergely Orosz",
+    "screen_name": "GergelyOrosz",
+    "is_blue_verified": true,
+    "profile_image_shape": "Circle",
+    "verified": false,
+    "profile_image_url_https": "https://pbs.twimg.com/profile_images/673095429748350976/ei5eeouV_normal.png",
+    "highlighted_label": {
+      "badge": {
+        "url": "https://pbs.twimg.com/profile_images/1544357754025951232/9hRrwOaX_bigger.jpg"
+      },
+      "description": "The Pragmatic Engineer",
+      "url": {
+        "url": "https://twitter.com/Pragmatic_Eng",
+        "url_type": "DeepLink"
+      },
+      "user_label_display_type": "Badge",
+      "user_label_type": "BusinessLabel"
+    }
+  },
+  "edit_control": {
+    "initial_tweet_id": "2103634640640659768",
+    "edit_tweet_ids": [
+      "2103634640640659768",
+      "2103634704888922317"
+    ],
+    "editable_until_msecs": "1790384156000",
+    "edits_remaining": "4",
+    "is_edit_eligible": true
+  },
+  "conversation_count": 38,
+  "news_action_type": "conversation",
+  "quoted_tweet": {
+    "favorite_count": 411,
+    "lang": "en",
+    "possibly_sensitive": false,
+    "reply_count": 9,
+    "retweet_count": 13,
+    "created_at": "2026-09-25T14:37:00.000Z",
+    "display_text_range": [
+      0,
+      20
+    ],
+    "entities": {
+      "media": [
+        {
+          "display_url": "pic.x.com/OgAKeOHKnW",
+          "expanded_url": "https://x.com/penzington/status/2103493980591669712/photo/1",
+          "indices": [
+            21,
+            44
+          ],
+          "url": "https://t.co/OgAKeOHKnW"
+        }
+      ],
+      "user_mentions": [
+        {
+          "id_str": "1083130198042656768",
+          "indices": [
+            13,
+            20
+          ],
+          "name": "Linear",
+          "screen_name": "linear"
+        }
+      ]
+    },
+    "id_str": "2103493980591669712",
+    "text": "Meanwhile at @linear https://t.co/OgAKeOHKnW",
+    "user": {
+      "id_str": "1864818224",
+      "name": "Maciek Pekala",
+      "screen_name": "penzington",
+      "is_blue_verified": true,
+      "profile_image_shape": "Circle",
+      "verified": false,
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1172245922459332608/U40sCtOw_normal.jpg",
+      "highlighted_label": {
+        "badge": {
+          "url": "https://pbs.twimg.com/profile_images/1882353118530224128/l8meBvMg_bigger.jpg"
+        },
+        "description": "Linear",
+        "url": {
+          "url": "https://twitter.com/linear",
+          "url_type": "DeepLink"
+        },
+        "user_label_display_type": "Badge",
+        "user_label_type": "BusinessLabel"
+      }
+    },
+    "edit_control": {
+      "edit_tweet_ids": [
+        "2103493980591669712"
+      ],
+      "editable_until_msecs": "1790350620000",
+      "edits_remaining": "5",
+      "is_edit_eligible": true
+    },
+    "mediaDetails": [
+      {
+        "display_url": "pic.x.com/OgAKeOHKnW",
+        "expanded_url": "https://x.com/penzington/status/2103493980591669712/photo/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          21,
+          44
+        ],
+        "media_url_https": "https://pbs.twimg.com/media/HTEcmTKWwAAq3BA.png",
+        "original_info": {
+          "focus_rects": [
+            {
+              "h": 364,
+              "w": 650,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "h": 458,
+              "w": 458,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "h": 458,
+              "w": 402,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "h": 458,
+              "w": 229,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "h": 458,
+              "w": 650,
+              "x": 0,
+              "y": 0
+            }
+          ],
+          "height": 458,
+          "width": 650
+        },
+        "sizes": {
+          "large": {
+            "h": 458,
+            "resize": "fit",
+            "w": 650
+          },
+          "medium": {
+            "h": 458,
+            "resize": "fit",
+            "w": 650
+          },
+          "small": {
+            "h": 458,
+            "resize": "fit",
+            "w": 650
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "photo",
+        "url": "https://t.co/OgAKeOHKnW"
+      }
+    ],
+    "photos": [
+      {
+        "backgroundColor": {
+          "red": 204,
+          "green": 214,
+          "blue": 221
+        },
+        "cropCandidates": [
+          {
+            "h": 364,
+            "w": 650,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 458,
+            "w": 458,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 458,
+            "w": 402,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 458,
+            "w": 229,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 458,
+            "w": 650,
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "expandedUrl": "https://x.com/penzington/status/2103493980591669712/photo/1",
+        "url": "https://pbs.twimg.com/media/HTEcmTKWwAAq3BA.png",
+        "width": 650,
+        "height": 458
+      }
+    ],
+    "isEdited": false,
+    "isStaleEdit": false
+  },
+  "isEdited": true,
+  "isStaleEdit": false,
+  "previous_counts": {
+    "favorite_count": 0,
+    "quote_count": 0,
+    "reply_count": 0,
+    "retweet_count": 0
+  }
+}
