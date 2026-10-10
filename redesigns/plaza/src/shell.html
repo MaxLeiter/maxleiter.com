@@ -14,6 +14,8 @@
 </style>
 </head>
 <body>
+<a class="skip" id="skip" href="#fallback">Skip to content</a>
+<div id="fallback" class="fallback">/*__FALLBACK__*/</div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="i-hand" viewBox="0 0 64 80">
@@ -50,7 +52,7 @@
   <button class="page-arrow next" id="nextPage" aria-label="Next page" hidden><span></span></button>
   <div class="dots" id="dots" aria-hidden="true"></div>
 
-  <footer class="dock" id="dock">
+  <nav class="dock" id="dock" aria-label="System menu">
     <svg class="dock-shape" id="dockShape" aria-hidden="true" preserveAspectRatio="none">
       <defs>
         <linearGradient id="dockFill" x1="0" y1="0" x2="0" y2="1">
@@ -62,19 +64,20 @@
       <path class="line"/>
     </svg>
     <button class="orb orb-left" id="orbMenu" aria-label="Plaza settings"><span class="orb-face"><span class="orb-word">Plaza</span></span></button>
-    <div class="clock" aria-live="off">
+    <div class="clock" aria-hidden="true">
       <div class="time" id="time"><span id="hh">12</span><i>:</i><span id="mm">00</span><small id="ampm">PM</small></div>
       <div class="date" id="date">Sat 10/10</div>
     </div>
-    <button class="pill-sm sound" id="soundBtn" aria-pressed="false"><span class="spk" aria-hidden="true"></span><span class="lbl">Sound off</span></button>
-    <button class="pill-sm tilt" id="tiltBtn" hidden aria-pressed="false"><span class="lbl">Tilt</span></button>
-    <button class="orb orb-right" id="orbMail" aria-label="Message board"><span class="orb-face"><svg class="mail-ico" aria-hidden="true"><use href="#i-mail"/></svg><span class="badge" id="mailBadge"></span></span></button>
-  </footer>
+    <button class="pill-sm sound" id="soundBtn" aria-pressed="false" aria-label="Sound"><span class="spk" aria-hidden="true"></span><span class="lbl" aria-hidden="true">Sound off</span></button>
+    <button class="pill-sm tilt" id="tiltBtn" hidden aria-pressed="false" aria-label="Tilt parallax"><span class="lbl" aria-hidden="true">Tilt</span></button>
+    <button class="orb orb-right" id="orbMail" aria-label="Message board"><span class="orb-face"><svg class="mail-ico" aria-hidden="true"><use href="#i-mail"/></svg></span></button>
+  </nav>
 </main>
 
 <section id="channel" class="channel" role="dialog" aria-modal="true" aria-labelledby="chTitle" hidden>
   <div class="stripes" aria-hidden="true"></div>
   <div class="splash" id="splash">
+    <p class="sr-only" id="splashDesc"></p>
     <div class="splash-art"><canvas id="splashCanvas" aria-hidden="true"></canvas><span class="glass" aria-hidden="true"></span></div>
     <div class="splash-bar">
       <button class="pill" id="splashMenu">Menu</button>
@@ -84,11 +87,11 @@
   <div class="ch-view" id="chView" hidden>
     <header class="ch-head">
       <span class="ch-badge" id="chBadge" aria-hidden="true"></span>
-      <h2 id="chTitle">Blog</h2>
+      <h1 id="chTitle">Blog</h1>
       <span class="ch-sub" id="chSub"></span>
       <span class="ch-clock" id="chClock"></span>
     </header>
-    <div class="ch-body" id="chBody" tabindex="-1"></div>
+    <div class="ch-body" id="chBody" tabindex="0" role="region" aria-labelledby="chTitle"></div>
     <footer class="ch-foot">
       <button class="round-back" id="chBack" aria-label="Back"><span>Back</span></button>
       <div class="ch-foot-mid" id="chFootMid"></div>
@@ -101,7 +104,7 @@
   <div class="stripes" aria-hidden="true"></div>
   <header class="bd-head">
     <svg class="bd-ico" aria-hidden="true"><use href="#i-mail"/></svg>
-    <h2 id="bdTitle">Message Board</h2>
+    <h1 id="bdTitle">Message Board</h1>
     <div class="bd-month">
       <button class="arrow-btn" id="bdPrev" aria-label="Previous month with posts">&lsaquo;</button>
       <div class="bd-mname" id="bdMonth" aria-live="polite">September 2026</div>
@@ -109,26 +112,27 @@
     </div>
   </header>
   <div class="bd-main">
-    <div class="cal" id="cal" role="grid" aria-labelledby="bdMonth"></div>
+    <div class="cal" id="cal" role="group" aria-labelledby="bdMonth"></div>
     <aside class="bd-day" id="bdDay" aria-live="polite"></aside>
   </div>
-  <div class="bd-strip" id="bdStrip" aria-label="Years"></div>
+  <nav class="bd-strip" id="bdStrip" aria-label="Jump to year"></nav>
   <footer class="ch-foot">
     <button class="round-back" id="bdBack" aria-label="Back"><span>Back</span></button>
-    <div class="ch-foot-mid legend"><span class="lg post"></span>Blog post <span class="lg note"></span>Note <span class="lg work"></span>Work</div>
+    <div class="ch-foot-mid legend"><span class="lg post" aria-hidden="true"></span>Blog post <span class="lg note" aria-hidden="true"></span>Note <span class="lg work" aria-hidden="true"></span>Work</div>
     <button class="pill pill-mid" id="bdMenu">Menu</button>
   </footer>
-  <div class="letter-wrap" id="letterWrap" hidden>
+  <div class="letter-wrap" id="letterWrap" role="dialog" aria-modal="true" aria-label="Letter" hidden>
     <article class="letter" id="letter" tabindex="-1"></article>
   </div>
 </section>
 
 <div class="settings-wrap" id="settings" hidden>
-  <div class="settings" role="dialog" aria-modal="true" aria-labelledby="stTitle">
+  <div class="settings" id="settingsDlg" role="dialog" aria-modal="true" aria-labelledby="stTitle">
     <h2 id="stTitle">Plaza Settings</h2>
-    <div class="st-row"><span>Sound effects &amp; jingle</span><button class="toggle" id="stSound" role="switch" aria-checked="false"><i></i></button></div>
-    <div class="st-row"><span>Ambient jingle</span><button class="toggle" id="stJingle" role="switch" aria-checked="true"><i></i></button></div>
-    <div class="st-row" id="stTiltRow"><span>Tilt parallax <small>(phones)</small></span><button class="toggle" id="stTilt" role="switch" aria-checked="false"><i></i></button></div>
+    <div class="st-row"><span id="lbSound">Sound effects &amp; jingle</span><button class="toggle" id="stSound" role="switch" aria-checked="false" aria-labelledby="lbSound"><i aria-hidden="true"></i></button></div>
+    <div class="st-row"><span id="lbJingle">Ambient jingle</span><button class="toggle" id="stJingle" role="switch" aria-checked="true" aria-labelledby="lbJingle"><i aria-hidden="true"></i></button></div>
+    <div class="st-row"><span id="lbMotion">Reduce motion</span><button class="toggle" id="stMotion" role="switch" aria-checked="false" aria-labelledby="lbMotion"><i aria-hidden="true"></i></button></div>
+    <div class="st-row" id="stTiltRow"><span id="lbTilt">Tilt parallax <small>(phones)</small></span><button class="toggle" id="stTilt" role="switch" aria-checked="false" aria-labelledby="lbTilt"><i aria-hidden="true"></i></button></div>
     <div class="st-help">
       <p><b>Keyboard</b> arrows move, Enter opens, Esc goes back.</p>
       <p><b>Controller</b> stick or d-pad moves, bottom face button opens, right face button goes back.</p>
@@ -140,6 +144,7 @@
 
 <div class="bubble" id="bubble" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sr-only" id="announcer" aria-live="polite" aria-atomic="true"></div>
 <div class="hand" id="hand" aria-hidden="true"><svg class="hand-shadow"><use href="#i-hand"/></svg><svg class="hand-glyph"><use href="#i-hand"/></svg></div>
 
 <script>

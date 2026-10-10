@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="nojs">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -22,6 +22,20 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #071233; }
+.vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* one focus language everywhere: white ring + dark halo, legible on every palette */
+:root { --ring: 0 0 0 2px #fff, 0 0 0 5px rgba(0, 12, 36, .78), 0 0 14px 4px rgba(255, 255, 255, .35); }
+.skip { position: fixed; left: 16px; top: 12px; z-index: 20; padding: 12px 18px; border-radius: 10px; color: #fff; background: #0a1a40;
+  font: 500 15px/1 var(--font); text-decoration: none; transform: translateY(-160%); box-shadow: var(--ring); }
+.skip:focus { transform: none; outline: none; }
+/* no-JS / failed-boot index */
+#nojs { display: none; }
+.nojs body { overflow: auto; touch-action: auto; user-select: text; -webkit-user-select: text; }
+.nojs #ui, .nojs #glass, .nojs .skip { display: none; }
+.nojs #nojs { display: block; position: relative; z-index: 5; max-width: 780px; margin: 0 auto; padding: 32px 24px 64px;
+  background: rgba(3, 10, 30, .88); color: #eef4ff; font: 400 16px/1.6 var(--font); min-height: 100%; }
+#nojs h1 { font-weight: 500; font-size: 30px; margin: 0 0 4px; } #nojs h2 { font-weight: 500; font-size: 21px; margin: 1.6em 0 .4em; }
+#nojs a { color: #a8d8ff; } #nojs ul { padding-left: 1.2em; } #nojs li { margin: .35em 0; } #nojs small { color: #c4d2ea; }
 body {
   font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
@@ -40,7 +54,7 @@ body.nogl { background: linear-gradient(180deg, var(--c0, #0a2f75), var(--c1, #1
   border-bottom: 1px solid rgba(255,255,255,.18); box-shadow: 0 1px 0 rgba(0,0,0,.25); }
 .sheet .sh-ic { flex: 0 0 64px; width: 64px; height: 64px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
 .sheet .sh-ic svg { width: 100%; height: 100%; display: block; }
-.sheet .sh-kicker { font-size: 13px; letter-spacing: .06em; color: rgba(225,236,255,.7); text-transform: uppercase; }
+.sheet .sh-kicker { font-size: 13px; letter-spacing: .06em; color: rgba(225,236,255,.82); text-transform: uppercase; }
 .sheet h1 { font-size: 30px; line-height: 1.22; font-weight: 500; margin: 2px 0 6px; color: #fff;
   text-shadow: 0 0 12px rgba(255,255,255,.28); letter-spacing: .005em; }
 .sheet .sh-desc { margin: 0; color: rgba(230,240,255,.78); font-size: 15.5px; }
@@ -50,21 +64,21 @@ body.nogl { background: linear-gradient(180deg, var(--c0, #0a2f75), var(--c1, #1
 .sheet ul, .sheet ol { margin: 0 0 1em; padding-left: 1.4em; }
 .sheet li { margin: .2em 0; }
 .sheet a { color: #9fd4ff; text-decoration: underline; text-decoration-color: rgba(159,212,255,.45); text-underline-offset: 3px; }
-.sheet a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 3px; }
+.sheet a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 3px; box-shadow: 0 0 0 5px rgba(0,12,36,.8); }
 .sheet code { font: 14px/1.5 var(--mono); background: rgba(0,10,30,.45); border: 1px solid rgba(255,255,255,.12);
   padding: 1px 5px; border-radius: 4px; }
 .sheet pre { margin: 1.2em 0; padding: 14px 18px; border-radius: 8px; overflow: hidden; white-space: pre-wrap;
   background: linear-gradient(180deg, rgba(0,6,20,.72), rgba(0,12,32,.6)); border: 1px solid rgba(255,255,255,.16);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 8px 18px rgba(0,0,0,.35); }
 .sheet pre code { background: none; border: 0; padding: 0; font-size: 13.5px; color: #dfe9ff; }
-.sheet .k { color: #8fd0ff; } .sheet .s { color: #ffd59a; } .sheet .c { color: rgba(220,230,255,.45); }
+.sheet .k { color: #8fd0ff; } .sheet .s { color: #ffd59a; } .sheet .c { color: rgba(220,230,255,.66); }
 .sheet .sh-more { margin-top: 1.6em; font-size: 15px; }
-.sheet .sh-more a { display: inline-flex; gap: 8px; align-items: center; padding: 8px 16px; border-radius: 999px;
+.sheet .sh-more a { display: inline-flex; gap: 8px; align-items: center; padding: 0 18px; min-height: 44px; border-radius: 999px;
   text-decoration: none; color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.08));
   border: 1px solid rgba(255,255,255,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 8px rgba(0,0,0,.25); }
 .sheet .sh-grid { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; font-size: 15px; margin: 0 0 1em; }
-.sheet .sh-grid dt { color: rgba(225,236,255,.6); } .sheet .sh-grid dd { margin: 0; }
-.sheet .ellip { color: rgba(230,240,255,.55); }
+.sheet .sh-grid dt { color: rgba(225,236,255,.75); } .sheet .sh-grid dd { margin: 0; }
+.sheet .ellip { color: rgba(230,240,255,.7); }
 .sheet ::selection { background: rgba(120,190,255,.55); color: #fff; }
 
 /* ---------------- DOM-overlay fallback panel ---------------- */
@@ -82,6 +96,7 @@ body.nogl { background: linear-gradient(180deg, var(--c0, #0a2f75), var(--c1, #1
   background: linear-gradient(115deg, transparent 44%, rgba(255,255,255,.12) 50%, transparent 56%);
   transform: translateX(-70%); }
 #glass.on::after { animation: sheen 8s linear .35s infinite; }
+#glass.instant { animation: none; }
 #glass .scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 0 var(--pad, 40px);
   overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.35) transparent;
   -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent);
@@ -114,7 +129,7 @@ body.open #menu * { pointer-events: none !important; }
 .cat.on .ic { transform: scale(1); filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)) drop-shadow(0 0 10px rgba(255,255,255,.35)); }
 .cat.on .lbl { opacity: 1; }
 .cat:not(.on) { opacity: .72; }
-.cat:focus-visible .ic { outline: 2px solid rgba(255,255,255,.7); outline-offset: 4px; border-radius: 12px; }
+.cat:focus-visible .ic { box-shadow: var(--ring); border-radius: 14px; }
 
 .list { position: absolute; left: 0; top: 0; transition: opacity .25s ease; }
 .list[hidden] { display: block; opacity: 0; visibility: hidden; }
@@ -124,13 +139,15 @@ body.open #menu * { pointer-events: none !important; }
 .item .ic { flex: 0 0 76px; width: 76px; height: 76px; transform: scale(.62); transition: transform var(--t) var(--ease), filter var(--t) ease;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
 .item .ic svg { width: 100%; height: 100%; display: block; }
-.item .tx { margin-left: 14px; min-width: 0; flex: 1; }
+.item .tx { margin-left: 4px; padding: 3px 10px; border-radius: 10px; min-width: 0; flex: 0 1 auto; transition: box-shadow .15s ease; }
+.item:focus-visible .tx { box-shadow: var(--ring); }
+#lists ul { list-style: none; margin: 0; padding: 0; }
 .item .t, .item .s { display: block; }
 .item .t { font-size: 20px; font-weight: 400; line-height: 1.25; text-shadow: 0 1px 3px rgba(0,0,0,.4); white-space: nowrap;
   overflow: hidden; text-overflow: ellipsis; opacity: .8; transition: opacity var(--t) ease; }
 .item .s { font-size: 14px; color: var(--ink-dim); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   max-height: 0; opacity: 0; transition: opacity var(--t) ease, max-height var(--t) ease; }
-.item .v { margin-left: 18px; font-size: 18px; color: var(--ink-dim); white-space: nowrap; opacity: .85; }
+.item .v { margin-left: auto; padding-left: 18px; font-size: 18px; color: var(--ink-dim); white-space: nowrap; opacity: .85; }
 .item.on .ic { transform: scale(1); filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)) drop-shadow(0 0 12px rgba(255,255,255,.42)); }
 .item.on .t { opacity: 1; font-weight: 500; text-shadow: var(--glow); }
 .item.on .s { max-height: 22px; opacity: 1; }
@@ -145,26 +162,35 @@ body.open #menu * { pointer-events: none !important; }
 #clock b { font-weight: 400; font-size: 19px; }
 #clock .line { position: absolute; right: -36px; left: -18px; bottom: -8px; height: 1px;
   background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.5)); }
-#snd { position: absolute; right: 34px; top: 66px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3);
+#snd { position: absolute; right: 30px; top: 62px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3);
   background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.22), rgba(255,255,255,.04)); color: #fff; cursor: pointer; padding: 0;
   display: grid; place-items: center; box-shadow: 0 2px 6px rgba(0,0,0,.25); opacity: .8; }
-#snd svg { width: 18px; height: 18px; }
-#snd:hover, #snd:focus-visible { opacity: 1; outline: none; box-shadow: 0 0 0 2px rgba(255,255,255,.5); }
+#snd svg { width: 20px; height: 20px; }
+#snd:hover { opacity: 1; } #snd:focus-visible { opacity: 1; outline: none; box-shadow: var(--ring); }
 #hints { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 22px; font-size: 13.5px;
   color: var(--ink-dim); text-shadow: 0 1px 2px rgba(0,0,0,.4); flex-wrap: wrap; padding: 0 140px; }
 #hints span { display: inline-flex; align-items: center; gap: 7px; }
 #hints kbd { font: 500 11px/1 var(--font); min-width: 22px; height: 20px; padding: 0 6px; display: inline-grid; place-items: center;
   border-radius: 6px; color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.3), rgba(255,255,255,.08));
   border: 1px solid rgba(255,255,255,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
-#hints button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; gap: 7px; align-items: center; }
+#hints button { font: inherit; color: inherit; background: none; border: 0; padding: 0 10px; min-height: 44px; min-width: 44px; margin: -12px 0;
+  border-radius: 10px; cursor: pointer; display: inline-flex; gap: 7px; align-items: center; }
+#hints button:focus-visible { outline: none; box-shadow: var(--ring); }
 #hints .touch { display: none; } body.phone #hints .touch { display: inline-flex; } body.phone #hints .when-menu:not(.touch) { display: none; }
 #hints .when-open { display: none; } body.open #hints .when-open { display: inline-flex; } body.open #hints .when-menu { display: none; }
 #badge { position: absolute; right: 18px; bottom: 16px; display: inline-flex; white-space: nowrap; align-items: center; gap: 7px; font-size: 11px;
   padding: 5px 10px 5px 8px; border-radius: 999px; color: rgba(255,255,255,.85); letter-spacing: .03em; pointer-events: auto;
-  background: rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.18); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: help; }
+  background: rgba(0,0,0,.32); border: 1px solid rgba(255,255,255,.18); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 #badge i { width: 7px; height: 7px; border-radius: 50%; background: #ffc35a; box-shadow: 0 0 6px #ffc35a; }
 #badge.hic i { background: #7dffb0; box-shadow: 0 0 6px #7dffb0; }
-#live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+#live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* sheet toolbar: real buttons, drawn into the canvas on the HTML-in-Canvas path */
+.sheet .sh-tools { display: flex; gap: 10px; justify-content: flex-end; margin: -8px 0 10px; }
+.sheet .sh-btn { font: 500 13.5px/1 var(--font); color: #fff; min-height: 44px; padding: 0 16px; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06)); border: 1px solid rgba(255,255,255,.34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35); display: inline-flex; align-items: center; gap: 8px; }
+.sheet .sh-btn[aria-pressed="true"] { background: linear-gradient(180deg, rgba(160,215,255,.45), rgba(90,160,230,.25)); }
+.sheet .sh-btn:focus-visible, .sheet .sh-more a:focus-visible { outline: none; box-shadow: var(--ring); }
 
 /* ---------------- phone ---------------- */
 body.phone .item { width: calc(100vw - 72px); }
@@ -185,11 +211,14 @@ body.phone .sheet h1 { font-size: 23px; }
 body.phone .sheet .sh-ic { flex-basis: 46px; width: 46px; height: 46px; }
 
 body.rm *, body.rm *::before, body.rm *::after { transition-duration: .01s !important; animation: none !important; }
+body.rm #glass, body.rm #menu { transition-property: opacity, visibility !important; transition-duration: .22s !important; }
+body.rm.open #menu { filter: none; }
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <!-- The stage. With HTML-in-Canvas the article sheet is a child of this canvas and is drawn into it. -->
-<canvas id="stage" aria-label="Article"></canvas>
+<canvas id="stage" aria-hidden="true"></canvas>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
@@ -217,13 +246,22 @@ body.rm *, body.rm *::before, body.rm *::after { transition-duration: .01s !impo
 
 <div id="glass" aria-hidden="true"><div class="scroller" tabindex="-1"></div></div>
 
+<!-- Without JS (or if boot fails) this static, readable index is what you get. -->
+<main id="nojs" aria-label="Index">__NOJS__</main>
+
 <div id="ui">
-  <div id="menu" role="application" aria-roledescription="console menu" aria-label="Max Leiter">
-    <div id="cats" role="tablist" aria-label="Categories"></div>
-    <div id="lists"></div>
-  </div>
-  <div id="clock" aria-hidden="true"><span id="cdate"></span><b id="ctime"></b><span class="line"></span></div>
-  <button id="snd" type="button" aria-pressed="false" aria-label="Sound off. Turn sound on"></button>
+  <header id="top">
+    <div id="clock" aria-hidden="true"><span id="cdate"></span><b id="ctime"></b><span class="line"></span></div>
+    <button id="snd" type="button" aria-pressed="false" aria-label="Sound"></button>
+  </header>
+  <main id="main" tabindex="-1">
+    <h1 class="vh" id="page-h1">Max Leiter</h1>
+    <div id="menu">
+      <nav aria-label="Sections"><div id="cats" role="tablist" aria-label="Sections"></div></nav>
+      <div id="lists"></div>
+    </div>
+  </main>
+  <footer id="foot">
   <div id="hints">
     <span class="when-menu kb"><kbd>←</kbd><kbd>→</kbd> Category</span>
     <span class="when-menu kb"><kbd>↑</kbd><kbd>↓</kbd> Select</span>
@@ -232,8 +270,9 @@ body.rm *, body.rm *::before, body.rm *::after { transition-duration: .01s !impo
     <span class="when-open kb"><kbd>↑</kbd><kbd>↓</kbd> Scroll</span>
     <button class="when-open hit" type="button" id="back"><kbd>Esc</kbd> Back</button>
   </div>
-  <div id="badge" title="" tabindex="0"><i></i><span id="badge-t">Detecting…</span></div>
-  <div id="live" aria-live="polite"></div>
+  <div id="badge" title=""><i aria-hidden="true"></i><span id="badge-t">Detecting…</span></div>
+  <div id="live" role="status" aria-live="polite" aria-atomic="true"></div>
+  </footer>
 </div>
 
 <script id="data" type="application/json">__DATA__</script>
@@ -311,7 +350,7 @@ function inline(s, base) {
 function md(src, base, truncated = src.length >= 1150) {
   const lines = src.replace(/\r/g, '').split('\n')
   const out = []
-  let para = [], list = null, fence = null
+  let para = [], list = null, fence = null, lastH = 1
   const flushP = () => { if (para.length) out.push(`<p>${inline(para.join(' '), base)}</p>`); para = [] }
   const flushL = () => { if (list) out.push(`<${list.t}>${list.items.map((i) => `<li>${inline(i, base)}</li>`).join('')}</${list.t}>`); list = null }
   for (const raw of lines) {
@@ -324,7 +363,7 @@ function md(src, base, truncated = src.length >= 1150) {
     if ((m = l.match(/^(#{1,4})\s+(.*)$/))) {
       flushP(); flushL()
       if (/table of contents/i.test(m[2])) continue
-      const lv = Math.min(3, Math.max(2, m[1].length))
+      const lv = Math.min(lastH + 1, Math.min(3, Math.max(2, m[1].length))); lastH = lv
       out.push(`<h${lv}>${inline(m[2], base)}</h${lv}>`); continue
     }
     if ((m = l.match(/^\s*(?:[-*]|(\d+)\.)\s+(.*)$/))) {
@@ -345,8 +384,10 @@ const yaml = (o) => '<span class="c">---</span>\n' + Object.entries(o).filter(([
   .map(([k, v]) => `<span class="k">${k}</span>: <span class="s">${esc(JSON.stringify(v))}</span>`).join('\n') + '\n<span class="c">---</span>'
 
 function sheetFor(cat, it) {
-  const head = (kicker, title, desc, ic) => `<header class="sh-head"><div class="sh-ic">${svgIcon(ic)}</div><div>
-    <div class="sh-kicker">${esc(kicker)}</div><h1>${esc(title)}</h1>${desc ? `<p class="sh-desc">${esc(desc)}</p>` : ''}</div></header>`
+  const tools = `<div class="sh-tools"><button type="button" class="sh-btn" data-act="read" aria-pressed="${!HIC.active}"${HIC.available && GL ? '' : ' disabled'}
+    title="Plain DOM: find-in-page and native text selection">Reading mode</button><button type="button" class="sh-btn" data-act="back">Back</button></div>`
+  const head = (kicker, title, desc, ic) => `${tools}<header class="sh-head"><div class="sh-ic">${svgIcon(ic)}</div><div>
+    <div class="sh-kicker">${esc(kicker)}</div><h1 id="sh-title">${esc(title)}</h1>${desc ? `<p class="sh-desc">${esc(desc)}</p>` : ''}</div></header>`
   const more = (href, label) => `<p class="sh-more"><a href="${esc(href)}" target="_blank" rel="noopener">${esc(label)} <span aria-hidden="true">↗</span></a></p>`
   const d = it.data
   if (it.kind === 'post' || it.kind === 'note') {
@@ -354,7 +395,7 @@ function sheetFor(cat, it) {
     const fm = { title: d.title, date: d.date, description: d.description, href: d.href }
     return head(`${cat.label} · ${d.date}`, d.title, d.description, cat.icon)
       + `<div class="sh-body">${md(d.excerpt || '', href)}</div>`
-      + `<h3>Frontmatter</h3><pre><code>${yaml(fm)}</code></pre>`
+      + `<h2>Frontmatter</h2><pre><code>${yaml(fm)}</code></pre>`
       + more(href, it.kind === 'post' ? 'Continue reading on maxleiter.com' : 'Open the full note')
   }
   if (it.kind === 'project' || it.kind === 'work') {
@@ -367,9 +408,9 @@ function sheetFor(cat, it) {
   if (it.kind === 'profile') {
     const s = DATA.site
     return head('Profile', s.name, 'maxleiter.com', 'about')
-      + `<p>${esc(s.blurb)}</p><h3>Elsewhere</h3><ul><li><a href="${s.github}" target="_blank" rel="noopener">GitHub — ${esc(s.github.replace('https://', ''))}</a></li>
+      + `<p>${esc(s.blurb)}</p><h2>Elsewhere</h2><ul><li><a href="${s.github}" target="_blank" rel="noopener">GitHub — ${esc(s.github.replace('https://', ''))}</a></li>
       <li><a href="${s.x}" target="_blank" rel="noopener">X — ${esc(s.x.replace('https://', ''))}</a></li><li><a href="${s.url}" target="_blank" rel="noopener">${esc(s.url.replace('https://', ''))}</a></li></ul>
-      <h3>On this console</h3><p>${DATA.posts.length} blog posts, ${DATA.notes.length} notes, ${DATA.projects.length} projects and ${DATA.work.length} pieces written for work.</p>
+      <h2>On this console</h2><p>${DATA.posts.length} blog posts, ${DATA.notes.length} notes, ${DATA.projects.length} projects and ${DATA.work.length} pieces written for work.</p>
       <pre><code>${yaml({ name: s.name, url: s.url, github: s.github, x: s.x })}</code></pre>`
   }
   if (it.kind === 'sysinfo') {
@@ -377,7 +418,7 @@ function sheetFor(cat, it) {
     return head('Settings · Renderer', 'System information', HIC.active ? 'Articles are drawn with HTML-in-Canvas.' : 'Articles are a DOM overlay.', 'chip')
       + `<dl class="sh-grid"><dt>Path</dt><dd>${esc(RENDER.label)}</dd><dt>Browser</dt><dd>${esc(h.ua)}</dd>
       <dt>Generation</dt><dd>${esc(h.gen || 'none')}</dd><dt>WebGL2</dt><dd>${GL ? 'yes' : 'no'}</dd><dt>WebGPU</dt><dd>${navigator.gpu ? 'present (not used, see NOTES)' : 'absent'}</dd></dl>
-      <h3>Detected API names</h3><pre><code>${esc(h.lines.join('\n'))}</code></pre>
+      <h2>Detected API names</h2><pre><code>${esc(h.lines.join('\n'))}</code></pre>
       <p>This panel is itself a live element. ${HIC.active ? 'Select some of this text, or press <code>Tab</code> to reach the links below; the selection and focus ring are painted into the texture.' : 'Without the flag it is plain DOM over the canvas, blurred with <code>backdrop-filter</code>.'}</p>
       <p><a href="?mode=${HIC.active ? 'dom' : 'auto'}">${HIC.active ? 'Reload with the DOM fallback' : 'Reload with auto-detection'}</a> · <a href="https://github.com/WICG/html-in-canvas" target="_blank" rel="noopener">WICG html-in-canvas explainer</a></p>`
   }
@@ -392,7 +433,9 @@ const state = {
   cat: 2, sel: {}, open: null, sound: false,
   tod: TOD.includes(qs.get('tod')) ? qs.get('tod') : 'auto',
   motion: reducedMQ.matches || qs.get('motion') === 'reduced' ? 'reduced' : 'full',
+  reading: qs.get('mode') === 'dom' || store('wave.reading') === '1',
 }
+function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v) } catch { return null } }
 const CATS = [
   { id: 'about', label: 'About', icon: 'about', items: [
     { kind: 'profile', title: DATA.site.name, sub: DATA.site.blurb, icon: 'person', href: SITE },
@@ -404,6 +447,7 @@ const CATS = [
     { kind: 'set', key: 'sound', title: 'Sound', sub: 'Soft synthesized ticks, made in WebAudio', icon: 'speaker' },
     { kind: 'set', key: 'tod', title: 'Time of Day', sub: 'Background palette; Auto follows your clock', icon: 'sun' },
     { kind: 'set', key: 'motion', title: 'Motion', sub: 'Wave, ripples and wobble', icon: 'wave' },
+    { kind: 'set', key: 'reading', title: 'Reading Mode', sub: 'Plain DOM articles: find-in-page and native selection', icon: 'doc' },
     { kind: 'sysinfo', title: 'System Information', sub: 'Which render path is active, and why', icon: 'chip' },
   ] },
   { id: 'blog', label: 'Blog', icon: 'blog', items: DATA.posts.map((d) => ({ kind: 'post', title: d.title, sub: [d.date, d.description].filter(Boolean).join('  ·  '), icon: 'doc', href: abs(d.href), data: d })) },
@@ -417,14 +461,15 @@ if (qs.has('item')) state.sel[state.cat] = Math.max(0, Math.min(CATS[state.cat].
 
 const setValue = (key) => key === 'sound' ? (state.sound ? 'On' : 'Off')
   : key === 'tod' ? (state.tod === 'auto' ? `Auto (${cap(todNow())})` : cap(state.tod))
-  : key === 'motion' ? (state.motion === 'full' ? 'Full' : 'Reduced') : ''
+  : key === 'motion' ? (state.motion === 'full' ? 'Full' : 'Reduced')
+  : key === 'reading' ? (!HIC.available || !GL ? 'Always on' : state.reading ? 'On' : 'Off') : ''
 const cap = (s) => s[0].toUpperCase() + s.slice(1)
 
 /* build DOM */
 const catsEl = $('#cats'), listsEl = $('#lists')
 const catEls = CATS.map((c, i) => {
   const b = document.createElement('button')
-  b.className = 'cat'; b.type = 'button'; b.id = 'cat-' + c.id; b.setAttribute('role', 'tab')
+  b.className = 'cat'; b.type = 'button'; b.id = 'cat-' + c.id; b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', 'list-' + c.id)
   b.innerHTML = `<span class="ic">${svgIcon(c.icon)}</span><span class="lbl">${c.label}</span>`
   b.addEventListener('click', () => { if (swiped()) return; setCat(i) })
   catsEl.appendChild(b); return b
@@ -432,11 +477,14 @@ const catEls = CATS.map((c, i) => {
 const listEls = [], itemEls = []
 CATS.forEach((c, ci) => {
   const l = document.createElement('div')
-  l.className = 'list'; l.setAttribute('role', 'tabpanel'); l.setAttribute('aria-labelledby', 'cat-' + c.id)
+  l.className = 'list'; l.id = 'list-' + c.id; l.setAttribute('role', 'tabpanel'); l.setAttribute('aria-labelledby', 'cat-' + c.id)
+  const ul = document.createElement('ul'); l.appendChild(ul)
   itemEls[ci] = c.items.map((it, ii) => {
-    const a = document.createElement('a')
+    const a = document.createElement('a'), li = document.createElement('li')
     a.className = 'item'; a.href = it.href || '#'; a.tabIndex = -1
     if (it.kind === 'link') { a.target = '_blank'; a.rel = 'noopener' }
+    if (it.kind === 'set' || it.kind === 'sysinfo') { a.setAttribute('role', 'button'); a.removeAttribute('href'); a.tabIndex = -1 }
+    if (it.kind === 'post' || it.kind === 'note' || it.kind === 'project' || it.kind === 'work' || it.kind === 'profile') a.setAttribute('aria-haspopup', 'dialog')
     a.innerHTML = `<span class="ic">${svgIcon(it.icon)}</span><span class="tx"><span class="t"></span><span class="s"></span></span>${it.kind === 'set' ? '<span class="v"></span>' : ''}`
     a.querySelector('.t').textContent = it.title
     a.querySelector('.s').textContent = it.sub || ''
@@ -447,7 +495,7 @@ CATS.forEach((c, ci) => {
       if (state.cat !== ci) setCat(ci)
       setSel(ii, true); activate()
     })
-    l.appendChild(a); return a
+    li.appendChild(a); ul.appendChild(li); return a
   })
   listsEl.appendChild(l); listEls.push(l)
 })
@@ -498,12 +546,18 @@ function layout() {
   })
   RENDER.layout?.()
 }
-function announce(t) { $('#live').textContent = t }
+let annT = 0
+function announce(t) { clearTimeout(annT); annT = setTimeout(() => { $('#live').textContent = t }, 220) }
+const posText = () => { const c = CATS[state.cat], i = state.sel[state.cat], it = c.items[i]
+  return `${it.title}${it.kind === 'set' ? ', ' + setValue(it.key) : ''}. ${i + 1} of ${c.items.length}` }
+function setTitle() {
+  document.title = state.open ? `${state.open.it.title} — Max Leiter` : `${CATS[state.cat].label} — Max Leiter`
+}
 function setCat(i, fromKey) {
   i = Math.max(0, Math.min(CATS.length - 1, i))
   if (i === state.cat) return
-  state.cat = i; tone('cat'); layout()
-  announce(`${CATS[i].label}: ${CATS[i].items[state.sel[i]].title}`)
+  state.cat = i; tone('cat'); layout(); setTitle()
+  announce(`${CATS[i].label} section. ${posText()}`)
   if (fromKey !== false) focusCurrent()
 }
 function setSel(i, quiet) {
@@ -511,7 +565,7 @@ function setSel(i, quiet) {
   i = Math.max(0, Math.min(n - 1, i))
   if (i === state.sel[state.cat]) return
   state.sel[state.cat] = i; if (!quiet) tone('tick'); layout()
-  announce(CATS[state.cat].items[i].title)
+  announce(posText())
   if (!quiet) focusCurrent()
 }
 function focusCurrent() {
@@ -526,6 +580,7 @@ function activate() {
     if (it.key === 'sound') { setSound(!state.sound) }
     if (it.key === 'tod') { state.tod = TOD[(TOD.indexOf(state.tod) + 1) % TOD.length]; tone('tick') }
     if (it.key === 'motion') { state.motion = state.motion === 'full' ? 'reduced' : 'full'; applyMotion(); tone('tick') }
+    if (it.key === 'reading') { setReading(!state.reading); tone('tick') }
     layout(); announce(`${it.title}: ${setValue(it.key)}`); return
   }
   openSheet(cat, it)
@@ -539,7 +594,7 @@ function setSound(on) {
   state.sound = on
   if (on) { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume() } catch { state.sound = false } }
   const b = $('#snd'); b.innerHTML = state.sound ? SND_ON : SND_OFF
-  b.setAttribute('aria-pressed', state.sound); b.setAttribute('aria-label', state.sound ? 'Sound on. Turn sound off' : 'Sound off. Turn sound on')
+  b.setAttribute('aria-pressed', state.sound); b.title = state.sound ? 'Sound on' : 'Sound off'
   if (state.sound) tone('open')
   layout()
 }
@@ -764,23 +819,27 @@ void main(){
   float ee = 1. - pow(1. - e, 3.);
   float spring = exp(-uOpenT * 4.2) * sin(uOpenT * 15.) * uMotion;
   vec2 hb = uRect.zw * .5, c = uRect.xy + hb;
-  vec2 c0 = mix(uFrom, c, ee);
-  vec2 sc = vec2(mix(.5, 1., ee)) * vec2(1. + .022 * spring, 1. - .018 * spring);
+  vec2 c0 = mix(c, mix(uFrom, c, ee), uMotion);               // reduced motion: no fly-in
+  vec2 sc = vec2(mix(1., mix(.5, 1., ee), uMotion)) * vec2(1. + .022 * spring, 1. - .018 * spring);
   vec2 q = (p - c0) / sc + c;
   vec2 disp = vec2(0.);
   float jelly = (1. - ee) * uMotion;
   disp += vec2(sin(q.y * .021 + uT * 7.) * 18., sin(q.x * .017 + uT * 6.) * 10.) * jelly;
   disp += vec2(sin(q.y * .012 + uOpenT * 9.), cos(q.x * .010 + uOpenT * 8.)) * 6. * abs(spring);
+  vec2 wet = vec2(0.);   // ripple + slosh, capped below
   for (int i = 0; i < 4; i++) {
     vec4 r = uRip[i]; float age = uT - r.z;
     if (age < 0. || age > 3.2 || r.w <= 0.) continue;
     vec2 d = q - r.xy; float L = length(d) + 1e-3; float ring = age * 380.;
     float w = sin((L - ring) * .06) * exp(-pow((L - ring) / 110., 2.)) * exp(-age * 1.5) * r.w;
-    disp += d / L * w * 10. * uMotion;
+    wet += d / L * w * 5.;
   }
   // scrolling makes the sheet slosh: a travelling wave that leans into the scroll direction
-  disp.x += sin(q.y * .03 - uT * 8.) * uVel * .16 * uMotion;
-  disp.y += (sin(q.x * .018 + uT * 3.) * .5 + .5) * uVel * .34 * uMotion;
+  wet.x += sin(q.y * .03 - uT * 8.) * uVel * .07;
+  wet.y += (sin(q.x * .018 + uT * 3.) * .5 + .5) * uVel * .12;
+  // readability cap: never bend text more than ~3.5 CSS px, and nothing at all with reduced motion
+  float wl = length(wet); wet *= min(1., 3.5 / max(wl, 1e-3));
+  disp += wet * uMotion;
   vec2 qd = q + disp;
   float sd = sdRR(qd - c, hb, uRadius);
   float shadow = (1. - smoothstep(-10., 46., sd - 10.)) * .42 * ee;
@@ -817,7 +876,7 @@ void main(){
   if (uHasEl > .5) {
     vec2 lp = qd - uContent.xy + vec2(0., uScroll);
     vec2 uv = lp / uElSize;
-    float ca = min(.0024, length(disp) * .00012 + abs(uVel) * .00002);
+    float ca = min(.0008, length(disp) * .00006 + abs(uVel) * .00001) * uMotion;
     vec4 tg = el(uv);
     vec4 t = vec4(el(uv + vec2(ca, 0.)).r, tg.g, el(uv - vec2(ca, 0.)).b, tg.a);
     float m = smoothstep(uContent.y, uContent.y + 20., qd.y) * (1. - smoothstep(uContent.y + uContent.w - 20., uContent.y + uContent.w, qd.y));
@@ -872,32 +931,51 @@ function glResize() {
 /* =====================================================================
    Render paths
    ===================================================================== */
-const sheet = document.createElement('article')
-sheet.className = 'sheet'; sheet.id = 'sheet'; sheet.setAttribute('aria-live', 'off')
+// the reader is a modal dialog in both paths; on the canvas path it is the canvas's drawable child
+const sheet = document.createElement('div')
+sheet.className = 'sheet'; sheet.id = 'sheet'
+sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-labelledby', 'sh-title')
+sheet.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('button[data-act]')
+  if (!b) return
+  if (b.dataset.act === 'back') closeSheet()
+  if (b.dataset.act === 'read') setReading(!state.reading)
+})
 const P = { rect: [0, 0, 0, 0], content: [0, 0, 0, 0], pad: 40, scroll: 0, target: 0, max: 0, vel: 0, prog: 0, openAt: 0, from: [0, 0], rips: [], ready: false, closing: false }
 
 const RENDER = {}
-function choosePath() {
-  const want = qs.get('mode')
-  const hic = GL && HIC.available && want !== 'dom'
-  HIC.active = !!hic
+function setPath() {
+  const hic = !!(GL && HIC.available && !state.reading)
+  if (hic === HIC.active && sheet.parentNode) return
+  const reopen = state.open && !P.closing ? state.open : null
+  if (reopen) { state.open = null; P.closing = false; P.ready = false; syncGeometryClear() }
+  HIC.active = hic
   document.body.classList.toggle('hic', HIC.active)
-  RENDER.label = hic ? `HTML-in-Canvas (${HIC.gen}, gl.${HIC.upName})` : GL ? 'DOM overlay over WebGL2' : 'DOM overlay, CSS gradient (no WebGL2)'
+  const reading = !hic && GL && HIC.available
+  RENDER.label = hic ? `HTML-in-Canvas (${HIC.gen}, gl.${HIC.upName})` : reading ? 'Reading mode: DOM overlay (HTML-in-Canvas available)' : GL ? 'DOM overlay over WebGL2' : 'DOM overlay, CSS gradient (no WebGL2)'
   const badge = $('#badge')
   badge.classList.toggle('hic', hic)
-  $('#badge-t').textContent = hic ? `HTML-in-Canvas · ${HIC.upName}` : GL ? 'DOM overlay · fallback' : 'DOM · no WebGL'
+  $('#badge-t').textContent = hic ? `HTML-in-Canvas · ${HIC.upName}` : reading ? 'Reading mode · DOM' : GL ? 'DOM overlay · fallback' : 'DOM · no WebGL'
   badge.title = HIC.report.lines.join('\n')
-  badge.setAttribute('aria-label', 'Renderer: ' + RENDER.label)
   if (hic) {
     canvas.setAttribute('layoutsubtree', '')   // legacy generation
     canvas.setAttribute('content', 'drawable') // current generation
     sheet.setAttribute('drawable', '')
     canvas.appendChild(sheet)
   } else {
+    canvas.removeAttribute('layoutsubtree'); canvas.removeAttribute('content'); sheet.removeAttribute('drawable')
+    sheet.style.width = ''
     $('#glass .scroller').appendChild(sheet)
-    canvas.setAttribute('aria-hidden', 'true')
   }
+  canvas.setAttribute('aria-hidden', 'true')
   sheet.inert = true; sheet.setAttribute('aria-hidden', 'true')
+  $('#glass').classList.remove('on')
+  if (reopen) { openSheet(reopen.cat, reopen.it, true); sheet.querySelector('[data-act="read"]')?.focus() }
+}
+function setReading(on) {
+  state.reading = on; store('wave.reading', on ? '1' : '0')
+  setPath(); layout()
+  announce(on ? 'Reading mode on: articles are plain page text' : 'Reading mode off: articles are drawn with HTML-in-Canvas')
 }
 
 /* --- HTML-in-Canvas: upload the live element into a texture --- */
@@ -934,6 +1012,10 @@ function hicListen() {
 }
 /* --- keep hit testing / accessibility geometry in sync with where we draw --- */
 let lastGeom = ''
+function syncGeometryClear() {
+  try { if (canvas.clearElementGeometry) canvas.clearElementGeometry(sheet); else GL?.setHitTestRegions?.([]) } catch {}
+  lastGeom = 'none'
+}
 function syncGeometry() {
   if (!HIC.active) return
   const gl = GL
@@ -973,18 +1055,18 @@ function panelLayout() {
 }
 RENDER.layout = () => { if (state.open) panelLayout() }
 
-function openSheet(cat, it) {
+function openSheet(cat, it, instant) {
   const ci = state.cat, ii = state.sel[ci]
   state.open = { cat, it }
-  sheet.innerHTML = sheetFor(cat, it)
+  sheet.innerHTML = `<article>${sheetFor(cat, it)}</article>`
   sheet.inert = false; sheet.removeAttribute('aria-hidden')
-  sheet.setAttribute('aria-label', it.title)
   document.body.classList.add('open')
-  $('#menu').inert = true
-  tone('open')
+  $('#menu').inert = true; $('#top').inert = true
+  setTitle()
+  if (!instant) tone('open')
   const r = itemEls[ci][ii].querySelector('.ic').getBoundingClientRect()
   P.from = [r.left + r.width / 2, r.top + r.height / 2]
-  P.scroll = P.target = 0; P.vel = 0; P.prog = state.motion === 'full' ? 0 : 1; P.openAt = now(); P.rips = []; P.closing = false; P.ready = false
+  P.scroll = P.target = 0; P.vel = 0; P.prog = instant ? 1 : 0; P.openAt = now() - (instant ? 3 : 0); P.rips = []; P.closing = false; P.ready = false
   panelLayout()
   if (HIC.active) {
     canvas.removeAttribute('aria-hidden')
@@ -994,23 +1076,26 @@ function openSheet(cat, it) {
   } else {
     const g = $('#glass'); g.removeAttribute('aria-hidden')
     g.style.setProperty('--fx', (P.from[0] - (P.rect[0] + P.rect[2] / 2)) + 'px'); g.style.setProperty('--fy', (P.from[1] - (P.rect[1] + P.rect[3] / 2)) + 'px')
+    g.classList.toggle('instant', !!instant)
     g.classList.remove('on'); void g.offsetWidth; g.classList.add('on')
-    const sc = g.querySelector('.scroller'); sc.scrollTop = 0; sc.focus({ preventScroll: true })
+    g.querySelector('.scroller').scrollTop = 0
+    sheet.tabIndex = -1; sheet.focus({ preventScroll: true })
   }
-  announce(`Opened ${it.title}`)
+  if (!instant) announce(`Opened ${it.title}. Press Escape to go back.`)
 }
 function closeSheet() {
   if (!state.open) return
   const { it } = state.open
   tone('back')
   document.body.classList.remove('open')
-  $('#menu').inert = false
+  $('#menu').inert = false; $('#top').inert = false
+  document.title = `${CATS[state.cat].label} — Max Leiter`
   P.closing = true; P.closeAt = now()
   syncGeometry()
   if (!HIC.active) { const g = $('#glass'); g.classList.remove('on'); g.setAttribute('aria-hidden', 'true') }
   sheet.inert = true; sheet.setAttribute('aria-hidden', 'true')
   getSelection()?.removeAllRanges()
-  setTimeout(() => { if (P.closing) { state.open = null; P.closing = false; P.ready = false; if (HIC.active) canvas.setAttribute('aria-hidden', 'true') } }, state.motion === 'full' ? 380 : 10)
+  setTimeout(() => { if (P.closing) { state.open = null; P.closing = false; P.ready = false; canvas.setAttribute('aria-hidden', 'true') } }, state.motion === 'full' ? 380 : 240)
   itemEls[state.cat][state.sel[state.cat]].focus({ preventScroll: true })
   announce(`Closed ${it.title}`)
 }
@@ -1034,6 +1119,13 @@ function ripple(x, y, amp) {
 addEventListener('keydown', (e) => {
   if (e.altKey || e.ctrlKey || e.metaKey) return
   const k = e.key
+  if (state.open && !P.closing && k === 'Tab') {
+    const f = [...sheet.querySelectorAll('a[href], button:not([disabled])'), $('#back')]
+    const i = f.indexOf(document.activeElement)
+    e.preventDefault()
+    f[i < 0 ? (e.shiftKey ? f.length - 1 : 0) : (i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus({ preventScroll: true })
+    return
+  }
   if (state.open) {
     const page = P.content[3] * 0.85 || 400
     if (k === 'Escape' || k === 'Backspace') { e.preventDefault(); closeSheet() }
@@ -1174,8 +1266,8 @@ function frame(ms) {
   const open = !!state.open && !P.closing
   dof += ((open ? 1 : 0) - dof) * Math.min(1, dt * 7)
   if (state.open) {
-    if (P.closing) P.prog = state.motion === 'full' ? Math.max(0, 1 - (t - P.closeAt) / 0.32) : 0
-    else if (P.ready || !HIC.active) P.prog = Math.min(1, P.prog + dt / 0.62)
+    if (P.closing) P.prog = Math.max(0, 1 - (t - P.closeAt) / (state.motion === 'full' ? 0.32 : 0.2))
+    else if (P.ready || !HIC.active) P.prog = Math.min(1, P.prog + dt / (state.motion === 'full' ? 0.62 : 0.22))
     if (window.__hold != null) { P.prog = window.__hold; P.openAt = t - window.__hold * 0.62 }
     const prev = P.scroll
     P.scroll += (P.target - P.scroll) * Math.min(1, dt * 12)
@@ -1188,8 +1280,8 @@ function frame(ms) {
     // fallback wobble from native scroll velocity
     fbVel *= Math.pow(0.86, dt * 60)
     const sc = $('#glass .scroller'), d = document.getElementById('fx-disp')
-    const amp = state.motion === 'full' ? Math.min(16, Math.abs(fbVel) * 0.22) : 0
-    sc.style.setProperty('--vel', (fbVel * 0.6).toFixed(2))
+    const amp = state.motion === 'full' ? Math.min(5, Math.abs(fbVel) * 0.08) : 0
+    sc.style.setProperty('--vel', state.motion === 'full' ? Math.max(-12, Math.min(12, fbVel * 0.3)).toFixed(2) : '0')
     if (amp > 0.5) { d.setAttribute('scale', amp.toFixed(1)); sc.querySelector('.sheet').style.filter = 'url(#fx-ripple)' }
     else sc.querySelector('.sheet').style.filter = ''
   }
@@ -1241,8 +1333,8 @@ function draw(t) {
    ===================================================================== */
 if (GL) { try { glInit() } catch (err) { console.error('[wave] WebGL2 init failed, using CSS background', err); GL = null } }
 if (!GL) { document.body.classList.add('nogl'); canvas.style.display = 'none' }
-choosePath()
-if (HIC.active) hicListen()
+setPath()
+if (HIC.available && GL) hicListen()
 applyMotion()
 setSound(false)
 layout(); tickClock(); setInterval(tickClock, 15000)
@@ -1252,6 +1344,13 @@ requestAnimationFrame(frame)
 // deep-link for screenshots/tests: ?open=1 opens the selected item
 itemEls[state.cat][state.sel[state.cat]].focus({ preventScroll: true })
 if (qs.get('open')) setTimeout(activate, 60)
+$('.skip').addEventListener('click', (e) => {
+  e.preventDefault()
+  ;(state.open ? sheet : itemEls[state.cat][state.sel[state.cat]]).focus()
+})
+setTitle()
+// boot finished: hide the static no-JS index (it stays visible if anything above threw)
+document.documentElement.classList.remove('nojs')
 window.__wave = { state, P, HIC, RENDER, now, tickClock, activate, closeSheet, scrollBy, ripple, setCat, setSel, layout }
 </script>
 </body>

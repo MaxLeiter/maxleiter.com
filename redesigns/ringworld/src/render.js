@@ -23,8 +23,8 @@ const SCENE = {
 const POSES = {
   title: { pos: [3.5, 2.6, 22], tgt: [4, -1.5, -12], fov: 42 },
   main: { pos: [0, 3.2, 13.5], tgt: [1.5, -0.6, -6], fov: 44 },
-  campaign: { pos: [-7.2, 0.62, 9.2], tgt: [2, -0.2, -10], fov: 46 },
-  theater: { pos: [6.5, 0.9, 13.5], tgt: [-2, -0.5, -9], fov: 44 },
+  campaign: { pos: [6, 5, 6], tgt: [9, -1, -3], fov: 46 },
+  theater: { pos: [-4, 1.2, 7], tgt: [8, 0.5, -4], fov: 50 },
   forge: { pos: [2.5, 4.2, 14.5], tgt: [3.5, -1.5, -4], fov: 46 },
   matchmaking: { pos: [-2.5, 0.4, 16.5], tgt: [12, -3.5, -30], fov: 40 },
   service: { pos: [-4, 3.5, 26], tgt: [5, -2, -16], fov: 40 },
@@ -253,7 +253,7 @@ const Render = (() => {
     async init(el, opts = {}) {
       canvas = el
       reducedMotion = !!opts.reducedMotion
-      motionScale = reducedMotion ? 0.25 : 1
+      motionScale = reducedMotion ? 0.12 : 1
       quality = opts.quality || 'auto'
       if (params.has('scale')) lockScale = parseFloat(params.get('scale'))
       setPose(opts.pose || 'title', true)
@@ -264,7 +264,7 @@ const Render = (() => {
     },
     setPose,
     setQuality(q) { quality = q; frameTimes = []; applyQuality() },
-    setReducedMotion(r) { reducedMotion = r; motionScale = r ? 0.25 : 1 },
+    setReducedMotion(r) { reducedMotion = r; motionScale = r ? 0.12 : 1 },
     onStats(f) { listeners.push(f) },
     get info() { return { kind, adapterInfo, scale, fps, quality, tier: qual } },
   }

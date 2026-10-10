@@ -3,8 +3,23 @@ const $ = (s, r = document) => r.querySelector(s)
 const $$ = (s, r = document) => [...r.querySelectorAll(s)]
 const root = document.documentElement
 const mqReduce = matchMedia('(prefers-reduced-motion: reduce)')
-let RM = mqReduce.matches
-mqReduce.addEventListener?.('change', (e) => { RM = e.matches; surfaces.forEach((s) => (s.dirty = true)) })
+let RM = mqReduce.matches, motionChoice = null
+function setRM(v) {
+  RM = !!v
+  root.classList.toggle('rm', RM)
+  root.classList.toggle('motion-ok', !RM)
+  surfaces.forEach((s) => (s.dirty = true))
+  $('#stMotion')?.setAttribute('aria-checked', RM)
+}
+mqReduce.addEventListener?.('change', (e) => { if (motionChoice === null) setRM(e.matches) })
+
+/* polite, debounced announcements for focus moved by arrows or a controller */
+let annT = 0
+function announce(msg) {
+  clearTimeout(annT)
+  annT = setTimeout(() => { const a = $('#announcer'); a.textContent = ''; setTimeout(() => (a.textContent = msg), 30) }, 220)
+}
+function setTitle(part) { document.title = part ? `${part} · Plaza · Max Leiter` : 'Max Leiter · Plaza' }
 const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches
 const COARSE = matchMedia('(pointer: coarse)').matches
 
@@ -37,7 +52,8 @@ function surface(canvas, draw, opts = {}) {
 }
 function fit(s) {
   if (!s) return
-  const r = s.canvas.getBoundingClientRect()
+  // layout size, not getBoundingClientRect: a canvas measured mid-zoom would come out tiny
+  const r = { width: s.canvas.clientWidth, height: s.canvas.clientHeight }
   const dpr = Math.min(2, window.devicePixelRatio || 1)
   if (!r.width || !r.height) return
   const W = Math.round(r.width * dpr), H = Math.round(r.height * dpr)
@@ -60,8 +76,8 @@ const tiles = CH.map((ch, i) => {
   el.style.setProperty('--i', i)
   el.style.setProperty('--d', (i * 0.73) % 9 + 's')
   if (ch.empty) el.setAttribute('aria-hidden', 'true')
-  else { el.type = 'button'; el.setAttribute('aria-label', `${ch.name} channel`); el.dataset.ch = ch.id }
-  el.innerHTML = '<span class="bezel"><span class="screen"><canvas></canvas><span class="glare"></span></span></span>'
+  else { el.type = 'button'; el.dataset.ch = ch.id }
+  el.innerHTML = (ch.empty ? '' : `<span class="sr-only">${ch.name} channel</span>`) + '<span class="bezel" aria-hidden="true"><span class="screen"><canvas></canvas><span class="glare"></span></span></span>'
   el.__ch = ch
   return el
 })
@@ -76,7 +92,7 @@ function layout() {
   drawDock(W)
   const availH = H - dockGeo.H - (isMobile ? 64 : 44)
   let cols = 4, rows = 3
-  if (isMobile) { cols = 2; rows = availH > 520 ? 4 : 3 }
+  if (isMobile) { cols = 2; rows = Math.max(1, Math.min(4, Math.floor((availH + 14) / 124))) }
   else if (W < 1000) { cols = 3; rows = 3 }
   const gx = isMobile ? 14 : Math.max(14, Math.min(26, W * 0.018)), gy = isMobile ? 14 : gx
   const aspect = isMobile ? 1.38 : 1.72
@@ -133,7 +149,7 @@ function goPage(p, smooth = true) {
 }
 track.addEventListener('scroll', () => {
   const p = Math.round(track.scrollLeft / Math.max(1, track.clientWidth))
-  if (p !== curPage) { curPage = p; updatePageUI(); Sound.tick(); hideBubble() }
+  if (p !== curPage) { curPage = p; updatePageUI(); Sound.tick(); hideBubble(); announce(`Page ${p + 1} of ${pageCount}`) }
 }, { passive: true })
 $('#prevPage').onclick = () => goPage(curPage - 1)
 $('#nextPage').onclick = () => goPage(curPage + 1)
@@ -170,7 +186,12 @@ function hideBubble(now) {
 }
 for (const t of tiles) {
   if (t.__ch.empty) continue
-  t.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'touch') setHot(t, 'mouse') })
+  t.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'touch') return
+    // keep one selection: if a tile holds focus, the pointer takes it along
+    if (document.activeElement?.classList.contains('tile') && document.activeElement !== t) t.focus({ preventScroll: true })
+    setHot(t, 'mouse')
+  })
   t.addEventListener('pointerleave', (e) => { if (hot === t && e.pointerType !== 'touch') setHot(null) })
   t.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') setHot(t, 'touch') })
   t.addEventListener('focus', () => setHot(t, 'key'))
@@ -218,10 +239,21 @@ $('#stJingle').onclick = () => {
 
 /* ---------------------------------------------------------------- zoom transitions */
 let busy = false
+// ?flip forces the manual FLIP fallback (what browsers without View Transitions get)
+const FORCE_FLIP = /[?&]flip\b/.test(location.search)
 async function zoom(from, to, update, back) {
   hideBubble(true)
-  if (RM || !from) { update(); return }
-  if (document.startViewTransition) {
+  if (!from) { update(); return }
+  if (RM) {
+    // calm version: a short crossfade, no scaling
+    if (!document.startViewTransition) { update(); return }
+    root.classList.add('vt-fade')
+    const vt = document.startViewTransition(update)
+    const guard = setTimeout(() => vt.skipTransition(), 700)
+    try { await vt.finished } catch (e) {} finally { clearTimeout(guard); root.classList.remove('vt-fade') }
+    return
+  }
+  if (document.startViewTransition && !FORCE_FLIP) {
     const a = from, other = to
     a.style.viewTransitionName = 'zoom'
     root.classList.add(back ? 'vt-back' : 'vt-in')
@@ -261,6 +293,8 @@ async function openChannel(ch, opts = {}) {
   $('#chTitle').textContent = ch.name
   $('#chSub').textContent = ch.sub
   splashS.draw = ch.r
+  $('#splashDesc').textContent = `${ch.name} channel. ${ch.sub}. Choose Start to open it, or Menu to go back.`
+  setTitle(ch.name)
   const update = () => {
     setInert(true)
     channel.hidden = false
@@ -271,7 +305,7 @@ async function openChannel(ch, opts = {}) {
     fit(splashS); paint(splashS, T)
   }
   await zoom(opts.instant ? null : tile, channel, update)
-  if (!opts.skipSplash) $('#splashStart').focus({ preventScroll: true })
+  if (!opts.skipSplash) { $('#splashStart').focus({ preventScroll: true }); announce(`${ch.name} channel opened. ${ch.sub}.`) }
   busy = false
   return true
 }
@@ -289,6 +323,7 @@ async function closeChannel() {
     clearExtra()
     view = 'menu'
     setHash('')
+    setTitle('')
   }
   await zoom(channel, tile, update, true)
   tile?.focus({ preventScroll: true })
@@ -316,32 +351,32 @@ const host = (u) => { try { return new URL(abs(u)).host.replace(/^www\./, '') } 
 const LIST = {
   blog() {
     const years = [...new Set(DATA.posts.map((p) => parseDate(p.date)?.getFullYear()).filter(Boolean))]
-    const chips = ['all', ...years].map((y) => `<button class="chip${String(y) === String(filterYear) ? ' on' : ''}" data-nav data-year="${y}">${y === 'all' ? 'All' : y}</button>`).join('')
+    const chips = ['all', ...years].map((y) => `<button class="chip${String(y) === String(filterYear) ? ' on' : ''}" aria-pressed="${String(y) === String(filterYear)}" data-nav data-year="${y}">${y === 'all' ? 'All' : y}</button>`).join('')
     const rows = DATA.posts.map((p, i) => [p, i]).filter(([p]) => filterYear === 'all' || parseDate(p.date)?.getFullYear() === +filterYear)
-      .map(([p, i]) => `<button class="row" data-nav data-art="post:${i}">${fmtBadge(p.date)}<span class="row-main"><span class="row-title">${esc(p.t)}</span><span class="row-desc">${esc(p.d || 'Blog post')}</span></span><span class="chev" aria-hidden="true"></span></button>`).join('')
-    return { html: `<div class="chips" role="toolbar" aria-label="Filter by year">${chips}</div><div class="list">${rows}</div>`, mid: `${DATA.posts.length} posts` }
+      .map(([p, i]) => `<li><button class="row" data-nav data-art="post:${i}">${fmtBadge(p.date)}<span class="row-main"><span class="row-title">${esc(p.t)}</span><span class="row-desc">${esc(p.d || 'Blog post')}</span></span><span class="chev" aria-hidden="true"></span></button></li>`).join('')
+    return { html: `<div class="chips" role="group" aria-label="Filter by year">${chips}</div><ul class="list ul-reset" aria-label="Posts">${rows}</ul>`, mid: `${DATA.posts.length} posts` }
   },
   notes() {
-    const html = DATA.notes.map((n, i) => `<button class="sticky s${i % 4}" data-nav data-art="note:${i}" style="--rot:${[-2, 1.5, -1, 2.2][i % 4]}deg"><span class="tape" aria-hidden="true"></span><span class="st-title">${esc(n.t)}</span><span class="st-date">${esc(n.date)}</span></button>`).join('')
-    return { html: `<div class="stickies">${html}</div>`, mid: `${DATA.notes.length} notes` }
+    const html = DATA.notes.map((n, i) => `<li><button class="sticky s${i % 4}" data-nav data-art="note:${i}" style="--rot:${[-2, 1.5, -1, 2.2][i % 4]}deg"><span class="tape" aria-hidden="true"></span><span class="st-title">${esc(n.t)}</span><span class="st-date">${esc(n.date)}</span></button></li>`).join('')
+    return { html: `<ul class="stickies ul-reset" aria-label="Notes">${html}</ul>`, mid: `${DATA.notes.length} notes` }
   },
   projects() {
     const html = DATA.projects.map((p, i) => {
       const ini = p.t.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
-      return `<a class="card" data-nav href="${abs(p.href)}" target="_blank" rel="noopener" style="--h:${(i * 47 + 250) % 360}"><span class="card-ico" aria-hidden="true">${esc(ini)}</span><span class="card-main"><b>${esc(p.t)}</b><span>${esc(p.d)}</span><em>${esc(host(p.href))} &rsaquo;</em></span></a>`
+      return `<li><a class="card" data-nav href="${abs(p.href)}" target="_blank" rel="noopener" style="--h:${(i * 47 + 250) % 360}"><span class="card-ico" aria-hidden="true">${esc(ini)}</span><span class="card-main"><b>${esc(p.t)}</b><span>${esc(p.d)}</span><em>${esc(host(p.href))} &rsaquo;</em></span></a></li>`
     }).join('')
-    return { html: `<div class="cards">${html}</div>`, mid: 'Opens in a new tab' }
+    return { html: `<ul class="cards ul-reset" aria-label="Projects">${html}</ul>`, mid: 'Opens in a new tab' }
   },
   work() {
-    const html = DATA.work.map((p) => `<a class="row news" data-nav href="${abs(p.href)}" target="_blank" rel="noopener">${fmtBadge(p.date)}<span class="row-main"><span class="row-title">${esc(p.t)}</span><span class="row-desc">${esc(p.d)}</span></span><span class="host">${esc(host(p.href))}</span></a>`).join('')
-    return { html: `<div class="list">${html}</div>`, mid: 'Writing on vercel.com' }
+    const html = DATA.work.map((p) => `<li><a class="row news" data-nav href="${abs(p.href)}" target="_blank" rel="noopener">${fmtBadge(p.date)}<span class="row-main"><span class="row-title">${esc(p.t)}</span><span class="row-desc">${esc(p.d)}</span></span><span class="host">${esc(host(p.href))}</span></a></li>`).join('')
+    return { html: `<ul class="list ul-reset" aria-label="Articles">${html}</ul>`, mid: 'Writing on vercel.com' }
   },
   about() {
     const first = ITEMS.filter((x) => x.kind === 'post').at(-1)
     return {
       html: `<div class="about"><div class="about-art"><canvas id="palCanvas" aria-hidden="true"></canvas></div>
       <div class="about-text"><p class="hello">Hi, I'm Max.</p><p class="blurb">${esc(DATA.site.blurb)}</p>
-      <div class="facts"><div><b>${DATA.posts.length}</b><span>posts</span></div><div><b>${DATA.notes.length}</b><span>notes</span></div><div><b>${parseDate(first.date).getFullYear()}</b><span>writing since</span></div></div>
+      <ul class="facts ul-reset"><li><b>${DATA.posts.length}</b> <span>posts</span></li><li><b>${DATA.notes.length}</b> <span>notes</span></li><li><b>${parseDate(first.date).getFullYear()}</b> <span>writing since</span></li></ul>
       <div class="btnrow"><a class="pill" data-nav href="${DATA.site.github}" target="_blank" rel="noopener">GitHub</a><a class="pill" data-nav href="${DATA.site.x}" target="_blank" rel="noopener">X / Twitter</a><button class="pill primary" data-nav data-go="blog">Read the blog</button></div></div></div>`,
       mid: 'maxleiter.com',
       after() {
@@ -364,8 +399,8 @@ const LIST = {
       ['RSS feed', 'Every post and note, in your reader', SITE + '/feed.xml', 'rss'],
       ['maxleiter.com', 'The real site, no bezels', SITE, 'www'],
     ]
-    const html = L.map(([t, d, h, g]) => `<a class="link-card" data-nav href="${h}" target="_blank" rel="noopener"><span class="lc-ico${g === 'rss' ? ' rss' : ''}" aria-hidden="true">${g === 'rss' ? '<i></i><i></i><i></i>' : esc(g)}</span><span class="lc-main"><b>${esc(t)}</b><span>${esc(d)}</span></span><span class="chev" aria-hidden="true"></span></a>`).join('')
-    return { html: `<div class="link-grid">${html}</div>`, mid: 'Opens in a new tab' }
+    const html = L.map(([t, d, h, g]) => `<li><a class="link-card" data-nav href="${h}" target="_blank" rel="noopener"><span class="lc-ico${g === 'rss' ? ' rss' : ''}" aria-hidden="true">${g === 'rss' ? '<i></i><i></i><i></i>' : esc(g)}</span><span class="lc-main"><b>${esc(t)}</b><span>${esc(d)}</span></span><span class="chev" aria-hidden="true"></span></a></li>`).join('')
+    return { html: `<ul class="link-grid ul-reset" aria-label="Links">${html}</ul>`, mid: 'Opens in a new tab' }
   },
   forecast() {
     const byYear = {}
@@ -373,12 +408,12 @@ const LIST = {
     const years = Object.keys(byYear).sort().slice(-6)
     const icon = (n) => (n >= 5 ? 'sun' : n >= 3 ? 'part' : n >= 2 ? 'cloud' : 'drizzle')
     const word = { sun: 'Sunny', part: 'Partly sunny', cloud: 'Cloudy', drizzle: 'Light drizzle' }
-    const days = years.map((y) => `<div class="fc-day"><span class="fc-y">${y}</span><span class="wx ${icon(byYear[y])}" aria-hidden="true"><i></i><i></i></span><b>${byYear[y]}</b><span class="fc-w">${word[icon(byYear[y])]}</span></div>`).join('')
+    const days = years.map((y) => `<li class="fc-day"><span class="fc-y">${y}</span><span class="wx ${icon(byYear[y])}" aria-hidden="true"><i></i><i></i></span><b>${byYear[y]}</b><span class="fc-w">${word[icon(byYear[y])]}</span></li>`).join('')
     const stats = [['350', 'ms', 'full build'], ['78', '', 'routes'], ['4', '', 'islands'], ['~1', 'KB', 'JS per article'], ['17', 'KB', 'homepage JS'], ['0', '', 'servers']]
-      .map(([v, u, l]) => `<div class="stat"><b>${v}<small>${u}</small></b><span>${l}</span></div>`).join('')
+      .map(([v, u, l]) => `<li class="stat"><b>${v}<small>${u}</small></b><span>${l}</span></li>`).join('')
     return {
-      html: `<div class="fc"><div class="fc-now"><canvas id="fcCanvas" aria-hidden="true"></canvas></div><div class="stats">${stats}</div></div>
-      <h3 class="sec">Writing outlook <span>posts and notes per year</span></h3><div class="fc-days">${days}</div>
+      html: `<div class="fc"><div class="fc-now"><canvas id="fcCanvas" aria-hidden="true"></canvas></div><ul class="stats ul-reset" aria-label="Build stats">${stats}</ul></div>
+      <h2 class="sec">Writing outlook <span>posts and notes per year</span></h2><ul class="fc-days ul-reset" aria-label="Posts and notes per year">${days}</ul>
       <p class="fine">Figures are from the real site's architecture notes: a bespoke static generator, every route rendered to a file at build time.</p>`,
       mid: 'Conditions as of the last build',
       after() { extra.push(surface($('#fcCanvas'), R.forecast)) },
@@ -386,7 +421,7 @@ const LIST = {
   },
   jukebox() {
     return {
-      html: `<div class="jb"><div class="jb-screen"><canvas id="rollCanvas" aria-label="Piano roll of the loop"></canvas></div>
+      html: `<div class="jb"><div class="jb-screen"><canvas id="rollCanvas" role="img" aria-label="Piano roll of the eight-bar loop: melody notes over the chord names listed below"></canvas></div>
       <div class="btnrow center"><button class="pill primary" data-nav id="jbPlay">${Jingle.playing ? 'Stop' : 'Play'}</button><button class="pill" data-nav id="jbRemix">Remix</button><button class="pill" data-nav id="jbHouse">House tune</button></div>
       <p class="jb-info" id="jbInfo"></p>
       <p class="fine">Nothing here is a recording. An FM electric piano, a mallet lead, a triangle bass and brushed noise are synthesized live with WebAudio over eight fixed chords. The melody grows from a seed, and bars five and six repeat the rhythm of one and two so it sounds like a tune rather than dice.</p></div>`,
@@ -444,6 +479,7 @@ function showList(fresh) {
   L.after?.()
   chBody.scrollTop = fresh ? 0 : listScroll
   setHash(cur.id)
+  setTitle(cur.name)
   const first = chBody.querySelector('[data-art], .card, .link-card, .row, #jbPlay, .about .pill')
   if (fresh) (first || chBody).focus({ preventScroll: true })
 }
@@ -451,12 +487,14 @@ function showList(fresh) {
 function articleHTML(item, kind) {
   const label = kind === 'note' ? 'Note' : 'Blog post'
   return `<article class="article"><div class="art-meta"><span class="tag ${kind}">${label}</span><span>${esc(item.date)}</span></div>
-    <h1>${esc(item.t)}</h1>${item.d ? `<p class="art-desc">${esc(item.d)}</p>` : ''}
+    <h2 class="art-title" tabindex="-1">${esc(item.t)}</h2>${item.d ? `<p class="art-desc">${esc(item.d)}</p>` : ''}
     <div class="prose">${md(item.ex, item.ex.length >= 1190)}</div>
     <div class="art-cta"><a class="pill primary" href="${abs(item.href)}" target="_blank" rel="noopener">Read it all on maxleiter.com</a></div></article>`
 }
 
+let articleOpener = null
 function openArticle(kind, i, fromList = true) {
+  articleOpener = kind + ':' + i
   const item = (kind === 'note' ? DATA.notes : DATA.posts)[i]
   if (!item) return
   if (fromList) listScroll = chBody.scrollTop
@@ -467,7 +505,8 @@ function openArticle(kind, i, fromList = true) {
   $('#chFootMid').textContent = `Reading · ${item.date}`
   chState = 'article'
   setHash(`${cur.id}/${slugOf(item.href)}`)
-  chBody.focus({ preventScroll: true })
+  setTitle(item.t)
+  chBody.querySelector('.art-title').focus({ preventScroll: true })
 }
 
 chBody.addEventListener('click', (e) => {
@@ -504,7 +543,7 @@ function renderBoard(focusDay) {
   const first = new Date(Y, M, 1).getDay(), days = new Date(Y, M + 1, 0).getDate()
   const prevDays = new Date(Y, M, 0).getDate()
   const today = new Date()
-  let html = DAY_NAMES.map((d, i) => `<div class="cal-h${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}" role="columnheader">${d}</div>`).join('')
+  let html = DAY_NAMES.map((d, i) => `<div class="cal-h${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}" aria-hidden="true">${d}</div>`).join('')
   for (let i = 0; i < 42; i++) {
     const day = i - first + 1
     if (day < 1 || day > days) {
@@ -515,29 +554,33 @@ function renderBoard(focusDay) {
     const its = items.filter((x) => x.when.getDate() === day)
     const isToday = today.getFullYear() === Y && today.getMonth() === M && today.getDate() === day
     const icons = its.slice(0, 3).map((x) => `<i class="env ${x.kind}"></i>`).join('') + (its.length > 3 ? `<em>+${its.length - 3}</em>` : '')
-    const lbl = `${MONTH_NAMES[M]} ${day}${its.length ? ': ' + its.map((x) => x.t).join('; ') : ''}`
-    html += `<button class="cell${its.length ? ' has' : ''}${isToday ? ' today' : ''}${bdSel === day ? ' sel' : ''}${(i % 7 === 0) ? ' sun' : (i % 7 === 6) ? ' sat' : ''}" data-day="${day}" tabindex="${(bdSel || (its.length ? day : 0)) === day ? 0 : -1}" aria-label="${esc(lbl)}"><span class="dn">${day}</span><span class="envs">${icons}</span>${its.length ? `<span class="peek">${esc(its[0].t)}</span>` : ''}</button>`
+    const lbl = `${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][i % 7]}, ${MONTH_NAMES[M]} ${day}: ${its.length ? its.length + (its.length === 1 ? ' message: ' : ' messages: ') + its.map((x) => x.t).join('; ') : 'no messages'}`
+    html += `<button class="cell${its.length ? ' has' : ''}${isToday ? ' today' : ''}${bdSel === day ? ' sel' : ''}${(i % 7 === 0) ? ' sun' : (i % 7 === 6) ? ' sat' : ''}" data-day="${day}" aria-pressed="${bdSel === day}"${isToday ? ' aria-current="date"' : ''} tabindex="${(bdSel || (its.length ? day : 0)) === day ? 0 : -1}" aria-label="${esc(lbl)}"><span class="dn" aria-hidden="true">${day}</span><span class="envs" aria-hidden="true">${icons}</span>${its.length ? `<span class="peek" aria-hidden="true">${esc(its[0].t)}</span>` : ''}</button>`
   }
   $('#cal').innerHTML = html
   if (!$('#cal [tabindex="0"]')) $('#cal .cell[data-day]')?.setAttribute('tabindex', '0')
   // side panel
   const list = bdSel ? items.filter((x) => x.when.getDate() === bdSel) : items
   const head = bdSel ? `${MONTH_NAMES[M]} ${bdSel}` : `All of ${MONTH_NAMES[M]}`
-  $('#bdDay').innerHTML = `<h3>${head}<span>${list.length} ${list.length === 1 ? 'message' : 'messages'}</span></h3>` + (list.length ? '<ul>' + list.map((x) => {
+  $('#bdDay').innerHTML = `<h2>${head}<span>${list.length} ${list.length === 1 ? 'message' : 'messages'}</span></h2>` + (list.length ? '<ul>' + list.map((x) => {
     const idx = x.kind === 'post' ? DATA.posts.findIndex((p) => p.href === x.href) : x.kind === 'note' ? DATA.notes.findIndex((p) => p.href === x.href) : -1
-    const inner = `<i class="env ${x.kind}"></i><span><b>${esc(x.t)}</b><small>${x.kind === 'post' ? 'Blog post' : x.kind === 'note' ? 'Note' : 'Work · ' + esc(host(x.href))} &middot; ${esc(x.date)}</small></span>`
+    const inner = `<i class="env ${x.kind}" aria-hidden="true"></i><span><b>${esc(x.t)}</b><small>${x.kind === 'post' ? 'Blog post' : x.kind === 'note' ? 'Note' : 'Work · ' + esc(host(x.href))} &middot; ${esc(x.date)}</small></span>`
     return `<li>${x.kind === 'work' ? `<a class="msg" href="${abs(x.href)}" target="_blank" rel="noopener">${inner}</a>` : `<button class="msg" data-letter="${x.kind}:${idx}">${inner}</button>`}</li>`
   }).join('') + '</ul>' : '<p class="empty-day">No messages on this day. Pick a day with an envelope.</p>')
   // year strip
   const y0 = +MKEYS[0].split('-')[0], y1 = Math.max(+MKEYS.at(-1).split('-')[0], today.getFullYear())
   let strip = ''
   for (let y = y0; y <= y1; y++) {
-    strip += `<div class="yr"><span>${y}</span><div class="pips">`
+    // one 44px button per year; the month pips inside are a picture of activity
+    const keys = MKEYS.filter((k) => +k.split('-')[0] === y)
+    const total = keys.reduce((a, k) => a + MONTHLY.get(k).length, 0)
+    const target = keys.includes(bdKey) ? bdKey : keys.at(-1)
+    let pips = ''
     for (let m = 0; m < 12; m++) {
       const k = y + '-' + m, n = (MONTHLY.get(k) || []).length
-      strip += `<button class="pip${n ? ' has' : ''}${k === bdKey ? ' cur' : ''}" ${n ? `data-key="${k}"` : 'disabled'} style="--n:${Math.min(n, 4)}" aria-label="${MONTH_NAMES[m]} ${y}${n ? `, ${n} messages` : ''}" tabindex="${n ? 0 : -1}"></button>`
+      pips += `<i class="pip${n ? ' has' : ''}${k === bdKey ? ' cur' : ''}" style="--n:${Math.min(n, 4)}"></i>`
     }
-    strip += '</div></div>'
+    strip += `<button class="yr" ${target ? `data-key="${target}"` : 'disabled'} aria-current="${+Y === y}" aria-label="${y}: ${total} ${total === 1 ? 'message' : 'messages'}"><span aria-hidden="true">${y}</span><span class="pips" aria-hidden="true">${pips}</span></button>`
   }
   $('#bdStrip').innerHTML = strip
   const sp = $('#bdStrip'), cp = sp.querySelector('.cur')
@@ -551,7 +594,11 @@ function renderBoard(focusDay) {
 function bdMonth(delta) {
   const i = MKEYS.indexOf(bdKey) + delta
   if (i < 0 || i >= MKEYS.length) return
+  const hadFocus = $('#cal').contains(document.activeElement) || document.activeElement === document.body
   bdKey = MKEYS[i]; bdSel = null; Sound.tick(); renderBoard()
+  if (hadFocus) $('#cal [tabindex="0"]')?.focus()
+  const [y, m] = bdKey.split('-').map(Number), n = (MONTHLY.get(bdKey) || []).length
+  announce(`${MONTH_NAMES[m]} ${y}, ${n} ${n === 1 ? 'message' : 'messages'}`)
 }
 $('#bdPrev').onclick = () => bdMonth(-1)
 $('#bdNext').onclick = () => bdMonth(1)
@@ -574,16 +621,26 @@ $('#cal').addEventListener('keydown', (e) => {
   if (e.key === 'PageUp') { e.preventDefault(); bdMonth(-1) }
   if (e.key === 'PageDown') { e.preventDefault(); bdMonth(1) }
 })
-$('#bdStrip').addEventListener('click', (e) => { const p = e.target.closest('[data-key]'); if (p) { bdKey = p.dataset.key; bdSel = null; Sound.tick(); renderBoard() } })
+$('#bdStrip').addEventListener('click', (e) => {
+  const p = e.target.closest('[data-key]'); if (!p) return
+  bdKey = p.dataset.key; bdSel = null; Sound.tick(); renderBoard()
+  $(`#bdStrip [data-key="${bdKey}"]`)?.focus()
+  const [y, m] = bdKey.split('-').map(Number); announce(`${MONTH_NAMES[m]} ${y}`)
+})
 $('#bdDay').addEventListener('click', (e) => {
   const b = e.target.closest('[data-letter]'); if (!b) return
   const [k, i] = b.dataset.letter.split(':')
   openLetter(k, +i)
 })
 
+let letterOpener = null
+const boardParts = () => [...board.children].filter((c) => c.id !== 'letterWrap')
 function openLetter(kind, i) {
   const item = (kind === 'note' ? DATA.notes : DATA.posts)[i]
   if (!item) return
+  letterOpener = document.activeElement
+  boardParts().forEach((c) => (c.inert = true))
+  setTitle(item.t)
   Sound.select()
   $('#letter').innerHTML = `<div class="letter-top"><span class="stamp ${kind}" aria-hidden="true"></span><span>From <b>Max Leiter</b> &middot; ${esc(item.date)}</span><button class="x" id="letterClose" aria-label="Close letter">&times;</button></div>` + articleHTML(item, kind)
   $('#letterWrap').hidden = false
@@ -591,7 +648,10 @@ function openLetter(kind, i) {
   $('#letter').focus({ preventScroll: true })
   $('#letter').scrollTop = 0
 }
-function closeLetter() { $('#letterWrap').hidden = true; Sound.back(); $('#bdDay .msg')?.focus() }
+function closeLetter() {
+  $('#letterWrap').hidden = true; boardParts().forEach((c) => (c.inert = false)); Sound.back(); setTitle('Message Board')
+  ;(letterOpener && document.contains(letterOpener) ? letterOpener : $('#bdDay .msg'))?.focus()
+}
 $('#letterWrap').addEventListener('click', (e) => { if (e.target.id === 'letterWrap') closeLetter() })
 
 async function openBoard(instant) {
@@ -600,7 +660,9 @@ async function openBoard(instant) {
   Sound.select(); setTimeout(() => Sound.whoosh(true), 60)
   bdSel = +(MONTHLY.get(bdKey) || [])[0]?.when.getDate() || null
   renderBoard()
+  setTitle('Message Board')
   await zoom(instant ? null : $('#orbMail'), board, () => { setInert(true); board.hidden = false; view = 'board'; setHash('board') })
+  announce('Message board. ' + $('#bdMonth').textContent)
   $(`#cal [tabindex="0"]`)?.focus({ preventScroll: true })
   busy = false
 }
@@ -608,7 +670,7 @@ async function closeBoard() {
   if (busy) return
   busy = true
   Sound.back(); Sound.whoosh(false)
-  await zoom(board, $('#orbMail'), () => { board.hidden = true; $('#letterWrap').hidden = true; setInert(false); view = 'menu'; setHash('') }, true)
+  await zoom(board, $('#orbMail'), () => { board.hidden = true; $('#letterWrap').hidden = true; boardParts().forEach((c) => (c.inert = false)); setInert(false); view = 'menu'; setHash(''); setTitle('') }, true)
   $('#orbMail').focus({ preventScroll: true })
   busy = false
 }
@@ -622,13 +684,19 @@ let settingsReturn = null
 function openSettings() {
   settingsReturn = document.activeElement
   Sound.select(); settings.hidden = false; syncSound()
+  for (const el of [$('#menu'), channel, board]) el.inert = true
   $('#stTiltRow').hidden = !('DeviceOrientationEvent' in window) || !COARSE
   $('#stSound').focus()
 }
-function closeSettings() { settings.hidden = true; Sound.back(); settingsReturn?.focus?.() }
+function closeSettings() {
+  settings.hidden = true; Sound.back()
+  $('#menu').inert = view !== 'menu'; channel.inert = false; board.inert = false
+  settingsReturn?.focus?.()
+}
+$('#stMotion').onclick = () => { motionChoice = !RM; setRM(motionChoice); toast(RM ? 'Reduced motion on.' : 'Full motion on.') }
 $('#orbMenu').onclick = openSettings
 $('#stClose').onclick = closeSettings
-$('#stIntro').onclick = () => { settings.hidden = true; showBoot() }
+$('#stIntro').onclick = () => { closeSettings(); showBoot() }
 settings.addEventListener('click', (e) => { if (e.target === settings) closeSettings() })
 
 /* ---------------------------------------------------------------- back / esc */
@@ -637,7 +705,7 @@ function back() {
   if (!settings.hidden) return closeSettings()
   if (view === 'board') { if (!$('#letterWrap').hidden) return closeLetter(); return closeBoard() }
   if (view === 'channel') {
-    if (chState === 'article') { Sound.back(); showList(false); const k = location.hash; return }
+    if (chState === 'article') { Sound.back(); showList(false); chBody.querySelector(`[data-art="${articleOpener}"]`)?.focus({ preventScroll: true }); return }
     return closeChannel()
   }
 }
@@ -671,7 +739,7 @@ function nav(dir, via = 'key') {
     const ae = document.activeElement
     if (dockBtns.includes(ae)) {
       const next = dir === 'up' ? spatial('up', live, ae) || live[0] : dir === 'down' ? null : spatial(dir, dockBtns, ae)
-      if (next) { next.focus({ preventScroll: true }); Sound.tick() }
+      if (next) { next.focus({ preventScroll: true }); Sound.tick(); announce(next.getAttribute('aria-label') || next.textContent.trim()) }
       return
     }
     const from = ae?.classList?.contains('tile') ? ae : null
@@ -684,6 +752,7 @@ function nav(dir, via = 'key') {
       if (pg >= 0 && pg !== curPage) goPage(pg)
       next.focus({ preventScroll: true })
       if (via === 'pad') setHot(next, 'pad')
+      announce(`${next.__ch.name} channel`)
     } else if (from && pageCount > 1 && (dir === 'left' || dir === 'right')) goPage(curPage + (dir === 'right' ? 1 : -1))
     return
   }
@@ -693,10 +762,30 @@ function nav(dir, via = 'key') {
   const from = scope.contains(document.activeElement) && document.activeElement !== chBody ? document.activeElement : null
   const cands = visibleFocusables(scope)
   const next = from ? spatial(dir, cands, from) : cands[0]
-  if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' }); Sound.tick() }
+  if (next) {
+    next.focus({ preventScroll: true }); next.scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' }); Sound.tick()
+    announce((next.getAttribute('aria-label') || next.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 120))
+  }
 }
 
+/* Tab stays inside whichever modal layer is on top */
+function topModal() {
+  if (!settings.hidden) return $('#settingsDlg')
+  if (view === 'boot') return boot
+  if (view === 'board') return $('#letterWrap').hidden ? board : $('#letterWrap')
+  if (view === 'channel') return channel
+  return null
+}
 document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab') return
+  const m = topModal(); if (!m) return
+  const f = visibleFocusables(m).filter((el) => el.tabIndex >= 0)
+  if (!f.length) { e.preventDefault(); m.focus?.(); return }
+  const i = f.indexOf(document.activeElement)
+  if (i === -1 || (e.shiftKey && i === 0) || (!e.shiftKey && i === f.length - 1)) { e.preventDefault(); f[e.shiftKey ? f.length - 1 : 0].focus() }
+}, true)
+document.addEventListener('keydown', (e) => {
+  if (hand.on && e.key !== 'Shift') { hand.on = false; root.classList.remove('hand-on') }
   if (view === 'boot') { if (!e.metaKey && !e.ctrlKey && e.key !== 'Tab') { e.preventDefault(); dismissBoot(true) } return }
   const inField = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)
   if (e.key === 'Escape' || (e.key === 'Backspace' && !inField)) { e.preventDefault(); back(); return }
@@ -863,7 +952,6 @@ layout()
 document.fonts?.ready.then(() => { wrapCache.clear(); surfaces.forEach((s) => (s.dirty = true)) })
 const newest = ITEMS[0]?.when
 if (newest && Date.now() - newest < 1000 * 60 * 60 * 24 * 30) $('#orbMail').classList.add('new')
-$('#mailBadge').textContent = ''
 
 async function route() {
   const h = location.hash.replace(/^#\/?/, '')
@@ -880,6 +968,14 @@ async function route() {
     if (pi >= 0) openArticle('post', pi); else if (ni >= 0) openArticle('note', ni)
   }
 }
+setRM(RM)
+$('#skip').addEventListener('click', (e) => {
+  e.preventDefault()
+  const scope = !settings.hidden ? settings : view === 'board' ? board : view === 'channel' ? (chView.hidden ? splash : chBody) : view === 'boot' ? boot : track
+  const t = scope.querySelector('button:not([disabled]):not([tabindex="-1"]), a[href], [tabindex="0"]') || scope
+  t.focus()
+})
+root.classList.add('app-ready')
 route()
 syncSound()
 requestAnimationFrame(frame)

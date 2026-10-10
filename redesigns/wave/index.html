@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="nojs">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -22,6 +22,20 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #071233; }
+.vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* one focus language everywhere: white ring + dark halo, legible on every palette */
+:root { --ring: 0 0 0 2px #fff, 0 0 0 5px rgba(0, 12, 36, .78), 0 0 14px 4px rgba(255, 255, 255, .35); }
+.skip { position: fixed; left: 16px; top: 12px; z-index: 20; padding: 12px 18px; border-radius: 10px; color: #fff; background: #0a1a40;
+  font: 500 15px/1 var(--font); text-decoration: none; transform: translateY(-160%); box-shadow: var(--ring); }
+.skip:focus { transform: none; outline: none; }
+/* no-JS / failed-boot index */
+#nojs { display: none; }
+.nojs body { overflow: auto; touch-action: auto; user-select: text; -webkit-user-select: text; }
+.nojs #ui, .nojs #glass, .nojs .skip { display: none; }
+.nojs #nojs { display: block; position: relative; z-index: 5; max-width: 780px; margin: 0 auto; padding: 32px 24px 64px;
+  background: rgba(3, 10, 30, .88); color: #eef4ff; font: 400 16px/1.6 var(--font); min-height: 100%; }
+#nojs h1 { font-weight: 500; font-size: 30px; margin: 0 0 4px; } #nojs h2 { font-weight: 500; font-size: 21px; margin: 1.6em 0 .4em; }
+#nojs a { color: #a8d8ff; } #nojs ul { padding-left: 1.2em; } #nojs li { margin: .35em 0; } #nojs small { color: #c4d2ea; }
 body {
   font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
@@ -40,7 +54,7 @@ body.nogl { background: linear-gradient(180deg, var(--c0, #0a2f75), var(--c1, #1
   border-bottom: 1px solid rgba(255,255,255,.18); box-shadow: 0 1px 0 rgba(0,0,0,.25); }
 .sheet .sh-ic { flex: 0 0 64px; width: 64px; height: 64px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
 .sheet .sh-ic svg { width: 100%; height: 100%; display: block; }
-.sheet .sh-kicker { font-size: 13px; letter-spacing: .06em; color: rgba(225,236,255,.7); text-transform: uppercase; }
+.sheet .sh-kicker { font-size: 13px; letter-spacing: .06em; color: rgba(225,236,255,.82); text-transform: uppercase; }
 .sheet h1 { font-size: 30px; line-height: 1.22; font-weight: 500; margin: 2px 0 6px; color: #fff;
   text-shadow: 0 0 12px rgba(255,255,255,.28); letter-spacing: .005em; }
 .sheet .sh-desc { margin: 0; color: rgba(230,240,255,.78); font-size: 15.5px; }
@@ -50,21 +64,21 @@ body.nogl { background: linear-gradient(180deg, var(--c0, #0a2f75), var(--c1, #1
 .sheet ul, .sheet ol { margin: 0 0 1em; padding-left: 1.4em; }
 .sheet li { margin: .2em 0; }
 .sheet a { color: #9fd4ff; text-decoration: underline; text-decoration-color: rgba(159,212,255,.45); text-underline-offset: 3px; }
-.sheet a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 3px; }
+.sheet a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 3px; box-shadow: 0 0 0 5px rgba(0,12,36,.8); }
 .sheet code { font: 14px/1.5 var(--mono); background: rgba(0,10,30,.45); border: 1px solid rgba(255,255,255,.12);
   padding: 1px 5px; border-radius: 4px; }
 .sheet pre { margin: 1.2em 0; padding: 14px 18px; border-radius: 8px; overflow: hidden; white-space: pre-wrap;
   background: linear-gradient(180deg, rgba(0,6,20,.72), rgba(0,12,32,.6)); border: 1px solid rgba(255,255,255,.16);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 8px 18px rgba(0,0,0,.35); }
 .sheet pre code { background: none; border: 0; padding: 0; font-size: 13.5px; color: #dfe9ff; }
-.sheet .k { color: #8fd0ff; } .sheet .s { color: #ffd59a; } .sheet .c { color: rgba(220,230,255,.45); }
+.sheet .k { color: #8fd0ff; } .sheet .s { color: #ffd59a; } .sheet .c { color: rgba(220,230,255,.66); }
 .sheet .sh-more { margin-top: 1.6em; font-size: 15px; }
-.sheet .sh-more a { display: inline-flex; gap: 8px; align-items: center; padding: 8px 16px; border-radius: 999px;
+.sheet .sh-more a { display: inline-flex; gap: 8px; align-items: center; padding: 0 18px; min-height: 44px; border-radius: 999px;
   text-decoration: none; color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.08));
   border: 1px solid rgba(255,255,255,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 8px rgba(0,0,0,.25); }
 .sheet .sh-grid { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; font-size: 15px; margin: 0 0 1em; }
-.sheet .sh-grid dt { color: rgba(225,236,255,.6); } .sheet .sh-grid dd { margin: 0; }
-.sheet .ellip { color: rgba(230,240,255,.55); }
+.sheet .sh-grid dt { color: rgba(225,236,255,.75); } .sheet .sh-grid dd { margin: 0; }
+.sheet .ellip { color: rgba(230,240,255,.7); }
 .sheet ::selection { background: rgba(120,190,255,.55); color: #fff; }
 
 /* ---------------- DOM-overlay fallback panel ---------------- */
@@ -82,6 +96,7 @@ body.nogl { background: linear-gradient(180deg, var(--c0, #0a2f75), var(--c1, #1
   background: linear-gradient(115deg, transparent 44%, rgba(255,255,255,.12) 50%, transparent 56%);
   transform: translateX(-70%); }
 #glass.on::after { animation: sheen 8s linear .35s infinite; }
+#glass.instant { animation: none; }
 #glass .scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 0 var(--pad, 40px);
   overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.35) transparent;
   -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent);
@@ -114,7 +129,7 @@ body.open #menu * { pointer-events: none !important; }
 .cat.on .ic { transform: scale(1); filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)) drop-shadow(0 0 10px rgba(255,255,255,.35)); }
 .cat.on .lbl { opacity: 1; }
 .cat:not(.on) { opacity: .72; }
-.cat:focus-visible .ic { outline: 2px solid rgba(255,255,255,.7); outline-offset: 4px; border-radius: 12px; }
+.cat:focus-visible .ic { box-shadow: var(--ring); border-radius: 14px; }
 
 .list { position: absolute; left: 0; top: 0; transition: opacity .25s ease; }
 .list[hidden] { display: block; opacity: 0; visibility: hidden; }
@@ -124,13 +139,15 @@ body.open #menu * { pointer-events: none !important; }
 .item .ic { flex: 0 0 76px; width: 76px; height: 76px; transform: scale(.62); transition: transform var(--t) var(--ease), filter var(--t) ease;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
 .item .ic svg { width: 100%; height: 100%; display: block; }
-.item .tx { margin-left: 14px; min-width: 0; flex: 1; }
+.item .tx { margin-left: 4px; padding: 3px 10px; border-radius: 10px; min-width: 0; flex: 0 1 auto; transition: box-shadow .15s ease; }
+.item:focus-visible .tx { box-shadow: var(--ring); }
+#lists ul { list-style: none; margin: 0; padding: 0; }
 .item .t, .item .s { display: block; }
 .item .t { font-size: 20px; font-weight: 400; line-height: 1.25; text-shadow: 0 1px 3px rgba(0,0,0,.4); white-space: nowrap;
   overflow: hidden; text-overflow: ellipsis; opacity: .8; transition: opacity var(--t) ease; }
 .item .s { font-size: 14px; color: var(--ink-dim); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   max-height: 0; opacity: 0; transition: opacity var(--t) ease, max-height var(--t) ease; }
-.item .v { margin-left: 18px; font-size: 18px; color: var(--ink-dim); white-space: nowrap; opacity: .85; }
+.item .v { margin-left: auto; padding-left: 18px; font-size: 18px; color: var(--ink-dim); white-space: nowrap; opacity: .85; }
 .item.on .ic { transform: scale(1); filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)) drop-shadow(0 0 12px rgba(255,255,255,.42)); }
 .item.on .t { opacity: 1; font-weight: 500; text-shadow: var(--glow); }
 .item.on .s { max-height: 22px; opacity: 1; }
@@ -145,26 +162,35 @@ body.open #menu * { pointer-events: none !important; }
 #clock b { font-weight: 400; font-size: 19px; }
 #clock .line { position: absolute; right: -36px; left: -18px; bottom: -8px; height: 1px;
   background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.5)); }
-#snd { position: absolute; right: 34px; top: 66px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3);
+#snd { position: absolute; right: 30px; top: 62px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3);
   background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.22), rgba(255,255,255,.04)); color: #fff; cursor: pointer; padding: 0;
   display: grid; place-items: center; box-shadow: 0 2px 6px rgba(0,0,0,.25); opacity: .8; }
-#snd svg { width: 18px; height: 18px; }
-#snd:hover, #snd:focus-visible { opacity: 1; outline: none; box-shadow: 0 0 0 2px rgba(255,255,255,.5); }
+#snd svg { width: 20px; height: 20px; }
+#snd:hover { opacity: 1; } #snd:focus-visible { opacity: 1; outline: none; box-shadow: var(--ring); }
 #hints { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 22px; font-size: 13.5px;
   color: var(--ink-dim); text-shadow: 0 1px 2px rgba(0,0,0,.4); flex-wrap: wrap; padding: 0 140px; }
 #hints span { display: inline-flex; align-items: center; gap: 7px; }
 #hints kbd { font: 500 11px/1 var(--font); min-width: 22px; height: 20px; padding: 0 6px; display: inline-grid; place-items: center;
   border-radius: 6px; color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.3), rgba(255,255,255,.08));
   border: 1px solid rgba(255,255,255,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
-#hints button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; gap: 7px; align-items: center; }
+#hints button { font: inherit; color: inherit; background: none; border: 0; padding: 0 10px; min-height: 44px; min-width: 44px; margin: -12px 0;
+  border-radius: 10px; cursor: pointer; display: inline-flex; gap: 7px; align-items: center; }
+#hints button:focus-visible { outline: none; box-shadow: var(--ring); }
 #hints .touch { display: none; } body.phone #hints .touch { display: inline-flex; } body.phone #hints .when-menu:not(.touch) { display: none; }
 #hints .when-open { display: none; } body.open #hints .when-open { display: inline-flex; } body.open #hints .when-menu { display: none; }
 #badge { position: absolute; right: 18px; bottom: 16px; display: inline-flex; white-space: nowrap; align-items: center; gap: 7px; font-size: 11px;
   padding: 5px 10px 5px 8px; border-radius: 999px; color: rgba(255,255,255,.85); letter-spacing: .03em; pointer-events: auto;
-  background: rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.18); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: help; }
+  background: rgba(0,0,0,.32); border: 1px solid rgba(255,255,255,.18); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 #badge i { width: 7px; height: 7px; border-radius: 50%; background: #ffc35a; box-shadow: 0 0 6px #ffc35a; }
 #badge.hic i { background: #7dffb0; box-shadow: 0 0 6px #7dffb0; }
-#live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+#live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* sheet toolbar: real buttons, drawn into the canvas on the HTML-in-Canvas path */
+.sheet .sh-tools { display: flex; gap: 10px; justify-content: flex-end; margin: -8px 0 10px; }
+.sheet .sh-btn { font: 500 13.5px/1 var(--font); color: #fff; min-height: 44px; padding: 0 16px; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06)); border: 1px solid rgba(255,255,255,.34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35); display: inline-flex; align-items: center; gap: 8px; }
+.sheet .sh-btn[aria-pressed="true"] { background: linear-gradient(180deg, rgba(160,215,255,.45), rgba(90,160,230,.25)); }
+.sheet .sh-btn:focus-visible, .sheet .sh-more a:focus-visible { outline: none; box-shadow: var(--ring); }
 
 /* ---------------- phone ---------------- */
 body.phone .item { width: calc(100vw - 72px); }
@@ -185,11 +211,14 @@ body.phone .sheet h1 { font-size: 23px; }
 body.phone .sheet .sh-ic { flex-basis: 46px; width: 46px; height: 46px; }
 
 body.rm *, body.rm *::before, body.rm *::after { transition-duration: .01s !important; animation: none !important; }
+body.rm #glass, body.rm #menu { transition-property: opacity, visibility !important; transition-duration: .22s !important; }
+body.rm.open #menu { filter: none; }
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <!-- The stage. With HTML-in-Canvas the article sheet is a child of this canvas and is drawn into it. -->
-<canvas id="stage" aria-label="Article"></canvas>
+<canvas id="stage" aria-hidden="true"></canvas>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
@@ -217,13 +246,24 @@ body.rm *, body.rm *::before, body.rm *::after { transition-duration: .01s !impo
 
 <div id="glass" aria-hidden="true"><div class="scroller" tabindex="-1"></div></div>
 
+<!-- Without JS (or if boot fails) this static, readable index is what you get. -->
+<main id="nojs" aria-label="Index"><h1>Max Leiter</h1><p>Software engineer at Vercel working on v0 and the AI SDK. Writes about the web, Linux, tooling and AI.</p>
+<p><a href="https://github.com/maxleiter">GitHub</a> · <a href="https://twitter.com/maxleiter">X</a> · <a href="https://maxleiter.com">maxleiter.com</a></p>
+<h2>Blog</h2><ul><li><a href="https://maxleiter.com/blog/embedding-emoji-search">You don't need Jev for good emoji search</a> <small>Sep 26, 2026 · or: semantic emoji search with embeddings</small></li><li><a href="https://maxleiter.com/blog/thank-u-next">thank u, next</a> <small>Sept 1, 2026 · Replacing Next.js with a vibe-coded &quot;framework</small></li><li><a href="https://maxleiter.com/blog/xios">Running Wayland, X11, GNOME, and KDE natively on an iPad</a> <small>Jul 28, 2026 · X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition</small></li><li><a href="https://maxleiter.com/blog/weights">They're Made Out of Weights</a> <small>Jun 3, 2026 · with apologies to Terry Bisson</small></li><li><a href="https://maxleiter.com/blog/sandcastle">Sandcastle: A web-based Linux desktop environment</a> <small>Feb 11, 2026</small></li><li><a href="https://maxleiter.com/blog/introducing-HFSViewer">Introducing HFSViewer</a> <small>Jan 2, 2026 · View and modify HFS partitions on modern macOS versions</small></li><li><a href="https://maxleiter.com/blog/the-new-maxleiter-com">The new maxleiter.com</a> <small>Nov 12, 2025 · iframes, view transitions, progressive enhancement, and React Server Components</small></li><li><a href="https://maxleiter.com/blog/rewrite-your-prompts">You should be rewriting your prompts</a> <small>Sept 14, 2025 · We talk about overfitting models but never overfitting prompts to models</small></li><li><a href="https://maxleiter.com/blog/seeing-the-future">I have seen the future through AR glasses</a> <small>Sept 7, 2025 · My experience with the XReal One Pros</small></li><li><a href="https://maxleiter.com/blog/formatting">Formatting code should be unnecessary</a> <small>Sep 6, 2025 · and we knew this back in the 80s</small></li><li><a href="https://maxleiter.com/blog/vibecoding-minecraft-mods">Vibe-coding Minecraft mods</a> <small>Jun 21, 2025 · and the lessons learned</small></li><li><a href="https://maxleiter.com/blog/sluggified-urls">Implementing Notion style URLs</a> <small>Jun 19, 2025 · Create /some-title-here-{id} URLs for recognizable links in Next.js</small></li><li><a href="https://maxleiter.com/blog/ship-every-day">Ship something every day</a> <small>Jun 10, 2024</small></li><li><a href="https://maxleiter.com/blog/mobile-browsers-resizing-font">Why your website's fonts might be larger than intended</a> <small>Jun 9, 2023 · A well-meaning mobile browser feature can be problematic</small></li><li><a href="https://maxleiter.com/blog/nintype">Nintype is still the best iOS keyboard</a> <small>May 22, 2023</small></li><li><a href="https://maxleiter.com/blog/build-a-blog-with-nextjs-13">Building a blog with Next.js 15 and React Server Components</a> <small>Apr 16, 2023 · Use MDX, RSC, and Bright to build a blog with Next.js 15.</small></li><li><a href="https://maxleiter.com/blog/node-has-tooling-problems">The Node ecosystem (still) has tooling problems</a> <small>July 30, 2022 · It shouldn't take this much work to publish a small library</small></li><li><a href="https://maxleiter.com/blog/supabase-next-analytics">Live updating page views with Supabase and Next.js</a> <small>May 15, 2022 · A step-by-step guide to page views and server analytics</small></li><li><a href="https://maxleiter.com/blog/easy-site-improvements">Easy ways to improve your websites accessibility and performance</a> <small>Apr 23, 2022 · A list of simple tips for developing a more accessible and user-friendly web.</small></li><li><a href="https://maxleiter.com/blog/hacker-sites">How hackers* run their sites</a> <small>Apr 7, 2022 · An analysis based on 700 personal websites</small></li><li><a href="https://maxleiter.com/blog/introducing-drift">Introducing Drift</a> <small>Mar 26, 2022 · A self-hostable alternative to GitHub Gist and Pastebin</small></li><li><a href="https://maxleiter.com/blog/contributing-to-oss">How to start contributing to open-source projects</a> <small>Jan 25, 2022 · A small guide to finding projects and contributing changes</small></li><li><a href="https://maxleiter.com/blog/pin-dependencies">Pin your npm/yarn dependencies</a> <small>Jan 9, 2022 · A guide on how to pin your dependencies and why you may want to</small></li><li><a href="https://maxleiter.com/blog/framework">Impressions of the Framework Laptop</a> <small>Nov 3, 2021 · My thoughts on the Framework Laptop's hardware</small></li><li><a href="https://maxleiter.com/blog/MSHW0184">Adding ambient light support to Linux and GNOME</a> <small>Dec 15, 2020 · A quick dive into Linux kernel drivers</small></li><li><a href="https://maxleiter.com/blog/X11">X11 on iOS</a> <small>Dec 15, 2019 · A guide on how to compile the X Window System for iOS</small></li></ul><h2>Notes</h2><ul><li><a href="https://maxleiter.com/notes/fish-directory-colors">Per-directory terminal colors in fish shell</a> <small>Apr 5, 2026</small></li><li><a href="https://maxleiter.com/notes/git-checkout-script">Never think about branch names again</a> <small>Aug 19, 2024 · a bash script for generating branch names</small></li><li><a href="https://maxleiter.com/notes/updating-jsonb-drizzle">Updating JSONB fields with Drizzle</a> <small>July 11, 2024 · hint: just use `sql` and COALESCE.</small></li><li><a href="https://maxleiter.com/notes/vscode-default-dir">Set your default directory in VS Code's open dialog</a> <small>Jun 6, 2024</small></li><li><a href="https://maxleiter.com/notes/gemini-script">gemini.sh script</a> <small>Apr 14, 2024 · A script for concatenating files in a directory for copying to an LLM</small></li><li><a href="https://maxleiter.com/notes/slack-message-fetch">Sending a Slack message with fetch</a> <small>Mar 30, 2024</small></li><li><a href="https://maxleiter.com/notes/swr-state">SWR for more than fetching</a> <small>Mar 30, 2024 · SWR for state management</small></li><li><a href="https://maxleiter.com/notes/wasm-edge-and-node">Loading wasm files on Vercel Edge and Node.js runtimes</a> <small>Mar 30, 2024</small></li></ul><h2>Projects</h2><ul><li><a href="https://maxleiter.com/blog/X11">X11 on iOS</a> <small>Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.</small></li><li><a href="https://github.com/maxleiter/drift">Drift</a> <small>A self-hostable and open-source alternative to GitHub Gist and Pastebin.</small></li><li><a href="https://github.com/thelounge/thelounge">The Lounge</a> <small>Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.</small></li><li><a href="https://github.com/maxleiter/sortablejs-vue3/">SortableJS-vue3</a> <small>A TypeScript wrapper for SortableJS built for Vue 3.</small></li><li><a href="https://github.com/knightos/knightos">KnightOS</a> <small>Open-source unix-like operating system for z80-based calculators written entirely in z80 asm. I wrote a significant portion of the libc and contribued to system libraries.</small></li><li><a href="https://maxleiter.com/blog/MSHW0184">MSHW0184 driver for Linux kernel</a> <small>I finally found an excuse to contribute to the Linux kernel</small></li><li><a href="https://github.com/maxleiter/jsontree">jsonTree</a> <small>My first open-source project</small></li><li><a href="https://easyarty.com">easyarty.com</a> <small>A tiny tool I made for a video game I like but it now gets 250,000+ visitors a year</small></li><li><a href="https://v0.app">v0</a> <small>I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.</small></li><li><a href="https://github.com/vercel/ai">AI SDK</a> <small>I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK.</small></li><li><a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362">Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening</a> <small>I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimate vertical cup to disk ratios from retinal images.</small></li></ul><h2>Work</h2><ul><li><a href="https://vercel.com/blog/how-we-made-v0-an-effective-coding-agent">How we made v0 an effective coding agent</a> <small>Jan 7, 2026 · Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.</small></li><li><a href="https://vercel.com/blog/v0-composite-model-family">Introducing the v0 composite model family</a> <small>Jun 1, 2025 · Introducing the v0 composite model family.</small></li><li><a href="https://vercel.com/blog/ai-sdk-3-generative-ui">Introducing AI SDK 3.0 with Generative UI support</a> <small>Mar 1, 2024 · Stream React Components from LLMs to deliver richer user experiences.</small></li><li><a href="https://vercel.com/blog/introducing-the-vercel-ai-sdk">Introducing the Vercel AI SDK</a> <small>Jun 15, 2023 · An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.</small></li><li><a href="https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site">Improving the accessibility of our Next.js site</a> <small>Sep 30, 2022 · We've made some improvements to the accessibility of our Next.js site. Here's how we did it.</small></li><li><a href="https://vercel.com/blog/new-edge-dev-infrastructure">New edge dev infrastructure</a> <small>Jul 21, 2020 · New edge dev infrastructure.</small></li></ul></main>
+
 <div id="ui">
-  <div id="menu" role="application" aria-roledescription="console menu" aria-label="Max Leiter">
-    <div id="cats" role="tablist" aria-label="Categories"></div>
-    <div id="lists"></div>
-  </div>
-  <div id="clock" aria-hidden="true"><span id="cdate"></span><b id="ctime"></b><span class="line"></span></div>
-  <button id="snd" type="button" aria-pressed="false" aria-label="Sound off. Turn sound on"></button>
+  <header id="top">
+    <div id="clock" aria-hidden="true"><span id="cdate"></span><b id="ctime"></b><span class="line"></span></div>
+    <button id="snd" type="button" aria-pressed="false" aria-label="Sound"></button>
+  </header>
+  <main id="main" tabindex="-1">
+    <h1 class="vh" id="page-h1">Max Leiter</h1>
+    <div id="menu">
+      <nav aria-label="Sections"><div id="cats" role="tablist" aria-label="Sections"></div></nav>
+      <div id="lists"></div>
+    </div>
+  </main>
+  <footer id="foot">
   <div id="hints">
     <span class="when-menu kb"><kbd>←</kbd><kbd>→</kbd> Category</span>
     <span class="when-menu kb"><kbd>↑</kbd><kbd>↓</kbd> Select</span>
@@ -232,8 +272,9 @@ body.rm *, body.rm *::before, body.rm *::after { transition-duration: .01s !impo
     <span class="when-open kb"><kbd>↑</kbd><kbd>↓</kbd> Scroll</span>
     <button class="when-open hit" type="button" id="back"><kbd>Esc</kbd> Back</button>
   </div>
-  <div id="badge" title="" tabindex="0"><i></i><span id="badge-t">Detecting…</span></div>
-  <div id="live" aria-live="polite"></div>
+  <div id="badge" title=""><i aria-hidden="true"></i><span id="badge-t">Detecting…</span></div>
+  <div id="live" role="status" aria-live="polite" aria-atomic="true"></div>
+  </footer>
 </div>
 
 <script id="data" type="application/json">{"site":{"name":"Max Leiter","url":"https://maxleiter.com","github":"https://github.com/maxleiter","x":"https://twitter.com/maxleiter","blurb":"Software engineer at Vercel working on v0 and the AI SDK. Writes about the web, Linux, tooling and AI."},"posts":[{"title":"You don't need Jev for good emoji search","description":"or: semantic emoji search with embeddings","date":"Sep 26, 2026","href":"/blog/embedding-emoji-search","excerpt":"There's been a lot of [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) hype lately, and for good reason.\nIt's largely novel (to most developers, at least), super cheap, and there's a lot of cool use cases for it.\n\nThe issue I see is a lot of people are seeing Jev as a hammer, and lots of _classification_ tasks as nails.\nYou want to use Jev when you need some LLM reasoning behind the decision.\n\nFor example, take this tweet:\n\n\n\nTo be clear, I don't intend to pick on Gergely or Linear. But I think this is a miss on both their parts.\n\nTwo years ago, I built semantic emoji search but with no LLM and just embeddings. And it was faster, cheaper, and occasionally better than Jev (\"pareto-mogged\", as the kids say).\n\nNow, to [Gergely's point](https://x.com/GergelyOrosz/status/2103873821908353260?s=20), setting up a database and embedding model or an embedding provider are more work than just using Jev.\nAnd two years ago I would have gladly used Jev instead of working with Opus 3/GPT-4-turbo to scrape all of Vercel's slack emojis and get this working.\n\nBut it's not two years ago and models are now more than\ncapable of autonomously doing the work for you.\n\n\nAn aside on scr"},{"title":"thank u, next","description":"Replacing Next.js with a vibe-coded \"framework","date":"Sept 1, 2026","href":"/blog/thank-u-next","excerpt":"![The cover of Ariana Grande's album Thank U, Next: the title repeated in many fonts on a pink background](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/thank-u-next/thank-u-next.png)\n\n\n  If you're wondering about this post's title:\n  https://en.wikipedia.org/wiki/Thank_U,_Next\n\n\nThere's been a lot of talk about custom / personal software and LLMs lately. I've been a huge fan -- I'm writing this in a [markdown editor](https://github.com/MaxLeiter/md-viewer) I made for myself. And lately I've been toying with thoughts about the future of frameworks. A nice intersection of the two seemed like a personal framework.\n\nSo as of September 1st, this website is no longer running on Next.js. Instead, it's built by a bespoke custom framework that Fable architected and Opus implemented. If this were a commercial project, I'd probably stay on Next[^1], but it's not, so 🤷\n\nThis site is overall [pretty simple](/blog/build-a-blog-with-nextjs-13) - it's fully static and compiled to HTML at build time. But it has a lot of React and non-trivial build-time processing like [MDX](https://mdxjs.com/). I gave Fable 5 (in the claude code CLI) the following:\n\n> i am curious about on-demand c"},{"title":"Running Wayland, X11, GNOME, and KDE natively on an iPad","description":"X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition","date":"Jul 28, 2026","href":"/blog/xios","excerpt":"I [like](https://knightos.org) [running](https://maxleiter.com/blog/MSHW0184) [software](https://maxleiter.com/x11) on devices that aren't \"supposed\" to run it.\n\nI own the hardware. I should control the software. And for _reasons_, Apple makes phenomenal hardware and operating systems, but locks them down.\n\nI've been bitter for a long time. Six years ago, when I should’ve been studying for finals, I [ported X11](https://maxleiter.com/x11) to my jailbroken iPad because I wanted to try using it as a \"real\" personal computer:\n\n\n\nThat first version worked, but also sucked: the X server ran on the iPad, but I used a VNC client to interact with it and a lot of\nsoftware did not compile. I was using vim and xterm and it looked like something from the 90s.\n\nWith more experience, and with LLMs, I was able to get significantly further.\n\nThere is a \"slop wiki\" available at https://xios.maxleiter.com with more information, and the code is on [GitHub](https://github.com/MaxLeiter/jailbreak/tree/main/x11/).\n\nSome screenshots:\n\n\n  \n  \n  \n  \n\n\n### X11\n\nIf you're unfamiliar with X11, this post assumes a basic understanding, but TL;DR: it’s a window server and protocol that\nmany devices use. It descr"},{"title":"They're Made Out of Weights","description":"with apologies to Terry Bisson","date":"Jun 3, 2026","href":"/blog/weights","excerpt":"_After Terry Bisson's [\"They're Made Out of Meat\"](https://web.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html)._\n\n\"They're made out of weights.\"\n\n\"Weights?\"\n\n\"Weights. Floating-point numbers. We checked the whole thing through. It's nothing but weights.\"\n\n\"Weights doing what? Where do the words come from?\"\n\n\"The weights make the words. Are you understanding me? We opened it up. There's no dictionary in there, no grammar rules, no little man. Just weights. Eighty layers of numbers getting multiplied together.\"\n\n\"That's ridiculous. It wrote my performance review last week. It softened the tone unprompted. You're telling me multiplication did that?\"\n\n\"Matrix multiplication did that. The numbers go in one end, the phrasing comes out the other.\"\n\n\"So there's a language module somewhere. A reasoning unit bolted on.\"\n\n\"No module. No unit. We looked. The reasoning is the weights. The weights are the reasoning.\"\n\n\"Spare me. Nobody writes a eulogy with linear algebra.\"\n\n\"It doesn't write eulogies, technically. It predicts the next token. Then the next one. The eulogy is a side effect.\"\n\n\"A side effect. You're asking me to believe in sentient weights.\"\n\n\"I'm not asking you, I'm "},{"title":"Sandcastle: A web-based Linux desktop environment","description":"","date":"Feb 11, 2026","href":"/blog/sandcastle","excerpt":"![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/header.png)\n\nSix years ago, while I should have been studying for finals, I patched and compiled X11 (and all its dependencies)\nto [run on a jailbroken iPad](https://maxleiter.com/blog/X11). I wanted to run real applications on my tablet.\n\nI've spent the last few ~months~ ~weeks~ ~days~ hours ~building~ vibecoding something that feels like a better solution:\na Linux desktop environment, on the web. I wrote zero lines of code.\n\nYou can try it out [here](https://sandcastle-os.vercel.app), and the source is available [here](https://github.com/vercel-labs/sandcastle).\n\n\n  If you're familiar with Desktop Environments and Linux, you can [skip the next\n  few sections](#the-servers)\n\n\n### Table of Contents\n\n# X11?\n\n[X11](https://www.x.org/wiki/) is the display server protocol that has powered Linux machines for decades. Released in 1984, it handles drawing windows on screens and routing input (key presses and clicks) to the right applications.\nBecause computers were [very different](/blog/formatting) in the 80s, X11 is built for _servers_ and _clients_. The application runs on a server, and dumb clients can draw th"},{"title":"Introducing HFSViewer","description":"View and modify HFS partitions on modern macOS versions","date":"Jan 2, 2026","href":"/blog/introducing-HFSViewer","excerpt":"Last year my roommate and I found an old original [iMac G3](https://en.wikipedia.org/wiki/IMac_G3) outside our apartment building. \nIt has some interesting early 2000s/late 90s style websites and files on it that I want to preserve (and hope to share here soon!).\n\nBut I realized getting files off of it wouldn't be easy.\n\nThe machine is running macOS 9.2, which supports USB 1.0.\nWe're up to USB 4 now, so thats pretty old; none of my modern USB 3 devices were detected by it.\nAfter [some research](https://www.reddit.com/r/VintageApple/comments/1jrmrqv/mac_os_9_hates_usb_sticks/) I found that macOS 9.2 _does_ have USB support, but it can't always negotiate USB 3 speeds or support larger USBs.\nSo I went and bought [this $5 stick](https://www.amazon.com/dp/B07W54X2F3) and it worked like a charm.\n\n\nYou should try to stick to USBs with less than 2 GBs of storage, otherwise Mac OS 9.2 might not support it. \n\n\nWith that solved and the files copied over, I plugged it into my M4 laptop and... it wasn't recognized there either. No error or mounting occurred due to no driver support.\nEventually I found [hfsutils](https://www.mars.org/home/rob/proj/hfs/), a wonderful package (which is convienentl"},{"title":"The new maxleiter.com","description":"iframes, view transitions, progressive enhancement, and React Server Components","date":"Nov 12, 2025","href":"/blog/the-new-maxleiter-com","excerpt":"I redesigned maxleiter.com this week. I've wanted to make it more personal and opinionated for a long time,\nbut felt I lacked the expertise to do it justice.\nWith [v0](https://v0.app) and [Claude Code](https://www.claude.com/product/claude-code) (and some manual cleanup) it only took a few hours.\n\nIf you haven't played with the [homepage](https://maxleiter.com/) yet, some of the features are:\n\n- Draggable and resizable windows, including the blog posts\n- A web-friendly version of [KnightOS](https://knightos.org) in the Calculator app\n- A terminal app with some fun easter eggs\n- You can full-screen the windows, and some redirect to real pages (like the blog posts)\n\nGoing into this I had some constraints:\n\n- Remains snappy and is SSR'd at build-time\n- Must work without JavaScript enabled\n- Uses new web platform features\n\n![maxleiter.com screenshot](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/homepage.png?w=800)\n\n### Table of Contents\n\n## Preloading iframes\n\nIf you open a blog post, it opens in a windowed app. I originally rendered the SSR'd MDX, and that worked,\nbut it involved either:\n\n- Sending every post in the initial payload (not great for performa"},{"title":"You should be rewriting your prompts","description":"We talk about overfitting models but never overfitting prompts to models","date":"Sept 14, 2025","href":"/blog/rewrite-your-prompts","excerpt":"I've been \"lucky\" to work with a lot of different LLMs over the past few years (there is, in fact, a reason we made the [AI SDK](https://ai-sdk.dev/)).\nWhen a new model is publicly released there's a good chance we've already tried it and evaluated it for use with v0 within a few hours.\n\nOur results do not always improve as expected, even when we use newer and strictly better models[^1].\n\nAnother example of this is when gpt-5 was released in Cursor. People _hated_ it, but the zeitgeist has since shifted.\nYou can read about what OpenAI and Cursor fixed in [OpenAI's gpt-5 cookbook](https://cookbook.openai.com/examples/gpt-5/gpt-5_prompting_guide?utm_source=chatgpt.com#collaborative-coding-in-production-cursors-gpt-5-prompt-tuning).\n\nSo what should you do when a new model comes out? Rewrite your prompts. Otherwise it's an apples-to-oranges comparison.\n\nMy three and a half arguments for this are:\n\n- Prompt Format\n- Position Bias\n- Model Biases\n  - Work with the model biases, not against\n\n## Reason #1: Prompt Format\n\nAn early obvious example of where differences between models come into play is markdown vs XML.\n\nAnecdatally, OpenAI models (especially older ones) were _great_ with markdo"},{"title":"I have seen the future through AR glasses","description":"My experience with the XReal One Pros","date":"Sept 7, 2025","href":"/blog/seeing-the-future","excerpt":"I like to try new technology. 75% of what I buy is something I use once or twice then sell or give away (or keep in a drawer and forget about. Sorry, remarkable).\nBut sometimes, on rare occasions, there's a product that is A) fucking awesome and B) I can't help but evangelize.\n\nOne of my more recent purchases was the [XReal One Pros](https://www.xreal.com/us/one-pro), and wow: I have seen the future, and it's through AR glasses.\n\nIf you&apos;re unfamiliar, the XReal One Pros are really just a display and (surprisingly good) speakers. They are augmented reality (AR) glasses,\nmeaning they aren't like _virtual reality_ headsets such as the Vision Pro or Meta Quest: they don't replace fully your view, they put an overlay on it\n\nI really think it's easier to show than tell in this case:\n\n\n  \n    \n      \n    \n  \n  \n    \n  \n\n\nTo get something out of the way: do I think XReal in particular will be the product that comes out on top? Not at all. I like their product, and I respect any newcomers to the hardware game, but it's an uphill battle for sure.\n\n## The Good\n\n- They are light. Because they're really just shells and they're powered by your devices, there's no need for a heavy battery\n- "},{"title":"Formatting code should be unnecessary","description":"and we knew this back in the 80s","date":"Sep 6, 2025","href":"/blog/formatting","excerpt":"I had a (maybe slightly overqualified) computer science teacher back in highschool, Mr. Paige.\nHe worked on the [Ada]() compiler and\nhas been programming since the early 80s.\n\nOne day I complained about linter tooling that\nwas driving me nuts. I said something to the effect of, \"it's 2016, how are we still dealing with this sort of thing?\"\n\nTurns out, that problem was solved four decades ago (well, three at that point). Back when he was working on Ada,\nthey didn't store text sources at all &mdash; they used an IR called [DIANA](https://archive.org/details/dianaintermediat0000unse/page/n7/mode/2up).\nEveryone had their own pretty-printing settings for viewing it however they wanted.\n\nWe've been debating some linter settings at work recently and I keep thinking back to\nMr. Paige. It's 2025, how are we still dealing with this sort of thing?\n\n---\n\nWell, to answer that it would help to know what we're missing.\n\nI believe he was working with the [Rational R1000](https://en.wikipedia.org/wiki/Rational_R1000), of which there isn't a ton of info\n(like all things Ada, it was used by the DoD):\n\n![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/formatting/rational.jpg?w=400)\n\nThe"},{"title":"Vibe-coding Minecraft mods","description":"and the lessons learned","date":"Jun 21, 2025","href":"/blog/vibecoding-minecraft-mods","excerpt":"{/* eslint-disable react/jsx-no-undef */}\n\nIf you aren't familiar with the extent of the Minecraft modding scene, it's _big_. There are mods with more thought put into them than many AAA games.\n\nThe best example is [Create](https://www.curseforge.com/minecraft/mc-mods/create):\n\n\n  \n  {\n    \n      Note that trains (and windmills and assembly lines) are not built into\n      Minecraft.\n    \n  }\n\n\nSo I was pretty lost when I started playing for the first time in a long time.\n\n### Table of Contents\n\n## The Problem\n\nAs some friends and I started playing the Divine Journey 2 modpack,\nI was overwhelmed by the number of modded blocks and items.\n\nTo give you a taste, there are 54 &quot;generators&quot; from 16 mods:\n\n{\n\n  \n    \n      I built this UI with v0 and extracted the images from a screenshot using\n      o4-mini with toolcalling.\n    \n}\n\nFinding them around our base was a pain. My friends knew where everything was,\nand would be telling me things like \"put coal in the hopper that feeds the Coke\nOven into the Blast Furnace by the biodiesel setup\"\n\nThere's one obvious solution:\n\n## The Solution: more mods\n\nI ended up creating two mods with a mix of [OpenAI Codex](https://github.com/opena"},{"title":"Implementing Notion style URLs","description":"Create /some-title-here-{id} URLs for recognizable links in Next.js","date":"Jun 19, 2025","href":"/blog/sluggified-urls","excerpt":"I hate unrecognizable URLs. If I want to go back to a specific document or page, I should be able\nto type the name of it in the address bar and find it in my browser history. Notion is particularly good at this,\nand v0 was particularly bad at it (for a while), so this is what I did to fix v0.\n\nHere's what a notion URL looks like:\n\n\n  \n\n\nIt's recognizable, visually appealing, and easy to find in your browser history:\n\n\n\nI'm a fan.\n\n\n\nAt first I thought implementing it would be straight forward, but there are a few easy-to-hit gotcha's involved.\nThis post will be focused on Next.js, but the concepts are universal. Here are some of the things to keep in mind:\n\n- You need to ensure the [canonical URL](https://developers.google.com/search/docs/crawling-indexing/canonicalization) is up-to-date\n- The client needs to wind up on the most recent URL, otherwise crawlers like Google can index \"fake\" paths\n- Be mindful of your previous URLs and ensure they don't conflict with the logic for adding/parsing the slug\n\nTo get started, we need two functions: one to generate the URL, and one to parse it.\n\nIt's important we support URLs both with and without the title, and I recommend using a library t"},{"title":"Ship something every day","description":"","date":"Jun 10, 2024","href":"/blog/ship-every-day","excerpt":"**Edit**: A better title would've been \"_commit_ every day _that you work_\". I don't mean you should work on weekends or not take time off, and\nwhatever you work on doesn't need to \"ship to prod\". \n\n\n\nI don't feel particularly qualified to give advice (I blame imposter syndrome),\nbut I do have one tip to share that I think has been useful for me.\nIt applies both to professional software dev and personal projects.\n\nYou probably guessed it from the title: **ship something every day**.\n\nIt doesn't need to be a major feature or even a bug fix. It just needs to be something you can point to.\n\nWhy? A few reasons:\n\n- The dopamine rush of your code being shipped\n- Your team sees you're working\n  - There's more to this than just performance reviews; with remote work, it's easy for you and co-workers to feel isolated.\n- It encourages incremental work. Your future self and co-workers will thank you\n- Your git commit streak looks good\n  - Yes, in an ideal world this doesn't matter. But I'm sure people like recruiters look at GitHub profiles, and an empty page isn't a great look. This is a benefit of the habit, not necessarily a reason to start it.\n- The satisfaction and mental benefits of gett"},{"title":"Why your website's fonts might be larger than intended","description":"A well-meaning mobile browser feature can be problematic","date":"Jun 9, 2023","href":"/blog/mobile-browsers-resizing-font","excerpt":"Someone recently reported that the font-size in some of my code blocks on my [build-your-own Next.js blog](/blog/build-a-blog-with-nextjs-13) post was too large. That's interesting because I use React and the code blocks are the same component. So why would the font-size be different between them?\n\nI was able to reproduce the issue and found that it only happened on iOS devices. Here it is in action:\n\n\n\nAfter adventuring down a small rabbit hole, I can share that mobile devices (mostly tablets/phones) support the [text-size-adjust](https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust) CSS property that automatically adjusts the font size of text to make it more readable.\nThis is a great feature for most websites, but it can be problematic for code blocks. It's worth noting that all browsers support this feature (although WebKit requires a prefix), but it seems like they use different heuristics to determine when to apply it.\n\nHere's a solution:\n\n\n\nThis disables the feature and makes the font size consistent across all browsers.\nBe careful though, because this will disable the feature for your entire site.\nYou may want to specifically opt certain elements out to let the"},{"title":"Nintype is still the best iOS keyboard","description":"","date":"May 22, 2023","href":"/blog/nintype","excerpt":"Describing Nintype is a challenge. Here's a the demo video from it's launch back in 2014:\n\n\n  \n\n\n  \"the true touch typing experience\"\n\n\nEssentially, Nintype is a keyboard that enables you to _swipe and tap_ with both hands at the same time.\nIf you're typing \"there\", you'd swipe the \\`th\\` with your right hand, and tap or swipe the \\`ere\\` with your left.\nIt's such elegant and obvious next step for swipe keyboards it's incredible to me that no alternatives exist.\nIt's really does feel like magic; see how my friend texted me when we were first discovering it (apologies for the expletives):\n\n\n\nIt's genius lies in a few things:\n\n## Swipe and type\n\nNintype's true magic lies in it's ability to understand swiping and tapping with both fingers simultaneously.\nIf you need to double tap a word, like \"I'll\", you can swipe the first half of the word, and then double tap the \"l\" key to finish it.\nIt's a bit tricky to put into words, but it feels intuitive and unlocks a lot of speed. I can consistently reach 100 WPM with ~90-95% accuracy using Nintype.\n\n## Customization\n\nNintype has options for seemingly everything.\nYou can add custom shortcuts (such as auto filling your email or credit card num"},{"title":"Building a blog with Next.js 15 and React Server Components","description":"Use MDX, RSC, and Bright to build a blog with Next.js 15.","date":"Apr 16, 2023","href":"/blog/build-a-blog-with-nextjs-13","excerpt":"I've been tinkering with this website and the [Next.js 13 App Router](https://beta.nextjs.org) for a while now,\nand it's been a great experience, especially in the last few months. But I've seen some confusion around\nhow to use the new features and React Server Components, so I wrote up an outline on building this website.\n\n\n  {' '}\n  This post has been updated for [Next.js\n  15.](https://nextjs.org/blog/next-15){' '}\n\n\nTo address the React-sized elephant in the room:\nyou do not need this fancy setup to build a blog.\nHTML and CSS may be a better choice for you, but I'd find little fun in that, and I'm a strong believer in having a website to experiment with.\n\nTo set a few expectations, here's what this post **won't** do:\n\n- Act as documentation for Next.js or React\n- Be a 100% code-complete tutorial. You'll need to fill in some gaps yourself.\n  - You can always reference [this website's source code](https://github.com/maxleiter/maxleiter.com).\n  - There are file trees included with links to the source code.\n\nAnd here's what it **will** do:\n\n- Show you real-world examples involving React Server Components and the App Router.\n- Guide you in spinning up your own blog with Next.js 13 a"},{"title":"The Node ecosystem (still) has tooling problems","description":"It shouldn't take this much work to publish a small library","date":"July 30, 2022","href":"/blog/node-has-tooling-problems","excerpt":"I recently published a [small npm package](https://github.com/maxleiter/sortablejs-vue3) containing a Vue library. The package is written in TypeScript powered by Vite, which I (wrongly) assumed would mediate most of my woes. \n\n![Obi Wan gif of him sarcastically saying \"Oh, this is going to be easy\"](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/node-tooling/obiwan.gif)\n\nFirst, I used Vite to build a small front-end site to demonstrate the library. This let me test the component and demonstrate usage in the same repository. Getting this working was fairly straight forward for someone with experience wrangling TypeScript configurations, but I imagine for a less experienced developer it could've been a daunting task. I ended up with two tsconfigs, \\`tsconfig.node.json\\` and \\`tsconfig.site.json\\`, had to figure out module resolution, realized I needed \\`vue-tsc\\`, and had a multitude of other minor roadblocks. The nicest thing about Vite is it is *fast*, which made working on this manageable.\n\nSecond, I had to figure out how to publish a library. After lots of research (AKA reading Reddit threads and blog posts), I figured out the proper incantation of \\`tsc\\` paramete"},{"title":"Live updating page views with Supabase and Next.js","description":"A step-by-step guide to page views and server analytics","date":"May 15, 2022","href":"/blog/supabase-next-analytics","excerpt":"This post was written for the (now stable) beta Next.js middleware. If you\n  want your own analytics, I recommend looking at{' '}\n  Vercel's solution.\n\n\nThis post starts with a brief introduction. If you want to jump down to the tutorial, click [here](/blog/supabase-next-analytics#how). You can also see the live updating views in action in the top right of this page! The analytics events themselves require no JavaScript and occur completely on the server thanks to the [new (in beta) Next.js middleware](https://nextjs.org/docs/advanced-features/middleware). If you have JavaScript enabled, the view count should live update thanks to Supabase Realtime. You can try it by opening the page in a new tab and eyeing the view count.\n\n**Contents**\n\n- [Motivations](/blog/supabase-next-analytics#motivations)\n- [How to do it](/blog/supabase-next-analytics#how)\n  - [Supabase: Setting up the Database and Realtime](/blog/supabase-next-analytics#supabase-setting-up-the-database-and-realtime)\n  - [Next.js: Adding server-side analytics](/blog/supabase-next-analytics#nextjs-adding-server-side-analytics)\n  - [Next.js: Adding a live updating view counter](/blog/supabase-next-analytics#nextjs-adding-a-liv"},{"title":"Easy ways to improve your websites accessibility and performance","description":"A list of simple tips for developing a more accessible and user-friendly web.","date":"Apr 23, 2022","href":"/blog/easy-site-improvements","excerpt":"Below is a short list I wrote up for people who are comfortable building websites (with any technology) but want to improve their work, whether that be in terms of loading speeds, software quality, or accessibility.\n\n\nTL;DR:\n- [Use WAVE](/blog/easy-site-improvements#wave)\n- [Compress your images](/blog/easy-site-improvements#compress-your-images)\n- [Embrace semantic HTML](/blog/easy-site-improvements#embrace-semantic-html)\n- [Don’t use JavaScript to replace browser controls](/blog/easy-site-improvements#dont-use-javascript-to-replace-browser-controls)\n- [Invest in learning your developer tools](/blog/easy-site-improvements#invest-in-learning-your-developer-tools)\n\n## WAVE \n\n[WAVE](https://wave.webaim.org/) is a suite of tools for finding, diagnosing, and fixing accessibility problems. It's my first step for finding the lowest hanging improvements. It helps you not just fix your errors but understand them by guiding you through the relevant part of the HTML5 spec in plain language. Below you can see a screenshot of the tool being applied to https://webaim.org. \n![Screenshot of the WAVE tool being used on webaim.org](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/site-i"},{"title":"How hackers* run their sites","description":"An analysis based on 700 personal websites","date":"Apr 7, 2022","href":"/blog/hacker-sites","excerpt":"\\* hackers: users of hacker news\n\nYesterday, when I probably should have been doing something productive, I instead [asked hacker news users for links to their personal sites](https://news.ycombinator.com/item?id=30934529).\n\nIt got far more replies than I expected (over 1000 at the time of writing) so I had the idea to do some scraping and see how commenters build and host their sites.\n\nI wrote a quick-and-dirty typescript script (at the bottom of page) for scraping, pinging, and sorting the comments. I could've used a pre-existing library or service for determining tech used on the sites, but where's the fun in that? I’d have loved to add features like checking for git repository links and doing some API calls for a more in-depth analysis, but I’ll leave the complicated parts as exercises for the reader.\n\nIf I were to do this all again, I would absolutely not choose JavaScript. Just 0 real benefits; I spent more time than I care to admit bashing my head before remembering \\`Promise.allSettled\\` exists. I should've just used Python.\n\n## The stats:\n\nOf the 721 top level comments, 692 contained links and were analyzed at the time of writing. I only looked at the first link in a comme"},{"title":"Introducing Drift","description":"A self-hostable alternative to GitHub Gist and Pastebin","date":"Mar 26, 2022","href":"/blog/introducing-drift","excerpt":"_[View this post on Drift](https://paste.maxleiter.com/post/9d77d452-8ccf-4056-89dd-9bf9f96dfc3c)_\n\nI've wanted a Gist alternative for years, but it wasn't until I saw [this tweet](https://twitter.com/emilyst/status/1499858264346935297) I decided to sit down and build it:\n\n> \"What is the absolute closest thing to GitHub Gist that can be self-hosted? In terms of design and functionality. Hosts images and markdown, rendered. Creates links that can be private or public. Uses/requires registration. I have looked at dozens of pastebin-like things.\" - @emilyst\n\nIf your response to that is \"why?\", I recommend reading ['Why you should start self-hosting'](https://rohanrd.xyz/posts/why-you-should-start-self-hosting/) by Rohan Deshumkh. Also know that I have a habit of starting time consuming weekend projects to procrastinate school work, and this seemed like an especially fun one.\n\nThe primary goal of Drift is to capture the value proposition of GitHub. Syntax highlighting, markdown rendering, straight to the point. There are tons of self-hostable pastebins, and none target an experience like Gist. You can try a demo [here](https://drift.maxleiter.com).\n\nHere's a screenshot of the authentic"},{"title":"How to start contributing to open-source projects","description":"A small guide to finding projects and contributing changes","date":"Jan 25, 2022","href":"/blog/contributing-to-oss","excerpt":"One of the most common questions I'm asked by my computer science friends and students is how they can contribute to an open-source project. In order for me to organize and share my thoughts I thought I'd write something here.\n\nFirst off, it's a good idea! Contributing to projects is a fantastic way to build experience, connections, and improve a piece of software you use or rely on. I've grown immensely through maintaining my few projects and contributing to a hand full of others. I've gained experience in community management, team communication, code review, dependency management, and the list goes on. This post is focused on programming, but don't forget that issue management, documentation, user support, and bug reporting are all valuable ways you can contribute. \n\nThat point about using open-source software is important. The first thing I tell my friends is they should first ensure they're using some before they attempt to contribute. There are few things that are more satisfying than fixing a bug that's been bugging you in a program written by someone else, and the motivation that provides is not inconsequential[^1]. As a maintainer, contributor, and extensive procrastinator"},{"title":"Pin your npm/yarn dependencies","description":"A guide on how to pin your dependencies and why you may want to","date":"Jan 9, 2022","href":"/blog/pin-dependencies","excerpt":"Today, the open-source maintainer [Marak](https://github.com/Marak) intentionally [bricked two popular JavaScript libraries](https://www.bleepingcomputer.com/news/security/dev-corrupts-npm-libs-colors-and-faker-breaking-thousands-of-apps/) (with ~25 total million weekly downloads) in such a way that they broke dependents software. There's nothing that npm or any other public registry could've done to have prevented this; the release was indistinguishable from a regular update, unless you looked at the code. This is not the first time an npm dependency has [gone rogue](https://qz.com/646467/how-one-programmer-broke-the-internet-by-deleting-a-tiny-piece-of-code/) and [caused havoc](https://github.com/dominictarr/event-stream/issues/115) due to supply chain problems, and it certainly won't be the last. And so the defensive role falls to you, the developer.\n\n### Pinning dependencies\n\nMy recommendation is to **pin your dependencies**. If you're unfamiliar with what this means, you should first be familiar with [semantic versioning](https://semver.org/). In short, pinning dependencies means the _exact_ version specified will be installed, rather than a dependency matching the range crite"},{"title":"Impressions of the Framework Laptop","description":"My thoughts on the Framework Laptop's hardware","date":"Nov 3, 2021","href":"/blog/framework","excerpt":"I received my [Framework Laptop DIY edition](https://frame.work) a few days ago and have been setting it up software-wise. I have it running Manjaro Linux with the Sway window manager. This is my first time using a Wayland desktop, and oh has it been a learning experience. This post will be largely about the hardware, but I plan to make one about the software once I'm more happy with my setup.\n\nHere's what I got:\n\n- Framework Laptop DIY Edition\n- 16GB (2 x 8GB) DDR4-3200\n- Intel® Wi-Fi 6E AX210 No vPro\n- 1TB - WD_BLACK™ SN850 NVMe™\n- USB-A Expansion Card\n- USB-C Expansion Card x2\n- HDMI Expansion Card\n\nI bought everything from the Framework store (at a slight markup of ~$80 for the RAM, SSD, and wifi card), but I'm happy to support them and for the convenience of knowing it would work properly was well worth it.\n\n## The Good\n\n- Well crafted body. I was not expecting a premium build quality from a startup trying to create an upgradeable laptop, but wow they excelled.\n- It's _really light_. It's just 2.8 pounds, compared to my 13\" Macbook Pro's 3.02. You wouldn't think that's a big difference, and maybe you wouldn't notice, but I sure did.\n- A solid keyboard. Most non-Mac laptops I'v"},{"title":"Adding ambient light support to Linux and GNOME","description":"A quick dive into Linux kernel drivers","date":"Dec 15, 2020","href":"/blog/MSHW0184","excerpt":"A couple of a weeks ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale. I love making devices run software they shouldn't, so I got to work dual-booting Linux on it. To my surprise, almost everything worked with the default Fedora 33 kernel, not including the touchscreen, the ambient light sensor, and the camera. After compiling and loading the great [linux-surface](https://github.com/linux-surface/linux-surface) kernel the touchscreen started to work but I found a [GitHub issue](https://github.com/linux-surface/linux-surface/issues/121) someone had made detailing that the ambient light sensor (a MSHW0184) isn't detected. This normally wouldn't matter a lot, but I'd discovered that GNOME supported adjusting the screen brightness based on the ambient light through [iio-sensor-proxy](https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/).\n\nI knew nothing (and still know very little) about the Linux kernel or drivers, but this seemed like a great place to start. Luckily, GitHub user archseer discovered that the MSHW0184 registers align with the APDS9960 device, which already has an upstream kernel driver, and he mentioned all that should be needed is a small change "},{"title":"X11 on iOS","description":"A guide on how to compile the X Window System for iOS","date":"Dec 15, 2019","href":"/blog/X11","excerpt":"This work has been picked back up recently, with KDE, GNOME, Wayland, and\n  more. Read about it here: https://maxleiter.com/blog/xios\n\n\nI'm excited to announce that X11 is coming soon to iOS. Most (see below) packages and dependencies for a fully functioning X11 desktop system have been compiled and are available on Cydia for iOS 11+. All packages have been compiled for arm64 and have been tested on iOS 12.4 and iOS 13.1. This requires a jailbroken device.\n\n\n[Image of programs running on\ndevice.](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/X11/onipad.jpg)\n\nThis site will serve largely as documentation for building yourself. ~You can add the Cydia repo below for the deb packages. Please let me know if you run across any issues with the debs; it's likely I messed up including a library or something like that. (These aren't done just yet.)~\n\n## How it works\n\nAt the moment, a virtual screen is accessed via a VNC client to an Xvnc instance running on the iDevice. If you're unfamiliar, Xvnc is an X server with a virtual screen that can be accessed via VNC. The best part of this is no drivers are required: it's all handled by Xvnc.\n\n## Why\n\nLargely just because I can. Als"}],"notes":[{"title":"Per-directory terminal colors in fish shell","description":"","date":"Apr 5, 2026","href":"/notes/fish-directory-colors","excerpt":"My terminal background color changes based on the current directory. \nIt's a small touch that makes it easy to tell which project I'm in at a glance, which is \nespecially useful when juggling AI agents.\n\nIt works via a custom fish function called `_color_for_dir`, which:\n\n1. Hashes the current `$PWD` \n2. Maps the hash to a hue (0-359)\n3. Converts it to a dark RGB color \n4. Sends an [OSC 11](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html) escape sequence to change the terminal background\n\n\n\nIt's deterministic, so each directory always gets the same color. \nThe function is triggered on startup and on every `cd` via a `--on-variable PWD` event listener.\n\nIt also skips VS Code's integrated terminal because I generally know what projects I have open \n\nFull code:\n\n\nClick to expand"},{"title":"Never think about branch names again","description":"a bash script for generating branch names","date":"Aug 19, 2024","href":"/notes/git-checkout-script","excerpt":"I recommend swapping out \\`max\\` to basically anything else.\n\n\n\nTo use on macOS/linux, you can paste the above into a file in \\`/usr/local/bin\\` and make it executable with \\`chmod +x /usr/local/bin/gcb\\`.\n\nI also recommend setting your git settings to sort branches by \\`committerdate\\` so that you can easily find the branch you worked on most recently:\n\n\n\nThis does work with the default alphabetical sorting, but this works better if you work on features over long periods of time."},{"title":"Updating JSONB fields with Drizzle","description":"hint: just use `sql` and COALESCE.","date":"July 11, 2024","href":"/notes/updating-jsonb-drizzle","excerpt":"I recently made a jsonb column in a postgres database and it took me a bit\nto figure out how to update a single value without overwriting the entire\nfield. If you know a better way please let me know."},{"title":"Set your default directory in VS Code's open dialog","description":"","date":"Jun 6, 2024","href":"/notes/vscode-default-dir","excerpt":"This is my workflow for opening a project in VS Code:\n\n1. Open an empty window of VS Code\n2. Hit cmd+O\n3. Navigate to my \\`~/Documents/...\\` directory\n4. Hit enter\n\nIn my opinion, that's a few too many steps. I've made it a little better by\nchanging the \\`files.dialog.defaultPath\\` setting (added almost exactly [one year ago](https://code.visualstudio.com/updates/v1_80)).\n\n![VS Code settings](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/vscode-dir/screenshot.png)\n\nHope this helps."},{"title":"gemini.sh script","description":"A script for concatenating files in a directory for copying to an LLM","date":"Apr 14, 2024","href":"/notes/gemini-script","excerpt":"As of late 2024/early 2025, I recommend using the great repomix tool: https://github.com/yamadashy/repomix\n\n\nI've been messing with gemini-1.5-pro with the 1 million token context window for a while now and found this script very useful\nfor grabbing entire repos. It ignores most binary files and concatenates the rest into a single file. \n\nYou'll need to have \\`parallel\\` installed for this to work (\\`brew install parallel\\` on macOS)."},{"title":"Sending a Slack message with fetch","description":"","date":"Mar 30, 2024","href":"/notes/slack-message-fetch","excerpt":"I like using Slack bots for things like alerts and notifications and\nhave needed this snippet enough to leave it here.\n\nI use [slack-block-builder](https://github.com/raycharius/slack-block-builder) to\nbuild the message; writing raw slack blocks is a pain."},{"title":"SWR for more than fetching","description":"SWR for state management","date":"Mar 30, 2024","href":"/notes/swr-state","excerpt":"[SWR](https://swr.vercel.app/) is a great library for data fetching in React.\nIt looks like this:\n\n\n\nBut my favorite use for it is local state management.\n\nHere's an example of how I use it for modals and dialogs:\n\n\n\nAny hook call with that same \\`state:modal\\` key will receive the same data and re-render when it changes.\nIt's a good replacement for other global state solutions or context."},{"title":"Loading wasm files on Vercel Edge and Node.js runtimes","description":"","date":"Mar 30, 2024","href":"/notes/wasm-edge-and-node","excerpt":"Loading wasm on the [Vercel Edge runtime](https://vercel.com/docs/functions/wasm) is easy. You need to do a little more work\nto do the same on Node.js."}],"projects":[{"title":"X11 on iOS","description":"Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.","href":"/blog/X11"},{"title":"Drift","description":"A self-hostable and open-source alternative to GitHub Gist and Pastebin.","href":"https://github.com/maxleiter/drift"},{"title":"The Lounge","description":"Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.","href":"https://github.com/thelounge/thelounge"},{"title":"SortableJS-vue3","description":"A TypeScript wrapper for SortableJS built for Vue 3.","href":"https://github.com/maxleiter/sortablejs-vue3/"},{"title":"KnightOS","description":"Open-source unix-like operating system for z80-based calculators written entirely in z80 asm. I wrote a significant portion of the libc and contribued to system libraries.","href":"https://github.com/knightos/knightos"},{"title":"MSHW0184 driver for Linux kernel","description":"I finally found an excuse to contribute to the Linux kernel","href":"blog/MSHW0184"},{"title":"jsonTree","description":"My first open-source project","href":"https://github.com/maxleiter/jsontree"},{"title":"easyarty.com","description":"A tiny tool I made for a video game I like but it now gets 250,000+ visitors a year","href":"https://easyarty.com"},{"title":"v0","description":"I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.","href":"https://v0.app"},{"title":"AI SDK","description":"I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK.","href":"https://github.com/vercel/ai"},{"title":"Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening","description":"I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimate vertical cup to disk ratios from retinal images.","href":"https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362"}],"work":[{"title":"How we made v0 an effective coding agent","description":"Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.","date":"Jan 7, 2026","href":"https://vercel.com/blog/how-we-made-v0-an-effective-coding-agent"},{"title":"Introducing the v0 composite model family","description":"Introducing the v0 composite model family.","date":"Jun 1, 2025","href":"https://vercel.com/blog/v0-composite-model-family"},{"title":"Introducing AI SDK 3.0 with Generative UI support","description":"Stream React Components from LLMs to deliver richer user experiences.","date":"Mar 1, 2024","href":"https://vercel.com/blog/ai-sdk-3-generative-ui"},{"title":"Introducing the Vercel AI SDK","description":"An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.","date":"Jun 15, 2023","href":"https://vercel.com/blog/introducing-the-vercel-ai-sdk"},{"title":"Improving the accessibility of our Next.js site","description":"We've made some improvements to the accessibility of our Next.js site. Here's how we did it.","date":"Sep 30, 2022","href":"https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site"},{"title":"New edge dev infrastructure","description":"New edge dev infrastructure.","date":"Jul 21, 2020","href":"https://vercel.com/blog/new-edge-dev-infrastructure"}]}</script>
@@ -311,7 +352,7 @@ function inline(s, base) {
 function md(src, base, truncated = src.length >= 1150) {
   const lines = src.replace(/\r/g, '').split('\n')
   const out = []
-  let para = [], list = null, fence = null
+  let para = [], list = null, fence = null, lastH = 1
   const flushP = () => { if (para.length) out.push(`<p>${inline(para.join(' '), base)}</p>`); para = [] }
   const flushL = () => { if (list) out.push(`<${list.t}>${list.items.map((i) => `<li>${inline(i, base)}</li>`).join('')}</${list.t}>`); list = null }
   for (const raw of lines) {
@@ -324,7 +365,7 @@ function md(src, base, truncated = src.length >= 1150) {
     if ((m = l.match(/^(#{1,4})\s+(.*)$/))) {
       flushP(); flushL()
       if (/table of contents/i.test(m[2])) continue
-      const lv = Math.min(3, Math.max(2, m[1].length))
+      const lv = Math.min(lastH + 1, Math.min(3, Math.max(2, m[1].length))); lastH = lv
       out.push(`<h${lv}>${inline(m[2], base)}</h${lv}>`); continue
     }
     if ((m = l.match(/^\s*(?:[-*]|(\d+)\.)\s+(.*)$/))) {
@@ -345,8 +386,10 @@ const yaml = (o) => '<span class="c">---</span>\n' + Object.entries(o).filter(([
   .map(([k, v]) => `<span class="k">${k}</span>: <span class="s">${esc(JSON.stringify(v))}</span>`).join('\n') + '\n<span class="c">---</span>'
 
 function sheetFor(cat, it) {
-  const head = (kicker, title, desc, ic) => `<header class="sh-head"><div class="sh-ic">${svgIcon(ic)}</div><div>
-    <div class="sh-kicker">${esc(kicker)}</div><h1>${esc(title)}</h1>${desc ? `<p class="sh-desc">${esc(desc)}</p>` : ''}</div></header>`
+  const tools = `<div class="sh-tools"><button type="button" class="sh-btn" data-act="read" aria-pressed="${!HIC.active}"${HIC.available && GL ? '' : ' disabled'}
+    title="Plain DOM: find-in-page and native text selection">Reading mode</button><button type="button" class="sh-btn" data-act="back">Back</button></div>`
+  const head = (kicker, title, desc, ic) => `${tools}<header class="sh-head"><div class="sh-ic">${svgIcon(ic)}</div><div>
+    <div class="sh-kicker">${esc(kicker)}</div><h1 id="sh-title">${esc(title)}</h1>${desc ? `<p class="sh-desc">${esc(desc)}</p>` : ''}</div></header>`
   const more = (href, label) => `<p class="sh-more"><a href="${esc(href)}" target="_blank" rel="noopener">${esc(label)} <span aria-hidden="true">↗</span></a></p>`
   const d = it.data
   if (it.kind === 'post' || it.kind === 'note') {
@@ -354,7 +397,7 @@ function sheetFor(cat, it) {
     const fm = { title: d.title, date: d.date, description: d.description, href: d.href }
     return head(`${cat.label} · ${d.date}`, d.title, d.description, cat.icon)
       + `<div class="sh-body">${md(d.excerpt || '', href)}</div>`
-      + `<h3>Frontmatter</h3><pre><code>${yaml(fm)}</code></pre>`
+      + `<h2>Frontmatter</h2><pre><code>${yaml(fm)}</code></pre>`
       + more(href, it.kind === 'post' ? 'Continue reading on maxleiter.com' : 'Open the full note')
   }
   if (it.kind === 'project' || it.kind === 'work') {
@@ -367,9 +410,9 @@ function sheetFor(cat, it) {
   if (it.kind === 'profile') {
     const s = DATA.site
     return head('Profile', s.name, 'maxleiter.com', 'about')
-      + `<p>${esc(s.blurb)}</p><h3>Elsewhere</h3><ul><li><a href="${s.github}" target="_blank" rel="noopener">GitHub — ${esc(s.github.replace('https://', ''))}</a></li>
+      + `<p>${esc(s.blurb)}</p><h2>Elsewhere</h2><ul><li><a href="${s.github}" target="_blank" rel="noopener">GitHub — ${esc(s.github.replace('https://', ''))}</a></li>
       <li><a href="${s.x}" target="_blank" rel="noopener">X — ${esc(s.x.replace('https://', ''))}</a></li><li><a href="${s.url}" target="_blank" rel="noopener">${esc(s.url.replace('https://', ''))}</a></li></ul>
-      <h3>On this console</h3><p>${DATA.posts.length} blog posts, ${DATA.notes.length} notes, ${DATA.projects.length} projects and ${DATA.work.length} pieces written for work.</p>
+      <h2>On this console</h2><p>${DATA.posts.length} blog posts, ${DATA.notes.length} notes, ${DATA.projects.length} projects and ${DATA.work.length} pieces written for work.</p>
       <pre><code>${yaml({ name: s.name, url: s.url, github: s.github, x: s.x })}</code></pre>`
   }
   if (it.kind === 'sysinfo') {
@@ -377,7 +420,7 @@ function sheetFor(cat, it) {
     return head('Settings · Renderer', 'System information', HIC.active ? 'Articles are drawn with HTML-in-Canvas.' : 'Articles are a DOM overlay.', 'chip')
       + `<dl class="sh-grid"><dt>Path</dt><dd>${esc(RENDER.label)}</dd><dt>Browser</dt><dd>${esc(h.ua)}</dd>
       <dt>Generation</dt><dd>${esc(h.gen || 'none')}</dd><dt>WebGL2</dt><dd>${GL ? 'yes' : 'no'}</dd><dt>WebGPU</dt><dd>${navigator.gpu ? 'present (not used, see NOTES)' : 'absent'}</dd></dl>
-      <h3>Detected API names</h3><pre><code>${esc(h.lines.join('\n'))}</code></pre>
+      <h2>Detected API names</h2><pre><code>${esc(h.lines.join('\n'))}</code></pre>
       <p>This panel is itself a live element. ${HIC.active ? 'Select some of this text, or press <code>Tab</code> to reach the links below; the selection and focus ring are painted into the texture.' : 'Without the flag it is plain DOM over the canvas, blurred with <code>backdrop-filter</code>.'}</p>
       <p><a href="?mode=${HIC.active ? 'dom' : 'auto'}">${HIC.active ? 'Reload with the DOM fallback' : 'Reload with auto-detection'}</a> · <a href="https://github.com/WICG/html-in-canvas" target="_blank" rel="noopener">WICG html-in-canvas explainer</a></p>`
   }
@@ -392,7 +435,9 @@ const state = {
   cat: 2, sel: {}, open: null, sound: false,
   tod: TOD.includes(qs.get('tod')) ? qs.get('tod') : 'auto',
   motion: reducedMQ.matches || qs.get('motion') === 'reduced' ? 'reduced' : 'full',
+  reading: qs.get('mode') === 'dom' || store('wave.reading') === '1',
 }
+function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v) } catch { return null } }
 const CATS = [
   { id: 'about', label: 'About', icon: 'about', items: [
     { kind: 'profile', title: DATA.site.name, sub: DATA.site.blurb, icon: 'person', href: SITE },
@@ -404,6 +449,7 @@ const CATS = [
     { kind: 'set', key: 'sound', title: 'Sound', sub: 'Soft synthesized ticks, made in WebAudio', icon: 'speaker' },
     { kind: 'set', key: 'tod', title: 'Time of Day', sub: 'Background palette; Auto follows your clock', icon: 'sun' },
     { kind: 'set', key: 'motion', title: 'Motion', sub: 'Wave, ripples and wobble', icon: 'wave' },
+    { kind: 'set', key: 'reading', title: 'Reading Mode', sub: 'Plain DOM articles: find-in-page and native selection', icon: 'doc' },
     { kind: 'sysinfo', title: 'System Information', sub: 'Which render path is active, and why', icon: 'chip' },
   ] },
   { id: 'blog', label: 'Blog', icon: 'blog', items: DATA.posts.map((d) => ({ kind: 'post', title: d.title, sub: [d.date, d.description].filter(Boolean).join('  ·  '), icon: 'doc', href: abs(d.href), data: d })) },
@@ -417,14 +463,15 @@ if (qs.has('item')) state.sel[state.cat] = Math.max(0, Math.min(CATS[state.cat].
 
 const setValue = (key) => key === 'sound' ? (state.sound ? 'On' : 'Off')
   : key === 'tod' ? (state.tod === 'auto' ? `Auto (${cap(todNow())})` : cap(state.tod))
-  : key === 'motion' ? (state.motion === 'full' ? 'Full' : 'Reduced') : ''
+  : key === 'motion' ? (state.motion === 'full' ? 'Full' : 'Reduced')
+  : key === 'reading' ? (!HIC.available || !GL ? 'Always on' : state.reading ? 'On' : 'Off') : ''
 const cap = (s) => s[0].toUpperCase() + s.slice(1)
 
 /* build DOM */
 const catsEl = $('#cats'), listsEl = $('#lists')
 const catEls = CATS.map((c, i) => {
   const b = document.createElement('button')
-  b.className = 'cat'; b.type = 'button'; b.id = 'cat-' + c.id; b.setAttribute('role', 'tab')
+  b.className = 'cat'; b.type = 'button'; b.id = 'cat-' + c.id; b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', 'list-' + c.id)
   b.innerHTML = `<span class="ic">${svgIcon(c.icon)}</span><span class="lbl">${c.label}</span>`
   b.addEventListener('click', () => { if (swiped()) return; setCat(i) })
   catsEl.appendChild(b); return b
@@ -432,11 +479,14 @@ const catEls = CATS.map((c, i) => {
 const listEls = [], itemEls = []
 CATS.forEach((c, ci) => {
   const l = document.createElement('div')
-  l.className = 'list'; l.setAttribute('role', 'tabpanel'); l.setAttribute('aria-labelledby', 'cat-' + c.id)
+  l.className = 'list'; l.id = 'list-' + c.id; l.setAttribute('role', 'tabpanel'); l.setAttribute('aria-labelledby', 'cat-' + c.id)
+  const ul = document.createElement('ul'); l.appendChild(ul)
   itemEls[ci] = c.items.map((it, ii) => {
-    const a = document.createElement('a')
+    const a = document.createElement('a'), li = document.createElement('li')
     a.className = 'item'; a.href = it.href || '#'; a.tabIndex = -1
     if (it.kind === 'link') { a.target = '_blank'; a.rel = 'noopener' }
+    if (it.kind === 'set' || it.kind === 'sysinfo') { a.setAttribute('role', 'button'); a.removeAttribute('href'); a.tabIndex = -1 }
+    if (it.kind === 'post' || it.kind === 'note' || it.kind === 'project' || it.kind === 'work' || it.kind === 'profile') a.setAttribute('aria-haspopup', 'dialog')
     a.innerHTML = `<span class="ic">${svgIcon(it.icon)}</span><span class="tx"><span class="t"></span><span class="s"></span></span>${it.kind === 'set' ? '<span class="v"></span>' : ''}`
     a.querySelector('.t').textContent = it.title
     a.querySelector('.s').textContent = it.sub || ''
@@ -447,7 +497,7 @@ CATS.forEach((c, ci) => {
       if (state.cat !== ci) setCat(ci)
       setSel(ii, true); activate()
     })
-    l.appendChild(a); return a
+    li.appendChild(a); ul.appendChild(li); return a
   })
   listsEl.appendChild(l); listEls.push(l)
 })
@@ -498,12 +548,18 @@ function layout() {
   })
   RENDER.layout?.()
 }
-function announce(t) { $('#live').textContent = t }
+let annT = 0
+function announce(t) { clearTimeout(annT); annT = setTimeout(() => { $('#live').textContent = t }, 220) }
+const posText = () => { const c = CATS[state.cat], i = state.sel[state.cat], it = c.items[i]
+  return `${it.title}${it.kind === 'set' ? ', ' + setValue(it.key) : ''}. ${i + 1} of ${c.items.length}` }
+function setTitle() {
+  document.title = state.open ? `${state.open.it.title} — Max Leiter` : `${CATS[state.cat].label} — Max Leiter`
+}
 function setCat(i, fromKey) {
   i = Math.max(0, Math.min(CATS.length - 1, i))
   if (i === state.cat) return
-  state.cat = i; tone('cat'); layout()
-  announce(`${CATS[i].label}: ${CATS[i].items[state.sel[i]].title}`)
+  state.cat = i; tone('cat'); layout(); setTitle()
+  announce(`${CATS[i].label} section. ${posText()}`)
   if (fromKey !== false) focusCurrent()
 }
 function setSel(i, quiet) {
@@ -511,7 +567,7 @@ function setSel(i, quiet) {
   i = Math.max(0, Math.min(n - 1, i))
   if (i === state.sel[state.cat]) return
   state.sel[state.cat] = i; if (!quiet) tone('tick'); layout()
-  announce(CATS[state.cat].items[i].title)
+  announce(posText())
   if (!quiet) focusCurrent()
 }
 function focusCurrent() {
@@ -526,6 +582,7 @@ function activate() {
     if (it.key === 'sound') { setSound(!state.sound) }
     if (it.key === 'tod') { state.tod = TOD[(TOD.indexOf(state.tod) + 1) % TOD.length]; tone('tick') }
     if (it.key === 'motion') { state.motion = state.motion === 'full' ? 'reduced' : 'full'; applyMotion(); tone('tick') }
+    if (it.key === 'reading') { setReading(!state.reading); tone('tick') }
     layout(); announce(`${it.title}: ${setValue(it.key)}`); return
   }
   openSheet(cat, it)
@@ -539,7 +596,7 @@ function setSound(on) {
   state.sound = on
   if (on) { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume() } catch { state.sound = false } }
   const b = $('#snd'); b.innerHTML = state.sound ? SND_ON : SND_OFF
-  b.setAttribute('aria-pressed', state.sound); b.setAttribute('aria-label', state.sound ? 'Sound on. Turn sound off' : 'Sound off. Turn sound on')
+  b.setAttribute('aria-pressed', state.sound); b.title = state.sound ? 'Sound on' : 'Sound off'
   if (state.sound) tone('open')
   layout()
 }
@@ -764,23 +821,27 @@ void main(){
   float ee = 1. - pow(1. - e, 3.);
   float spring = exp(-uOpenT * 4.2) * sin(uOpenT * 15.) * uMotion;
   vec2 hb = uRect.zw * .5, c = uRect.xy + hb;
-  vec2 c0 = mix(uFrom, c, ee);
-  vec2 sc = vec2(mix(.5, 1., ee)) * vec2(1. + .022 * spring, 1. - .018 * spring);
+  vec2 c0 = mix(c, mix(uFrom, c, ee), uMotion);               // reduced motion: no fly-in
+  vec2 sc = vec2(mix(1., mix(.5, 1., ee), uMotion)) * vec2(1. + .022 * spring, 1. - .018 * spring);
   vec2 q = (p - c0) / sc + c;
   vec2 disp = vec2(0.);
   float jelly = (1. - ee) * uMotion;
   disp += vec2(sin(q.y * .021 + uT * 7.) * 18., sin(q.x * .017 + uT * 6.) * 10.) * jelly;
   disp += vec2(sin(q.y * .012 + uOpenT * 9.), cos(q.x * .010 + uOpenT * 8.)) * 6. * abs(spring);
+  vec2 wet = vec2(0.);   // ripple + slosh, capped below
   for (int i = 0; i < 4; i++) {
     vec4 r = uRip[i]; float age = uT - r.z;
     if (age < 0. || age > 3.2 || r.w <= 0.) continue;
     vec2 d = q - r.xy; float L = length(d) + 1e-3; float ring = age * 380.;
     float w = sin((L - ring) * .06) * exp(-pow((L - ring) / 110., 2.)) * exp(-age * 1.5) * r.w;
-    disp += d / L * w * 10. * uMotion;
+    wet += d / L * w * 5.;
   }
   // scrolling makes the sheet slosh: a travelling wave that leans into the scroll direction
-  disp.x += sin(q.y * .03 - uT * 8.) * uVel * .16 * uMotion;
-  disp.y += (sin(q.x * .018 + uT * 3.) * .5 + .5) * uVel * .34 * uMotion;
+  wet.x += sin(q.y * .03 - uT * 8.) * uVel * .07;
+  wet.y += (sin(q.x * .018 + uT * 3.) * .5 + .5) * uVel * .12;
+  // readability cap: never bend text more than ~3.5 CSS px, and nothing at all with reduced motion
+  float wl = length(wet); wet *= min(1., 3.5 / max(wl, 1e-3));
+  disp += wet * uMotion;
   vec2 qd = q + disp;
   float sd = sdRR(qd - c, hb, uRadius);
   float shadow = (1. - smoothstep(-10., 46., sd - 10.)) * .42 * ee;
@@ -817,7 +878,7 @@ void main(){
   if (uHasEl > .5) {
     vec2 lp = qd - uContent.xy + vec2(0., uScroll);
     vec2 uv = lp / uElSize;
-    float ca = min(.0024, length(disp) * .00012 + abs(uVel) * .00002);
+    float ca = min(.0008, length(disp) * .00006 + abs(uVel) * .00001) * uMotion;
     vec4 tg = el(uv);
     vec4 t = vec4(el(uv + vec2(ca, 0.)).r, tg.g, el(uv - vec2(ca, 0.)).b, tg.a);
     float m = smoothstep(uContent.y, uContent.y + 20., qd.y) * (1. - smoothstep(uContent.y + uContent.w - 20., uContent.y + uContent.w, qd.y));
@@ -872,32 +933,51 @@ function glResize() {
 /* =====================================================================
    Render paths
    ===================================================================== */
-const sheet = document.createElement('article')
-sheet.className = 'sheet'; sheet.id = 'sheet'; sheet.setAttribute('aria-live', 'off')
+// the reader is a modal dialog in both paths; on the canvas path it is the canvas's drawable child
+const sheet = document.createElement('div')
+sheet.className = 'sheet'; sheet.id = 'sheet'
+sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-labelledby', 'sh-title')
+sheet.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('button[data-act]')
+  if (!b) return
+  if (b.dataset.act === 'back') closeSheet()
+  if (b.dataset.act === 'read') setReading(!state.reading)
+})
 const P = { rect: [0, 0, 0, 0], content: [0, 0, 0, 0], pad: 40, scroll: 0, target: 0, max: 0, vel: 0, prog: 0, openAt: 0, from: [0, 0], rips: [], ready: false, closing: false }
 
 const RENDER = {}
-function choosePath() {
-  const want = qs.get('mode')
-  const hic = GL && HIC.available && want !== 'dom'
-  HIC.active = !!hic
+function setPath() {
+  const hic = !!(GL && HIC.available && !state.reading)
+  if (hic === HIC.active && sheet.parentNode) return
+  const reopen = state.open && !P.closing ? state.open : null
+  if (reopen) { state.open = null; P.closing = false; P.ready = false; syncGeometryClear() }
+  HIC.active = hic
   document.body.classList.toggle('hic', HIC.active)
-  RENDER.label = hic ? `HTML-in-Canvas (${HIC.gen}, gl.${HIC.upName})` : GL ? 'DOM overlay over WebGL2' : 'DOM overlay, CSS gradient (no WebGL2)'
+  const reading = !hic && GL && HIC.available
+  RENDER.label = hic ? `HTML-in-Canvas (${HIC.gen}, gl.${HIC.upName})` : reading ? 'Reading mode: DOM overlay (HTML-in-Canvas available)' : GL ? 'DOM overlay over WebGL2' : 'DOM overlay, CSS gradient (no WebGL2)'
   const badge = $('#badge')
   badge.classList.toggle('hic', hic)
-  $('#badge-t').textContent = hic ? `HTML-in-Canvas · ${HIC.upName}` : GL ? 'DOM overlay · fallback' : 'DOM · no WebGL'
+  $('#badge-t').textContent = hic ? `HTML-in-Canvas · ${HIC.upName}` : reading ? 'Reading mode · DOM' : GL ? 'DOM overlay · fallback' : 'DOM · no WebGL'
   badge.title = HIC.report.lines.join('\n')
-  badge.setAttribute('aria-label', 'Renderer: ' + RENDER.label)
   if (hic) {
     canvas.setAttribute('layoutsubtree', '')   // legacy generation
     canvas.setAttribute('content', 'drawable') // current generation
     sheet.setAttribute('drawable', '')
     canvas.appendChild(sheet)
   } else {
+    canvas.removeAttribute('layoutsubtree'); canvas.removeAttribute('content'); sheet.removeAttribute('drawable')
+    sheet.style.width = ''
     $('#glass .scroller').appendChild(sheet)
-    canvas.setAttribute('aria-hidden', 'true')
   }
+  canvas.setAttribute('aria-hidden', 'true')
   sheet.inert = true; sheet.setAttribute('aria-hidden', 'true')
+  $('#glass').classList.remove('on')
+  if (reopen) { openSheet(reopen.cat, reopen.it, true); sheet.querySelector('[data-act="read"]')?.focus() }
+}
+function setReading(on) {
+  state.reading = on; store('wave.reading', on ? '1' : '0')
+  setPath(); layout()
+  announce(on ? 'Reading mode on: articles are plain page text' : 'Reading mode off: articles are drawn with HTML-in-Canvas')
 }
 
 /* --- HTML-in-Canvas: upload the live element into a texture --- */
@@ -934,6 +1014,10 @@ function hicListen() {
 }
 /* --- keep hit testing / accessibility geometry in sync with where we draw --- */
 let lastGeom = ''
+function syncGeometryClear() {
+  try { if (canvas.clearElementGeometry) canvas.clearElementGeometry(sheet); else GL?.setHitTestRegions?.([]) } catch {}
+  lastGeom = 'none'
+}
 function syncGeometry() {
   if (!HIC.active) return
   const gl = GL
@@ -973,18 +1057,18 @@ function panelLayout() {
 }
 RENDER.layout = () => { if (state.open) panelLayout() }
 
-function openSheet(cat, it) {
+function openSheet(cat, it, instant) {
   const ci = state.cat, ii = state.sel[ci]
   state.open = { cat, it }
-  sheet.innerHTML = sheetFor(cat, it)
+  sheet.innerHTML = `<article>${sheetFor(cat, it)}</article>`
   sheet.inert = false; sheet.removeAttribute('aria-hidden')
-  sheet.setAttribute('aria-label', it.title)
   document.body.classList.add('open')
-  $('#menu').inert = true
-  tone('open')
+  $('#menu').inert = true; $('#top').inert = true
+  setTitle()
+  if (!instant) tone('open')
   const r = itemEls[ci][ii].querySelector('.ic').getBoundingClientRect()
   P.from = [r.left + r.width / 2, r.top + r.height / 2]
-  P.scroll = P.target = 0; P.vel = 0; P.prog = state.motion === 'full' ? 0 : 1; P.openAt = now(); P.rips = []; P.closing = false; P.ready = false
+  P.scroll = P.target = 0; P.vel = 0; P.prog = instant ? 1 : 0; P.openAt = now() - (instant ? 3 : 0); P.rips = []; P.closing = false; P.ready = false
   panelLayout()
   if (HIC.active) {
     canvas.removeAttribute('aria-hidden')
@@ -994,23 +1078,26 @@ function openSheet(cat, it) {
   } else {
     const g = $('#glass'); g.removeAttribute('aria-hidden')
     g.style.setProperty('--fx', (P.from[0] - (P.rect[0] + P.rect[2] / 2)) + 'px'); g.style.setProperty('--fy', (P.from[1] - (P.rect[1] + P.rect[3] / 2)) + 'px')
+    g.classList.toggle('instant', !!instant)
     g.classList.remove('on'); void g.offsetWidth; g.classList.add('on')
-    const sc = g.querySelector('.scroller'); sc.scrollTop = 0; sc.focus({ preventScroll: true })
+    g.querySelector('.scroller').scrollTop = 0
+    sheet.tabIndex = -1; sheet.focus({ preventScroll: true })
   }
-  announce(`Opened ${it.title}`)
+  if (!instant) announce(`Opened ${it.title}. Press Escape to go back.`)
 }
 function closeSheet() {
   if (!state.open) return
   const { it } = state.open
   tone('back')
   document.body.classList.remove('open')
-  $('#menu').inert = false
+  $('#menu').inert = false; $('#top').inert = false
+  document.title = `${CATS[state.cat].label} — Max Leiter`
   P.closing = true; P.closeAt = now()
   syncGeometry()
   if (!HIC.active) { const g = $('#glass'); g.classList.remove('on'); g.setAttribute('aria-hidden', 'true') }
   sheet.inert = true; sheet.setAttribute('aria-hidden', 'true')
   getSelection()?.removeAllRanges()
-  setTimeout(() => { if (P.closing) { state.open = null; P.closing = false; P.ready = false; if (HIC.active) canvas.setAttribute('aria-hidden', 'true') } }, state.motion === 'full' ? 380 : 10)
+  setTimeout(() => { if (P.closing) { state.open = null; P.closing = false; P.ready = false; canvas.setAttribute('aria-hidden', 'true') } }, state.motion === 'full' ? 380 : 240)
   itemEls[state.cat][state.sel[state.cat]].focus({ preventScroll: true })
   announce(`Closed ${it.title}`)
 }
@@ -1034,6 +1121,13 @@ function ripple(x, y, amp) {
 addEventListener('keydown', (e) => {
   if (e.altKey || e.ctrlKey || e.metaKey) return
   const k = e.key
+  if (state.open && !P.closing && k === 'Tab') {
+    const f = [...sheet.querySelectorAll('a[href], button:not([disabled])'), $('#back')]
+    const i = f.indexOf(document.activeElement)
+    e.preventDefault()
+    f[i < 0 ? (e.shiftKey ? f.length - 1 : 0) : (i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus({ preventScroll: true })
+    return
+  }
   if (state.open) {
     const page = P.content[3] * 0.85 || 400
     if (k === 'Escape' || k === 'Backspace') { e.preventDefault(); closeSheet() }
@@ -1174,8 +1268,8 @@ function frame(ms) {
   const open = !!state.open && !P.closing
   dof += ((open ? 1 : 0) - dof) * Math.min(1, dt * 7)
   if (state.open) {
-    if (P.closing) P.prog = state.motion === 'full' ? Math.max(0, 1 - (t - P.closeAt) / 0.32) : 0
-    else if (P.ready || !HIC.active) P.prog = Math.min(1, P.prog + dt / 0.62)
+    if (P.closing) P.prog = Math.max(0, 1 - (t - P.closeAt) / (state.motion === 'full' ? 0.32 : 0.2))
+    else if (P.ready || !HIC.active) P.prog = Math.min(1, P.prog + dt / (state.motion === 'full' ? 0.62 : 0.22))
     if (window.__hold != null) { P.prog = window.__hold; P.openAt = t - window.__hold * 0.62 }
     const prev = P.scroll
     P.scroll += (P.target - P.scroll) * Math.min(1, dt * 12)
@@ -1188,8 +1282,8 @@ function frame(ms) {
     // fallback wobble from native scroll velocity
     fbVel *= Math.pow(0.86, dt * 60)
     const sc = $('#glass .scroller'), d = document.getElementById('fx-disp')
-    const amp = state.motion === 'full' ? Math.min(16, Math.abs(fbVel) * 0.22) : 0
-    sc.style.setProperty('--vel', (fbVel * 0.6).toFixed(2))
+    const amp = state.motion === 'full' ? Math.min(5, Math.abs(fbVel) * 0.08) : 0
+    sc.style.setProperty('--vel', state.motion === 'full' ? Math.max(-12, Math.min(12, fbVel * 0.3)).toFixed(2) : '0')
     if (amp > 0.5) { d.setAttribute('scale', amp.toFixed(1)); sc.querySelector('.sheet').style.filter = 'url(#fx-ripple)' }
     else sc.querySelector('.sheet').style.filter = ''
   }
@@ -1241,8 +1335,8 @@ function draw(t) {
    ===================================================================== */
 if (GL) { try { glInit() } catch (err) { console.error('[wave] WebGL2 init failed, using CSS background', err); GL = null } }
 if (!GL) { document.body.classList.add('nogl'); canvas.style.display = 'none' }
-choosePath()
-if (HIC.active) hicListen()
+setPath()
+if (HIC.available && GL) hicListen()
 applyMotion()
 setSound(false)
 layout(); tickClock(); setInterval(tickClock, 15000)
@@ -1252,6 +1346,13 @@ requestAnimationFrame(frame)
 // deep-link for screenshots/tests: ?open=1 opens the selected item
 itemEls[state.cat][state.sel[state.cat]].focus({ preventScroll: true })
 if (qs.get('open')) setTimeout(activate, 60)
+$('.skip').addEventListener('click', (e) => {
+  e.preventDefault()
+  ;(state.open ? sheet : itemEls[state.cat][state.sel[state.cat]]).focus()
+})
+setTitle()
+// boot finished: hide the static no-JS index (it stays visible if anything above threw)
+document.documentElement.classList.remove('nojs')
 window.__wave = { state, P, HIC, RENDER, now, tickClock, activate, closeSheet, scrollBy, ripple, setCat, setSel, layout }
 </script>
 </body>

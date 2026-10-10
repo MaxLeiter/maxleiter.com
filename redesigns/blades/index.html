@@ -9,6 +9,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<script>
+  document.documentElement.classList.add('js');
+  addEventListener('error', function () { if (!document.documentElement.classList.contains('booted')) document.documentElement.classList.remove('js'); });
+</script>
 <style>
 @property --bg-a { syntax: '<color>'; inherits: true; initial-value: #3f8f12; }
 @property --bg-b { syntax: '<color>'; inherits: true; initial-value: #0b2203; }
@@ -79,15 +83,16 @@ a { color: inherit; }
   -webkit-box-reflect: below 8px linear-gradient(transparent 87%, rgba(255,255,255,.2)); }
 .blade-surface { position: absolute; inset: 0; border-radius: inherit; overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.42) 0, rgba(255,255,255,.16) 3.2%, rgba(255,255,255,.07) 14%, rgba(255,255,255,0) 34%),
+    linear-gradient(180deg, rgba(255,255,255,.5) 0, rgba(255,255,255,.14) 1.1%, rgba(255,255,255,.035) 4%, rgba(255,255,255,0) 22%),
     linear-gradient(90deg, rgba(255,255,255,.55) 0, rgba(255,255,255,.18) 2px, rgba(255,255,255,.04) 8px, rgba(0,0,0,.22) calc(var(--E) - 1px),
       rgba(255,255,255,.35) var(--E), rgba(255,255,255,.08) calc(var(--E) + 2px), transparent calc(var(--E) + 40px),
-      rgba(255,255,255,.07) 42%, rgba(255,255,255,0) 64%, rgba(0,0,0,.28) 100%),
-    radial-gradient(130% 95% at 34% 6%, var(--c1), var(--c2) 52%, var(--c3) 100%);
+      rgba(255,255,255,.04) 42%, rgba(255,255,255,0) 64%, rgba(0,0,0,.28) 100%),
+    radial-gradient(48% 34% at 86% -4%, color-mix(in srgb, var(--c1) 80%, transparent), transparent 100%),
+    radial-gradient(140% 110% at 40% 0%, var(--c2) 0, color-mix(in srgb, var(--c2) 72%, var(--c3)) 62%, var(--c3) 100%);
   box-shadow: -14px 0 34px rgba(0,0,0,.5), inset 1px 0 0 rgba(255,255,255,.75), inset 0 1px 0 rgba(255,255,255,.65); }
 .blade-surface::before { /* curved specular band */
   content: ''; position: absolute; left: 0; right: 0; top: 0; height: 48%;
-  background: radial-gradient(120% 90% at 40% -40%, rgba(255,255,255,.28), rgba(255,255,255,.06) 55%, transparent 70%); }
+  background: radial-gradient(70% 60% at 82% -38%, rgba(255,255,255,.3), rgba(255,255,255,.05) 55%, transparent 70%); }
 .blade-surface::after { /* faint concentric rings watermark + brushed noise */
   content: ''; position: absolute; inset: 0;
   background:
@@ -117,14 +122,14 @@ a { color: inherit; }
   scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.55) rgba(0,0,0,.15); overscroll-behavior: contain; }
 .item { position: relative; display: flex; align-items: center; gap: 11px; width: 100%; height: 42px; margin-bottom: 5px; padding: 0 12px 0 7px;
   border-radius: 8px; text-align: left;
-  background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.15) 49%, rgba(255,255,255,.08) 51%, rgba(255,255,255,.17));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 0 0 1px rgba(255,255,255,.22), 0 1px 2px rgba(0,0,0,.18);
+  background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.07) 49%, rgba(0,0,0,.06) 51%, rgba(255,255,255,.06));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 0 0 1px rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.22);
   transition: transform .18s var(--spring), box-shadow .2s; }
 .item .it { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 600;
   text-shadow: 0 1px 2px rgba(0,0,0,.5); letter-spacing: -.005em; }
 .item .id { flex: none; font-size: 12px; font-weight: 600; opacity: .78; text-shadow: 0 1px 2px rgba(0,0,0,.5); font-variant-numeric: tabular-nums; }
 .ico { flex: none; width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center;
-  background: radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.75), transparent 55%), linear-gradient(var(--c1), var(--c2));
+  background: radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.6), transparent 55%), linear-gradient(var(--c1), var(--c2));
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.6), 0 1px 2px rgba(0,0,0,.35); }
 .ico svg { width: 16px; height: 16px; fill: #fff; filter: drop-shadow(0 1px 1px rgba(0,0,0,.45)); }
 .item[aria-selected="true"] {
@@ -148,7 +153,7 @@ a { color: inherit; }
 .tip p { margin: 0; font-size: 13px; line-height: 1.45; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,.55); opacity: .95; }
 .tip b { font-weight: 800; }
 /* ---------- gamertag card ---------- */
-.gcard { flex: none; position: relative; display: flex; gap: 13px; padding: 11px 13px; border-radius: 12px;
+.gcard { flex: none; position: relative; display: flex; color: #fff; gap: 13px; padding: 11px 13px; border-radius: 12px;
   background: linear-gradient(180deg, #5b636b 0%, #31363c 46%, #1b1e22 50%, #24282d 100%);
   box-shadow: 0 0 0 1px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 0 1px rgba(255,255,255,.12), 0 6px 16px rgba(0,0,0,.35); overflow: hidden; }
 .gcard::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 48%; border-radius: 12px 12px 40% 40% / 12px 12px 14px 14px;
@@ -161,7 +166,7 @@ a { color: inherit; }
 .gmeta { min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px; position: relative; z-index: 1; }
 .gtag { font-size: 19px; font-weight: 700; letter-spacing: -.01em; text-shadow: 0 1px 2px #000, 0 0 12px rgba(255,255,255,.25); }
 .grow { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #e3e8ec; text-shadow: 0 1px 1px #000; }
-.grow .k { color: #9aa5ae; min-width: 34px; }
+.grow .k { color: #bcc6ce; min-width: 34px; }
 .stars { display: inline-flex; gap: 1px; }
 .stars svg { width: 12px; height: 12px; }
 .score { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
@@ -176,11 +181,11 @@ a { color: inherit; }
 .pv-inner { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 14px; }
 .cover { position: relative; flex: none; height: 46%; min-height: 150px; border-radius: 11px; overflow: hidden;
   box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 2px 6px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.5); }
-.cover svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cover > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cover .chip { position: absolute; left: 12px; top: 12px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 10px; border-radius: 11px; font-size: 11px; font-weight: 800;
   letter-spacing: .08em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.5);
-  background: linear-gradient(rgba(255,255,255,.45), rgba(255,255,255,.1) 50%, rgba(0,0,0,.12) 51%, rgba(255,255,255,.12)), var(--c2);
+  background: linear-gradient(rgba(255,255,255,.3), rgba(255,255,255,.04) 50%, rgba(0,0,0,.14) 51%, rgba(255,255,255,.06)), color-mix(in srgb, var(--c2) 85%, var(--c3));
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.45), 0 1px 3px rgba(0,0,0,.4); }
 .pv-text { flex: 1; min-height: 0; padding: 16px 8px 0; display: flex; flex-direction: column; }
 .pv-title { margin: 0; font-size: 25px; line-height: 1.16; font-weight: 700; letter-spacing: -.02em; color: #15191c; text-shadow: 0 1px 0 #fff; }
@@ -191,14 +196,14 @@ a { color: inherit; }
 .pv-actions { margin-top: auto; padding: 12px 0 2px; display: flex; gap: 10px; align-items: center; }
 .btn { display: inline-flex; align-items: center; gap: 9px; height: 38px; padding: 0 18px 0 8px; border-radius: 19px; font-size: 14px; font-weight: 700;
   text-decoration: none; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.45);
-  background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.12) 50%, rgba(0,0,0,.08) 51%, rgba(255,255,255,.25)), linear-gradient(var(--c1), var(--c2));
+  background: linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,.06) 50%, rgba(0,0,0,.1) 51%, rgba(255,255,255,.1)), linear-gradient(var(--c2), color-mix(in srgb, var(--c2) 70%, var(--c3)));
   box-shadow: 0 0 0 1px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.8), 0 3px 8px rgba(0,0,0,.25); }
 .btn:hover { filter: brightness(1.08); }
 .btn.ghost { color: var(--ink); text-shadow: 0 1px 0 #fff; background: linear-gradient(#fff, #e9edf0 50%, #dce2e7 51%, #f3f5f7); padding: 0 16px; }
 .btn .g { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
   background: radial-gradient(circle at 40% 30%, #fff, #d5dbe0 50%, #8c96a0); box-shadow: inset 0 0 0 1px rgba(0,0,0,.25), 0 1px 1px rgba(0,0,0,.3); }
 .btn .g svg { width: 12px; height: 12px; fill: #3a4249; }
-.pv-hint { margin-left: auto; font-size: 12px; font-weight: 600; color: #7a848b; }
+.pv-hint { margin-left: auto; font-size: 12px; font-weight: 600; color: #566067; }
 
 /* ---------- bottom hints ---------- */
 .hints { position: fixed; left: 0; right: 0; bottom: 0; height: var(--bot); display: flex; align-items: center; gap: 22px;
@@ -248,6 +253,7 @@ body.pad .padchip { display: flex; }
 .toast .tk { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--glow); text-shadow: 0 0 8px color-mix(in srgb, var(--glow) 60%, transparent), 0 1px 1px #000; }
 .toast .tt { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px #000; }
 .toast .tx { min-width: 0; flex: 1; }
+.toast .tk, .toast .tt { display: block; }
 
 /* ---------- guide overlay ---------- */
 .guide { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; }
@@ -276,8 +282,9 @@ body.pad .padchip { display: flex; }
   box-shadow: 0 0 0 1px rgba(255,255,255,.9), 0 0 0 2px rgba(0,0,0,.3), 0 30px 90px rgba(0,0,0,.7), inset 0 2px 0 #fff; }
 .reader-head { position: relative; flex: none; padding: 20px 34px 22px; color: #fff; overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,.12) 40%, rgba(255,255,255,0) 60%),
-    radial-gradient(120% 140% at 20% 0%, var(--rc1), var(--rc2) 60%, var(--rc3));
+    linear-gradient(180deg, rgba(255,255,255,.45) 0, rgba(255,255,255,.08) 4%, rgba(255,255,255,0) 30%),
+    radial-gradient(40% 90% at 92% -30%, color-mix(in srgb, var(--rc1) 75%, transparent), transparent),
+    radial-gradient(130% 160% at 30% 0%, var(--rc2), color-mix(in srgb, var(--rc2) 65%, var(--rc3)));
   box-shadow: inset 0 -1px 0 rgba(0,0,0,.25), 0 2px 8px rgba(0,0,0,.2); }
 .reader-head .cover-bg { position: absolute; inset: 0; opacity: .35; mix-blend-mode: soft-light; }
 .reader-head .cover-bg svg { width: 100%; height: 100%; }
@@ -328,9 +335,9 @@ body.pad .padchip { display: flex; }
   .presence b + span { display: none; }
   .tabs { position: fixed; left: 0; right: 0; top: 50px; height: 46px; z-index: 50; display: flex; gap: 6px; padding: 4px 12px 8px; }
   .tabs button { flex: 1; min-width: 0; height: 34px; border-radius: 10px; font-size: 13px; font-weight: 700; letter-spacing: -.01em; text-transform: lowercase;
-    background: linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.08) 50%, rgba(0,0,0,.12) 51%, rgba(255,255,255,.1)), linear-gradient(var(--c1), var(--c2));
+    background: linear-gradient(rgba(255,255,255,.3), rgba(255,255,255,.05) 50%, rgba(0,0,0,.12) 51%, rgba(255,255,255,.06)), linear-gradient(var(--c2), color-mix(in srgb, var(--c2) 70%, var(--c3)));
     box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 0 0 1px rgba(255,255,255,.25), 0 2px 4px rgba(0,0,0,.45);
-    text-shadow: 0 1px 2px rgba(0,0,0,.55); opacity: .62; transform: scale(.94); transition: opacity .25s, transform .3s var(--spring); }
+    text-shadow: 0 1px 2px rgba(0,0,0,.55); opacity: .88; transition: opacity .25s, transform .3s var(--spring); }
   .tabs button[aria-selected="true"] { opacity: 1; transform: scale(1); box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 0 0 2px rgba(255,255,255,.9), 0 0 14px var(--glow2), 0 2px 4px rgba(0,0,0,.45); }
   .blade { border-radius: 18px 0 0 18px; -webkit-box-reflect: none; }
   .blade-tab span, .blade-tab::after { display: none; }
@@ -363,38 +370,136 @@ body.pad .padchip { display: flex; }
   .item, .tabs button, .count .bar i { transition: none; }
   body { transition: none; }
 }
+
+/* ================= accessibility layer ================= */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip { position: fixed; left: 12px; top: -80px; z-index: 300; padding: 12px 20px; border-radius: 22px; font-size: 15px; font-weight: 700; color: #111; text-decoration: none;
+  background: linear-gradient(#fff, #dfe4e8); box-shadow: 0 0 0 2px #000, 0 6px 16px rgba(0,0,0,.6); }
+.skip:focus { top: 8px; }
+/* Focus: a black / white / black ring, legible on saturated glass, brushed silver and the dark chrome alike. */
+:focus-visible,
+.items:focus-visible .item[aria-selected="true"],
+.glist:focus-visible .item[aria-selected="true"] { outline: 3px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 2px #000, 0 0 0 7px #000; }
+.items:focus-visible, .glist:focus-visible, #stage:focus-visible { outline: none; box-shadow: none; }
+.items { padding: 10px 11px 10px 10px; margin: -10px -11px -10px -10px; }
+.glist { padding: 8px; margin: -8px; }
+/* touch targets >= 44px */
+.item { height: auto; min-height: 44px; }
+.btn { height: 42px; position: relative; white-space: nowrap; }
+@media (max-width: 1060px) { .pv-hint { display: none; } }
+.btn::after { content: ''; position: absolute; inset: -2px -1px; }
+.sound, .r-back, .gclose { position: relative; }
+.sound::after, .r-back::after, .gclose::after { content: ''; position: absolute; inset: -9px -6px; }
+.sound .state { margin-left: -3px; opacity: .85; }
+.sound[aria-checked="true"] { background: linear-gradient(#ffffff70, #ffffff30 50%, #ffffff10 51%, #ffffff30); }
+.sound[aria-checked="true"] .waves { opacity: 1; }
+.sound[aria-checked="true"] .mute { opacity: 0; }
+.gclose { display: inline-flex; align-items: center; gap: 8px; min-height: 30px; font-size: 13px; font-weight: 700; }
+.gclose .key { display: inline-grid; }
+/* toast lives in the hint bar, right of the guide orb: it never covers a control */
+#toasts { left: calc(50% + 50px); bottom: 7px; width: min(420px, calc(50% - 170px)); transform: none; }
+.toast { height: 64px; }
+/* desktop: the section tabs are a real tablist, shown when keyboard focus enters it */
+@media (min-width: 761px) {
+  .tabs { position: fixed; top: 6px; left: 50%; transform: translateX(-50%); z-index: 60; display: flex; gap: 6px; padding: 5px; border-radius: 16px;
+    background: rgba(0,0,0,.72); box-shadow: 0 0 0 1px rgba(255,255,255,.25), 0 8px 24px rgba(0,0,0,.6); opacity: 0; pointer-events: none; }
+  .tabs:focus-within { opacity: 1; pointer-events: auto; }
+  .tabs button { height: 32px; padding: 0 14px; border-radius: 11px; font-size: 13px; font-weight: 700; text-transform: lowercase; text-shadow: 0 1px 2px rgba(0,0,0,.55);
+    background: linear-gradient(rgba(255,255,255,.3), rgba(255,255,255,.05) 50%, rgba(0,0,0,.12) 51%, rgba(255,255,255,.06)), linear-gradient(var(--c2), color-mix(in srgb, var(--c2) 70%, var(--c3))); }
+  .tabs button[aria-selected="true"] { box-shadow: inset 0 0 0 2px #fff; }
+}
+@media (max-width: 760px) {
+  :root { --top: 108px; }
+  .tabs { height: 58px; padding: 4px 10px 10px; gap: 5px; }
+  .tabs button { height: 44px; }
+  .hints { justify-content: space-between; }
+  .kb-hint { display: none; }
+  #toasts { left: 10px; bottom: 5px; width: calc(100vw - 150px); }
+  .toast { height: 54px; border-radius: 27px; padding: 0 14px 0 6px; gap: 9px; }
+  .toast .orb { width: 40px; height: 40px; }
+  .toast .tt { font-size: 14px; }
+}
+/* short viewports, including 200% zoom on a laptop */
+@media (max-height: 540px) {
+  :root { --top: 40px; --bot: 54px; }
+  .topbar { height: 40px; }
+  .gcard, .tip, .bs { display: none; }
+  .bh { height: 44px; } .bt { font-size: 30px; padding-bottom: 4px; } .bh .bcount { margin-bottom: 6px; }
+  .blade-body { top: 8px; bottom: 10px; }
+  .cols { padding-top: 6px; }
+  .orb { width: 40px; height: 40px; } .orb-label { display: none; }
+  .hints { gap: 14px; font-size: 12px; }
+  .cover { height: 38%; min-height: 80px; }
+  .pv-ex { display: none; }
+}
+@media (max-height: 540px) and (max-width: 760px) {
+  :root { --top: 96px; }
+  .tabs { top: 40px; }
+}
+/* in-app motion toggle mirrors prefers-reduced-motion */
+.rm .orb, .rm .item[aria-selected="true"] { animation: none; }
+.rm .item, .rm .tabs button, .rm .count .bar i { transition: none; }
+html.rm body { transition: none; }
+/* ---------- no-JS / failed-boot fallback: a plain, readable index ---------- */
+#fallback { display: none; }
+html:not(.js), html:not(.js) body { overflow: auto; height: auto; user-select: text; -webkit-user-select: text; }
+html:not(.js) #fallback { display: block; max-width: 780px; margin: 0 auto; padding: 28px 16px 64px; }
+html:not(.js) .topbar, html:not(.js) .tabsnav, html:not(.js) #stage, html:not(.js) .hints, html:not(.js) #bg, html:not(.js) .scan,
+html:not(.js) #toasts, html:not(.js) .skip, html:not(.js) #live { display: none; }
+#fallback h1 { margin: 0 0 6px; font-size: 40px; letter-spacing: -.03em; text-shadow: 0 2px 4px rgba(0,0,0,.4); }
+#fallback .lede { margin: 0 0 22px; font-size: 16px; line-height: 1.5; font-weight: 600; }
+#fallback .lede a { color: #fff; }
+#fallback section { margin: 0 0 18px; padding: 16px 20px 10px; border-radius: 16px; background: rgba(0,0,0,.62);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 0 0 1px rgba(255,255,255,.12), 0 10px 30px rgba(0,0,0,.4); }
+#fallback h2 { margin: 0 0 8px; font-size: 22px; text-transform: lowercase; letter-spacing: -.02em; }
+#fallback ul { list-style: none; margin: 0; padding: 0; }
+#fallback li { display: flex; gap: 12px; justify-content: space-between; align-items: baseline; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.14); }
+#fallback li:first-child { border-top: 0; }
+#fallback li a { color: #fff; font-weight: 600; font-size: 16px; }
+#fallback li span { flex: none; font-size: 13px; color: #d5dce2; }
+#fallback li p { margin: 2px 0 0; font-size: 14px; color: #d5dce2; }
 </style>
 </head>
 <body>
+<a class="skip" href="#stage" id="skip">Skip to content</a>
+<!--FALLBACK--><main id="fallback">
+<h1>Max Leiter</h1>
+<p class="lede">Software engineer at Vercel working on v0 and the AI SDK. Writes about the web, Linux, tooling and AI. <a href="https://github.com/maxleiter">GitHub</a> · <a href="https://twitter.com/maxleiter">X</a> · <a href="https://maxleiter.com">maxleiter.com</a></p>
+<section aria-labelledby="fb-blog"><h2 id="fb-blog">Blog</h2><ul><li><div><a href="https://maxleiter.com/blog/embedding-emoji-search">You don't need Jev for good emoji search</a><p>or: semantic emoji search with embeddings</p></div><span>Sep 26, 2026</span></li><li><div><a href="https://maxleiter.com/blog/thank-u-next">thank u, next</a><p>Replacing Next.js with a vibe-coded &quot;framework</p></div><span>Sept 1, 2026</span></li><li><div><a href="https://maxleiter.com/blog/xios">Running Wayland, X11, GNOME, and KDE natively on an iPad</a><p>X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition</p></div><span>Jul 28, 2026</span></li><li><div><a href="https://maxleiter.com/blog/weights">They're Made Out of Weights</a><p>with apologies to Terry Bisson</p></div><span>Jun 3, 2026</span></li><li><div><a href="https://maxleiter.com/blog/sandcastle">Sandcastle: A web-based Linux desktop environment</a></div><span>Feb 11, 2026</span></li><li><div><a href="https://maxleiter.com/blog/introducing-HFSViewer">Introducing HFSViewer</a><p>View and modify HFS partitions on modern macOS versions</p></div><span>Jan 2, 2026</span></li><li><div><a href="https://maxleiter.com/blog/the-new-maxleiter-com">The new maxleiter.com</a><p>iframes, view transitions, progressive enhancement, and React Server Components</p></div><span>Nov 12, 2025</span></li><li><div><a href="https://maxleiter.com/blog/rewrite-your-prompts">You should be rewriting your prompts</a><p>We talk about overfitting models but never overfitting prompts to models</p></div><span>Sept 14, 2025</span></li><li><div><a href="https://maxleiter.com/blog/seeing-the-future">I have seen the future through AR glasses</a><p>My experience with the XReal One Pros</p></div><span>Sept 7, 2025</span></li><li><div><a href="https://maxleiter.com/blog/formatting">Formatting code should be unnecessary</a><p>and we knew this back in the 80s</p></div><span>Sep 6, 2025</span></li><li><div><a href="https://maxleiter.com/blog/vibecoding-minecraft-mods">Vibe-coding Minecraft mods</a><p>and the lessons learned</p></div><span>Jun 21, 2025</span></li><li><div><a href="https://maxleiter.com/blog/sluggified-urls">Implementing Notion style URLs</a><p>Create /some-title-here-{id} URLs for recognizable links in Next.js</p></div><span>Jun 19, 2025</span></li><li><div><a href="https://maxleiter.com/blog/ship-every-day">Ship something every day</a></div><span>Jun 10, 2024</span></li><li><div><a href="https://maxleiter.com/blog/mobile-browsers-resizing-font">Why your website's fonts might be larger than intended</a><p>A well-meaning mobile browser feature can be problematic</p></div><span>Jun 9, 2023</span></li><li><div><a href="https://maxleiter.com/blog/nintype">Nintype is still the best iOS keyboard</a></div><span>May 22, 2023</span></li><li><div><a href="https://maxleiter.com/blog/build-a-blog-with-nextjs-13">Building a blog with Next.js 15 and React Server Components</a><p>Use MDX, RSC, and Bright to build a blog with Next.js 15.</p></div><span>Apr 16, 2023</span></li><li><div><a href="https://maxleiter.com/blog/node-has-tooling-problems">The Node ecosystem (still) has tooling problems</a><p>It shouldn't take this much work to publish a small library</p></div><span>July 30, 2022</span></li><li><div><a href="https://maxleiter.com/blog/supabase-next-analytics">Live updating page views with Supabase and Next.js</a><p>A step-by-step guide to page views and server analytics</p></div><span>May 15, 2022</span></li><li><div><a href="https://maxleiter.com/blog/easy-site-improvements">Easy ways to improve your websites accessibility and performance</a><p>A list of simple tips for developing a more accessible and user-friendly web.</p></div><span>Apr 23, 2022</span></li><li><div><a href="https://maxleiter.com/blog/hacker-sites">How hackers* run their sites</a><p>An analysis based on 700 personal websites</p></div><span>Apr 7, 2022</span></li><li><div><a href="https://maxleiter.com/blog/introducing-drift">Introducing Drift</a><p>A self-hostable alternative to GitHub Gist and Pastebin</p></div><span>Mar 26, 2022</span></li><li><div><a href="https://maxleiter.com/blog/contributing-to-oss">How to start contributing to open-source projects</a><p>A small guide to finding projects and contributing changes</p></div><span>Jan 25, 2022</span></li><li><div><a href="https://maxleiter.com/blog/pin-dependencies">Pin your npm/yarn dependencies</a><p>A guide on how to pin your dependencies and why you may want to</p></div><span>Jan 9, 2022</span></li><li><div><a href="https://maxleiter.com/blog/framework">Impressions of the Framework Laptop</a><p>My thoughts on the Framework Laptop's hardware</p></div><span>Nov 3, 2021</span></li><li><div><a href="https://maxleiter.com/blog/MSHW0184">Adding ambient light support to Linux and GNOME</a><p>A quick dive into Linux kernel drivers</p></div><span>Dec 15, 2020</span></li><li><div><a href="https://maxleiter.com/blog/X11">X11 on iOS</a><p>A guide on how to compile the X Window System for iOS</p></div><span>Dec 15, 2019</span></li></ul></section>
+<section aria-labelledby="fb-notes"><h2 id="fb-notes">Notes</h2><ul><li><div><a href="https://maxleiter.com/notes/fish-directory-colors">Per-directory terminal colors in fish shell</a></div><span>Apr 5, 2026</span></li><li><div><a href="https://maxleiter.com/notes/git-checkout-script">Never think about branch names again</a><p>a bash script for generating branch names</p></div><span>Aug 19, 2024</span></li><li><div><a href="https://maxleiter.com/notes/updating-jsonb-drizzle">Updating JSONB fields with Drizzle</a><p>hint: just use `sql` and COALESCE.</p></div><span>July 11, 2024</span></li><li><div><a href="https://maxleiter.com/notes/vscode-default-dir">Set your default directory in VS Code's open dialog</a></div><span>Jun 6, 2024</span></li><li><div><a href="https://maxleiter.com/notes/gemini-script">gemini.sh script</a><p>A script for concatenating files in a directory for copying to an LLM</p></div><span>Apr 14, 2024</span></li><li><div><a href="https://maxleiter.com/notes/slack-message-fetch">Sending a Slack message with fetch</a></div><span>Mar 30, 2024</span></li><li><div><a href="https://maxleiter.com/notes/swr-state">SWR for more than fetching</a><p>SWR for state management</p></div><span>Mar 30, 2024</span></li><li><div><a href="https://maxleiter.com/notes/wasm-edge-and-node">Loading wasm files on Vercel Edge and Node.js runtimes</a></div><span>Mar 30, 2024</span></li></ul></section>
+<section aria-labelledby="fb-projects"><h2 id="fb-projects">Projects</h2><ul><li><div><a href="https://maxleiter.com/blog/X11">X11 on iOS</a><p>Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.</p></div></li><li><div><a href="https://github.com/maxleiter/drift">Drift</a><p>A self-hostable and open-source alternative to GitHub Gist and Pastebin.</p></div></li><li><div><a href="https://github.com/thelounge/thelounge">The Lounge</a><p>Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.</p></div></li><li><div><a href="https://github.com/maxleiter/sortablejs-vue3/">SortableJS-vue3</a><p>A TypeScript wrapper for SortableJS built for Vue 3.</p></div></li><li><div><a href="https://github.com/knightos/knightos">KnightOS</a><p>Open-source unix-like operating system for z80-based calculators written entirely in z80 asm. I wrote a significant portion of the libc and contribued to system libraries.</p></div></li><li><div><a href="https://maxleiter.com/blog/MSHW0184">MSHW0184 driver for Linux kernel</a><p>I finally found an excuse to contribute to the Linux kernel</p></div></li><li><div><a href="https://github.com/maxleiter/jsontree">jsonTree</a><p>My first open-source project</p></div></li><li><div><a href="https://easyarty.com">easyarty.com</a><p>A tiny tool I made for a video game I like but it now gets 250,000+ visitors a year</p></div></li><li><div><a href="https://v0.app">v0</a><p>I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.</p></div></li><li><div><a href="https://github.com/vercel/ai">AI SDK</a><p>I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK.</p></div></li><li><div><a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362">Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening</a><p>I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimate vertical cup to disk ratios from retinal images.</p></div></li></ul></section>
+<section aria-labelledby="fb-work"><h2 id="fb-work">Work on the Vercel blog</h2><ul><li><div><a href="https://vercel.com/blog/how-we-made-v0-an-effective-coding-agent">How we made v0 an effective coding agent</a><p>Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.</p></div><span>Jan 7, 2026</span></li><li><div><a href="https://vercel.com/blog/v0-composite-model-family">Introducing the v0 composite model family</a><p>Introducing the v0 composite model family.</p></div><span>Jun 1, 2025</span></li><li><div><a href="https://vercel.com/blog/ai-sdk-3-generative-ui">Introducing AI SDK 3.0 with Generative UI support</a><p>Stream React Components from LLMs to deliver richer user experiences.</p></div><span>Mar 1, 2024</span></li><li><div><a href="https://vercel.com/blog/introducing-the-vercel-ai-sdk">Introducing the Vercel AI SDK</a><p>An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.</p></div><span>Jun 15, 2023</span></li><li><div><a href="https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site">Improving the accessibility of our Next.js site</a><p>We've made some improvements to the accessibility of our Next.js site. Here's how we did it.</p></div><span>Sep 30, 2022</span></li><li><div><a href="https://vercel.com/blog/new-edge-dev-infrastructure">New edge dev infrastructure</a><p>New edge dev infrastructure.</p></div><span>Jul 21, 2020</span></li></ul></section>
+</main><!--/FALLBACK-->
 <canvas id="bg" aria-hidden="true"></canvas>
 <div class="scan" aria-hidden="true"></div>
 
 <header class="topbar">
-  <div class="presence"><i></i><b>MaxLeiter</b><span>&nbsp;· online · maxleiter.com</span></div>
+  <div class="presence"><i aria-hidden="true"></i><b>MaxLeiter</b><span>&nbsp;· online · maxleiter.com</span></div>
   <div class="spacer"></div>
-  <div class="clock" id="clock">--:--</div>
-  <button class="sound" id="sound" aria-pressed="false" title="Toggle sound (M)">
+  <div class="clock" id="clock" aria-hidden="true">--:--</div>
+  <button class="sound" id="sound" role="switch" aria-checked="false" title="Interface sound (M)">
     <svg viewBox="0 0 16 16" fill="#fff" aria-hidden="true"><path d="M2 6h3l4-3v10L5 10H2z"/><path class="waves" d="M11 5.2a4 4 0 0 1 0 5.6l-.8-.8a2.9 2.9 0 0 0 0-4zM12.8 3.4a6.5 6.5 0 0 1 0 9.2l-.8-.8a5.4 5.4 0 0 0 0-7.6z"/><path class="mute" d="M11 5.5l.7-.7 1.6 1.6 1.6-1.6.7.7-1.6 1.6 1.6 1.6-.7.7-1.6-1.6-1.6 1.6-.7-.7 1.6-1.6z"/></svg>
-    <span id="soundLabel">Sound off</span>
+    <span>Sound</span><span class="state" id="soundLabel" aria-hidden="true">off</span>
   </button>
 </header>
 
-<nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
+<nav class="tabsnav" id="tabsnav" aria-label="Sections"><div class="tabs" id="tabs" role="tablist" aria-label="Sections"></div></nav>
 
-<main id="stage" aria-label="Dashboard"></main>
+<main id="stage" tabindex="-1"><h1 class="sr-only" id="pageH1">Max Leiter</h1></main>
+<div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
 
-<footer class="hints">
-  <div class="hint"><span class="key kb-only"><svg viewBox="0 0 16 16"><path d="M13 3v6H5.4l2.3-2.3-.9-.9L3 9.6l3.8 3.8.9-.9L5.4 10.2H14V3z"/></svg></span><span class="key pad-only" id="padS"></span> Select</div>
-  <div class="hint"><span class="key kb-only">esc</span><span class="key pad-only" id="padE"></span> Back</div>
-  <div class="hint"><span class="key kb-only"><svg viewBox="0 0 16 16"><path d="M6 3 1 8l5 5zM10 3l5 5-5 5z"/></svg></span><span class="key pad-only">LB RB</span> Blades</div>
+<footer class="hints" aria-label="Controls">
+  <div class="hint"><span class="key kb-only"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M13 3v6H5.4l2.3-2.3-.9-.9L3 9.6l3.8 3.8.9-.9L5.4 10.2H14V3z"/></svg></span><span class="key pad-only" id="padS"></span> Select</div>
+  <div class="hint"><span class="key kb-only">Esc</span><span class="key pad-only" id="padE"></span> Back</div>
+  <div class="hint"><span class="key kb-only"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M6 3 1 8l5 5zM10 3l5 5-5 5z"/></svg></span><span class="key pad-only">LB RB</span> Blades</div>
   <div class="spacer"></div>
-  <div class="hint padchip"><i></i><span id="padName">Controller connected</span></div>
+  <div class="hint padchip"><i aria-hidden="true"></i><span id="padName">Controller connected</span></div>
   <div class="hint"><span class="key">M</span> Sound</div>
   <div class="hint m">Swipe blades · tap to open</div>
-  <div class="orb-wrap"><button class="orb" id="orbBtn" aria-label="Open guide (G)" title="Guide (G)"></button><span class="orb-label">guide · G</span></div>
+  <div class="orb-wrap"><button class="orb" id="orbBtn" aria-label="Guide" aria-haspopup="dialog" aria-expanded="false" aria-keyshortcuts="G" title="Guide (G)"></button><span class="orb-label" aria-hidden="true">guide<span class="kb-hint"> · G</span></span></div>
 </footer>
 
-<div id="toasts" aria-live="polite"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
 
 <div class="guide" id="guide" hidden role="dialog" aria-modal="true" aria-label="Guide">
   <div class="guide-backdrop" data-close></div>
@@ -403,7 +508,7 @@ body.pad .padchip { display: flex; }
     <div class="guide-title"><h2>guide</h2><span id="guideClock"></span></div>
     <div id="guideCard"></div>
     <div class="glist" id="glist" role="listbox" aria-label="Guide actions"></div>
-    <div class="guide-foot"><span><span class="key" style="display:inline-grid">G</span> Close</span><span>Arrows to move · Enter to choose</span></div>
+    <div class="guide-foot"><button class="gclose" id="gClose"><span class="key" aria-hidden="true">G</span> Close guide</button><span>Arrows to move · Enter to choose</span></div>
   </div>
 </div>
 
@@ -412,15 +517,15 @@ body.pad .padchip { display: flex; }
   <article class="reader-glass" id="readerGlass">
     <header class="reader-head">
       <div class="cover-bg" id="rCover" aria-hidden="true"></div>
-      <div class="r-top"><button class="r-back" id="rBack"><span class="key">esc</span>Back</button><span class="r-kicker" id="rKicker"></span></div>
+      <div class="r-top"><button class="r-back" id="rBack" aria-keyshortcuts="Escape"><span class="key" aria-hidden="true">Esc</span>Back</button><span class="r-kicker" id="rKicker"></span></div>
       <h1 id="rTitle"></h1>
       <p class="r-desc" id="rDesc"></p>
     </header>
-    <div class="reader-scroll" id="rScroll">
+    <div class="reader-scroll" id="rScroll" tabindex="0" aria-label="Article text">
       <div class="prose" id="rProse"></div>
-      <a class="btn r-cta" id="rCta" target="_blank" rel="noopener"><span class="g"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5z"/></svg></span>Continue reading on maxleiter.com</a>
+      <a class="btn r-cta" id="rCta" target="_blank" rel="noopener"><span class="g" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5z"/></svg></span><span>Continue reading on maxleiter.com</span></a>
     </div>
-    <footer class="reader-foot"><span><span class="key" style="display:inline-grid">esc</span> Back</span><span><span class="key" style="display:inline-grid">&uarr;&darr;</span> Scroll</span><span class="grow2"></span><span id="rUrl"></span></footer>
+    <footer class="reader-foot" aria-hidden="true"><span><span class="key" style="display:inline-grid">Esc</span> Back</span><span><span class="key" style="display:inline-grid">&uarr;&darr;</span> Scroll</span><span class="grow2"></span><span id="rUrl"></span></footer>
   </article>
 </div>
 
@@ -496,8 +601,7 @@ function createRenderer(ctx) {
 </script>
 
 <script>
-(() => {
-'use strict';
+(() => { 'use strict'; try {
 const $ = (s, r = document) => r.querySelector(s);
 const DATA = JSON.parse($('#content').textContent);
 const SITE = 'https://maxleiter.com';
@@ -561,7 +665,7 @@ const ICON = {
   home: '<path d="M8 1.5 15 8h-2v6.5H9.5v-4h-3v4H3V8H1z"/>',
   close: '<path d="M3.5 2.4 8 6.9l4.5-4.5 1.1 1.1L9.1 8l4.5 4.5-1.1 1.1L8 9.1l-4.5 4.5-1.1-1.1L6.9 8 2.4 3.5z"/>',
 };
-const icon = k => `<span class="ico"><svg viewBox="0 0 16 16" aria-hidden="true">${ICON[k] || ICON.post}</svg></span>`;
+const icon = k => `<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" aria-hidden="true">${ICON[k] || ICON.post}</svg></span>`;
 
 /* ================= procedural art ================= */
 function avatarSVG(id = 'av') {
@@ -630,11 +734,11 @@ const system = [
 const score = posts.length * 50 + notes.length * 25 + projects.length * 20 + work.length * 40;
 
 const BLADES = [
-  { id: 'projects', sub: 'things I made, and things I helped make', c: ['#ffc04d', '#ef7400', '#6e2800'], glow: '#ffbe55', rgb: [255, 140, 30], items: projects, list: 'Projects' },
-  { id: 'blog', sub: 'writing about the web, Linux, tooling and AI', c: ['#b0ea52', '#4c9c14', '#123a03'], glow: '#c8ff6e', rgb: [140, 230, 60], items: posts, list: 'Posts', card: true },
-  { id: 'notes', sub: 'short fixes, scripts and snippets', c: ['#7dd2ff', '#1b7fd8', '#052a60'], glow: '#92dcff', rgb: [60, 160, 255], items: notes, list: 'Notes', tip: ['Tip', 'Notes are the short, practical stuff: scripts and fixes worth finding again. Enter opens one in the reader.'] },
-  { id: 'work', sub: 'on the Vercel blog: v0, the AI SDK and more', c: ['#cf9cff', '#7a3cc8', '#240a52'], glow: '#dcb2ff', rgb: [170, 100, 255], items: work, list: 'Articles', tip: ['On the AI team at Vercel.', 'Max co-created v0 and worked on the first three versions of the AI SDK. These are his posts on the Vercel blog.'] },
-  { id: 'system', sub: 'about, contact and settings', c: ['#e3e8ec', '#8f99a3', '#2a3036'], glow: '#ffffff', rgb: [190, 205, 220], items: system, list: 'System', tip: ['Guide.', 'Press G anywhere, or the orb below. Arrows, Enter and Esc work everywhere, and so does a gamepad.'] },
+  { id: 'projects', sub: 'things I made, and things I helped make', c: ['#ffb53f', '#ad4a00', '#4d1900'], glow: '#ffbe55', rgb: [255, 140, 30], items: projects, list: 'Projects' },
+  { id: 'blog', sub: 'writing about the web, Linux, tooling and AI', c: ['#a6e050', '#347c0d', '#0d3202'], glow: '#c8ff6e', rgb: [140, 230, 60], items: posts, list: 'Posts', card: true },
+  { id: 'notes', sub: 'short fixes, scripts and snippets', c: ['#74ccff', '#1565b4', '#04224d'], glow: '#92dcff', rgb: [60, 160, 255], items: notes, list: 'Notes', tip: ['Tip', 'Notes are the short, practical stuff: scripts and fixes worth finding again. Enter opens one in the reader.'] },
+  { id: 'work', sub: 'on the Vercel blog: v0, the AI SDK and more', c: ['#cf9cff', '#7440bd', '#200a4b'], glow: '#dcb2ff', rgb: [170, 100, 255], items: work, list: 'Articles', tip: ['On the AI team at Vercel.', 'Max co-created v0 and worked on the first three versions of the AI SDK. These are his posts on the Vercel blog.'] },
+  { id: 'system', sub: 'about, contact and settings', c: ['#d3d9df', '#5e6974', '#1b2025'], glow: '#ffffff', rgb: [190, 205, 220], items: system, list: 'System', tip: ['Guide.', 'Press G anywhere, or the orb below. Arrows, Enter and Esc work everywhere, and so does a gamepad.'] },
 ];
 const N = BLADES.length;
 const state = { blade: 1, sel: BLADES.map(() => 0), overlay: null };
@@ -713,10 +817,10 @@ const blades = BLADES.map((b, i) => {
   const el = document.createElement('section');
   el.className = 'blade'; el.dataset.i = i;
   el.style.cssText = `--c1:${b.c[0]};--c2:${b.c[1]};--c3:${b.c[2]};--glow:${b.glow};z-index:${i + 1}`;
-  el.setAttribute('aria-roledescription', 'blade'); el.setAttribute('aria-label', b.id);
+  el.id = 'blade-' + b.id; el.setAttribute('role', 'tabpanel'); el.setAttribute('aria-labelledby', 'tab-' + b.id);
   const isSys = b.id === 'system';
   el.innerHTML = `<div class="blade-surface"></div><div class="blade-shade"></div>
-    <button class="blade-tab" tabindex="-1" aria-label="${b.id}"><span>${b.id}</span></button>
+    <button class="blade-tab" tabindex="-1" aria-hidden="true"><span>${b.id}</span></button>
     <div class="blade-body">
       <header class="bh"><h2 class="bt">${b.id}</h2><p class="bs">${esc(b.sub)}</p><span class="bcount">${b.items.length} ${isSys ? 'options' : b.list.toLowerCase()}</span></header>
       <div class="cols">
@@ -733,14 +837,14 @@ const blades = BLADES.map((b, i) => {
     </div>`;
   stage.appendChild(el);
   const tab = document.createElement('button');
-  tab.setAttribute('role', 'tab'); tab.textContent = b.id; tab.style.cssText = `--c1:${b.c[0]};--c2:${b.c[1]};--glow2:${b.glow}`;
+  tab.setAttribute('role', 'tab'); tab.id = 'tab-' + b.id; tab.setAttribute('aria-controls', 'blade-' + b.id); tab.tabIndex = -1; tab.textContent = b.id; tab.style.cssText = `--c1:${b.c[0]};--c2:${b.c[1]};--c3:${b.c[2]};--glow2:${b.glow}`;
   tab.onclick = () => goBlade(i); tabs.appendChild(tab);
   return { el, tab, body: $('.blade-body', el), shade: $('.blade-shade', el), list: $('.items', el), pv: $('.pv-inner', el), pvBox: $('.preview', el), count: $('.count .n', el), bar: $('.count .bar i', el) };
 });
 function gcardHTML(id) {
   return `<div class="gcard"><div class="avatar">${avatarSVG(id)}</div><div class="gmeta">
     <div class="gtag">MaxLeiter</div>
-    <div class="grow"><span class="k">Rep</span><span class="stars">${[1, 1, 1, 1, 1].map((v, i) => star(v, id + i)).join('')}</span></div>
+    <div class="grow"><span class="k">Rep</span><span class="stars" aria-hidden="true">${[1, 1, 1, 1, 1].map((v, i) => star(v, id + i)).join('')}</span><span class="sr-only">5 out of 5</span></div>
     <div class="grow"><span class="k">Score</span><span class="score">${score.toLocaleString('en-US')}</span></div>
     <div class="grow"><span class="k">Zone</span><span>Builder · v0 &amp; AI SDK</span></div></div></div>`;
 }
@@ -836,7 +940,7 @@ function activate(bi, j, fromEl) {
   if (it.kind === 'motion') { setMotion(!reduceMotion); return; }
 }
 function renderSound() {
-  const btn = $('#sound'); btn.setAttribute('aria-pressed', String(sfx.on)); $('#soundLabel').textContent = sfx.on ? 'Sound on' : 'Sound off';
+  const btn = $('#sound'); btn.setAttribute('aria-checked', String(sfx.on)); $('#soundLabel').textContent = sfx.on ? 'on' : 'off';
   system.find(x => x.kind === 'sound').sub = sfx.on ? 'On' : 'Off';
   refreshSystem();
 }
@@ -880,7 +984,6 @@ function layout() {
     B.shade.style.opacity = (d < 0 ? Math.min(1, -d) * .42 : t * .12).toFixed(3);
     const op = d < 0 ? clamp(1 + d * .9, 0, 1) : clamp(1 - d * 1.7, 0, 1);
     B.body.style.opacity = op.toFixed(3);
-    B.body.style.visibility = op < .01 ? 'hidden' : 'visible';
   }
 }
 let raf = 0, lastT = 0;
@@ -895,8 +998,10 @@ function tick(now) {
 function setActiveUI() {
   const bi = state.blade, b = BLADES[bi];
   blades.forEach((B, i) => {
-    const on = i === bi; B.el.classList.toggle('is-active', on); B.body.inert = !on; B.list.tabIndex = on ? 0 : -1; B.tab.setAttribute('aria-selected', String(on));
+    const on = i === bi; B.el.classList.toggle('is-active', on); B.body.inert = !on; B.list.tabIndex = on ? 0 : -1;
+    B.tab.setAttribute('aria-selected', String(on)); B.tab.tabIndex = on ? 0 : -1;
   });
+  if (state.overlay !== 'reader') document.title = `${b.id} · Max Leiter`;
   document.documentElement.style.setProperty('--glow', b.glow);
   document.body.style.setProperty('--bg-a', b.c[1]);
   document.body.style.setProperty('--bg-b', mixHex(b.c[2], '#000000', .55));
@@ -910,8 +1015,20 @@ function goBlade(i, opts = {}) {
   state.blade = i; spring.target = i;
   if (opts.v != null) spring.v = opts.v;
   setActiveUI(); kick();
-  if (!opts.silent) sfx.swish(dir);
+  if (reduceMotion && stage.animate) stage.animate([{ opacity: .35 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
+  if (!opts.silent) { sfx.swish(dir); announceBlade(); }
 }
+/* ---- screen-reader announcements for arrow / gamepad / swipe moves (debounced, polite) ---- */
+const live = $('#live'); let liveT = 0, liveFlip = false;
+function announce(msg) { clearTimeout(liveT); liveT = setTimeout(() => { liveFlip = !liveFlip; live.textContent = msg + (liveFlip ? '\u00a0' : ''); }, 260); }
+function itemLabel(bi) { const b = BLADES[bi], j = state.sel[bi], it = b.items[j]; return `${it.title}${it.sub ? ', ' + it.sub : ''}, ${j + 1} of ${b.items.length}`; }
+function announceBlade() { const b = BLADES[state.blade]; announce(`${b.id} section, ${b.items.length} ${b.id === 'system' ? 'options' : b.list.toLowerCase()}. ${itemLabel(state.blade)}`); }
+/* keyboard focus follows spatial navigation: the active tab keeps focus if it had it, otherwise the active list does */
+function syncFocus() {
+  const ae = document.activeElement, B = blades[state.blade];
+  if (ae && ae.getAttribute('role') === 'tab') { B.tab.focus(); return; }
+  if (!ae || ae === document.body || ae === stage || ae.closest('.blade') || ae.closest('#toasts')) B.list.focus({ preventScroll: true });
+}  // (setting the old blade inert drops its focus to <body> synchronously, which is why body counts as "in the blade")
 function mixHex(a, b, k) {
   const pa = a.match(/\w\w/g).map(h => parseInt(h, 16)), pb = b.match(/\w\w/g).map(h => parseInt(h, 16));
   return '#' + pa.map((v, i) => Math.round(v + (pb[i] - v) * k).toString(16).padStart(2, '0')).join('');
@@ -985,7 +1102,7 @@ stage.addEventListener('wheel', e => {
 }, { passive: false });
 
 /* ================= keyboard ================= */
-function moveItem(dy) { const bi = state.blade; select(bi, state.sel[bi] + dy); }
+function moveItem(dy) { const bi = state.blade, before = state.sel[bi]; select(bi, before + dy); if (state.sel[bi] !== before) announce(itemLabel(bi)); }
 document.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key;
@@ -993,25 +1110,49 @@ document.addEventListener('keydown', e => {
   if (k === 'm' || k === 'M') { e.preventDefault(); return sfx.toggle(); }
   if (state.overlay === 'reader') { if (k === 'Escape' || k === 'Backspace') { e.preventDefault(); closeReader(); } return; }
   if (state.overlay === 'guide') return guideKey(e);
-  const inLink = document.activeElement && document.activeElement.matches('a, .btn');
+  const ae = document.activeElement;
+  const native = ae && ae !== document.body && ae.matches('a, button, [role=switch]') && !ae.matches('.item');
+  const onTab = ae && ae.getAttribute('role') === 'tab';
   switch (k) {
-    case 'ArrowLeft': e.preventDefault(); goBlade(state.blade - 1); break;
-    case 'ArrowRight': e.preventDefault(); goBlade(state.blade + 1); break;
-    case 'ArrowUp': e.preventDefault(); moveItem(-1); break;
-    case 'ArrowDown': e.preventDefault(); moveItem(1); break;
-    case 'PageUp': e.preventDefault(); moveItem(-6); break;
-    case 'PageDown': e.preventDefault(); moveItem(6); break;
-    case 'Home': e.preventDefault(); select(state.blade, 0); break;
-    case 'End': e.preventDefault(); select(state.blade, 1e9); break;
-    case 'Enter': case ' ': if (inLink) return; e.preventDefault(); activate(state.blade, state.sel[state.blade], innerWidth <= 760 ? blades[state.blade].list.children[state.sel[state.blade]] : blades[state.blade].pvBox); break;
-    case 'Escape': case 'Backspace': if (state.blade !== 1) { e.preventDefault(); goBlade(1); sfx.back(); } break;
-    default: if (/^[1-5]$/.test(k)) goBlade(+k - 1);
+    case 'ArrowLeft': e.preventDefault(); goBlade(state.blade - 1); syncFocus(); break;
+    case 'ArrowRight': e.preventDefault(); goBlade(state.blade + 1); syncFocus(); break;
+    case 'ArrowUp': e.preventDefault(); moveItem(-1); if (!onTab) syncFocus(); break;
+    case 'ArrowDown': e.preventDefault(); moveItem(1); if (!onTab) syncFocus(); break;
+    case 'PageUp': e.preventDefault(); moveItem(-6); syncFocus(); break;
+    case 'PageDown': e.preventDefault(); moveItem(6); syncFocus(); break;
+    case 'Home': e.preventDefault(); select(state.blade, 0); announce(itemLabel(state.blade)); syncFocus(); break;
+    case 'End': e.preventDefault(); select(state.blade, 1e9); announce(itemLabel(state.blade)); syncFocus(); break;
+    case 'Enter': case ' ':
+      if (onTab) { e.preventDefault(); blades[state.blade].list.focus(); announce(itemLabel(state.blade)); return; }
+      if (native) return; e.preventDefault(); activate(state.blade, state.sel[state.blade], innerWidth <= 760 ? blades[state.blade].list.children[state.sel[state.blade]] : blades[state.blade].pvBox); break;
+    case 'Escape': case 'Backspace': if (state.blade !== 1) { e.preventDefault(); goBlade(1); sfx.back(); syncFocus(); } break;
+    default: if (/^[1-5]$/.test(k)) { goBlade(+k - 1); syncFocus(); }
   }
+});
+
+/* ================= modal plumbing: inert background, Tab trap, focus return ================= */
+const backdropRegions = () => [$('#skip'), $('.topbar'), $('#tabsnav'), stage, $('.hints'), $('#toasts')];
+function setBackgroundInert(on) { backdropRegions().forEach(el => { if (el) el.inert = on; }); }
+function trapTab(e, root) {
+  if (e.key !== 'Tab') return;
+  const f = [...root.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')].filter(el => el.getClientRects().length && !el.closest('[hidden]'));
+  if (!f.length) { e.preventDefault(); return; }
+  const first = f[0], last = f[f.length - 1], a = document.activeElement;
+  if (e.shiftKey && (a === first || !root.contains(a))) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && (a === last || !root.contains(a))) { e.preventDefault(); first.focus(); }
+}
+function restoreFocus(el) {
+  const target = el && el !== document.body && el.isConnected && !el.closest('[inert]') && el.getClientRects().length ? el : blades[state.blade].list;
+  target.focus({ preventScroll: true });
+}
+document.addEventListener('keydown', e => {
+  if (state.overlay === 'reader') trapTab(e, rGlass);
+  else if (state.overlay === 'guide') trapTab(e, gpanel);
 });
 
 /* ================= reader (View Transition into full-screen glass) ================= */
 const reader = $('#reader'), rGlass = $('#readerGlass');
-let readerFrom = null;
+let readerFrom = null, readerReturn = null;
 function withVT(fn) {
   if (document.startViewTransition && !reduceMotion) { try { return document.startViewTransition(fn); } catch {} }
   fn(); return null;
@@ -1031,23 +1172,26 @@ function openReader(bi, it, fromEl) {
   cta.href = url; cta.lastChild.textContent = it.excerpt ? 'Continue reading on maxleiter.com' : `Open ${hostOf(url)}`;
   $('#rUrl').textContent = url.replace(/^https:\/\//, '');
   if (readerFrom) readerFrom.style.viewTransitionName = 'glass';
-  state.overlay = 'reader';
+  readerReturn = document.activeElement;
+  state.overlay = 'reader'; setBackgroundInert(true); document.title = `${it.title} · Max Leiter`;
   withVT(() => {
     if (readerFrom) readerFrom.style.viewTransitionName = '';
     reader.hidden = false; rGlass.style.viewTransitionName = 'glass'; $('#rScroll').scrollTop = 0;
   });
+  if (reduceMotion && rGlass.animate) rGlass.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
   sfx.chime();
   setTimeout(() => $('#rBack').focus({ preventScroll: true }), 30);
 }
 function closeReader() {
   if (state.overlay !== 'reader') return;
-  state.overlay = null;
+  state.overlay = null; setBackgroundInert(false); setActiveUI();
   const vt = withVT(() => {
     reader.hidden = true; rGlass.style.viewTransitionName = '';
     if (readerFrom && readerFrom.offsetParent) readerFrom.style.viewTransitionName = 'glass';
   });
   const done = () => { if (readerFrom) readerFrom.style.viewTransitionName = ''; };
   if (vt) vt.finished.then(done, done); else done();
+  restoreFocus(readerReturn);
   sfx.back();
 }
 $('#rBack').onclick = closeReader;
@@ -1060,31 +1204,33 @@ document.addEventListener('keydown', e => { // arrow/page scrolling inside the r
 
 /* ================= guide overlay ================= */
 const guide = $('#guide'), gpanel = $('#guidePanel'), glist = $('#glist');
-let gActions = [], gSel = 0;
+let gActions = [], gSel = 0, guideReturn = null;
 const gSpring = new Spring(0, 260, 22);
 function buildGuide() {
   $('#guideCard').innerHTML = gcardHTML('gd');
   const latest = posts[0], rnd = notes[(Date.now() / 6e4 | 0) % notes.length];
   gActions = [
-    { t: 'Dashboard home', i: 'home', f: () => { closeGuide(true); goBlade(1); select(1, 0); } },
+    { t: 'Dashboard home', i: 'home', f: () => { closeGuide(true); goBlade(1); select(1, 0); blades[1].list.focus(); } },
     { t: 'Latest: ' + latest.title, i: 'post', f: () => { closeGuide(true); goBlade(1, { silent: true }); select(1, 0, { silent: true }); openReader(1, latest, null); } },
     { t: 'Random note', i: 'note', f: () => { closeGuide(true); openReader(2, rnd, null); } },
-    { t: 'Projects', i: 'project', f: () => { closeGuide(true); goBlade(0); } },
+    { t: 'Projects', i: 'project', f: () => { closeGuide(true); goBlade(0); blades[0].list.focus(); } },
     { t: 'GitHub', i: 'link', f: () => { window.open(s.github, '_blank', 'noopener'); } },
     { t: 'X', i: 'link', f: () => { window.open(s.x, '_blank', 'noopener'); } },
     { t: 'Sound: ' + (sfx.on ? 'On' : 'Off'), i: 'sound', f: () => sfx.toggle() },
     { t: 'Close guide', i: 'close', f: () => closeGuide() },
   ];
-  glist.innerHTML = gActions.map((a, j) => `<button class="item" role="option" tabindex="-1" data-g="${j}" aria-selected="${j === gSel}">${icon(a.i)}<span class="it">${esc(a.t)}</span></button>`).join('');
+  glist.tabIndex = 0; glist.setAttribute('aria-activedescendant', 'g-' + gSel);
+  glist.innerHTML = gActions.map((a, j) => `<button class="item" role="option" tabindex="-1" id="g-${j}" data-g="${j}" aria-selected="${j === gSel}">${icon(a.i)}<span class="it">${esc(a.t)}</span></button>`).join('');
 }
-function gSelect(j) { gSel = (j + gActions.length) % gActions.length; glist.querySelectorAll('.item').forEach((el, k) => el.setAttribute('aria-selected', String(k === gSel))); sfx.tick(); }
+function gSelect(j) { gSel = (j + gActions.length) % gActions.length; glist.querySelectorAll('.item').forEach((el, k) => el.setAttribute('aria-selected', String(k === gSel))); glist.setAttribute('aria-activedescendant', 'g-' + gSel); sfx.tick(); }
 function openGuide() {
-  if (state.overlay) return; state.overlay = 'guide'; gSel = 0; buildGuide();
+  if (state.overlay) return; guideReturn = document.activeElement; state.overlay = 'guide'; gSel = 0; buildGuide();
   $('#guideClock').textContent = clockText();
-  guide.hidden = false; gSpring.x = 0; gSpring.v = 0; gSpring.target = 1; animGuide(); sfx.guide();
+  guide.hidden = false; setBackgroundInert(true); $('#orbBtn').setAttribute('aria-expanded', 'true'); glist.focus({ preventScroll: true }); gSpring.x = 0; gSpring.v = 0; gSpring.target = 1; animGuide(); sfx.guide();
 }
 function closeGuide(quiet) {
   if (state.overlay !== 'guide') return; state.overlay = null; gSpring.target = 0; animGuide(() => (guide.hidden = true)); if (!quiet) sfx.back();
+  setBackgroundInert(false); $('#orbBtn').setAttribute('aria-expanded', 'false'); if (!quiet) restoreFocus(guideReturn);
 }
 let gRaf = 0;
 function animGuide(done) {
@@ -1103,6 +1249,7 @@ function animGuide(done) {
 function guideKey(e) {
   const cols = innerWidth <= 760 ? 1 : 2;
   const k = e.key;
+  if ((k === 'Enter' || k === ' ') && document.activeElement === $('#gClose')) return; // native button click
   if (k === 'Escape' || k === 'Backspace') { e.preventDefault(); closeGuide(); }
   else if (k === 'ArrowDown') { e.preventDefault(); gSelect(gSel + cols); }
   else if (k === 'ArrowUp') { e.preventDefault(); gSelect(gSel - cols); }
@@ -1113,6 +1260,8 @@ function guideKey(e) {
 glist.addEventListener('click', e => { const it = e.target.closest('[data-g]'); if (it) { gSel = +it.dataset.g; gActions[gSel].f(); } });
 glist.addEventListener('pointermove', e => { const it = e.target.closest('[data-g]'); if (it && +it.dataset.g !== gSel) gSelect(+it.dataset.g); });
 guide.addEventListener('click', e => { if (e.target.hasAttribute('data-close')) closeGuide(); });
+$('#gClose').onclick = () => closeGuide();
+$('#skip').addEventListener('click', e => { e.preventDefault(); blades[state.blade].list.focus(); });
 $('#orbBtn').onclick = () => (state.overlay === 'guide' ? closeGuide() : openGuide());
 $('#sound').onclick = () => sfx.toggle();
 
@@ -1120,7 +1269,7 @@ $('#sound').onclick = () => sfx.toggle();
 const toastBox = $('#toasts');
 function toast(kicker, title, onClick) {
   const el = document.createElement('button'); el.className = 'toast';
-  el.innerHTML = `<span class="orb" aria-hidden="true"></span><span class="tx"><div class="tk">${esc(kicker)}</div><div class="tt">${esc(title)}</div></span>`;
+  el.innerHTML = `<span class="orb" aria-hidden="true"></span><span class="tx"><span class="tk">${esc(kicker)}<span class="sr-only">:</span></span> <span class="tt">${esc(title)}</span></span>`;
   toastBox.appendChild(el);
   const sp = new Spring(0, 230, 20); sp.target = 1; let shown = 0, hideAfter = 5.2, last = performance.now(); // timed in simulated seconds, so a janky frame never cuts the toast short
   el.onclick = () => { if (onClick) onClick(); sp.target = 0; hideAfter = 0; };
@@ -1129,7 +1278,7 @@ function toast(kicker, title, onClick) {
     shown += dt; if (shown > hideAfter && sp.target === 1) sp.target = 0;
     if (reduceMotion) sp.snap(); else sp.advance(dt);
     el.style.transform = `translateY(${((1 - sp.x) * 120).toFixed(2)}%)`; el.style.opacity = clamp(sp.x * 2, 0, 1).toFixed(3);
-    if (sp.target === 0 && sp.x < .01) { el.remove(); return; }
+    if (sp.target === 0 && sp.x < .01) { const had = el.contains(document.activeElement); el.remove(); if (had && !state.overlay) blades[state.blade].list.focus(); return; }
     requestAnimationFrame(step);
   };
   requestAnimationFrame(step); sfx.toast();
@@ -1170,7 +1319,7 @@ function pollPad() {
 function synthKey(key) { document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true })); }
 
 /* ================= ambient background (OffscreenCanvas worker, main-thread fallback) ================= */
-const bg = (() => {
+const bg = (() => { try {
   const canvas = $('#bg'), src = $('#bgsrc').textContent; let api = null, worker = null, mainR = null, mraf = 0, mlast = 0, still = reduceMotion;
   const size = () => { const k = Math.min(devicePixelRatio || 1, 1.5) * .5; return [innerWidth * k, innerHeight * k]; };
   try {
@@ -1198,6 +1347,7 @@ const bg = (() => {
     canvas.dataset.mode = 'main';
   }
   return api;
+  } catch (e) { $('#bg').dataset.mode = 'none'; return { color() {}, resize() {}, still() {} }; }
 })();
 
 /* ================= clock, resize, boot ================= */
@@ -1216,7 +1366,8 @@ const params = new URLSearchParams(location.search);
 if (params.has('blade')) { const i = BLADES.findIndex(b => b.id === params.get('blade')); if (i >= 0) { state.blade = i; spring.target = i; spring.snap(); setActiveUI(); layout(); } }
 window.__mid = x => { spring.x = spring.target = x; spring.v = -2.5; layout(); }; // screenshot hook: freeze a mid-swing pose
 if (!params.has('notoast')) setTimeout(() => toast('New post', posts[0].title, () => { goBlade(1, { silent: true }); select(1, 0, { silent: true }); openReader(1, posts[0], blades[1].pvBox); }), 1600);
-})();
+document.documentElement.classList.add('booted');
+} catch (err) { console.error(err); document.documentElement.classList.remove('js'); } })();
 </script>
 </body>
 </html>

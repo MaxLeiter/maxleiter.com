@@ -8,6 +8,8 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
   const pad2 = (n) => String(n).padStart(2, '0')
   const DATA = JSON.parse(document.getElementById('content').textContent)
+  // some excerpts carry MDX-escaped backticks (\`); normalise before parsing
+  for (const x of [...DATA.posts, ...DATA.notes]) x.excerpt = x.excerpt.replace(/\\`/g, '`')
   const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 }
   const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
   const parseDate = (s) => { const m = String(s).match(/([A-Za-z]+)\.?\s+(\d+),\s*(\d{4})/); return m ? new Date(+m[3], MONTHS[m[1].slice(0, 3).toLowerCase()] ?? 0, +m[2]) : new Date(0) }
@@ -31,7 +33,7 @@
   })
   const missions = posts.slice().reverse()
   const notes = DATA.notes.map((n) => {
-    const text = n.excerpt.replace(/```[\s\S]*?(```|$)/g, (m) => m.replace(/```\w*/g, '').trim()).replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*_~#>]/g, '').replace(/`/g, '').replace(/[ \t]+\n/g, '\n').replace(/([^\n])\n(?!\n)/g, '$1 ').trim()
+    const text = n.excerpt.replace(/```[\s\S]*?(```|$)/g, (m) => m.replace(/```\w*/g, '').trim()).replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*_~#>]/g, '').replace(/`/g, '').replace(/[ \t]+\n/g, '\n').replace(/([^\n])\n(?!\n|\d+\.\s|[-*]\s)/g, '$1 ').replace(/\n{3,}/g, '\n\n').trim()
     const secs = Math.max(12, Math.round(words(text) / 2.6))
     return { ...n, d: parseDate(n.date), text, secs }
   })
@@ -139,9 +141,11 @@
   const app = document.getElementById('app')
   app.innerHTML = `
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="gAmber" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0c4"/><stop offset=".5" stop-color="#ffc46b"/><stop offset="1" stop-color="#b97a22"/></linearGradient></defs></svg>
+  <a class="skip" href="#screens" id="skip">Skip to content</a>
+  <div id="announce" class="sr" aria-live="polite" aria-atomic="true"></div>
   <div id="shade"></div>
   <div id="sweep"></div>
-  <section class="title-screen" id="title" aria-label="Title screen">
+  <main class="title-screen" id="title" aria-label="Title screen">
     <div class="logo-wrap">
       <svg class="logo-arc" viewBox="0 0 1000 300" aria-hidden="true"><defs><linearGradient id="arcg" x1="0" x2="1"><stop offset="0" stop-color="#7fd2ff" stop-opacity="0"/><stop offset=".45" stop-color="#c4ecff" stop-opacity=".85"/><stop offset=".7" stop-color="#ffd8a0" stop-opacity=".7"/><stop offset="1" stop-color="#7fd2ff" stop-opacity="0"/></linearGradient></defs><ellipse cx="500" cy="150" rx="480" ry="64" fill="none" stroke="url(#arcg)" stroke-width="2.2" transform="rotate(-5 500 150)"/><ellipse cx="500" cy="150" rx="480" ry="64" fill="none" stroke="rgba(196,236,255,.18)" stroke-width="9" transform="rotate(-5 500 150)"/></svg>
       <h1 class="logo" data-text="Meridian">Meridian</h1>
@@ -151,13 +155,13 @@
     <button class="press-start" id="press-start">Press Start</button>
     <div class="title-opts"><button class="chip" id="title-snd" aria-pressed="false"><span class="eq"><i></i><i></i><i></i></span><span>Sound off</span></button></div>
     <div class="title-foot">© ${new Date().getFullYear()} ${esc(SITE.name)} · An original work · All art and audio generated in your browser</div>
-  </section>
+  </main>
   <div id="shell" hidden>
     <header class="topbar">
       <div class="brand"><span class="brand-logo">Meridian</span><span class="brand-sep"></span><span class="crumb" id="crumb"></span></div>
       <div class="top-right"><span class="net"><span class="net-dot"></span>Online</span><button class="chip" id="snd" aria-pressed="false" title="Toggle sound (M)"><span class="eq"><i></i><i></i><i></i></span><span>Sound off</span></button></div>
     </header>
-    <main id="screens"></main>
+    <main id="screens" tabindex="-1"></main>
     <footer class="hints" id="hints"><div class="hints-l" id="hints-l"></div><div class="hints-r" id="hints-r"></div></footer>
   </div>
   <div class="fps" id="fps" hidden></div>`
@@ -169,12 +173,13 @@
   S.main = {
     pose: 'main', crumb: () => '<b>Main menu</b>',
     html: () => `
-      <div class="holo sheet">
-        <ul class="menu" role="menu">${MENU.map(([k, l], i) => `<li role="none"><a class="mi" role="menuitem" data-nav href="#${k}">${BAR}<span class="num">${pad2(i + 1)}</span><span class="lbl">${l}</span></a></li>`).join('')}</ul>
-        <div class="menu-desc" id="menu-desc" aria-live="polite"></div>
-      </div>
+      <h1 class="sr">Main menu</h1>
+      <nav class="holo sheet" aria-label="Main menu">
+        <ul class="menu">${MENU.map(([k, l], i) => `<li><a class="mi" data-nav href="#${k}">${BAR}<span class="num">${pad2(i + 1)}</span><span class="lbl">${l}</span></a></li>`).join('')}</ul>
+        <div class="menu-desc" id="menu-desc"></div>
+      </nav>
       <div class="holo lobby panel">
-        <div class="ph">Party <small>1 / 4 · Open</small></div>
+        <h2 class="ph">Party <small>1 / 4 · Open</small></h2>
         <div class="tag-card">${Art.emblem({ id: 'e1' })}<div><div class="gt">${esc(SITE.name)}</div><div class="gt-sub">Software engineer · Vercel</div><div class="gt-row"><span class="stag">ML26</span>${Art.rankIcon()}<span>${esc(SR.rank)}</span></div></div></div>
         <ul class="slots">${[1, 2, 3].map(() => '<li class="slot"><span class="sq"></span><span>Open slot</span><em></em></li>').join('')}</ul>
         <div class="lobby-foot"><span class="live">● Party leader</span><span>${esc(SITE.url.replace('https://', ''))}</span></div>
@@ -187,9 +192,9 @@
   S.campaign = {
     pose: 'campaign', crumb: () => 'Main menu › <b>Campaign</b>', parent: 'main',
     html: () => `
-      <div class="scr-head holo"><h2 class="scr-title">Campaign</h2><p class="scr-sub">Mission select · ${posts.length} missions</p></div>
+      <div class="scr-head holo"><h1 class="scr-title">Campaign</h1><p class="scr-sub">Mission select · ${posts.length} missions</p></div>
       <div class="split">
-        <div class="panel listp holo"><div class="ph">Missions <small>${posts[0].d.getFullYear()} — ${posts[posts.length - 1].d.getFullYear()}</small></div>
+        <div class="panel listp holo"><h2 class="ph">Missions <small>${posts[0].d.getFullYear()} — ${posts[posts.length - 1].d.getFullYear()}</small></h2>
           <ul class="list">${missions.map((p) => `<li><a class="li" data-nav href="#mission/${encodeURIComponent(p.slug)}">${BAR}<span class="n">${pad2(p.num)}</span><span class="t">${esc(p.title)}</span><span class="m">${fmtMonth(p.d)}</span></a></li>`).join('')}</ul>
           <div class="list-foot"><span id="mis-pos"></span><span>Newest first</span></div></div>
         <div class="panel detail holo" id="mis-detail"></div>
@@ -198,14 +203,14 @@
       const p = missions[i]; if (!p) return
       $('#mis-pos').textContent = `Mission ${pad2(p.num)} / ${posts.length}`
       $('#mis-detail').innerHTML = `
-        <div class="ph">Mission ${pad2(p.num)} <small>${esc(p.date)}</small></div>
-        <div class="shot"><canvas></canvas><div class="shot-tl"><span>Sector ${pad2(p.num)}</span><span>${p.d.getFullYear()}</span></div><div class="shot-cap"><small>Mission ${pad2(p.num)}</small><h3>${esc(p.title)}</h3></div></div>
+        <h2 class="ph">Mission ${pad2(p.num)} <small>${esc(p.date)}</small></h2>
+        <div class="shot"><canvas aria-hidden="true"></canvas><div class="shot-tl"><span>Sector ${pad2(p.num)}</span><span>${p.d.getFullYear()}</span></div><div class="shot-cap"><small>Mission ${pad2(p.num)}</small><h3>${esc(p.title)}</h3></div></div>
         <div class="dbody">
           <div class="dmain"><span class="lab">Intel</span><p class="intel">${esc(p.intel)}</p><span class="lab">Briefing</span><p class="brief">${esc(plain(p.excerpt))}</p></div>
           <div class="dside">
             <div><span class="lab">Difficulty</span><div class="diff">${[0, 1, 2, 3].map((k) => Art.diffIcon(k <= p.tier, k)).join('')}</div><div class="kv">${TIERS[p.tier]}<small>Est. ${p.mins} min read</small></div></div>
             <div><span class="lab">Deployed</span><div class="kv">${fmtDate(p.d)}<small>${p.prev == null ? 'First deployment' : p.prev + ' days after mission ' + pad2(p.num - 1)}</small></div></div>
-            <a class="go" href="#mission/${encodeURIComponent(p.slug)}"><span class="key">↵</span>Start mission</a>
+            <a class="go" tabindex="-1" href="#mission/${encodeURIComponent(p.slug)}"><span class="key">↵</span>Start mission</a>
           </div>
         </div>`
       Art.drawPlate($('#mis-detail canvas'), p.slug, 'land')
@@ -221,9 +226,9 @@
       const p = posts.find((x) => x.slug === slug) || posts[posts.length - 1]
       const url = fullUrl(p.href)
       return `
-      <div class="scr-head holo"><h2 class="scr-title">Briefing</h2><p class="scr-sub">Mission ${pad2(p.num)} · Intel package decrypted</p></div>
+      <div class="scr-head holo"><h1 class="scr-title">Briefing</h1><p class="scr-sub">Mission ${pad2(p.num)} · Intel package decrypted</p></div>
       <div class="brief-wrap">
-        <article class="panel article holo"><div class="ph">Transmission <small>${esc(p.date)}</small></div>
+        <article class="panel article holo"><h2 class="ph">Transmission <small>${esc(p.date)}</small></h2>
           <div class="prose-scroll" id="prose" tabindex="-1">
             <h3>${esc(p.title)}</h3>
             <p class="prose-meta">${esc(p.date)} · <i>${TIERS[p.tier]}</i> · est. ${p.mins} min${p.description ? ' · ' + esc(p.description) : ''}</p>
@@ -231,7 +236,7 @@
             <div class="trunc"><span>[ Transmission truncated ]</span><a class="cta" data-nav href="${esc(url)}" target="_blank" rel="noopener">Continue on maxleiter.com ›</a></div>
           </div></article>
         <aside class="panel side-stack holo">
-          <div class="shot"><canvas></canvas><div class="shot-cap"><small>Mission ${pad2(p.num)}</small></div></div>
+          <div class="shot"><canvas aria-hidden="true"></canvas><div class="shot-cap"><small>Mission ${pad2(p.num)}</small></div></div>
           <div class="side-body">
             <div><span class="lab">Difficulty</span><div class="diff">${[0, 1, 2, 3].map((k) => Art.diffIcon(k <= p.tier, k)).join('')}</div><div class="kv">${TIERS[p.tier]}<small>Est. ${p.mins} min read</small></div></div>
             <div><span class="lab">Objective</span><p class="intel" style="margin:0;font-size:14px">${esc(p.intel)}</p></div>
@@ -250,10 +255,10 @@
   S.theater = {
     pose: 'theater', parent: 'main', crumb: () => 'Main menu › <b>Theater</b>',
     html: () => `
-      <div class="scr-head holo"><h2 class="scr-title">Theater</h2><p class="scr-sub">Saved films · ${notes.length} clips</p></div>
+      <div class="scr-head holo"><h1 class="scr-title">Theater</h1><p class="scr-sub">Saved films · ${notes.length} clips</p></div>
       <div class="split">
-        <div class="panel listp holo"><div class="ph">Saved films <small>Notebook</small></div>
-          <ul class="list">${notes.map((n, i) => `<li><a class="li thumb" data-nav href="#film/${encodeURIComponent(n.slug)}">${BAR}<canvas data-plate="${esc(n.slug)}"></canvas><span class="t">${esc(n.title)}</span><span class="m">${fmtTime(n.secs)}</span></a></li>`).join('')}</ul>
+        <div class="panel listp holo"><h2 class="ph">Saved films <small>Notebook</small></h2>
+          <ul class="list">${notes.map((n, i) => `<li><a class="li thumb" data-nav href="#film/${encodeURIComponent(n.slug)}">${BAR}<canvas aria-hidden="true" data-plate="${esc(n.slug)}"></canvas><span class="t">${esc(n.title)}</span><span class="m">${fmtTime(n.secs)}</span></a></li>`).join('')}</ul>
           <div class="list-foot"><span>${notes.length} films</span><span>${fmtTime(notes.reduce((a, n) => a + n.secs, 0))} total</span></div></div>
         <div class="panel detail holo" id="film-detail"></div>
       </div>`,
@@ -261,10 +266,10 @@
     onSel(i) {
       const n = notes[i]; if (!n) return
       $('#film-detail').innerHTML = `
-        <div class="ph">Film details <small>Clip ${pad2(i + 1)}</small></div>
-        <div class="shot" style="height:250px"><canvas></canvas><div class="shot-tl"><span>● Rec</span><span>${fmtTime(n.secs)}</span></div><div class="shot-cap"><small>${esc(n.date)}</small><h3>${esc(n.title)}</h3></div></div>
+        <h2 class="ph">Film details <small>Clip ${pad2(i + 1)}</small></h2>
+        <div class="shot" style="height:250px"><canvas aria-hidden="true"></canvas><div class="shot-tl"><span>● Rec</span><span>${fmtTime(n.secs)}</span></div><div class="shot-cap"><small>${esc(n.date)}</small><h3>${esc(n.title)}</h3></div></div>
         <div class="dbody"><div class="dmain"><span class="lab">Description</span><p class="brief" style="-webkit-line-clamp:5">${esc(n.text)}</p></div>
-          <div class="dside"><div><span class="lab">Length</span><div class="kv">${fmtTime(n.secs)}<small>${words(n.text)} words</small></div></div><div><span class="lab">Recorded</span><div class="kv">${fmtDate(n.d)}<small>Author: ${esc(SITE.name)}</small></div></div><a class="go" href="#film/${encodeURIComponent(n.slug)}"><span class="key">↵</span>Play film</a></div></div>`
+          <div class="dside"><div><span class="lab">Length</span><div class="kv">${fmtTime(n.secs)}<small>${words(n.text)} words</small></div></div><div><span class="lab">Recorded</span><div class="kv">${fmtDate(n.d)}<small>Author: ${esc(SITE.name)}</small></div></div><a class="go" tabindex="-1" href="#film/${encodeURIComponent(n.slug)}"><span class="key">↵</span>Play film</a></div></div>`
       Art.drawPlate($('#film-detail canvas'), n.slug, 'film')
     },
     hints: () => [['↑↓', 'Browse'], ['↵', 'Play film'], ['Esc', 'Back']],
@@ -281,10 +286,10 @@
       const paras = n.text.split(/\n\n+/); let acc = 0
       const ticks = paras.slice(0, -1).map((p) => { acc += p.length + 2; return acc / n.text.length })
       return `
-      <div class="scr-head holo"><h2 class="scr-title">Theater</h2><p class="scr-sub">Now playing · ${esc(n.date)}</p></div>
+      <div class="scr-head holo"><h1 class="scr-title">Theater</h1><p class="scr-sub">Now playing · ${esc(n.date)}</p></div>
       <div class="film panel holo">
         <div class="film-view">
-          <div class="film-frame"><canvas id="film-cv"></canvas><div class="film-hud"><span class="rec"><i></i>Playback</span><span class="tc" id="film-tc">00:00</span><span class="cam">Camera: free · ${esc(n.title)}</span></div></div>
+          <div class="film-frame"><canvas id="film-cv" aria-hidden="true"></canvas><div class="film-hud"><span class="rec"><i></i>Playback</span><span class="tc" id="film-tc">00:00</span><span class="cam">Camera: free · ${esc(n.title)}</span></div></div>
           <div class="transcript" id="film-tx" aria-live="off"></div>
         </div>
         <div class="timeline">
@@ -317,7 +322,7 @@
     const n = film.n; if (!n) return
     const tx = $('#film-tx'); if (!tx) return
     const k = Math.floor(film.t * n.text.length)
-    tx.innerHTML = `<span style="white-space:pre-wrap">${esc(n.text.slice(0, k))}</span><span class="caret"></span><span class="ghost" style="white-space:pre-wrap">${esc(n.text.slice(k))}</span>`
+    tx.innerHTML = `<span class="sr">${esc(n.text)}</span><span aria-hidden="true"><span style="white-space:pre-wrap">${esc(n.text.slice(0, k))}</span><span class="caret"></span><span class="ghost" style="white-space:pre-wrap">${esc(n.text.slice(k))}</span></span>`
     const pct = (film.t * 100).toFixed(2) + '%'
     $('#film-fill').style.width = pct; $('#film-head').style.left = pct
     $('.track')?.setAttribute('aria-valuenow', Math.round(film.t * 100))
@@ -348,9 +353,9 @@
         return head + `<li><a class="li" data-nav href="${esc(fullUrl(p.href))}" target="_blank" rel="noopener" style="grid-template-columns:30px minmax(0,1fr) auto">${BAR}${Art.objIcon(p.cat)}<span class="t">${esc(p.title)}</span><span class="m">${pad2(i + 1)}</span></a></li>`
       }).join('')
       return `
-      <div class="scr-head holo"><h2 class="scr-title">Forge</h2><p class="scr-sub">Object palette · ${projects.length} items</p></div>
+      <div class="scr-head holo"><h1 class="scr-title">Forge</h1><p class="scr-sub">Object palette · ${projects.length} items</p></div>
       <div class="split">
-        <div class="panel listp holo"><div class="ph">Palette <small>${catOrder.filter((c) => projects.some((p) => p.cat === c)).length} categories</small></div><ul class="list">${rows}</ul>
+        <div class="panel listp holo"><h2 class="ph">Palette <small>${catOrder.filter((c) => projects.some((p) => p.cat === c)).length} categories</small></h2><ul class="list">${rows}</ul>
           <div class="list-foot"><span>Objects placed ${projects.length} / 16</span><span class="budget" style="width:120px"><span class="meter"><i style="width:${(projects.length / 16) * 100}%"></i></span></span></div></div>
         <div class="panel detail holo" id="forge-detail"></div>
       </div>`
@@ -359,13 +364,13 @@
       const p = projects[i]; if (!p) return
       const host = fullUrl(p.href).replace(/^https?:\/\//, '').replace(/\/$/, '')
       $('#forge-detail').innerHTML = `
-        <div class="ph">Object properties <small>ID ${String(Art.hashStr(p.title) % 100000).padStart(5, '0')}</small></div>
-        <div class="forge-view"><canvas id="forge-cv"></canvas><div class="forge-ov"><span>Edit mode · <b>Pivot</b></span><span>Snap 0.25 · Rot 15°</span></div></div>
+        <h2 class="ph">Object properties <small>ID ${String(Art.hashStr(p.title) % 100000).padStart(5, '0')}</small></h2>
+        <div class="forge-view"><canvas id="forge-cv" aria-hidden="true"></canvas><div class="forge-ov"><span>Edit mode · <b>Pivot</b></span><span>Snap 0.25 · Rot 15°</span></div></div>
         <div class="dmain" style="overflow:auto"><table class="props">
           <tr><th>Name</th><td style="font:600 18px/1.2 var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:#fff">${esc(p.title)}</td></tr>
           <tr><th>Category</th><td>${CAT_NAME[p.cat]}</td></tr>
           <tr><th>Description</th><td>${esc(p.description)}</td></tr>
-          <tr><th>Spawn at</th><td><a href="${esc(fullUrl(p.href))}" target="_blank" rel="noopener">${esc(host)}</a></td></tr>
+          <tr><th>Spawn at</th><td><a tabindex="-1" href="${esc(fullUrl(p.href))}" target="_blank" rel="noopener">${esc(host)}</a></td></tr>
         </table></div>`
       cancelAnimationFrame(forgeRaf)
       const cv = $('#forge-cv'), t0 = performance.now()
@@ -381,9 +386,9 @@
   S.matchmaking = {
     pose: 'matchmaking', parent: 'main', crumb: () => 'Main menu › <b>Matchmaking</b>',
     html: () => `
-      <div class="scr-head holo"><h2 class="scr-title">Matchmaking</h2><p class="scr-sub">Playlists · ${work.length} online</p></div>
+      <div class="scr-head holo"><h1 class="scr-title">Matchmaking</h1><p class="scr-sub">Playlists · ${work.length} online</p></div>
       <div class="split">
-        <div class="panel listp holo"><div class="ph">Playlists <small>vercel.com</small></div>
+        <div class="panel listp holo"><h2 class="ph">Playlists <small>vercel.com</small></h2>
           <ul class="list">${work.map((w, i) => `<li><button class="li" data-nav data-i="${i}">${BAR}<span class="n">${pad2(i + 1)}</span><span class="t">${esc(w.title)}</span><span class="m">${w.d.getFullYear()}</span></button></li>`).join('')}</ul>
           <div class="list-foot"><span>Ranked: off</span><span>Region: worldwide</span></div></div>
         <div class="panel detail holo" id="mm-detail"></div>
@@ -398,7 +403,7 @@
     const w = work[i]; if (!w) return
     const d = $('#mm-detail'); d.className = 'panel detail'
     d.innerHTML = `
-      <div class="ph">Playlist <small>Season ${w.d.getFullYear()}</small></div>
+      <h2 class="ph">Playlist <small>Season ${w.d.getFullYear()}</small></h2>
       <div class="mm-card">
         <div class="mm-idle" style="display:flex;flex-direction:column;gap:16px">
           <span class="lab" style="margin:0;color:var(--amber)">${fmtDate(w.d)}</span>
@@ -449,10 +454,10 @@
       const xpPct = SR.next ? ((SR.xp - SR.prevXp) / (SR.next[1] - SR.prevXp)) * 100 : 100
       const stats = [[posts.length, 'Missions'], [notes.length, 'Saved films'], [projects.length, 'Objects forged'], [work.length, 'Matches'], [SR.span.toFixed(1), 'Years in service'], [SR.busiest[0], `Best year · ${SR.busiest[1]} missions`], [SR.best, 'Year streak'], [SR.gap, 'Longest silence (days)']]
       return `
-      <div class="scr-head holo"><h2 class="scr-title">Service Record</h2><p class="scr-sub">Personnel file · ${esc(SITE.name)}</p></div>
+      <div class="scr-head holo"><h1 class="scr-title">Service Record</h1><p class="scr-sub">Personnel file · ${esc(SITE.name)}</p></div>
       <div class="sr-grid">
         <div class="panel sr-card holo">
-          <div class="ph">Service tag <small>ML26</small></div>
+          <h2 class="ph">Service tag <small>ML26</small></h2>
           <div class="sr-id">${Art.emblem({ id: 'e2' })}<div><div class="gt">${esc(SITE.name)}</div><div class="gt-row" style="margin-top:10px">${Art.rankIcon()}<span>${esc(SR.rank)}</span></div></div></div>
           <p class="sr-blurb">${esc(SITE.blurb)}</p>
           <div class="xp"><div class="xp-row"><span>${SR.xp.toLocaleString()} XP</span><span>${SR.next ? 'Next: ' + esc(SR.next[0]) + ' · ' + SR.next[1].toLocaleString() : 'Max rank'}</span></div><div class="meter"><i style="width:${xpPct.toFixed(1)}%"></i></div></div>
@@ -463,10 +468,10 @@
           </div>
         </div>
         <div class="sr-right">
-          <div class="panel holo"><div class="ph">Career <small>Computed from ${posts.length + notes.length + entries.length} records</small></div><div class="stats">${stats.map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('')}</div></div>
+          <div class="panel holo"><h2 class="ph">Career <small>Computed from ${posts.length + notes.length + entries.length} records</small></h2><div class="stats">${stats.map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('')}</div></div>
           <div class="sr-lower">
-            <div class="panel holo"><div class="ph">Missions per year <small>${SR.years[0][0]}–${SR.years[SR.years.length - 1][0]}</small></div><div class="chart"><svg viewBox="0 0 ${W} ${H + 22}" role="img" aria-label="Posts per year">${grid}<line x1="0" x2="${W}" y1="${H}" y2="${H}" stroke="rgba(196,236,255,.5)"/>${bars}</svg></div></div>
-            <div class="panel holo" style="display:flex;flex-direction:column"><div class="ph">Medals <small>${SR.medals.filter((m) => m.on).length} / ${SR.medals.length}</small></div>
+            <div class="panel holo"><h2 class="ph">Missions per year <small>${SR.years[0][0]}–${SR.years[SR.years.length - 1][0]}</small></h2><div class="chart"><svg viewBox="0 0 ${W} ${H + 22}" role="img" aria-label="Posts per year">${grid}<line x1="0" x2="${W}" y1="${H}" y2="${H}" stroke="rgba(196,236,255,.5)"/>${bars}</svg></div></div>
+            <div class="panel holo" style="display:flex;flex-direction:column"><h2 class="ph">Medals <small>${SR.medals.filter((m) => m.on).length} / ${SR.medals.length}</small></h2>
               <div class="medals">${SR.medals.map((m, i) => `<button class="medal ${m.on ? '' : 'locked'}" data-nav data-medal="${i}" aria-label="${esc(m.name)}${m.on ? '' : ' (locked)'}">${Art.medal(m.id, m.color, i)}<span>${esc(m.name)}</span></button>`).join('')}</div>
               <div class="medal-info" id="medal-info"></div></div>
           </div>
@@ -496,11 +501,11 @@
   S.settings = {
     pose: 'settings', parent: 'main', crumb: () => 'Main menu › <b>Settings</b>',
     html: () => `
-      <div class="scr-head holo"><h2 class="scr-title">Settings</h2><p class="scr-sub">Audio · video · controls</p></div>
+      <div class="scr-head holo"><h1 class="scr-title">Settings</h1><p class="scr-sub">Audio · video · controls</p></div>
       <div class="split">
-        <div class="panel listp holo"><div class="ph">Options</div><ul class="opts">${OPTS.map((o, i) => `<li><button class="opt" data-nav data-opt="${i}">${BAR}<span>${o.label}</span><span class="val" id="opt-${i}"></span></button></li>`).join('')}
+        <div class="panel listp holo"><h2 class="ph">Options</h2><ul class="opts">${OPTS.map((o, i) => `<li><button class="opt" data-nav data-opt="${i}">${BAR}<span>${o.label}</span><span class="val" id="opt-${i}"></span></button></li>`).join('')}
           <li><button class="opt" data-nav data-act="defaults">${BAR}<span>Restore defaults</span><span class="val"></span></button></li></ul></div>
-        <div class="panel detail holo"><div class="ph">System <small>Live</small></div><div class="sys"><dl id="sysinfo"></dl></div></div>
+        <div class="panel detail holo"><h2 class="ph">System <small>Live</small></h2><div class="sys"><dl id="sysinfo"></dl></div></div>
       </div>`,
     after() { OPTS.forEach((_, i) => renderOpt(i)); renderSys() },
     horizontal(dir, el) { const i = el?.dataset.opt; if (i == null) return true; changeOpt(+i, dir); return true },
@@ -509,8 +514,8 @@
   }
   function renderOpt(i) {
     const o = OPTS[i], v = prefs[o.k], el = $('#opt-' + i); if (!el) return
-    const inner = o.range ? `<span class="pips">${Array.from({ length: 10 }, (_, k) => `<i class="${k < v ? 'on' : ''}"></i>`).join('')}</span>` : `<span>${o.show(v)}</span>`
-    el.innerHTML = `<span class="arr">◀</span>${inner}<span class="arr">▶</span>`
+    const inner = o.range ? `<span class="pips" aria-hidden="true">${Array.from({ length: 10 }, (_, k) => `<i class="${k < v ? 'on' : ''}"></i>`).join('')}</span>` : `<span>${o.show(v)}</span>`
+    el.innerHTML = `<span class="arr" aria-hidden="true">◀</span>${inner}${o.range ? `<span class="sr">${v} of 10</span>` : ''}<span class="arr" aria-hidden="true">▶</span>`
   }
   function changeOpt(i, dir) {
     const o = OPTS[i]
@@ -582,11 +587,19 @@
       }
       cur.onSel?.(listIndex(el), el)
       if (changed && sound) Sound.blip('move')
+      if (changed) announce(el)
     },
     move(d) { Nav.select((cur.sel ?? 0) + d) },
     refresh(i) { Nav.select(i ?? cur.sel, { sound: false }) },
   }
   window.Nav = Nav
+  let annT = 0
+  function announce(el) {
+    // focus already moves with the selection, so this only backs it up for AT that ignores programmatic focus
+    clearTimeout(annT)
+    annT = setTimeout(() => { const t = (el.getAttribute('aria-label') || el.textContent).replace(/\s+/g, ' ').trim(); $('#announce').textContent = t }, 300)
+  }
+  $('#skip').addEventListener('click', (e) => { e.preventDefault(); const el = navItems()[cur?.sel || 0]; (el || $('#screens')).focus() })
   // index among same-kind rows (for list screens the detail cares about row index, not nav index)
   function listIndex(el) {
     if (el.matches('.li, .mi, .opt')) { const sib = $$(el.matches('.mi') ? '.mi' : '.list .li, .opts .opt', cur.el); const k = sib.indexOf(el); if (k >= 0) return k }
@@ -609,6 +622,7 @@
     if (prefs.motion !== 'reduced') { s.el.classList.remove('enter'); void s.el.offsetWidth; s.el.classList.add('enter'); setTimeout(() => s.el.classList.remove('enter'), 900) }
     const sw = $('#sweep'); sw.classList.remove('go'); void sw.offsetWidth; if (prefs.motion !== 'reduced') sw.classList.add('go')
     $('#crumb').innerHTML = s.crumb(arg)
+    if (prev) $('#announce').textContent = s.crumb(arg).replace(/<[^>]+>/g, '').split('›').pop().trim() + ' screen'
     renderHints()
     Render.setPose(s.pose)
     s.after?.()
@@ -690,7 +704,6 @@
     setTimeout(() => { $('#title').hidden = true }, 1300)
     $('#shell').hidden = false
     const [n, a] = parseHash()
-    if (n !== 'main') { S.main.el.classList.add('active'); cur = S.main; }
     cur = null
     show(n, a, 1)
   }
@@ -784,8 +797,9 @@
     $('#fps').textContent = `${Math.round(fps)} FPS · ${Math.round(scale * 100)}% · ${kind.toUpperCase()}`
     if (cur?.name === 'settings') renderSys()
   })
+  if (Q.has('noui')) document.getElementById('app').style.display = 'none'
   const deep = location.hash.length > 1 || Q.has('nostart')
-  Render.init(document.getElementById('bg'), { pose: deep ? parseHash()[0] === 'main' ? 'main' : S[parseHash()[0]].pose : 'title', quality: prefs.quality, reducedMotion: prefs.motion === 'reduced' }).then(() => {
+  Render.init(document.getElementById('bg'), { pose: Q.get('pose') || (deep ? (parseHash()[0] === 'main' ? 'main' : S[parseHash()[0]].pose) : 'title'), quality: prefs.quality, reducedMotion: prefs.motion === 'reduced' }).then(() => {
     window.__ready = true
     const d = $('#menu-desc'); if (d && cur?.name === 'main') d.innerHTML = MENU[cur.sel][2]()
   })
