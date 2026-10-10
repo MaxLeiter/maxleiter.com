@@ -63,9 +63,17 @@ const T = [
   [9.9, key('Escape')],
   [10.3, () => page.evaluate(() => document.activeElement.blur())],   // keep the time-lapse frame clean
 ]
-const LAPSE = [10.8, 14.6]           // time-lapse: 13:00 → dusk → night → dawn → day
+const LAPSE = [10.6, 14.7]           // time-lapse: 13:00 → dusk → night → dawn → day
 const END = 15.0
-const lapseHour = (f) => { const e = f * f * (3 - 2 * f); return 13.1 + e * 24 }   // full day, back to start
+// hour keyframes with a short dwell on each palette: day → dusk → night → dawn → day
+const HK = [[0, 13.1], [0.2, 18.9], [0.3, 19.5], [0.48, 23.0], [0.56, 26.5], [0.68, 30.6], [0.78, 31.1], [1, 37.1]]
+const lapseHour = (f) => {
+  for (let i = 0; i < HK.length - 1; i++) if (f <= HK[i + 1][0]) {
+    const u = (f - HK[i][0]) / (HK[i + 1][0] - HK[i][0]), e = u * u * (3 - 2 * u)
+    return HK[i][1] + (HK[i + 1][1] - HK[i][1]) * e
+  }
+  return HK[HK.length - 1][1]
+}
 let ti = 0, n = 0
 const total = Math.min(F(END), ONLY)
 const t0 = Date.now()

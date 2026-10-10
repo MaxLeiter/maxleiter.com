@@ -331,7 +331,7 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 /* ---------------- Mission briefing (article) ---------------- */
 .brief-wrap { position: absolute; left: 0; right: 0; top: 76px; bottom: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 26px; }
 .article { display: flex; flex-direction: column; min-height: 0; }
-.prose-scroll:focus-visible { outline: 2px solid #eaf8ff; outline-offset: -4px; box-shadow: none; }
+.prose-scroll:focus-visible { outline: 2px solid rgba(196, 236, 255, 0.6); outline-offset: -4px; box-shadow: none; }
 .prose-scroll.sel:not(:focus-visible) { outline: none; }
 .prose-scroll { flex: 1; overflow-y: auto; padding: 26px 40px 40px; scrollbar-width: thin; scrollbar-color: rgba(150, 205, 255, 0.35) transparent; }
 .prose-scroll h3 { margin: 0 0 8px; font: 500 30px/1.1 var(--f-menu); font-stretch: 105%; letter-spacing: 0.04em; color: #fff; }
@@ -2740,7 +2740,7 @@ const Art = (() => {
     let out = esc(s)
     out = out.replace(/`([^`]+)`/g, '<code>$1</code>')
     out = out.replace(/!\[[^\]]*\]\([^)]*\)/g, '')
-    out = out.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, (_, t, h) => `<a href="${fullUrl(h.replace(/&amp;/g, '&')).replace(/"/g, '&quot;')}" target="_blank" rel="noopener">${t}</a>`)
+    out = out.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, (_, t, h) => `<a data-nav href="${fullUrl(h.replace(/&amp;/g, '&')).replace(/"/g, '&quot;')}" target="_blank" rel="noopener">${t}</a>`)
     out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     out = out.replace(/(^|\s)~([^~\s][^~\n]{0,30}?)~(?=[\s.,!?:;]|$)/g, '$1<del>$2</del>')
     out = out.replace(/(^|[\s(])[_*]([^_*\n]+)[_*](?=[\s).,!?:;]|$)/g, '$1<em>$2</em>')
@@ -3235,6 +3235,7 @@ const Art = (() => {
       cur.sel = i
       const el = items[i]
       if (focus && document.activeElement !== el) el.focus({ preventScroll: true })
+      if (el.closest('.prose') && focus) el.scrollIntoView({ block: 'nearest' })
       const list = el.closest('.list, .prose-scroll, .links, .medals, .opts')
       if (list && list.classList.contains('list')) {
         const r = el.getBoundingClientRect(), lr = list.getBoundingClientRect()
@@ -3387,7 +3388,12 @@ const Art = (() => {
     else if (k === 'PageUp') { e.preventDefault(); Nav.move(-8) }
     else if (k === 'Home') { e.preventDefault(); Nav.select(0) }
     else if (k === 'End') { e.preventDefault(); Nav.select(1e6) }
-    else if (k === 'Enter') { e.preventDefault(); activate() }
+    else if (k === 'Enter') {
+      // a control focused by Tab/AT but not (yet) the arrow selection keeps its native behaviour
+      const ae = document.activeElement, items = navItems()
+      if (ae && ae !== items[cur.sel] && cur.el.contains(ae) && ae.matches('a, button')) return
+      e.preventDefault(); activate()
+    }
     else if (k === ' ') { e.preventDefault(); if (cur.name === 'film') { film.playing = !film.playing; if (film.t >= 1) { film.t = 0; film.playing = true } filmRender() } else activate() }
     else if (k === 'Escape' || k === 'Backspace') { e.preventDefault(); back() }
     else if (k === 'm' || k === 'M') setSound(!prefs.sound)

@@ -6,7 +6,7 @@ const GLARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-sw
 const FLAG = '--enable-blink-features=CanvasDrawElement'
 async function shot(name, { q = '', w = 1280, h = 720, flag = true, pose } = {}) {
   const b = await chromium.launch({ args: flag ? [...GLARGS, FLAG] : GLARGS })
-  const p = await b.newPage({ viewport: { width: w, height: h }, hasTouch: w < 700, isMobile: w < 700 })
+  const p = await b.newPage({ viewport: { width: w, height: h }, hasTouch: w < 700, isMobile: w < 700 }); p.setDefaultTimeout(240000)
   const errs = []
   p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => m.type() === 'error' && errs.push(m.text()))
   await p.goto(base + q); await p.waitForTimeout(1500)

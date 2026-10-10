@@ -921,7 +921,7 @@ void main(){
     drawMeshes(VP, eye, carM, 1)
     // additive volumetrics
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE); gl.depthMask(false)
-    gl.useProgram(P.cone.p); gl.uniformMatrix4fv(P.cone.u.uVP, false, VP); gl.uniform3fv(P.cone.u.uEye, eye); gl.uniform1f(P.cone.u.uTime, t)
+    gl.useProgram(P.cone.p); gl.uniformMatrix4fv(P.cone.u.uVP, false, VP); gl.uniform3fv(P.cone.u.uEye, eye); gl.uniform1f(P.cone.u.uTime, st.reduced ? 0 : t)
     if (!dbg.nocone) { gl.bindVertexArray(M.cone.vao); gl.drawArrays(gl.TRIANGLES, 0, M.cone.n) }
     drawStreaks(VP)
     if (st.rainOn && !dbg.norain) {
@@ -968,7 +968,7 @@ void main(){
     gl.activeTexture(gl.TEXTURE0)
   }
   function drawSky(VP) {
-    gl.useProgram(P.sky.p); gl.uniformMatrix4fv(P.sky.u.uVP, false, VP); gl.uniform1f(P.sky.u.uTime, st.t)
+    gl.useProgram(P.sky.p); gl.uniformMatrix4fv(P.sky.u.uVP, false, VP); gl.uniform1f(P.sky.u.uTime, st.reduced ? 0 : st.t)
     gl.bindVertexArray(M.sky.vao); gl.drawArrays(gl.TRIANGLES, 0, M.sky.n)
   }
   function drawStreaks(VP) {

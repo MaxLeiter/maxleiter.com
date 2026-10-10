@@ -321,7 +321,7 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 /* ---------------- Mission briefing (article) ---------------- */
 .brief-wrap { position: absolute; left: 0; right: 0; top: 76px; bottom: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 26px; }
 .article { display: flex; flex-direction: column; min-height: 0; }
-.prose-scroll:focus-visible { outline: 2px solid #eaf8ff; outline-offset: -4px; box-shadow: none; }
+.prose-scroll:focus-visible { outline: 2px solid rgba(196, 236, 255, 0.6); outline-offset: -4px; box-shadow: none; }
 .prose-scroll.sel:not(:focus-visible) { outline: none; }
 .prose-scroll { flex: 1; overflow-y: auto; padding: 26px 40px 40px; scrollbar-width: thin; scrollbar-color: rgba(150, 205, 255, 0.35) transparent; }
 .prose-scroll h3 { margin: 0 0 8px; font: 500 30px/1.1 var(--f-menu); font-stretch: 105%; letter-spacing: 0.04em; color: #fff; }

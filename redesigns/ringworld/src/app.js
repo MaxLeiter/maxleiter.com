@@ -85,7 +85,7 @@
     let out = esc(s)
     out = out.replace(/`([^`]+)`/g, '<code>$1</code>')
     out = out.replace(/!\[[^\]]*\]\([^)]*\)/g, '')
-    out = out.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, (_, t, h) => `<a href="${fullUrl(h.replace(/&amp;/g, '&')).replace(/"/g, '&quot;')}" target="_blank" rel="noopener">${t}</a>`)
+    out = out.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, (_, t, h) => `<a data-nav href="${fullUrl(h.replace(/&amp;/g, '&')).replace(/"/g, '&quot;')}" target="_blank" rel="noopener">${t}</a>`)
     out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     out = out.replace(/(^|\s)~([^~\s][^~\n]{0,30}?)~(?=[\s.,!?:;]|$)/g, '$1<del>$2</del>')
     out = out.replace(/(^|[\s(])[_*]([^_*\n]+)[_*](?=[\s).,!?:;]|$)/g, '$1<em>$2</em>')
@@ -580,6 +580,7 @@
       cur.sel = i
       const el = items[i]
       if (focus && document.activeElement !== el) el.focus({ preventScroll: true })
+      if (el.closest('.prose') && focus) el.scrollIntoView({ block: 'nearest' })
       const list = el.closest('.list, .prose-scroll, .links, .medals, .opts')
       if (list && list.classList.contains('list')) {
         const r = el.getBoundingClientRect(), lr = list.getBoundingClientRect()
@@ -732,7 +733,12 @@
     else if (k === 'PageUp') { e.preventDefault(); Nav.move(-8) }
     else if (k === 'Home') { e.preventDefault(); Nav.select(0) }
     else if (k === 'End') { e.preventDefault(); Nav.select(1e6) }
-    else if (k === 'Enter') { e.preventDefault(); activate() }
+    else if (k === 'Enter') {
+      // a control focused by Tab/AT but not (yet) the arrow selection keeps its native behaviour
+      const ae = document.activeElement, items = navItems()
+      if (ae && ae !== items[cur.sel] && cur.el.contains(ae) && ae.matches('a, button')) return
+      e.preventDefault(); activate()
+    }
     else if (k === ' ') { e.preventDefault(); if (cur.name === 'film') { film.playing = !film.playing; if (film.t >= 1) { film.t = 0; film.playing = true } filmRender() } else activate() }
     else if (k === 'Escape' || k === 'Backspace') { e.preventDefault(); back() }
     else if (k === 'm' || k === 'M') setSound(!prefs.sound)

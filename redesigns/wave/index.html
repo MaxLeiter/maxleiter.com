@@ -210,6 +210,7 @@ body.phone.open #snd { display: none; }
 body.phone #hints { padding: 0 12px; bottom: 46px; gap: 14px; font-size: 12.5px; }
 body.phone #hints .kb { display: none; }
 body.phone #badge { left: 50%; right: auto; transform: translateX(-50%); bottom: 14px; }
+body.short #badge { display: none; } body.short #hints { bottom: 14px; }
 body.phone .sheet { font-size: 15.5px; }
 body.phone .sheet h1 { font-size: 23px; }
 body.phone .sheet .sh-ic { flex-basis: 46px; width: 46px; height: 46px; }
@@ -222,7 +223,7 @@ body.rm.open #menu { filter: none; }
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <!-- The stage. With HTML-in-Canvas the article sheet is a child of this canvas and is drawn into it. -->
-<canvas id="stage" aria-hidden="true"></canvas>
+<section id="reader" aria-label="Reader" aria-hidden="true"><canvas id="stage"></canvas></section>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
@@ -510,12 +511,14 @@ CATS.forEach((c, ci) => {
 /* layout: menu is designed on a 1280×720 board and scaled; phone gets its own board */
 let W = innerWidth, H = innerHeight, PHONE = false, SCALE = 1
 function layout() {
-  W = innerWidth; H = innerHeight; PHONE = W < 700
-  document.body.classList.toggle('phone', PHONE)
+  W = innerWidth; H = innerHeight; PHONE = W < 700 || H < 420
+  const SHORT = PHONE && H < 560   // e.g. a laptop window at 200% zoom
+  document.body.classList.toggle('phone', PHONE); document.body.classList.toggle('short', SHORT)
   const menu = $('#menu')
   let bw, bh, catX, rowY, catGap, ic, itemGap, firstGap
   if (PHONE) {
-    SCALE = 1; bw = W; bh = H; catX = 54; rowY = Math.max(128, H * 0.17); catGap = 96; ic = 60; itemGap = 66; firstGap = 64
+    SCALE = 1; bw = W; bh = H; catX = 54; rowY = SHORT ? 92 : Math.max(128, H * 0.17); catGap = 96; ic = 60
+    itemGap = SHORT ? 56 : 66; firstGap = SHORT ? 58 : 64
   } else {
     SCALE = Math.min(W / 1280, H / 720); if (SCALE > 1) SCALE = Math.min(SCALE, 1.6)
     bw = W / SCALE; bh = H / SCALE; catX = Math.max(220, bw * 0.235); rowY = bh * 0.262; catGap = 150; ic = 76; itemGap = 64; firstGap = 80
@@ -543,8 +546,9 @@ function layout() {
       else y = rowY - ic / 2 - 26 - (-d) * itemGap
       el.style.transform = `translate3d(0, ${y - 6}px, 0)`
       el.classList.toggle('on', d === 0); el.classList.toggle('up', d < 0)
-      const fade = Math.max(0, Math.min(1, (bh - (PHONE ? 110 : 64) - y) / 110, (y + 30) / 110))
-      el.style.opacity = d === 0 ? '' : String(fade)   // only the scroll-edge rows fade
+      // rows are either fully legible or gone (a half-faded row fails contrast); the transition crossfades them
+      const vis = d === 0 || (y > -24 && y < bh - (SHORT ? 96 : PHONE ? 150 : 118))
+      el.style.opacity = vis ? '' : '0'   // still in the accessibility tree, so the whole list stays readable
       el.tabIndex = on && d === 0 ? 0 : -1
       el.setAttribute('aria-current', d === 0 ? 'true' : 'false')
       const it = CATS[ci].items[ii]
@@ -974,7 +978,7 @@ function setPath() {
     sheet.style.width = ''
     $('#glass .scroller').appendChild(sheet)
   }
-  canvas.setAttribute('aria-hidden', 'true')
+  $('#reader').setAttribute('aria-hidden', 'true')
   sheet.inert = true; sheet.setAttribute('aria-hidden', 'true')
   $('#glass').classList.remove('on')
   if (reopen) { openSheet(reopen.cat, reopen.it, true); sheet.querySelector('[data-act="read"]')?.focus() }
@@ -1051,7 +1055,7 @@ function syncGeometry() {
 
 function panelLayout() {
   let x, y, w, h, pad
-  if (PHONE) { x = 10; w = W - 20; y = 58; h = H - y - 84; pad = 18 }
+  if (PHONE) { x = 10; w = W - 20; y = 58; h = H - y - (H < 560 ? 52 : 84); pad = 18 }
   else { w = Math.min(880, W - 96); x = (W - w) / 2; y = Math.max(70, H * 0.1); h = H - y - Math.max(62, H * 0.09); pad = 44 }
   P.rect = [x, y, w, h]; P.pad = pad
   P.content = [x + pad, y + 6, w - pad * 2, h - 12]
@@ -1076,7 +1080,7 @@ function openSheet(cat, it, instant) {
   P.scroll = P.target = 0; P.vel = 0; P.prog = instant ? 1 : 0; P.openAt = now() - (instant ? 3 : 0); P.rips = []; P.closing = false; P.ready = false
   panelLayout()
   if (HIC.active) {
-    canvas.removeAttribute('aria-hidden')
+    $('#reader').removeAttribute('aria-hidden')
     canvas.requestPaint?.()
     // focus the sheet so screen readers land in the article; links inside are tabbable
     sheet.tabIndex = -1; sheet.focus({ preventScroll: true })
@@ -1102,7 +1106,7 @@ function closeSheet() {
   if (!HIC.active) { const g = $('#glass'); g.classList.remove('on'); g.setAttribute('aria-hidden', 'true') }
   sheet.inert = true; sheet.setAttribute('aria-hidden', 'true')
   getSelection()?.removeAllRanges()
-  setTimeout(() => { if (P.closing) { state.open = null; P.closing = false; P.ready = false; canvas.setAttribute('aria-hidden', 'true') } }, state.motion === 'full' ? 380 : 240)
+  setTimeout(() => { if (P.closing) { state.open = null; P.closing = false; P.ready = false; $('#reader').setAttribute('aria-hidden', 'true') } }, state.motion === 'full' ? 380 : 240)
   itemEls[state.cat][state.sel[state.cat]].focus({ preventScroll: true })
   announce(`Closed ${it.title}`)
 }
