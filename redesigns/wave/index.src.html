@@ -1252,7 +1252,7 @@ requestAnimationFrame(frame)
 // deep-link for screenshots/tests: ?open=1 opens the selected item
 itemEls[state.cat][state.sel[state.cat]].focus({ preventScroll: true })
 if (qs.get('open')) setTimeout(activate, 60)
-window.__wave = { state, P, HIC, RENDER, now, activate, closeSheet, scrollBy, ripple, setCat, setSel, layout }
+window.__wave = { state, P, HIC, RENDER, now, tickClock, activate, closeSheet, scrollBy, ripple, setCat, setSel, layout }
 </script>
 </body>
 </html>
