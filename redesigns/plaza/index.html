@@ -1,0 +1,2574 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Max Leiter · Plaza</title>
+<meta name="description" content="Max Leiter's site as a friendly 2006-era console home menu.">
+<meta name="theme-color" content="#f2f3f5">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-top: #fdfdfe;
+  --bg-bot: #e9ebef;
+  --ink: #4a5059;
+  --ink-strong: #353a41;
+  --muted: #8d939b;
+  --line: #d6dade;
+  --accent: #35b0e2;
+  --accent-deep: #1b8ec6;
+  --accent-soft: rgba(53, 176, 226, 0.22);
+  --font: 'M PLUS Rounded 1c', 'Nunito', 'Varela Round', ui-rounded, system-ui, sans-serif;
+  --prose: 'Nunito', 'M PLUS Rounded 1c', ui-rounded, system-ui, sans-serif;
+  --px: 0;
+  --py: 0;
+  --cc: #35b0e2;
+  color-scheme: light;
+}
+@property --sweep { syntax: '<percentage>'; inherits: false; initial-value: -40%; }
+@property --ring { syntax: '<number>'; inherits: false; initial-value: 0; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: linear-gradient(var(--bg-top), var(--bg-bot));
+  color: var(--ink);
+  font-family: var(--font);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+button { font: inherit; color: inherit; }
+a { color: var(--accent-deep); }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus { outline: none; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+html.hand-ok.hand-on, html.hand-ok.hand-on * { cursor: none !important; }
+
+/* ------------------------------------------------ stripes */
+.stripes { position: absolute; inset: 0; overflow: hidden; pointer-events: none; background: linear-gradient(var(--bg-top), var(--bg-bot)); }
+.stripes::before {
+  content: ''; position: absolute; inset: -8px 0 0;
+  background: repeating-linear-gradient(to bottom, rgba(150, 160, 172, 0.13) 0 1px, rgba(255, 255, 255, 0.5) 1px 2px, transparent 2px 4px);
+  animation: stripe-drift 3.2s linear infinite;
+  transform: translateY(calc(var(--py) * -3px));
+}
+.stripes::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 38%; top: 0;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.55) 50%, transparent);
+  animation: stripe-sweep 11s ease-in-out infinite;
+}
+@keyframes stripe-drift { to { translate: 0 4px; } }
+@keyframes stripe-sweep { 0% { transform: translateY(-110%); } 100% { transform: translateY(330%); } }
+
+/* ------------------------------------------------ menu + grid */
+.menu { position: fixed; inset: 0; }
+.track {
+  position: absolute; left: 0; right: 0; top: 0; bottom: var(--dh, 150px);
+  display: flex; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.track::-webkit-scrollbar { display: none; }
+.page {
+  flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always;
+  display: grid; grid-template-columns: repeat(var(--cols), var(--tw)); grid-auto-rows: var(--th);
+  gap: var(--gy) var(--gx); place-content: center;
+  padding: 22px 0 26px;
+  transform: translate3d(calc(var(--px) * 9px), calc(var(--py) * 7px), 0);
+}
+
+.tile {
+  position: relative; width: var(--tw); height: var(--th); padding: 0; border: 0; background: none;
+  border-radius: var(--tr); cursor: pointer; display: block;
+  -webkit-user-select: none; user-select: none; touch-action: manipulation;
+}
+.tile:focus-visible { outline: none; }
+.bezel {
+  position: absolute; inset: 0; border-radius: var(--tr);
+  background: linear-gradient(170deg, #ffffff 0%, #f1f3f5 38%, #cfd3d9 78%, #e3e6ea 100%);
+  box-shadow:
+    0 0 0 1px rgba(122, 130, 142, 0.5),
+    inset 0 1.5px 0 #ffffff,
+    inset 0 -2px 2px rgba(110, 118, 130, 0.25),
+    0 3px 2px -1px rgba(60, 70, 85, 0.12),
+    0 8px 16px -6px rgba(60, 70, 85, 0.22);
+  transition: transform 0.28s cubic-bezier(0.3, 1.7, 0.5, 1), box-shadow 0.2s;
+}
+.bezel::before {
+  content: ''; position: absolute; inset: calc(var(--bz) - 2px); border-radius: calc(var(--tr) - var(--bz) + 2px);
+  background: linear-gradient(180deg, #a9afb8, #f8f9fa);
+}
+.screen {
+  position: absolute; inset: var(--bz); border-radius: calc(var(--tr) - var(--bz)); overflow: hidden;
+  background: #dfe3e8; isolation: isolate;
+}
+.screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.screen::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(40, 50, 62, 0.32), inset 0 2px 5px rgba(20, 30, 45, 0.28), inset 0 -1px 2px rgba(255, 255, 255, 0.4);
+}
+.glare {
+  position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background:
+    radial-gradient(150% 95% at calc(18% + var(--px) * 12%) calc(-38% + var(--py) * 8%), rgba(255, 255, 255, 0.5) 0 49%, rgba(255, 255, 255, 0.06) 49.6%, transparent 70%);
+  mix-blend-mode: screen; opacity: 0.55;
+}
+.glare::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(112deg, transparent calc(var(--sweep) - 16%), rgba(255, 255, 255, 0.0) calc(var(--sweep) - 9%), rgba(255, 255, 255, 0.75) var(--sweep), rgba(255, 255, 255, 0) calc(var(--sweep) + 7%), transparent calc(var(--sweep) + 14%));
+  animation: sweep 9s var(--d, 0s) cubic-bezier(0.5, 0, 0.3, 1) infinite;
+}
+@keyframes sweep { 0%, 84% { --sweep: -40%; } 100% { --sweep: 140%; } }
+.tile.hot .glare::after { animation: sweep-now 0.75s cubic-bezier(0.3, 0, 0.2, 1) both; }
+@keyframes sweep-now { from { --sweep: -30%; } to { --sweep: 140%; } }
+
+.tile.hot .bezel, .tile:focus-visible .bezel {
+  transform: scale(1.065);
+  box-shadow:
+    0 0 0 3px var(--accent),
+    0 0 0 7px rgba(53, 176, 226, 0.2),
+    0 0 22px 4px rgba(53, 176, 226, 0.35),
+    inset 0 1.5px 0 #fff,
+    0 14px 24px -8px rgba(30, 80, 120, 0.35);
+}
+.tile.hot { z-index: 2; }
+.tile.rumble { animation: rumble 0.24s linear; }
+@keyframes rumble {
+  0% { translate: 0 0; } 15% { translate: -1.6px 0.6px; } 30% { translate: 1.6px -0.6px; } 45% { translate: -1.2px -0.4px; }
+  60% { translate: 1.2px 0.5px; } 75% { translate: -0.6px 0.3px; } 100% { translate: 0 0; }
+}
+.tile.empty { cursor: default; }
+.tile.empty .bezel { background: linear-gradient(170deg, #fbfbfc 0%, #eceef1 45%, #d3d7dc 100%); }
+
+.menu.enter .tile { animation: tile-in 0.55s cubic-bezier(0.25, 1.4, 0.5, 1) backwards; animation-delay: calc(var(--i) * 32ms + 60ms); }
+@keyframes tile-in { from { opacity: 0; transform: scale(0.82); } }
+
+.page-arrow {
+  position: absolute; top: calc((100% - var(--dh)) / 2 - 38px); width: 40px; height: 76px; border: 0; padding: 0; cursor: pointer;
+  background: linear-gradient(#fff, #e5e8ec); box-shadow: 0 0 0 1px rgba(120, 128, 140, 0.4), 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.page-arrow.prev { left: 0; border-radius: 0 38px 38px 0; }
+.page-arrow.next { right: 0; border-radius: 38px 0 0 38px; }
+.page-arrow span { display: block; width: 0; height: 0; margin: auto; border: 11px solid transparent; }
+.page-arrow.next span { border-left: 14px solid var(--accent); margin-left: 16px; }
+.page-arrow.prev span { border-right: 14px solid var(--accent); margin-left: 2px; }
+.page-arrow.dim { opacity: 0.35; }
+.dots { position: absolute; left: 0; right: 0; bottom: calc(var(--dh) + 8px); display: flex; justify-content: center; gap: 9px; pointer-events: none; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: #c9cdd3; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15); transition: background 0.2s, transform 0.2s; }
+.dots i.on { background: var(--accent); transform: scale(1.25); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+/* ------------------------------------------------ dock */
+.dock { position: absolute; left: 0; right: 0; bottom: 0; height: var(--dh); }
+.dock-shape { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 -3px 8px rgba(60, 70, 85, 0.1)); }
+.dock-shape .line { fill: none; stroke: var(--accent); stroke-width: 2.5; filter: drop-shadow(0 0 3px rgba(53, 176, 226, 0.6)); }
+.dock-shape .hi { fill: none; stroke: #fff; stroke-width: 2; transform: translateY(3px); opacity: 0.9; }
+
+.orb {
+  position: absolute; top: calc(var(--ocy) - var(--or)); width: calc(var(--or) * 2); height: calc(var(--or) * 2);
+  border-radius: 50%; border: 0; padding: calc(var(--or) * 0.1); cursor: pointer;
+  background: linear-gradient(160deg, #ffffff 10%, #d4d8de 55%, #aeb4bc 100%);
+  box-shadow: 0 0 0 1px rgba(110, 118, 130, 0.55), 0 4px 10px rgba(40, 50, 65, 0.22), inset 0 2px 0 #fff;
+  transition: transform 0.25s cubic-bezier(0.3, 1.7, 0.5, 1), box-shadow 0.2s;
+}
+.orb-left { left: calc(var(--ocx) - var(--or)); }
+.orb-right { right: calc(var(--ocx) - var(--or)); }
+.orb-face {
+  position: relative; display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
+  background: radial-gradient(120% 120% at 50% 15%, #ffffff 0%, #f3f5f7 45%, #dde1e6 100%);
+  box-shadow: inset 0 0 0 2.5px rgba(53, 176, 226, 0.85), inset 0 -4px 8px rgba(80, 100, 120, 0.15), inset 0 3px 6px rgba(255, 255, 255, 0.9);
+}
+.orb-face::after {
+  content: ''; position: absolute; left: 12%; right: 12%; top: 4%; height: 46%; border-radius: 50% 50% 45% 45%;
+  background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0)); pointer-events: none;
+}
+.orb-word { font-weight: 900; font-size: calc(var(--or) * 0.36); color: var(--accent-deep); letter-spacing: -0.02em; text-shadow: 0 1px 0 #fff; }
+.mail-ico { width: calc(var(--or) * 0.95); height: calc(var(--or) * 0.72); fill: #fff; stroke: #8fa3b5; stroke-width: 2.6; color: #8fa3b5; overflow: visible; }
+.orb.new .mail-ico { animation: mail-glow 2.4s ease-in-out infinite; }
+@keyframes mail-glow {
+  0%, 100% { fill: #fff; stroke: #8fa3b5; color: #8fa3b5; filter: none; }
+  50% { fill: #e5f6fd; stroke: var(--accent); color: var(--accent); filter: drop-shadow(0 0 6px rgba(53, 176, 226, 0.9)); }
+}
+.orb:hover, .orb:focus-visible { transform: scale(1.07); box-shadow: 0 0 0 3px var(--accent), 0 0 18px 4px rgba(53, 176, 226, 0.35), 0 6px 14px rgba(40, 50, 65, 0.25); outline: none; }
+.orb:active { transform: scale(0.97); }
+
+.clock { position: absolute; left: 50%; top: 0; transform: translateX(-50%); text-align: center; pointer-events: none; white-space: nowrap; }
+.time {
+  font-weight: 800; font-size: 56px; line-height: 1; color: #a1a7ae; letter-spacing: 0.01em;
+  margin-top: calc(var(--btop) - 60px);
+  text-shadow: 0 1px 0 #fff, 0 -1px 0 rgba(0, 0, 0, 0.08);
+  font-variant-numeric: tabular-nums;
+}
+.time i { font-style: normal; display: inline-block; margin: 0 0.04em; animation: colon 1s steps(1) infinite; position: relative; top: -0.06em; }
+.time small { font-size: 0.34em; font-weight: 800; margin-left: 0.25em; vertical-align: 0.15em; color: #aab0b6; }
+@keyframes colon { 50% { opacity: 0.2; } }
+.date { margin-top: 18px; font-size: 25px; font-weight: 800; color: #8e949b; text-shadow: 0 1px 0 #fff; }
+
+.pill-sm {
+  position: absolute; bottom: 20px; height: 38px; padding: 0 16px 0 12px; border-radius: 19px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; color: #7b828a;
+  background: linear-gradient(#ffffff, #eceef1 60%, #dfe2e6); border: 2px solid #c3c8cf;
+  box-shadow: inset 0 1.5px 0 #fff, 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s cubic-bezier(0.3, 1.7, 0.5, 1), border-color 0.2s, color 0.2s;
+}
+.pill-sm.sound { left: calc(var(--ocx) + var(--or) + 40px); }
+.pill-sm.tilt { right: calc(var(--ocx) + var(--or) + 40px); padding: 0 16px; }
+.pill-sm:hover, .pill-sm:focus-visible { border-color: var(--accent); color: var(--accent-deep); transform: scale(1.05); outline: none; box-shadow: 0 0 0 4px var(--accent-soft); }
+.pill-sm.on { color: var(--accent-deep); border-color: var(--accent); }
+.spk { position: relative; width: 18px; height: 16px; }
+.spk::before { content: ''; position: absolute; left: 0; top: 4px; width: 6px; height: 8px; background: currentColor; border-radius: 1px; box-shadow: 4px 0 0 -1px currentColor; }
+.spk::after { content: ''; position: absolute; left: 3px; top: 0; border: 8px solid transparent; border-right: 7px solid currentColor; border-left: 0; }
+.pill-sm:not(.on) .spk { opacity: 0.7; }
+.pill-sm:not(.on) .lbl::before { content: ''; }
+
+/* ------------------------------------------------ bubble, toast, hand */
+.bubble {
+  position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none;
+  transform: translate(-50%, -100%) scale(0.85); opacity: 0; transform-origin: 50% 100%;
+  padding: 9px 22px 10px; border-radius: 16px; background: #fff; color: var(--ink-strong);
+  font-weight: 800; font-size: 20px; white-space: nowrap;
+  border: 2.5px solid #b8c0c9; box-shadow: 0 6px 14px rgba(40, 50, 70, 0.18);
+  transition: opacity 0.15s, transform 0.22s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+.bubble::after { content: ''; position: absolute; left: 50%; bottom: -9px; width: 14px; height: 14px; background: #fff; border: 2.5px solid #b8c0c9; border-top: 0; border-left: 0; transform: translateX(-50%) rotate(45deg); }
+.bubble.below { transform-origin: 50% 0; }
+.bubble.show { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+.toast {
+  position: fixed; left: 50%; bottom: calc(var(--dh, 150px) + 18px); z-index: 90; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  background: rgba(255, 255, 255, 0.96); color: var(--ink-strong); font-weight: 700; font-size: 15px; padding: 11px 20px; border-radius: 22px;
+  border: 2px solid var(--accent); box-shadow: 0 8px 20px rgba(30, 60, 90, 0.18); transition: 0.3s cubic-bezier(0.3, 1.5, 0.5, 1); max-width: calc(100vw - 32px); text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.hand { position: fixed; left: 0; top: 0; width: 44px; height: 55px; z-index: 1000; pointer-events: none; opacity: 0; transform-origin: 15px 2px; will-change: transform; view-transition-name: hand; }
+html.hand-on .hand { opacity: 1; }
+.hand svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.hand-glyph { fill: #fff; stroke: var(--accent-deep); stroke-width: 4.2; stroke-linejoin: round; filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.9)); }
+.hand-shadow { fill: rgba(30, 50, 70, 0.22); transform: translate(6px, 8px); filter: blur(2px); }
+
+/* ------------------------------------------------ boot */
+.boot { position: fixed; inset: 0; z-index: 80; background: #fff; display: grid; place-items: center; padding: 24px 16px; cursor: pointer; transition: opacity 0.5s ease; }
+.boot.out { opacity: 0; pointer-events: none; }
+.boot-inner { max-width: 860px; text-align: center; color: #26292e; animation: boot-in 0.9s ease both; }
+@keyframes boot-in { from { opacity: 0; } }
+.boot-head { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 28px; }
+.boot-sign { width: 58px; height: 52px; color: #26292e; fill: #26292e; flex: none; }
+.boot h1 { margin: 0; font-size: clamp(22px, 3.6vw, 40px); font-weight: 900; letter-spacing: 0.01em; }
+.boot p { margin: 0 auto 18px; font-size: clamp(16px, 1.9vw, 21px); line-height: 1.55; font-weight: 500; max-width: 760px; }
+.boot .boot-lead { font-weight: 800; font-size: clamp(17px, 2.2vw, 24px); }
+.boot .boot-small { color: #4b4f56; }
+.boot hr { border: 0; height: 2px; background: #e3e5e8; margin: 30px auto 26px; max-width: 720px; }
+.boot-press { display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 800; color: var(--accent-deep); animation: press 1.8s ease-in-out infinite; }
+.boot-hand { width: 26px; height: 32px; fill: #fff; stroke: var(--accent-deep); stroke-width: 5; transform: rotate(-12deg); overflow: visible; }
+@keyframes press { 50% { opacity: 0.35; } }
+.boot .boot-foot { font-size: 14px; color: #9aa0a7; margin-top: 8px; }
+
+/* ------------------------------------------------ view transitions */
+::view-transition-group(zoom) { animation-duration: 0.55s; animation-timing-function: cubic-bezier(0.22, 0.9, 0.24, 1); z-index: 5; }
+::view-transition-old(zoom), ::view-transition-new(zoom) { width: 100%; height: 100%; object-fit: fill; animation-duration: 0.55s; }
+html.vt-in::view-transition-old(zoom) { animation: vt-fade-out 0.35s ease both; }
+html.vt-in::view-transition-new(zoom) { animation: vt-fade-in 0.35s 0.08s ease both; }
+html.vt-back::view-transition-old(zoom) { animation: vt-fade-out 0.4s 0.1s ease both; }
+html.vt-back::view-transition-new(zoom) { animation: vt-fade-in 0.3s ease both; }
+::view-transition-old(root) { animation: none; opacity: 0; }
+::view-transition-new(root) { animation: none; }
+html.vt-in::view-transition-new(root) { animation: root-away 0.55s cubic-bezier(0.3, 0.6, 0.3, 1) both; }
+html.vt-back::view-transition-new(root) { animation: root-away 0.55s cubic-bezier(0.3, 0.6, 0.3, 1) reverse both; }
+@keyframes root-away { to { transform: scale(1.08); opacity: 0.35; filter: blur(2px); } }
+::view-transition-group(hand) { animation-duration: 0s; z-index: 10; }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; } }
+
+/* ------------------------------------------------ channel */
+.channel, .board { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; background: var(--bg-bot); overflow: hidden; }
+.splash { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.splash-art { position: relative; flex: 1; overflow: hidden; }
+.splash-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.glass { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(160% 90% at 20% -40%, rgba(255, 255, 255, 0.35) 0 50%, transparent 50.5%); }
+.splash-bar {
+  position: relative; height: 128px; flex: none; display: flex; align-items: center; justify-content: center; gap: clamp(20px, 6vw, 90px);
+  background: linear-gradient(#f5f6f8, #e2e5e9 55%, #d2d6db); padding: 0 16px;
+  box-shadow: 0 -1px 0 rgba(120, 128, 140, 0.35), 0 -8px 24px rgba(40, 50, 70, 0.12);
+}
+.splash-bar::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2.5px; background: var(--accent); box-shadow: 0 0 6px rgba(53, 176, 226, 0.6); }
+
+.pill {
+  display: inline-flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer;
+  min-width: min(250px, 40vw); height: 66px; padding: 0 30px; border-radius: 34px;
+  font-weight: 800; font-size: 25px; color: #5a616a;
+  background: linear-gradient(#ffffff, #f0f2f4 55%, #dfe2e6);
+  border: 3px solid #c0c6cd;
+  box-shadow: inset 0 2px 0 #fff, inset 0 -3px 4px rgba(120, 128, 140, 0.15), 0 4px 8px rgba(40, 50, 70, 0.12);
+  transition: transform 0.22s cubic-bezier(0.3, 1.7, 0.5, 1), border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.pill:hover, .pill:focus-visible { border-color: var(--accent); color: var(--accent-deep); transform: scale(1.05); outline: none; box-shadow: 0 0 0 5px var(--accent-soft), inset 0 2px 0 #fff, 0 6px 12px rgba(40, 80, 120, 0.18); }
+.pill:active { transform: scale(0.97); }
+.pill.primary { color: var(--accent-deep); }
+
+.ch-view { position: absolute; inset: 0; display: flex; flex-direction: column; animation: view-in 0.35s ease both; }
+@keyframes view-in { from { opacity: 0; transform: scale(0.985); } }
+.ch-head {
+  position: relative; flex: none; height: 78px; display: flex; align-items: center; gap: 14px; padding: 0 clamp(16px, 3vw, 34px);
+  background: linear-gradient(#ffffff, #eef0f3); box-shadow: 0 1px 0 rgba(120, 128, 140, 0.3), 0 6px 14px rgba(40, 50, 70, 0.07); z-index: 2;
+}
+.ch-head::after { content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 3px; background: var(--cc); opacity: 0.85; }
+.ch-badge { width: 40px; height: 40px; border-radius: 50%; flex: none; background: radial-gradient(circle at 35% 30%, #fff 0 12%, var(--cc) 60%); box-shadow: 0 0 0 3px #fff, 0 0 0 4px rgba(120, 128, 140, 0.4), 0 3px 6px rgba(0, 0, 0, 0.15); }
+.ch-head h2 { margin: 0; font-size: 30px; font-weight: 900; color: var(--ink-strong); }
+.ch-sub { color: var(--muted); font-weight: 700; font-size: 16px; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-clock { margin-left: auto; font-weight: 800; font-size: 20px; color: #a1a7ae; white-space: nowrap; }
+.ch-body { position: relative; flex: 1; overflow-y: auto; overflow-x: hidden; padding: 28px clamp(16px, 4vw, 48px) 40px; scrollbar-width: thin; scrollbar-color: #b9c0c8 transparent; }
+.ch-body:focus { outline: none; }
+.ch-body::-webkit-scrollbar { width: 14px; }
+.ch-body::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #d5dade, #b8bfc7); border-radius: 7px; border: 3px solid transparent; background-clip: padding-box; }
+.ch-inner { max-width: 1040px; margin: 0 auto; }
+.ch-foot {
+  position: relative; flex: none; height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 clamp(16px, 3vw, 34px);
+  background: linear-gradient(#f5f6f8, #e1e4e8 55%, #d2d6db); box-shadow: 0 -1px 0 rgba(120, 128, 140, 0.35), 0 -8px 20px rgba(40, 50, 70, 0.08); z-index: 2;
+}
+.ch-foot::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2.5px; background: var(--accent); box-shadow: 0 0 6px rgba(53, 176, 226, 0.6); }
+.ch-foot-mid { color: var(--muted); font-weight: 800; font-size: 16px; text-align: center; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pill-mid { min-width: 150px; height: 54px; font-size: 21px; }
+.round-back {
+  width: 70px; height: 70px; flex: none; border-radius: 50%; border: 0; cursor: pointer; padding: 6px;
+  background: linear-gradient(160deg, #fff 10%, #d4d8de 55%, #aeb4bc 100%);
+  box-shadow: 0 0 0 1px rgba(110, 118, 130, 0.55), 0 4px 10px rgba(40, 50, 65, 0.2);
+  transition: transform 0.22s cubic-bezier(0.3, 1.7, 0.5, 1), box-shadow 0.15s;
+}
+.round-back span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; font-weight: 900; font-size: 16px; color: var(--accent-deep); background: radial-gradient(120% 120% at 50% 15%, #fff, #e6e9ed); box-shadow: inset 0 0 0 2.5px rgba(53, 176, 226, 0.85); }
+.round-back:hover, .round-back:focus-visible { transform: scale(1.08); outline: none; box-shadow: 0 0 0 3px var(--accent), 0 0 16px 3px rgba(53, 176, 226, 0.35); }
+
+/* lists */
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.chip { height: 40px; padding: 0 18px; border-radius: 20px; border: 2px solid #c9ced4; background: linear-gradient(#fff, #eef0f3); font-weight: 800; font-size: 15px; color: #6e757d; cursor: pointer; transition: 0.15s; }
+.chip.on { background: linear-gradient(#5cc4ec, var(--accent)); border-color: var(--accent-deep); color: #fff; text-shadow: 0 1px 1px rgba(0, 60, 100, 0.3); }
+.chip:hover, .chip:focus-visible { border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px var(--accent-soft); }
+.list { display: grid; gap: 12px; }
+.row {
+  display: grid; grid-template-columns: 66px 1fr auto; align-items: center; gap: 18px; text-align: left; width: 100%; cursor: pointer; text-decoration: none; color: inherit;
+  background: #fff; border: 2.5px solid #dde1e5; border-radius: 20px; padding: 12px 20px 12px 14px;
+  box-shadow: 0 2px 0 #dfe2e6, 0 6px 14px -8px rgba(40, 50, 70, 0.15);
+  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), border-color 0.15s, box-shadow 0.15s;
+}
+.row:hover, .row:focus-visible { border-color: var(--accent); transform: scale(1.012); outline: none; box-shadow: 0 0 0 5px var(--accent-soft), 0 8px 18px -8px rgba(30, 80, 120, 0.3); }
+.cal-badge { display: grid; grid-template-rows: 20px 1fr; width: 62px; height: 62px; border-radius: 14px; overflow: hidden; background: linear-gradient(#fff, #f1f3f5); box-shadow: 0 0 0 2px #d6dade, 0 2px 3px rgba(0, 0, 0, 0.06); text-align: center; position: relative; }
+.cal-badge b { background: var(--cc); color: #fff; font-size: 12px; line-height: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; }
+.cal-badge i { font-style: normal; font-weight: 900; font-size: 24px; color: var(--ink-strong); line-height: 1.25; }
+.cal-badge s { position: absolute; bottom: 2px; left: 0; right: 0; text-decoration: none; font-size: 9.5px; font-weight: 800; color: #a3a9b0; }
+.row-main { display: grid; gap: 3px; min-width: 0; }
+.row-title { font-weight: 800; font-size: 19px; color: var(--ink-strong); line-height: 1.3; }
+.row-desc { font-family: var(--prose); font-size: 15px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chev { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(#fff, #e9ecef); box-shadow: 0 0 0 2px #d0d5da; position: relative; }
+.chev::after { content: ''; position: absolute; left: 12px; top: 10px; border: 7px solid transparent; border-left: 10px solid var(--accent); }
+.host { font-size: 13px; font-weight: 800; color: #fff; background: var(--cc); padding: 5px 11px; border-radius: 12px; white-space: nowrap; }
+
+.stickies { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 28px 24px; padding: 10px 4px; }
+.sticky {
+  position: relative; aspect-ratio: 1; border: 0; cursor: pointer; text-align: left; padding: 30px 20px 18px; display: flex; flex-direction: column; justify-content: space-between;
+  transform: rotate(var(--rot)); transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.2s;
+  box-shadow: 0 10px 18px -8px rgba(50, 60, 40, 0.35), inset 0 -18px 30px -24px rgba(0, 0, 0, 0.2);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%);
+}
+.sticky.s0 { background: linear-gradient(#fff07a, #f7dc45); }
+.sticky.s1 { background: linear-gradient(#ffd1e1, #f9adc7); }
+.sticky.s2 { background: linear-gradient(#cdeaff, #a3d6f9); }
+.sticky.s3 { background: linear-gradient(#d4f6c8, #aee69a); }
+.sticky::after { content: ''; position: absolute; right: 0; bottom: 0; width: 22px; height: 22px; background: linear-gradient(135deg, rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.4)); }
+.sticky .tape { position: absolute; top: -2px; left: 50%; width: 80px; height: 22px; transform: translateX(-50%) rotate(-3deg); background: rgba(255, 255, 255, 0.55); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08); }
+.st-title { font-weight: 800; font-size: 20px; color: #4a3f2a; line-height: 1.3; }
+.st-date { font-weight: 700; font-size: 13px; color: rgba(74, 63, 42, 0.6); }
+.sticky:hover, .sticky:focus-visible { transform: rotate(0) scale(1.05); outline: none; box-shadow: 0 16px 26px -10px rgba(30, 60, 90, 0.4), 0 0 0 4px var(--accent); clip-path: none; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.card { display: flex; gap: 16px; align-items: flex-start; text-decoration: none; color: inherit; background: #fff; border-radius: 22px; border: 2.5px solid #dde1e5; padding: 16px; box-shadow: 0 2px 0 #dfe2e6, 0 8px 16px -10px rgba(40, 50, 70, 0.2); transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), border-color 0.15s, box-shadow 0.15s; }
+.card:hover, .card:focus-visible { border-color: var(--accent); transform: scale(1.02); outline: none; box-shadow: 0 0 0 5px var(--accent-soft); }
+.card-ico { flex: none; width: 58px; height: 58px; border-radius: 16px; display: grid; place-items: center; font-weight: 900; font-size: 21px; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); background: linear-gradient(160deg, hsl(var(--h) 80% 72%), hsl(var(--h) 65% 52%)); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 3px 6px hsl(var(--h) 50% 40% / 0.35); position: relative; overflow: hidden; }
+.card-ico::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 48%; background: rgba(255, 255, 255, 0.22); border-radius: 0 0 50% 50% / 0 0 30% 30%; }
+.card-main { display: grid; gap: 4px; min-width: 0; }
+.card-main b { font-size: 18px; color: var(--ink-strong); }
+.card-main span { font-family: var(--prose); font-size: 14.5px; color: #6c737b; line-height: 1.45; }
+.card-main em { font-style: normal; font-weight: 800; font-size: 13px; color: var(--accent-deep); }
+
+.about { display: grid; grid-template-columns: minmax(220px, 360px) 1fr; gap: 36px; align-items: center; min-height: 100%; }
+.about-art { position: relative; aspect-ratio: 1; border-radius: 36px; background: linear-gradient(#bfe7ff, #f2fbff); box-shadow: inset 0 0 0 3px #fff, 0 0 0 2px #cfd8e0, 0 12px 24px -12px rgba(30, 80, 120, 0.35); overflow: hidden; }
+.about-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hello { font-size: clamp(30px, 4vw, 46px); font-weight: 900; margin: 0 0 8px; color: var(--ink-strong); }
+.blurb { font-family: var(--prose); font-size: 20px; line-height: 1.6; margin: 0 0 22px; color: #555c64; }
+.facts { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+.facts div { background: #fff; border: 2.5px solid #dde1e5; border-radius: 18px; padding: 10px 18px; display: grid; text-align: center; min-width: 96px; }
+.facts b { font-size: 28px; font-weight: 900; color: var(--cc); }
+.facts span { font-size: 13px; font-weight: 800; color: var(--muted); }
+.btnrow { display: flex; gap: 14px; flex-wrap: wrap; }
+.btnrow.center { justify-content: center; }
+.btnrow .pill { min-width: 0; height: 54px; font-size: 19px; padding: 0 24px; }
+
+.link-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.link-card { display: flex; align-items: center; gap: 18px; padding: 18px 20px; border-radius: 26px; background: #fff; border: 2.5px solid #dde1e5; text-decoration: none; color: inherit; box-shadow: 0 2px 0 #dfe2e6; transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), border-color 0.15s, box-shadow 0.15s; }
+.link-card:hover, .link-card:focus-visible { border-color: var(--accent); transform: scale(1.02); outline: none; box-shadow: 0 0 0 5px var(--accent-soft); }
+.lc-ico { flex: none; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 22px; color: #fff; background: radial-gradient(circle at 35% 25%, #ff9cc6, #e0559a 70%); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 3px 8px rgba(224, 85, 154, 0.35); position: relative; }
+.lc-ico.rss { background: radial-gradient(circle at 35% 25%, #ffc483, #f08a24 70%); }
+.lc-ico.rss i { position: absolute; left: 20px; bottom: 20px; border: 4px solid #fff; border-left: 0; border-bottom: 0; border-radius: 0 100% 0 0; }
+.lc-ico.rss i:nth-child(1) { width: 8px; height: 8px; border: 0; background: #fff; border-radius: 50%; }
+.lc-ico.rss i:nth-child(2) { width: 17px; height: 17px; }
+.lc-ico.rss i:nth-child(3) { width: 27px; height: 27px; }
+.lc-main { flex: 1; display: grid; gap: 3px; }
+.lc-main b { font-size: 21px; color: var(--ink-strong); }
+.lc-main span { font-family: var(--prose); color: var(--muted); font-size: 15px; }
+
+.fc { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; }
+.fc-now { position: relative; aspect-ratio: 16 / 9; border-radius: 26px; overflow: hidden; box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.7), 0 0 0 2px #cfd8e0, 0 12px 22px -12px rgba(30, 80, 120, 0.4); }
+.fc-now canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.stat { background: #fff; border: 2.5px solid #dde1e5; border-radius: 20px; padding: 12px 16px; display: grid; align-content: center; }
+.stat b { font-size: 30px; font-weight: 900; color: #2a86cc; line-height: 1.1; }
+.stat b small { font-size: 0.55em; margin-left: 3px; }
+.stat span { font-size: 14px; font-weight: 800; color: var(--muted); }
+.sec { margin: 30px 0 14px; font-size: 22px; font-weight: 900; color: var(--ink-strong); }
+.sec span { font-size: 14px; color: var(--muted); font-weight: 700; margin-left: 10px; }
+.fc-days { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+.fc-day { background: linear-gradient(#ffffff, #f0f6fb); border: 2.5px solid #d6e2ec; border-radius: 20px; padding: 12px 10px 14px; text-align: center; display: grid; justify-items: center; gap: 4px; }
+.fc-y { font-weight: 900; color: #2a86cc; font-size: 17px; }
+.fc-day b { font-size: 22px; font-weight: 900; color: var(--ink-strong); }
+.fc-w { font-size: 12.5px; font-weight: 800; color: var(--muted); }
+.wx { position: relative; width: 54px; height: 42px; }
+.wx i { position: absolute; display: block; }
+.wx.sun i:first-child, .wx.part i:first-child { left: 13px; top: 6px; width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff6b8, #ffcb2f 70%); box-shadow: 0 0 0 4px rgba(255, 210, 60, 0.3); }
+.wx.part i:first-child { left: 6px; top: 2px; }
+.wx.part i:last-child, .wx.cloud i:last-child, .wx.drizzle i:last-child { left: 10px; top: 16px; width: 38px; height: 18px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 2px #cdd9e3, -4px -6px 0 -1px #fff, 6px -9px 0 -2px #fff; }
+.wx.cloud i:first-child, .wx.drizzle i:first-child { left: 6px; top: 10px; width: 26px; height: 16px; border-radius: 9px; background: #e3eaf0; }
+.wx.drizzle::after { content: ''; position: absolute; left: 18px; top: 36px; width: 20px; height: 5px; background: repeating-linear-gradient(90deg, #58aee8 0 3px, transparent 3px 8px); border-radius: 2px; }
+.fine { font-family: var(--prose); font-size: 14px; color: var(--muted); line-height: 1.6; margin-top: 22px; }
+
+.jb { display: grid; gap: 20px; }
+.jb-screen { position: relative; height: clamp(200px, 38vh, 320px); border-radius: 26px; overflow: hidden; box-shadow: 0 0 0 6px #e6e9ed, 0 0 0 8px #c4cad1, 0 14px 24px -12px rgba(60, 20, 60, 0.4); }
+.jb-screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.jb-info { text-align: center; font-weight: 800; color: #8a6a80; margin: 0; font-size: 15px; line-height: 1.6; }
+
+/* article */
+.article { max-width: 780px; margin: 0 auto; background: #fff; border-radius: 30px; border: 2.5px solid #dde1e5; padding: clamp(22px, 4vw, 46px) clamp(18px, 5vw, 56px); box-shadow: 0 2px 0 #dfe2e6, 0 16px 30px -18px rgba(40, 50, 70, 0.3); }
+.art-meta { display: flex; align-items: center; gap: 12px; color: var(--muted); font-weight: 800; font-size: 15px; margin-bottom: 12px; }
+.tag { color: #fff; background: #f08a24; padding: 4px 12px; border-radius: 12px; font-size: 13px; }
+.tag.note { background: #2fae6b; }
+.article h1 { margin: 0 0 8px; font-size: clamp(26px, 3.6vw, 38px); font-weight: 900; line-height: 1.2; color: var(--ink-strong); }
+.art-desc { margin: 0 0 22px; font-size: 18px; color: var(--muted); font-weight: 700; }
+.prose { font-family: var(--prose); font-size: 18.5px; line-height: 1.72; color: #3d434a; overflow-wrap: break-word; }
+.prose p { margin: 0 0 1.05em; }
+.prose a { color: var(--accent-deep); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.prose code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.86em; background: #eef2f6; border-radius: 6px; padding: 0.1em 0.38em; }
+.prose pre { background: #2a2e36; color: #e8ecf1; border-radius: 16px; padding: 16px 18px; overflow-x: auto; font-size: 14.5px; line-height: 1.55; }
+.prose pre code { background: none; padding: 0; color: inherit; }
+.prose blockquote { margin: 0 0 1em; padding: 10px 18px; border-left: 5px solid var(--accent); background: #f2f9fd; border-radius: 0 14px 14px 0; color: #4d5a66; }
+.prose h2, .prose h3, .prose h4 { font-family: var(--font); color: var(--ink-strong); margin: 1.3em 0 0.4em; line-height: 1.25; }
+.prose ul, .prose ol { padding-left: 1.3em; margin: 0 0 1em; }
+.img-note { font-family: var(--font); font-size: 14px !important; font-weight: 700; color: #8a9199; background: repeating-linear-gradient(45deg, #f4f6f8 0 10px, #eef1f4 10px 20px); border: 2px dashed #d3d9df; border-radius: 14px; padding: 14px 16px; }
+.art-cta { margin-top: 28px; display: flex; justify-content: center; }
+.art-cta .pill { min-width: 0; font-size: 19px; height: 56px; }
+
+/* ------------------------------------------------ board */
+.bd-head { position: relative; z-index: 2; flex: none; height: 84px; display: flex; align-items: center; gap: 14px; padding: 0 clamp(16px, 3vw, 34px); background: linear-gradient(#ffffff, #eef0f3); box-shadow: 0 1px 0 rgba(120, 128, 140, 0.3), 0 6px 14px rgba(40, 50, 70, 0.07); }
+.bd-head::after { content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 3px; background: var(--accent); }
+.bd-ico { width: 46px; height: 34px; fill: #e5f6fd; stroke: var(--accent); color: var(--accent); stroke-width: 2.6; overflow: visible; flex: none; }
+.bd-head h2 { margin: 0; font-size: 28px; font-weight: 900; color: var(--ink-strong); white-space: nowrap; }
+.bd-month { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.bd-mname { font-weight: 900; font-size: 24px; color: var(--accent-deep); min-width: 210px; text-align: center; }
+.arrow-btn { width: 46px; height: 46px; border-radius: 50%; border: 2.5px solid #c3c8cf; background: linear-gradient(#fff, #e8ebee); font-size: 30px; font-weight: 900; line-height: 1; color: var(--accent-deep); cursor: pointer; padding: 0 0 4px; transition: transform 0.2s cubic-bezier(0.3, 1.7, 0.5, 1); }
+.arrow-btn:hover:not(:disabled), .arrow-btn:focus-visible { border-color: var(--accent); transform: scale(1.1); outline: none; box-shadow: 0 0 0 4px var(--accent-soft); }
+.arrow-btn:disabled { opacity: 0.35; cursor: default; }
+.bd-main { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr minmax(260px, 340px); gap: 22px; padding: 18px clamp(16px, 3vw, 34px) 10px; }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: 26px; grid-auto-rows: 1fr; gap: 7px; min-height: 0; }
+.cal-h { text-align: center; font-weight: 900; font-size: 14px; color: #9aa1a8; align-self: center; }
+.cal-h.sun { color: #e57b7b; }
+.cal-h.sat { color: #5aa6d8; }
+.cell { position: relative; border-radius: 14px; border: 2px solid #dfe3e7; background: linear-gradient(#ffffff, #f5f6f8); padding: 5px 7px; text-align: left; min-height: 0; overflow: hidden; display: block; cursor: pointer; transition: transform 0.18s cubic-bezier(0.3, 1.7, 0.5, 1), border-color 0.15s, box-shadow 0.15s; }
+.cell.out { background: rgba(255, 255, 255, 0.35); border-color: rgba(220, 224, 228, 0.6); cursor: default; }
+.cell .dn { font-weight: 900; font-size: 15px; color: #8f969d; }
+.cell.sun .dn { color: #e08080; }
+.cell.sat .dn { color: #5aa6d8; }
+.cell.out .dn { color: #c8cdd2; }
+.cell.has { background: linear-gradient(#ffffff, #eef8fd); border-color: #bfe0f0; }
+.cell.today { box-shadow: inset 0 0 0 2px #ffc94a; }
+.cell.today .dn::after { content: 'today'; font-size: 10px; margin-left: 5px; color: #e0a100; vertical-align: 2px; }
+.cell.sel, .cell:focus-visible, .cell:hover:not(.out) { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); outline: none; z-index: 1; }
+.cell.sel { transform: scale(1.04); }
+.envs { position: absolute; right: 6px; top: 6px; display: flex; gap: 3px; align-items: center; }
+.envs em { font-style: normal; font-size: 11px; font-weight: 900; color: var(--accent-deep); }
+.env { display: inline-block; width: 22px; height: 16px; border-radius: 3px; position: relative; flex: none; background: #fff; box-shadow: 0 0 0 1.5px #57b2de, 0 2px 3px rgba(0, 0, 0, 0.12); overflow: hidden; }
+.env::before { content: ''; position: absolute; left: 1px; right: 1px; top: -9px; height: 16px; border: 1.5px solid #57b2de; transform: rotate(45deg) scale(0.72); transform-origin: 50% 50%; border-top: 0; border-left: 0; }
+.env.note { background: #fff07a; box-shadow: 0 0 0 1.5px #d1b52b, 0 2px 3px rgba(0, 0, 0, 0.12); border-radius: 2px; }
+.env.note::before { border: 0; height: 2px; top: 5px; left: 4px; right: 4px; transform: none; background: rgba(120, 100, 30, 0.45); box-shadow: 0 4px 0 rgba(120, 100, 30, 0.45); }
+.env.work { background: #e1f7e7; box-shadow: 0 0 0 1.5px #47b46a, 0 2px 3px rgba(0, 0, 0, 0.12); }
+.env.work::before { border-color: #47b46a; }
+.peek { position: absolute; left: 7px; right: 7px; bottom: 5px; font-size: 11.5px; font-weight: 800; color: #4a6577; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.bd-day { background: #fff; border-radius: 24px; border: 2.5px solid #dde1e5; padding: 18px; overflow-y: auto; min-height: 0; box-shadow: 0 10px 22px -16px rgba(40, 50, 70, 0.3); }
+.bd-day h3 { margin: 0 0 12px; font-size: 20px; font-weight: 900; color: var(--ink-strong); display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.bd-day h3 span { font-size: 13px; color: var(--muted); font-weight: 800; }
+.bd-day ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.msg { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; padding: 12px; border-radius: 16px; border: 2px solid #e2e6ea; background: linear-gradient(#fff, #f7f8fa); cursor: pointer; text-decoration: none; color: inherit; transition: 0.15s; }
+.msg .env { margin-top: 3px; }
+.msg b { display: block; font-size: 15.5px; color: var(--ink-strong); line-height: 1.3; }
+.msg small { display: block; font-size: 12.5px; color: var(--muted); font-weight: 700; margin-top: 3px; }
+.msg:hover, .msg:focus-visible { border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px var(--accent-soft); }
+.empty-day { color: var(--muted); font-weight: 700; font-size: 15px; }
+.bd-strip { position: relative; flex: none; display: flex; gap: 8px; justify-content: safe center; padding: 6px 16px 14px; overflow-x: auto; scrollbar-width: none; }
+.yr { display: grid; justify-items: center; gap: 4px; }
+.yr span { font-size: 12px; font-weight: 900; color: #9aa1a8; }
+.pips { display: flex; gap: 2px; padding: 5px 7px; border-radius: 10px; background: rgba(255, 255, 255, 0.7); box-shadow: inset 0 0 0 1.5px #dde1e5; }
+.pip { width: 7px; height: 16px; border-radius: 3px; border: 0; padding: 0; background: #e3e6ea; }
+.pip.has { cursor: pointer; background: hsl(198 75% calc(80% - var(--n) * 8%)); }
+.pip.cur { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent); }
+.pip.has:hover, .pip.has:focus-visible { transform: scaleY(1.2); outline: none; box-shadow: 0 0 0 2px var(--accent); }
+.legend { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
+.lg { display: inline-block; width: 18px; height: 13px; border-radius: 3px; margin-left: 12px; }
+.lg.post { background: #fff; box-shadow: 0 0 0 1.5px #57b2de; }
+.lg.note { background: #fff07a; box-shadow: 0 0 0 1.5px #d1b52b; }
+.lg.work { background: #e1f7e7; box-shadow: 0 0 0 1.5px #47b46a; }
+.letter-wrap { position: absolute; inset: 0; z-index: 6; background: rgba(230, 234, 238, 0.7); backdrop-filter: blur(6px); display: grid; place-items: center; padding: 24px 16px; animation: view-in 0.3s ease both; }
+.letter { width: min(820px, 100%); max-height: 100%; overflow-y: auto; border-radius: 30px; background: #fff; box-shadow: 0 0 0 2.5px #d6dbe0, 0 26px 50px -20px rgba(30, 50, 80, 0.45); }
+.letter:focus { outline: none; }
+.letter .article { border: 0; box-shadow: none; background: repeating-linear-gradient(transparent 0 31px, #eef3f7 31px 32px); border-radius: 0; }
+.letter-top { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 12px; padding: 14px 18px 14px 22px; background: linear-gradient(#fff, #f3f5f7); border-bottom: 2px solid #e4e8ec; font-weight: 700; color: var(--muted); font-size: 15px; }
+.stamp { width: 34px; height: 40px; border-radius: 4px; background: radial-gradient(circle at 50% 45%, #fff 0 25%, var(--accent) 27% 60%, #fff 62%); box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #c9d1d8; flex: none; }
+.stamp.note { background: radial-gradient(circle at 50% 45%, #fff 0 25%, #f2c230 27% 60%, #fff 62%); }
+.x { margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 2.5px solid #c3c8cf; background: linear-gradient(#fff, #e8ebee); font-size: 26px; font-weight: 800; color: #7b828a; cursor: pointer; line-height: 1; padding: 0 0 3px; }
+.x:hover, .x:focus-visible { border-color: var(--accent); color: var(--accent-deep); outline: none; box-shadow: 0 0 0 4px var(--accent-soft); }
+
+/* ------------------------------------------------ settings */
+.settings-wrap { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: rgba(225, 230, 235, 0.65); backdrop-filter: blur(6px); padding: 16px; animation: view-in 0.25s ease both; }
+.settings { width: min(520px, 100%); background: linear-gradient(#fff, #f4f6f8); border-radius: 32px; padding: 26px 28px 24px; box-shadow: 0 0 0 2.5px #cfd5db, 0 0 0 6px rgba(255, 255, 255, 0.8), 0 30px 60px -24px rgba(30, 50, 80, 0.45); }
+.settings h2 { margin: 0 0 16px; font-size: 26px; font-weight: 900; color: var(--ink-strong); }
+.st-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 4px; border-bottom: 2px dashed #e1e5e9; font-weight: 800; font-size: 17px; }
+.st-row small { color: var(--muted); font-weight: 700; }
+.toggle { width: 74px; height: 38px; border-radius: 19px; border: 2.5px solid #c3c8cf; background: linear-gradient(#e3e6ea, #f3f5f7); position: relative; cursor: pointer; flex: none; transition: background 0.2s, border-color 0.2s; }
+.toggle i { position: absolute; top: 3px; left: 3px; width: 27px; height: 27px; border-radius: 50%; background: linear-gradient(#fff, #e3e6ea); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.toggle[aria-checked='true'] { background: linear-gradient(#5cc4ec, var(--accent)); border-color: var(--accent-deep); }
+.toggle[aria-checked='true'] i { transform: translateX(36px); }
+.toggle:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--accent-soft); }
+.st-help { margin: 16px 0 6px; font-size: 14.5px; color: #6d747c; line-height: 1.5; font-family: var(--prose); }
+.st-help p { margin: 0 0 6px; }
+.st-help b { font-family: var(--font); color: var(--ink); margin-right: 4px; }
+.st-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 14px; flex-wrap: wrap; }
+.st-actions .pill { min-width: 0; height: 50px; font-size: 18px; padding: 0 22px; }
+
+/* ------------------------------------------------ phones */
+@media (max-width: 699px) {
+  .page { padding: 18px 0 30px; }
+  .time { font-size: 38px; margin-top: calc(var(--btop) - 42px); }
+  .date { font-size: 17px; margin-top: 12px; }
+  .pill-sm { bottom: 12px; height: 32px; font-size: 12.5px; padding: 0 11px 0 9px; gap: 6px; }
+  .pill-sm.sound { left: auto; right: calc(50% + 4px); }
+  .pill-sm.tilt { right: auto; left: calc(50% + 4px); }
+  .bubble { font-size: 16px; padding: 7px 16px 8px; }
+  .splash-bar { height: 104px; gap: 14px; }
+  .pill { height: 56px; font-size: 20px; min-width: 0; padding: 0 22px; flex: 1; max-width: 200px; }
+  .ch-head { height: 62px; gap: 10px; }
+  .ch-badge { width: 30px; height: 30px; }
+  .ch-head h2 { font-size: 23px; }
+  .ch-sub { display: none; }
+  .ch-clock { font-size: 15px; }
+  .ch-body { padding: 18px 16px 30px; }
+  .ch-foot { height: 80px; }
+  .round-back { width: 60px; height: 60px; }
+  .round-back span { font-size: 14px; }
+  .pill-mid { flex: none; min-width: 110px; height: 48px; font-size: 18px; }
+  .ch-foot-mid { font-size: 13px; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 16px; padding: 4px 16px 6px; scrollbar-width: none; }
+  .chip { flex: none; }
+  .row { grid-template-columns: 54px 1fr; gap: 12px; padding: 10px 12px; border-radius: 18px; }
+  .row .chev, .row .host { display: none; }
+  .cal-badge { width: 52px; height: 54px; grid-template-rows: 17px 1fr; }
+  .cal-badge b { font-size: 10px; line-height: 17px; }
+  .cal-badge i { font-size: 20px; }
+  .row-title { font-size: 16.5px; }
+  .row-desc { font-size: 13.5px; }
+  .stickies { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .sticky { padding: 24px 12px 12px; }
+  .st-title { font-size: 15px; }
+  .cards, .link-grid { grid-template-columns: 1fr; }
+  .about { grid-template-columns: 1fr; gap: 18px; }
+  .about-art { max-width: 280px; width: 100%; margin: 0 auto; }
+  .blurb { font-size: 17px; }
+  .fc { grid-template-columns: 1fr; }
+  .fc-days { grid-template-columns: repeat(3, 1fr); }
+  .prose { font-size: 17px; }
+  .bd-head { height: auto; min-height: 64px; flex-wrap: wrap; padding: 10px 16px; gap: 8px 10px; }
+  .bd-head h2 { font-size: 22px; }
+  .bd-ico { width: 34px; height: 26px; }
+  .bd-month { margin-left: 0; width: 100%; justify-content: space-between; }
+  .bd-mname { font-size: 19px; min-width: 0; }
+  .arrow-btn { width: 40px; height: 40px; font-size: 26px; }
+  .bd-main { display: flex; flex-direction: column; overflow-y: auto; padding: 10px 12px; gap: 14px; }
+  .cal { flex: none; grid-auto-rows: 52px; gap: 4px; }
+  .cell { border-radius: 10px; padding: 3px 4px; }
+  .cell .dn { font-size: 12.5px; }
+  .cell.today .dn::after { display: none; }
+  .peek { display: none; }
+  .envs { right: 3px; top: auto; bottom: 4px; gap: 1px; }
+  .env { width: 15px; height: 11px; }
+  .bd-day { flex: none; overflow: visible; }
+  .legend { font-size: 0; gap: 0; }
+  .legend .lg { margin-left: 6px; }
+  .letter .article { padding: 20px 18px; }
+}
+
+/* ------------------------------------------------ reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
+  .stripes::before, .stripes::after, .glare::after { animation: none !important; }
+  .time i { animation: none; }
+  .boot-press { animation: none; }
+  .tile.hot .bezel { transform: none; }
+}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-hand" viewBox="0 0 64 80">
+      <!-- original pointing mitten: finger up, three tucked fingers, thumb, cuff -->
+      <path d="M22 6c0-3.4 2.7-6 6-6s6 2.6 6 6v26.5c1.1-1.8 3-3 5.3-3 3 0 5.5 2.2 6 5.1 1-1 2.5-1.6 4.1-1.6 3.2 0 5.8 2.6 5.8 5.8v.9c.9-.5 1.9-.8 3-.8 3.2 0 5.8 2.6 5.8 5.8V58c0 11.6-9.4 21-21 21h-6.8c-6.7 0-12.7-3.4-16.2-9L5 52.3c-1.7-2.8-.9-6.4 1.8-8.2 2.6-1.7 6-1.1 7.9 1.3L22 54.6V6z"/>
+    </symbol>
+    <symbol id="i-mail" viewBox="0 0 48 36">
+      <rect x="2" y="3" width="44" height="30" rx="5"/>
+      <path d="M4 7l20 14L44 7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="boot" class="boot" role="dialog" aria-modal="true" aria-labelledby="boot-title" tabindex="-1">
+  <div class="boot-inner">
+    <div class="boot-head">
+      <svg class="boot-sign" viewBox="0 0 64 58" aria-hidden="true"><path d="M27.6 4.6a5 5 0 0 1 8.8 0l25 44.2A5 5 0 0 1 57 56H7a5 5 0 0 1-4.4-7.2z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><rect x="29" y="18" width="6" height="20" rx="3"/><circle cx="32" cy="46" r="3.6"/></svg>
+      <h1 id="boot-title">WARNING &ndash; OPINIONS AND SAFETY</h1>
+    </div>
+    <p class="boot-lead">BEFORE BROWSING, READ THE BLOG POSTS ABOUT NODE TOOLING.</p>
+    <p>This site contains strongly held opinions about package managers, code formatters, and pinning your dependencies. Side effects may include rewriting your prompts.</p>
+    <p class="boot-small">Do not read about Linux on an iPad while operating heavy machinery. Take a 15-minute break every hour, or whenever a build takes longer than 350&nbsp;ms.</p>
+    <hr>
+    <p class="boot-press"><svg class="boot-hand" aria-hidden="true"><use href="#i-hand"/></svg><span>Press anywhere to continue.</span></p>
+    <p class="boot-foot">Sound starts muted. Flip it on from the menu if you'd like a little jingle.</p>
+  </div>
+</div>
+
+<main id="menu" class="menu" aria-label="Home menu">
+  <div class="stripes" aria-hidden="true"></div>
+  <h1 class="sr-only">Max Leiter</h1>
+  <div id="track" class="track" aria-label="Channels"></div>
+  <button class="page-arrow prev" id="prevPage" aria-label="Previous page" hidden><span></span></button>
+  <button class="page-arrow next" id="nextPage" aria-label="Next page" hidden><span></span></button>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+
+  <footer class="dock" id="dock">
+    <svg class="dock-shape" id="dockShape" aria-hidden="true" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="dockFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f6f7f9"/><stop offset=".45" stop-color="#e6e8ec"/><stop offset="1" stop-color="#d3d6db"/>
+        </linearGradient>
+      </defs>
+      <path class="fill" fill="url(#dockFill)"/>
+      <path class="hi"/>
+      <path class="line"/>
+    </svg>
+    <button class="orb orb-left" id="orbMenu" aria-label="Plaza settings"><span class="orb-face"><span class="orb-word">Plaza</span></span></button>
+    <div class="clock" aria-live="off">
+      <div class="time" id="time"><span id="hh">12</span><i>:</i><span id="mm">00</span><small id="ampm">PM</small></div>
+      <div class="date" id="date">Sat 10/10</div>
+    </div>
+    <button class="pill-sm sound" id="soundBtn" aria-pressed="false"><span class="spk" aria-hidden="true"></span><span class="lbl">Sound off</span></button>
+    <button class="pill-sm tilt" id="tiltBtn" hidden aria-pressed="false"><span class="lbl">Tilt</span></button>
+    <button class="orb orb-right" id="orbMail" aria-label="Message board"><span class="orb-face"><svg class="mail-ico" aria-hidden="true"><use href="#i-mail"/></svg><span class="badge" id="mailBadge"></span></span></button>
+  </footer>
+</main>
+
+<section id="channel" class="channel" role="dialog" aria-modal="true" aria-labelledby="chTitle" hidden>
+  <div class="stripes" aria-hidden="true"></div>
+  <div class="splash" id="splash">
+    <div class="splash-art"><canvas id="splashCanvas" aria-hidden="true"></canvas><span class="glass" aria-hidden="true"></span></div>
+    <div class="splash-bar">
+      <button class="pill" id="splashMenu">Menu</button>
+      <button class="pill primary" id="splashStart">Start</button>
+    </div>
+  </div>
+  <div class="ch-view" id="chView" hidden>
+    <header class="ch-head">
+      <span class="ch-badge" id="chBadge" aria-hidden="true"></span>
+      <h2 id="chTitle">Blog</h2>
+      <span class="ch-sub" id="chSub"></span>
+      <span class="ch-clock" id="chClock"></span>
+    </header>
+    <div class="ch-body" id="chBody" tabindex="-1"></div>
+    <footer class="ch-foot">
+      <button class="round-back" id="chBack" aria-label="Back"><span>Back</span></button>
+      <div class="ch-foot-mid" id="chFootMid"></div>
+      <button class="pill pill-mid" id="chMenu">Menu</button>
+    </footer>
+  </div>
+</section>
+
+<section id="board" class="board" role="dialog" aria-modal="true" aria-labelledby="bdTitle" hidden>
+  <div class="stripes" aria-hidden="true"></div>
+  <header class="bd-head">
+    <svg class="bd-ico" aria-hidden="true"><use href="#i-mail"/></svg>
+    <h2 id="bdTitle">Message Board</h2>
+    <div class="bd-month">
+      <button class="arrow-btn" id="bdPrev" aria-label="Previous month with posts">&lsaquo;</button>
+      <div class="bd-mname" id="bdMonth" aria-live="polite">September 2026</div>
+      <button class="arrow-btn" id="bdNext" aria-label="Next month with posts">&rsaquo;</button>
+    </div>
+  </header>
+  <div class="bd-main">
+    <div class="cal" id="cal" role="grid" aria-labelledby="bdMonth"></div>
+    <aside class="bd-day" id="bdDay" aria-live="polite"></aside>
+  </div>
+  <div class="bd-strip" id="bdStrip" aria-label="Years"></div>
+  <footer class="ch-foot">
+    <button class="round-back" id="bdBack" aria-label="Back"><span>Back</span></button>
+    <div class="ch-foot-mid legend"><span class="lg post"></span>Blog post <span class="lg note"></span>Note <span class="lg work"></span>Work</div>
+    <button class="pill pill-mid" id="bdMenu">Menu</button>
+  </footer>
+  <div class="letter-wrap" id="letterWrap" hidden>
+    <article class="letter" id="letter" tabindex="-1"></article>
+  </div>
+</section>
+
+<div class="settings-wrap" id="settings" hidden>
+  <div class="settings" role="dialog" aria-modal="true" aria-labelledby="stTitle">
+    <h2 id="stTitle">Plaza Settings</h2>
+    <div class="st-row"><span>Sound effects &amp; jingle</span><button class="toggle" id="stSound" role="switch" aria-checked="false"><i></i></button></div>
+    <div class="st-row"><span>Ambient jingle</span><button class="toggle" id="stJingle" role="switch" aria-checked="true"><i></i></button></div>
+    <div class="st-row" id="stTiltRow"><span>Tilt parallax <small>(phones)</small></span><button class="toggle" id="stTilt" role="switch" aria-checked="false"><i></i></button></div>
+    <div class="st-help">
+      <p><b>Keyboard</b> arrows move, Enter opens, Esc goes back.</p>
+      <p><b>Controller</b> stick or d-pad moves, bottom face button opens, right face button goes back.</p>
+      <p><b>Phone</b> swipe between pages, tilt to lean the menu.</p>
+    </div>
+    <div class="st-actions"><button class="pill" id="stIntro">Replay intro</button><button class="pill primary" id="stClose">Done</button></div>
+  </div>
+</div>
+
+<div class="bubble" id="bubble" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="hand" id="hand" aria-hidden="true"><svg class="hand-shadow"><use href="#i-hand"/></svg><svg class="hand-glyph"><use href="#i-hand"/></svg></div>
+
+<script>
+/* ---- data.js ---- */
+const DATA = {"site":{"name":"Max Leiter","url":"https://maxleiter.com","github":"https://github.com/maxleiter","x":"https://twitter.com/maxleiter","blurb":"Software engineer at Vercel working on v0 and the AI SDK. Writes about the web, Linux, tooling and AI."},"posts":[{"t":"You don't need Jev for good emoji search","d":"or: semantic emoji search with embeddings","date":"Sep 26, 2026","href":"/blog/embedding-emoji-search","ex":"There's been a lot of [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) hype lately, and for good reason.\nIt's largely novel (to most developers, at least), super cheap, and there's a lot of cool use cases for it.\n\nThe issue I see is a lot of people are seeing Jev as a hammer, and lots of _classification_ tasks as nails.\nYou want to use Jev when you need some LLM reasoning behind the decision.\n\nFor example, take this tweet:\n\n\n\nTo be clear, I don't intend to pick on Gergely or Linear. But I think this is a miss on both their parts.\n\nTwo years ago, I built semantic emoji search but with no LLM and just embeddings. And it was faster, cheaper, and occasionally better than Jev (\"pareto-mogged\", as the kids say).\n\nNow, to [Gergely's point](https://x.com/GergelyOrosz/status/2103873821908353260?s=20), setting up a database and embedding model or an embedding provider are more work than just using Jev.\nAnd two years ago I would have gladly used Jev instead of working with Opus 3/GPT-4-turbo to scrape all of Vercel's slack emojis and get this working.\n\nBut it's not two years ago and models are now more than\ncapable of autonomously doing the work for you.\n\n\nAn aside on scr"},{"t":"thank u, next","d":"Replacing Next.js with a vibe-coded \"framework","date":"Sept 1, 2026","href":"/blog/thank-u-next","ex":"![The cover of Ariana Grande's album Thank U, Next: the title repeated in many fonts on a pink background](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/thank-u-next/thank-u-next.png)\n\n\n  If you're wondering about this post's title:\n  https://en.wikipedia.org/wiki/Thank_U,_Next\n\n\nThere's been a lot of talk about custom / personal software and LLMs lately. I've been a huge fan -- I'm writing this in a [markdown editor](https://github.com/MaxLeiter/md-viewer) I made for myself. And lately I've been toying with thoughts about the future of frameworks. A nice intersection of the two seemed like a personal framework.\n\nSo as of September 1st, this website is no longer running on Next.js. Instead, it's built by a bespoke custom framework that Fable architected and Opus implemented. If this were a commercial project, I'd probably stay on Next[^1], but it's not, so 🤷\n\nThis site is overall [pretty simple](/blog/build-a-blog-with-nextjs-13) - it's fully static and compiled to HTML at build time. But it has a lot of React and non-trivial build-time processing like [MDX](https://mdxjs.com/). I gave Fable 5 (in the claude code CLI) the following:\n\n> i am curious about on-demand c"},{"t":"Running Wayland, X11, GNOME, and KDE natively on an iPad","d":"X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition","date":"Jul 28, 2026","href":"/blog/xios","ex":"I [like](https://knightos.org) [running](https://maxleiter.com/blog/MSHW0184) [software](https://maxleiter.com/x11) on devices that aren't \"supposed\" to run it.\n\nI own the hardware. I should control the software. And for _reasons_, Apple makes phenomenal hardware and operating systems, but locks them down.\n\nI've been bitter for a long time. Six years ago, when I should’ve been studying for finals, I [ported X11](https://maxleiter.com/x11) to my jailbroken iPad because I wanted to try using it as a \"real\" personal computer:\n\n\n\nThat first version worked, but also sucked: the X server ran on the iPad, but I used a VNC client to interact with it and a lot of\nsoftware did not compile. I was using vim and xterm and it looked like something from the 90s.\n\nWith more experience, and with LLMs, I was able to get significantly further.\n\nThere is a \"slop wiki\" available at https://xios.maxleiter.com with more information, and the code is on [GitHub](https://github.com/MaxLeiter/jailbreak/tree/main/x11/).\n\nSome screenshots:\n\n\n  \n  \n  \n  \n\n\n### X11\n\nIf you're unfamiliar with X11, this post assumes a basic understanding, but TL;DR: it’s a window server and protocol that\nmany devices use. It descr"},{"t":"They're Made Out of Weights","d":"with apologies to Terry Bisson","date":"Jun 3, 2026","href":"/blog/weights","ex":"_After Terry Bisson's [\"They're Made Out of Meat\"](https://web.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html)._\n\n\"They're made out of weights.\"\n\n\"Weights?\"\n\n\"Weights. Floating-point numbers. We checked the whole thing through. It's nothing but weights.\"\n\n\"Weights doing what? Where do the words come from?\"\n\n\"The weights make the words. Are you understanding me? We opened it up. There's no dictionary in there, no grammar rules, no little man. Just weights. Eighty layers of numbers getting multiplied together.\"\n\n\"That's ridiculous. It wrote my performance review last week. It softened the tone unprompted. You're telling me multiplication did that?\"\n\n\"Matrix multiplication did that. The numbers go in one end, the phrasing comes out the other.\"\n\n\"So there's a language module somewhere. A reasoning unit bolted on.\"\n\n\"No module. No unit. We looked. The reasoning is the weights. The weights are the reasoning.\"\n\n\"Spare me. Nobody writes a eulogy with linear algebra.\"\n\n\"It doesn't write eulogies, technically. It predicts the next token. Then the next one. The eulogy is a side effect.\"\n\n\"A side effect. You're asking me to believe in sentient weights.\"\n\n\"I'm not asking you, I'm "},{"t":"Sandcastle: A web-based Linux desktop environment","d":"","date":"Feb 11, 2026","href":"/blog/sandcastle","ex":"![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/header.png)\n\nSix years ago, while I should have been studying for finals, I patched and compiled X11 (and all its dependencies)\nto [run on a jailbroken iPad](https://maxleiter.com/blog/X11). I wanted to run real applications on my tablet.\n\nI've spent the last few ~months~ ~weeks~ ~days~ hours ~building~ vibecoding something that feels like a better solution:\na Linux desktop environment, on the web. I wrote zero lines of code.\n\nYou can try it out [here](https://sandcastle-os.vercel.app), and the source is available [here](https://github.com/vercel-labs/sandcastle).\n\n\n  If you're familiar with Desktop Environments and Linux, you can [skip the next\n  few sections](#the-servers)\n\n\n### Table of Contents\n\n# X11?\n\n[X11](https://www.x.org/wiki/) is the display server protocol that has powered Linux machines for decades. Released in 1984, it handles drawing windows on screens and routing input (key presses and clicks) to the right applications.\nBecause computers were [very different](/blog/formatting) in the 80s, X11 is built for _servers_ and _clients_. The application runs on a server, and dumb clients can draw th"},{"t":"Introducing HFSViewer","d":"View and modify HFS partitions on modern macOS versions","date":"Jan 2, 2026","href":"/blog/introducing-HFSViewer","ex":"Last year my roommate and I found an old original [iMac G3](https://en.wikipedia.org/wiki/IMac_G3) outside our apartment building. \nIt has some interesting early 2000s/late 90s style websites and files on it that I want to preserve (and hope to share here soon!).\n\nBut I realized getting files off of it wouldn't be easy.\n\nThe machine is running macOS 9.2, which supports USB 1.0.\nWe're up to USB 4 now, so thats pretty old; none of my modern USB 3 devices were detected by it.\nAfter [some research](https://www.reddit.com/r/VintageApple/comments/1jrmrqv/mac_os_9_hates_usb_sticks/) I found that macOS 9.2 _does_ have USB support, but it can't always negotiate USB 3 speeds or support larger USBs.\nSo I went and bought [this $5 stick](https://www.amazon.com/dp/B07W54X2F3) and it worked like a charm.\n\n\nYou should try to stick to USBs with less than 2 GBs of storage, otherwise Mac OS 9.2 might not support it. \n\n\nWith that solved and the files copied over, I plugged it into my M4 laptop and... it wasn't recognized there either. No error or mounting occurred due to no driver support.\nEventually I found [hfsutils](https://www.mars.org/home/rob/proj/hfs/), a wonderful package (which is convienentl"},{"t":"The new maxleiter.com","d":"iframes, view transitions, progressive enhancement, and React Server Components","date":"Nov 12, 2025","href":"/blog/the-new-maxleiter-com","ex":"I redesigned maxleiter.com this week. I've wanted to make it more personal and opinionated for a long time,\nbut felt I lacked the expertise to do it justice.\nWith [v0](https://v0.app) and [Claude Code](https://www.claude.com/product/claude-code) (and some manual cleanup) it only took a few hours.\n\nIf you haven't played with the [homepage](https://maxleiter.com/) yet, some of the features are:\n\n- Draggable and resizable windows, including the blog posts\n- A web-friendly version of [KnightOS](https://knightos.org) in the Calculator app\n- A terminal app with some fun easter eggs\n- You can full-screen the windows, and some redirect to real pages (like the blog posts)\n\nGoing into this I had some constraints:\n\n- Remains snappy and is SSR'd at build-time\n- Must work without JavaScript enabled\n- Uses new web platform features\n\n![maxleiter.com screenshot](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/homepage.png?w=800)\n\n### Table of Contents\n\n## Preloading iframes\n\nIf you open a blog post, it opens in a windowed app. I originally rendered the SSR'd MDX, and that worked,\nbut it involved either:\n\n- Sending every post in the initial payload (not great for performa"},{"t":"You should be rewriting your prompts","d":"We talk about overfitting models but never overfitting prompts to models","date":"Sept 14, 2025","href":"/blog/rewrite-your-prompts","ex":"I've been \"lucky\" to work with a lot of different LLMs over the past few years (there is, in fact, a reason we made the [AI SDK](https://ai-sdk.dev/)).\nWhen a new model is publicly released there's a good chance we've already tried it and evaluated it for use with v0 within a few hours.\n\nOur results do not always improve as expected, even when we use newer and strictly better models[^1].\n\nAnother example of this is when gpt-5 was released in Cursor. People _hated_ it, but the zeitgeist has since shifted.\nYou can read about what OpenAI and Cursor fixed in [OpenAI's gpt-5 cookbook](https://cookbook.openai.com/examples/gpt-5/gpt-5_prompting_guide?utm_source=chatgpt.com#collaborative-coding-in-production-cursors-gpt-5-prompt-tuning).\n\nSo what should you do when a new model comes out? Rewrite your prompts. Otherwise it's an apples-to-oranges comparison.\n\nMy three and a half arguments for this are:\n\n- Prompt Format\n- Position Bias\n- Model Biases\n  - Work with the model biases, not against\n\n## Reason #1: Prompt Format\n\nAn early obvious example of where differences between models come into play is markdown vs XML.\n\nAnecdatally, OpenAI models (especially older ones) were _great_ with markdo"},{"t":"I have seen the future through AR glasses","d":"My experience with the XReal One Pros","date":"Sept 7, 2025","href":"/blog/seeing-the-future","ex":"I like to try new technology. 75% of what I buy is something I use once or twice then sell or give away (or keep in a drawer and forget about. Sorry, remarkable).\nBut sometimes, on rare occasions, there's a product that is A) fucking awesome and B) I can't help but evangelize.\n\nOne of my more recent purchases was the [XReal One Pros](https://www.xreal.com/us/one-pro), and wow: I have seen the future, and it's through AR glasses.\n\nIf you&apos;re unfamiliar, the XReal One Pros are really just a display and (surprisingly good) speakers. They are augmented reality (AR) glasses,\nmeaning they aren't like _virtual reality_ headsets such as the Vision Pro or Meta Quest: they don't replace fully your view, they put an overlay on it\n\nI really think it's easier to show than tell in this case:\n\n\n  \n    \n      \n    \n  \n  \n    \n  \n\n\nTo get something out of the way: do I think XReal in particular will be the product that comes out on top? Not at all. I like their product, and I respect any newcomers to the hardware game, but it's an uphill battle for sure.\n\n## The Good\n\n- They are light. Because they're really just shells and they're powered by your devices, there's no need for a heavy battery\n- "},{"t":"Formatting code should be unnecessary","d":"and we knew this back in the 80s","date":"Sep 6, 2025","href":"/blog/formatting","ex":"I had a (maybe slightly overqualified) computer science teacher back in highschool, Mr. Paige.\nHe worked on the [Ada]() compiler and\nhas been programming since the early 80s.\n\nOne day I complained about linter tooling that\nwas driving me nuts. I said something to the effect of, \"it's 2016, how are we still dealing with this sort of thing?\"\n\nTurns out, that problem was solved four decades ago (well, three at that point). Back when he was working on Ada,\nthey didn't store text sources at all &mdash; they used an IR called [DIANA](https://archive.org/details/dianaintermediat0000unse/page/n7/mode/2up).\nEveryone had their own pretty-printing settings for viewing it however they wanted.\n\nWe've been debating some linter settings at work recently and I keep thinking back to\nMr. Paige. It's 2025, how are we still dealing with this sort of thing?\n\n---\n\nWell, to answer that it would help to know what we're missing.\n\nI believe he was working with the [Rational R1000](https://en.wikipedia.org/wiki/Rational_R1000), of which there isn't a ton of info\n(like all things Ada, it was used by the DoD):\n\n![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/formatting/rational.jpg?w=400)\n\nThe"},{"t":"Vibe-coding Minecraft mods","d":"and the lessons learned","date":"Jun 21, 2025","href":"/blog/vibecoding-minecraft-mods","ex":"{/* eslint-disable react/jsx-no-undef */}\n\nIf you aren't familiar with the extent of the Minecraft modding scene, it's _big_. There are mods with more thought put into them than many AAA games.\n\nThe best example is [Create](https://www.curseforge.com/minecraft/mc-mods/create):\n\n\n  \n  {\n    \n      Note that trains (and windmills and assembly lines) are not built into\n      Minecraft.\n    \n  }\n\n\nSo I was pretty lost when I started playing for the first time in a long time.\n\n### Table of Contents\n\n## The Problem\n\nAs some friends and I started playing the Divine Journey 2 modpack,\nI was overwhelmed by the number of modded blocks and items.\n\nTo give you a taste, there are 54 &quot;generators&quot; from 16 mods:\n\n{\n\n  \n    \n      I built this UI with v0 and extracted the images from a screenshot using\n      o4-mini with toolcalling.\n    \n}\n\nFinding them around our base was a pain. My friends knew where everything was,\nand would be telling me things like \"put coal in the hopper that feeds the Coke\nOven into the Blast Furnace by the biodiesel setup\"\n\nThere's one obvious solution:\n\n## The Solution: more mods\n\nI ended up creating two mods with a mix of [OpenAI Codex](https://github.com/opena"},{"t":"Implementing Notion style URLs","d":"Create /some-title-here-{id} URLs for recognizable links in Next.js","date":"Jun 19, 2025","href":"/blog/sluggified-urls","ex":"I hate unrecognizable URLs. If I want to go back to a specific document or page, I should be able\nto type the name of it in the address bar and find it in my browser history. Notion is particularly good at this,\nand v0 was particularly bad at it (for a while), so this is what I did to fix v0.\n\nHere's what a notion URL looks like:\n\n\n  \n\n\nIt's recognizable, visually appealing, and easy to find in your browser history:\n\n\n\nI'm a fan.\n\n\n\nAt first I thought implementing it would be straight forward, but there are a few easy-to-hit gotcha's involved.\nThis post will be focused on Next.js, but the concepts are universal. Here are some of the things to keep in mind:\n\n- You need to ensure the [canonical URL](https://developers.google.com/search/docs/crawling-indexing/canonicalization) is up-to-date\n- The client needs to wind up on the most recent URL, otherwise crawlers like Google can index \"fake\" paths\n- Be mindful of your previous URLs and ensure they don't conflict with the logic for adding/parsing the slug\n\nTo get started, we need two functions: one to generate the URL, and one to parse it.\n\nIt's important we support URLs both with and without the title, and I recommend using a library t"},{"t":"Ship something every day","d":"","date":"Jun 10, 2024","href":"/blog/ship-every-day","ex":"**Edit**: A better title would've been \"_commit_ every day _that you work_\". I don't mean you should work on weekends or not take time off, and\nwhatever you work on doesn't need to \"ship to prod\". \n\n\n\nI don't feel particularly qualified to give advice (I blame imposter syndrome),\nbut I do have one tip to share that I think has been useful for me.\nIt applies both to professional software dev and personal projects.\n\nYou probably guessed it from the title: **ship something every day**.\n\nIt doesn't need to be a major feature or even a bug fix. It just needs to be something you can point to.\n\nWhy? A few reasons:\n\n- The dopamine rush of your code being shipped\n- Your team sees you're working\n  - There's more to this than just performance reviews; with remote work, it's easy for you and co-workers to feel isolated.\n- It encourages incremental work. Your future self and co-workers will thank you\n- Your git commit streak looks good\n  - Yes, in an ideal world this doesn't matter. But I'm sure people like recruiters look at GitHub profiles, and an empty page isn't a great look. This is a benefit of the habit, not necessarily a reason to start it.\n- The satisfaction and mental benefits of gett"},{"t":"Why your website's fonts might be larger than intended","d":"A well-meaning mobile browser feature can be problematic","date":"Jun 9, 2023","href":"/blog/mobile-browsers-resizing-font","ex":"Someone recently reported that the font-size in some of my code blocks on my [build-your-own Next.js blog](/blog/build-a-blog-with-nextjs-13) post was too large. That's interesting because I use React and the code blocks are the same component. So why would the font-size be different between them?\n\nI was able to reproduce the issue and found that it only happened on iOS devices. Here it is in action:\n\n\n\nAfter adventuring down a small rabbit hole, I can share that mobile devices (mostly tablets/phones) support the [text-size-adjust](https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust) CSS property that automatically adjusts the font size of text to make it more readable.\nThis is a great feature for most websites, but it can be problematic for code blocks. It's worth noting that all browsers support this feature (although WebKit requires a prefix), but it seems like they use different heuristics to determine when to apply it.\n\nHere's a solution:\n\n\n\nThis disables the feature and makes the font size consistent across all browsers.\nBe careful though, because this will disable the feature for your entire site.\nYou may want to specifically opt certain elements out to let the"},{"t":"Nintype is still the best iOS keyboard","d":"","date":"May 22, 2023","href":"/blog/nintype","ex":"Describing Nintype is a challenge. Here's a the demo video from it's launch back in 2014:\n\n\n  \n\n\n  \"the true touch typing experience\"\n\n\nEssentially, Nintype is a keyboard that enables you to _swipe and tap_ with both hands at the same time.\nIf you're typing \"there\", you'd swipe the \\`th\\` with your right hand, and tap or swipe the \\`ere\\` with your left.\nIt's such elegant and obvious next step for swipe keyboards it's incredible to me that no alternatives exist.\nIt's really does feel like magic; see how my friend texted me when we were first discovering it (apologies for the expletives):\n\n\n\nIt's genius lies in a few things:\n\n## Swipe and type\n\nNintype's true magic lies in it's ability to understand swiping and tapping with both fingers simultaneously.\nIf you need to double tap a word, like \"I'll\", you can swipe the first half of the word, and then double tap the \"l\" key to finish it.\nIt's a bit tricky to put into words, but it feels intuitive and unlocks a lot of speed. I can consistently reach 100 WPM with ~90-95% accuracy using Nintype.\n\n## Customization\n\nNintype has options for seemingly everything.\nYou can add custom shortcuts (such as auto filling your email or credit card num"},{"t":"Building a blog with Next.js 15 and React Server Components","d":"Use MDX, RSC, and Bright to build a blog with Next.js 15.","date":"Apr 16, 2023","href":"/blog/build-a-blog-with-nextjs-13","ex":"I've been tinkering with this website and the [Next.js 13 App Router](https://beta.nextjs.org) for a while now,\nand it's been a great experience, especially in the last few months. But I've seen some confusion around\nhow to use the new features and React Server Components, so I wrote up an outline on building this website.\n\n\n  {' '}\n  This post has been updated for [Next.js\n  15.](https://nextjs.org/blog/next-15){' '}\n\n\nTo address the React-sized elephant in the room:\nyou do not need this fancy setup to build a blog.\nHTML and CSS may be a better choice for you, but I'd find little fun in that, and I'm a strong believer in having a website to experiment with.\n\nTo set a few expectations, here's what this post **won't** do:\n\n- Act as documentation for Next.js or React\n- Be a 100% code-complete tutorial. You'll need to fill in some gaps yourself.\n  - You can always reference [this website's source code](https://github.com/maxleiter/maxleiter.com).\n  - There are file trees included with links to the source code.\n\nAnd here's what it **will** do:\n\n- Show you real-world examples involving React Server Components and the App Router.\n- Guide you in spinning up your own blog with Next.js 13 a"},{"t":"The Node ecosystem (still) has tooling problems","d":"It shouldn't take this much work to publish a small library","date":"July 30, 2022","href":"/blog/node-has-tooling-problems","ex":"I recently published a [small npm package](https://github.com/maxleiter/sortablejs-vue3) containing a Vue library. The package is written in TypeScript powered by Vite, which I (wrongly) assumed would mediate most of my woes. \n\n![Obi Wan gif of him sarcastically saying \"Oh, this is going to be easy\"](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/node-tooling/obiwan.gif)\n\nFirst, I used Vite to build a small front-end site to demonstrate the library. This let me test the component and demonstrate usage in the same repository. Getting this working was fairly straight forward for someone with experience wrangling TypeScript configurations, but I imagine for a less experienced developer it could've been a daunting task. I ended up with two tsconfigs, \\`tsconfig.node.json\\` and \\`tsconfig.site.json\\`, had to figure out module resolution, realized I needed \\`vue-tsc\\`, and had a multitude of other minor roadblocks. The nicest thing about Vite is it is *fast*, which made working on this manageable.\n\nSecond, I had to figure out how to publish a library. After lots of research (AKA reading Reddit threads and blog posts), I figured out the proper incantation of \\`tsc\\` paramete"},{"t":"Live updating page views with Supabase and Next.js","d":"A step-by-step guide to page views and server analytics","date":"May 15, 2022","href":"/blog/supabase-next-analytics","ex":"This post was written for the (now stable) beta Next.js middleware. If you\n  want your own analytics, I recommend looking at{' '}\n  Vercel's solution.\n\n\nThis post starts with a brief introduction. If you want to jump down to the tutorial, click [here](/blog/supabase-next-analytics#how). You can also see the live updating views in action in the top right of this page! The analytics events themselves require no JavaScript and occur completely on the server thanks to the [new (in beta) Next.js middleware](https://nextjs.org/docs/advanced-features/middleware). If you have JavaScript enabled, the view count should live update thanks to Supabase Realtime. You can try it by opening the page in a new tab and eyeing the view count.\n\n**Contents**\n\n- [Motivations](/blog/supabase-next-analytics#motivations)\n- [How to do it](/blog/supabase-next-analytics#how)\n  - [Supabase: Setting up the Database and Realtime](/blog/supabase-next-analytics#supabase-setting-up-the-database-and-realtime)\n  - [Next.js: Adding server-side analytics](/blog/supabase-next-analytics#nextjs-adding-server-side-analytics)\n  - [Next.js: Adding a live updating view counter](/blog/supabase-next-analytics#nextjs-adding-a-liv"},{"t":"Easy ways to improve your websites accessibility and performance","d":"A list of simple tips for developing a more accessible and user-friendly web.","date":"Apr 23, 2022","href":"/blog/easy-site-improvements","ex":"Below is a short list I wrote up for people who are comfortable building websites (with any technology) but want to improve their work, whether that be in terms of loading speeds, software quality, or accessibility.\n\n\nTL;DR:\n- [Use WAVE](/blog/easy-site-improvements#wave)\n- [Compress your images](/blog/easy-site-improvements#compress-your-images)\n- [Embrace semantic HTML](/blog/easy-site-improvements#embrace-semantic-html)\n- [Don’t use JavaScript to replace browser controls](/blog/easy-site-improvements#dont-use-javascript-to-replace-browser-controls)\n- [Invest in learning your developer tools](/blog/easy-site-improvements#invest-in-learning-your-developer-tools)\n\n## WAVE \n\n[WAVE](https://wave.webaim.org/) is a suite of tools for finding, diagnosing, and fixing accessibility problems. It's my first step for finding the lowest hanging improvements. It helps you not just fix your errors but understand them by guiding you through the relevant part of the HTML5 spec in plain language. Below you can see a screenshot of the tool being applied to https://webaim.org. \n![Screenshot of the WAVE tool being used on webaim.org](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/site-i"},{"t":"How hackers* run their sites","d":"An analysis based on 700 personal websites","date":"Apr 7, 2022","href":"/blog/hacker-sites","ex":"\\* hackers: users of hacker news\n\nYesterday, when I probably should have been doing something productive, I instead [asked hacker news users for links to their personal sites](https://news.ycombinator.com/item?id=30934529).\n\nIt got far more replies than I expected (over 1000 at the time of writing) so I had the idea to do some scraping and see how commenters build and host their sites.\n\nI wrote a quick-and-dirty typescript script (at the bottom of page) for scraping, pinging, and sorting the comments. I could've used a pre-existing library or service for determining tech used on the sites, but where's the fun in that? I’d have loved to add features like checking for git repository links and doing some API calls for a more in-depth analysis, but I’ll leave the complicated parts as exercises for the reader.\n\nIf I were to do this all again, I would absolutely not choose JavaScript. Just 0 real benefits; I spent more time than I care to admit bashing my head before remembering \\`Promise.allSettled\\` exists. I should've just used Python.\n\n## The stats:\n\nOf the 721 top level comments, 692 contained links and were analyzed at the time of writing. I only looked at the first link in a comme"},{"t":"Introducing Drift","d":"A self-hostable alternative to GitHub Gist and Pastebin","date":"Mar 26, 2022","href":"/blog/introducing-drift","ex":"_[View this post on Drift](https://paste.maxleiter.com/post/9d77d452-8ccf-4056-89dd-9bf9f96dfc3c)_\n\nI've wanted a Gist alternative for years, but it wasn't until I saw [this tweet](https://twitter.com/emilyst/status/1499858264346935297) I decided to sit down and build it:\n\n> \"What is the absolute closest thing to GitHub Gist that can be self-hosted? In terms of design and functionality. Hosts images and markdown, rendered. Creates links that can be private or public. Uses/requires registration. I have looked at dozens of pastebin-like things.\" - @emilyst\n\nIf your response to that is \"why?\", I recommend reading ['Why you should start self-hosting'](https://rohanrd.xyz/posts/why-you-should-start-self-hosting/) by Rohan Deshumkh. Also know that I have a habit of starting time consuming weekend projects to procrastinate school work, and this seemed like an especially fun one.\n\nThe primary goal of Drift is to capture the value proposition of GitHub. Syntax highlighting, markdown rendering, straight to the point. There are tons of self-hostable pastebins, and none target an experience like Gist. You can try a demo [here](https://drift.maxleiter.com).\n\nHere's a screenshot of the authentic"},{"t":"How to start contributing to open-source projects","d":"A small guide to finding projects and contributing changes","date":"Jan 25, 2022","href":"/blog/contributing-to-oss","ex":"One of the most common questions I'm asked by my computer science friends and students is how they can contribute to an open-source project. In order for me to organize and share my thoughts I thought I'd write something here.\n\nFirst off, it's a good idea! Contributing to projects is a fantastic way to build experience, connections, and improve a piece of software you use or rely on. I've grown immensely through maintaining my few projects and contributing to a hand full of others. I've gained experience in community management, team communication, code review, dependency management, and the list goes on. This post is focused on programming, but don't forget that issue management, documentation, user support, and bug reporting are all valuable ways you can contribute. \n\nThat point about using open-source software is important. The first thing I tell my friends is they should first ensure they're using some before they attempt to contribute. There are few things that are more satisfying than fixing a bug that's been bugging you in a program written by someone else, and the motivation that provides is not inconsequential[^1]. As a maintainer, contributor, and extensive procrastinator"},{"t":"Pin your npm/yarn dependencies","d":"A guide on how to pin your dependencies and why you may want to","date":"Jan 9, 2022","href":"/blog/pin-dependencies","ex":"Today, the open-source maintainer [Marak](https://github.com/Marak) intentionally [bricked two popular JavaScript libraries](https://www.bleepingcomputer.com/news/security/dev-corrupts-npm-libs-colors-and-faker-breaking-thousands-of-apps/) (with ~25 total million weekly downloads) in such a way that they broke dependents software. There's nothing that npm or any other public registry could've done to have prevented this; the release was indistinguishable from a regular update, unless you looked at the code. This is not the first time an npm dependency has [gone rogue](https://qz.com/646467/how-one-programmer-broke-the-internet-by-deleting-a-tiny-piece-of-code/) and [caused havoc](https://github.com/dominictarr/event-stream/issues/115) due to supply chain problems, and it certainly won't be the last. And so the defensive role falls to you, the developer.\n\n### Pinning dependencies\n\nMy recommendation is to **pin your dependencies**. If you're unfamiliar with what this means, you should first be familiar with [semantic versioning](https://semver.org/). In short, pinning dependencies means the _exact_ version specified will be installed, rather than a dependency matching the range crite"},{"t":"Impressions of the Framework Laptop","d":"My thoughts on the Framework Laptop's hardware","date":"Nov 3, 2021","href":"/blog/framework","ex":"I received my [Framework Laptop DIY edition](https://frame.work) a few days ago and have been setting it up software-wise. I have it running Manjaro Linux with the Sway window manager. This is my first time using a Wayland desktop, and oh has it been a learning experience. This post will be largely about the hardware, but I plan to make one about the software once I'm more happy with my setup.\n\nHere's what I got:\n\n- Framework Laptop DIY Edition\n- 16GB (2 x 8GB) DDR4-3200\n- Intel® Wi-Fi 6E AX210 No vPro\n- 1TB - WD_BLACK™ SN850 NVMe™\n- USB-A Expansion Card\n- USB-C Expansion Card x2\n- HDMI Expansion Card\n\nI bought everything from the Framework store (at a slight markup of ~$80 for the RAM, SSD, and wifi card), but I'm happy to support them and for the convenience of knowing it would work properly was well worth it.\n\n## The Good\n\n- Well crafted body. I was not expecting a premium build quality from a startup trying to create an upgradeable laptop, but wow they excelled.\n- It's _really light_. It's just 2.8 pounds, compared to my 13\" Macbook Pro's 3.02. You wouldn't think that's a big difference, and maybe you wouldn't notice, but I sure did.\n- A solid keyboard. Most non-Mac laptops I'v"},{"t":"Adding ambient light support to Linux and GNOME","d":"A quick dive into Linux kernel drivers","date":"Dec 15, 2020","href":"/blog/MSHW0184","ex":"A couple of a weeks ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale. I love making devices run software they shouldn't, so I got to work dual-booting Linux on it. To my surprise, almost everything worked with the default Fedora 33 kernel, not including the touchscreen, the ambient light sensor, and the camera. After compiling and loading the great [linux-surface](https://github.com/linux-surface/linux-surface) kernel the touchscreen started to work but I found a [GitHub issue](https://github.com/linux-surface/linux-surface/issues/121) someone had made detailing that the ambient light sensor (a MSHW0184) isn't detected. This normally wouldn't matter a lot, but I'd discovered that GNOME supported adjusting the screen brightness based on the ambient light through [iio-sensor-proxy](https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/).\n\nI knew nothing (and still know very little) about the Linux kernel or drivers, but this seemed like a great place to start. Luckily, GitHub user archseer discovered that the MSHW0184 registers align with the APDS9960 device, which already has an upstream kernel driver, and he mentioned all that should be needed is a small change "},{"t":"X11 on iOS","d":"A guide on how to compile the X Window System for iOS","date":"Dec 15, 2019","href":"/blog/X11","ex":"This work has been picked back up recently, with KDE, GNOME, Wayland, and\n  more. Read about it here: https://maxleiter.com/blog/xios\n\n\nI'm excited to announce that X11 is coming soon to iOS. Most (see below) packages and dependencies for a fully functioning X11 desktop system have been compiled and are available on Cydia for iOS 11+. All packages have been compiled for arm64 and have been tested on iOS 12.4 and iOS 13.1. This requires a jailbroken device.\n\n\n[Image of programs running on\ndevice.](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/X11/onipad.jpg)\n\nThis site will serve largely as documentation for building yourself. ~You can add the Cydia repo below for the deb packages. Please let me know if you run across any issues with the debs; it's likely I messed up including a library or something like that. (These aren't done just yet.)~\n\n## How it works\n\nAt the moment, a virtual screen is accessed via a VNC client to an Xvnc instance running on the iDevice. If you're unfamiliar, Xvnc is an X server with a virtual screen that can be accessed via VNC. The best part of this is no drivers are required: it's all handled by Xvnc.\n\n## Why\n\nLargely just because I can. Als"}],"notes":[{"t":"Per-directory terminal colors in fish shell","d":"","date":"Apr 5, 2026","href":"/notes/fish-directory-colors","ex":"My terminal background color changes based on the current directory. \nIt's a small touch that makes it easy to tell which project I'm in at a glance, which is \nespecially useful when juggling AI agents.\n\nIt works via a custom fish function called `_color_for_dir`, which:\n\n1. Hashes the current `$PWD` \n2. Maps the hash to a hue (0-359)\n3. Converts it to a dark RGB color \n4. Sends an [OSC 11](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html) escape sequence to change the terminal background\n\n\n\nIt's deterministic, so each directory always gets the same color. \nThe function is triggered on startup and on every `cd` via a `--on-variable PWD` event listener.\n\nIt also skips VS Code's integrated terminal because I generally know what projects I have open \n\nFull code:\n\n\nClick to expand"},{"t":"Never think about branch names again","d":"a bash script for generating branch names","date":"Aug 19, 2024","href":"/notes/git-checkout-script","ex":"I recommend swapping out \\`max\\` to basically anything else.\n\n\n\nTo use on macOS/linux, you can paste the above into a file in \\`/usr/local/bin\\` and make it executable with \\`chmod +x /usr/local/bin/gcb\\`.\n\nI also recommend setting your git settings to sort branches by \\`committerdate\\` so that you can easily find the branch you worked on most recently:\n\n\n\nThis does work with the default alphabetical sorting, but this works better if you work on features over long periods of time."},{"t":"Updating JSONB fields with Drizzle","d":"hint: just use `sql` and COALESCE.","date":"July 11, 2024","href":"/notes/updating-jsonb-drizzle","ex":"I recently made a jsonb column in a postgres database and it took me a bit\nto figure out how to update a single value without overwriting the entire\nfield. If you know a better way please let me know."},{"t":"Set your default directory in VS Code's open dialog","d":"","date":"Jun 6, 2024","href":"/notes/vscode-default-dir","ex":"This is my workflow for opening a project in VS Code:\n\n1. Open an empty window of VS Code\n2. Hit cmd+O\n3. Navigate to my \\`~/Documents/...\\` directory\n4. Hit enter\n\nIn my opinion, that's a few too many steps. I've made it a little better by\nchanging the \\`files.dialog.defaultPath\\` setting (added almost exactly [one year ago](https://code.visualstudio.com/updates/v1_80)).\n\n![VS Code settings](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/vscode-dir/screenshot.png)\n\nHope this helps."},{"t":"gemini.sh script","d":"A script for concatenating files in a directory for copying to an LLM","date":"Apr 14, 2024","href":"/notes/gemini-script","ex":"As of late 2024/early 2025, I recommend using the great repomix tool: https://github.com/yamadashy/repomix\n\n\nI've been messing with gemini-1.5-pro with the 1 million token context window for a while now and found this script very useful\nfor grabbing entire repos. It ignores most binary files and concatenates the rest into a single file. \n\nYou'll need to have \\`parallel\\` installed for this to work (\\`brew install parallel\\` on macOS)."},{"t":"Sending a Slack message with fetch","d":"","date":"Mar 30, 2024","href":"/notes/slack-message-fetch","ex":"I like using Slack bots for things like alerts and notifications and\nhave needed this snippet enough to leave it here.\n\nI use [slack-block-builder](https://github.com/raycharius/slack-block-builder) to\nbuild the message; writing raw slack blocks is a pain."},{"t":"SWR for more than fetching","d":"SWR for state management","date":"Mar 30, 2024","href":"/notes/swr-state","ex":"[SWR](https://swr.vercel.app/) is a great library for data fetching in React.\nIt looks like this:\n\n\n\nBut my favorite use for it is local state management.\n\nHere's an example of how I use it for modals and dialogs:\n\n\n\nAny hook call with that same \\`state:modal\\` key will receive the same data and re-render when it changes.\nIt's a good replacement for other global state solutions or context."},{"t":"Loading wasm files on Vercel Edge and Node.js runtimes","d":"","date":"Mar 30, 2024","href":"/notes/wasm-edge-and-node","ex":"Loading wasm on the [Vercel Edge runtime](https://vercel.com/docs/functions/wasm) is easy. You need to do a little more work\nto do the same on Node.js."}],"work":[{"t":"How we made v0 an effective coding agent","d":"Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.","date":"Jan 7, 2026","href":"https://vercel.com/blog/how-we-made-v0-an-effective-coding-agent","ex":""},{"t":"Introducing the v0 composite model family","d":"Introducing the v0 composite model family.","date":"Jun 1, 2025","href":"https://vercel.com/blog/v0-composite-model-family","ex":""},{"t":"Introducing AI SDK 3.0 with Generative UI support","d":"Stream React Components from LLMs to deliver richer user experiences.","date":"Mar 1, 2024","href":"https://vercel.com/blog/ai-sdk-3-generative-ui","ex":""},{"t":"Introducing the Vercel AI SDK","d":"An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.","date":"Jun 15, 2023","href":"https://vercel.com/blog/introducing-the-vercel-ai-sdk","ex":""},{"t":"Improving the accessibility of our Next.js site","d":"We've made some improvements to the accessibility of our Next.js site. Here's how we did it.","date":"Sep 30, 2022","href":"https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site","ex":""},{"t":"New edge dev infrastructure","d":"New edge dev infrastructure.","date":"Jul 21, 2020","href":"https://vercel.com/blog/new-edge-dev-infrastructure","ex":""}],"projects":[{"t":"X11 on iOS","d":"Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.","date":"","href":"/blog/X11","ex":""},{"t":"Drift","d":"A self-hostable and open-source alternative to GitHub Gist and Pastebin.","date":"","href":"https://github.com/maxleiter/drift","ex":""},{"t":"The Lounge","d":"Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.","date":"","href":"https://github.com/thelounge/thelounge","ex":""},{"t":"SortableJS-vue3","d":"A TypeScript wrapper for SortableJS built for Vue 3.","date":"","href":"https://github.com/maxleiter/sortablejs-vue3/","ex":""},{"t":"KnightOS","d":"Open-source unix-like operating system for z80-based calculators written entirely in z80 asm. I wrote a significant portion of the libc and contribued to system libraries.","date":"","href":"https://github.com/knightos/knightos","ex":""},{"t":"MSHW0184 driver for Linux kernel","d":"I finally found an excuse to contribute to the Linux kernel","date":"","href":"blog/MSHW0184","ex":""},{"t":"jsonTree","d":"My first open-source project","date":"","href":"https://github.com/maxleiter/jsontree","ex":""},{"t":"easyarty.com","d":"A tiny tool I made for a video game I like but it now gets 250,000+ visitors a year","date":"","href":"https://easyarty.com","ex":""},{"t":"v0","d":"I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.","date":"","href":"https://v0.app","ex":""},{"t":"AI SDK","d":"I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK.","date":"","href":"https://github.com/vercel/ai","ex":""},{"t":"Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening","d":"I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimate vertical cup to disk ratios from retinal images.","date":"","href":"https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362","ex":""}]}
+const SITE = 'https://maxleiter.com'
+
+const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+
+/** "Sept 1, 2026" / "July 30, 2022" -> Date (local midnight), or null. */
+function parseDate(s) {
+  const m = /^([A-Za-z]+)\.?\s+(\d{1,2}),\s*(\d{4})$/.exec((s || '').trim())
+  if (!m) return null
+  const mi = MONTHS.indexOf(m[1].slice(0, 3).toLowerCase())
+  if (mi < 0) return null
+  return new Date(+m[3], mi, +m[2])
+}
+
+function abs(href) {
+  if (!href) return SITE
+  if (/^https?:/.test(href)) return href
+  return SITE + (href.startsWith('/') ? href : '/' + href)
+}
+
+function slugOf(href) {
+  return (href || '').split('/').filter(Boolean).pop() || ''
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
+}
+
+// Every dated thing on the site, newest first, for the message board.
+const ITEMS = []
+for (const p of DATA.posts) ITEMS.push({ ...p, kind: 'post', slug: slugOf(p.href), when: parseDate(p.date) })
+for (const p of DATA.notes) ITEMS.push({ ...p, kind: 'note', slug: slugOf(p.href), when: parseDate(p.date) })
+for (const p of DATA.work) ITEMS.push({ ...p, kind: 'work', slug: slugOf(p.href), when: parseDate(p.date) })
+ITEMS.sort((a, b) => (b.when || 0) - (a.when || 0))
+
+/* ---------- a deliberately small markdown -> HTML for excerpts ---------- */
+function inline(s) {
+  s = esc(s)
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>')
+  s = s.replace(/\[\^[^\]]+\]/g, '')
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, (_, t, u) => {
+    const url = u.startsWith('/') ? SITE + u : u
+    return `<a href="${url}" target="_blank" rel="noopener">${t}</a>`
+  })
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+  s = s.replace(/(^|[\s(])[*_]([^*_\n]+)[*_](?=[\s).,!?:;]|$)/g, '$1<em>$2</em>')
+  return s
+}
+
+function md(src, truncated) {
+  const lines = src.replace(/\r/g, '').split('\n')
+  const out = []
+  let para = [], list = null, code = null
+  const flushP = () => { if (para.length) out.push('<p>' + inline(para.join(' ')) + '</p>'); para = [] }
+  const flushL = () => { if (list) out.push(`<${list.t}>` + list.items.map((i) => '<li>' + inline(i) + '</li>').join('') + `</${list.t}>`); list = null }
+  for (const raw of lines) {
+    const line = raw.replace(/\s+$/, '')
+    if (code) {
+      if (/^\s*```/.test(line)) { out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>'); code = null } else code.push(raw)
+      continue
+    }
+    if (/^\s*```/.test(line)) { flushP(); flushL(); code = []; continue }
+    if (!line.trim()) { flushP(); flushL(); continue }
+    if (/^\s*(<|import |export |\{\/\*)/.test(line)) { flushP(); continue }
+    const img = /^!\[([^\]]*)\]\(([^)]+)\)/.exec(line.trim())
+    if (img) { flushP(); flushL(); if (img[1]) out.push(`<p class="img-note">Image: ${esc(img[1])}</p>`); continue }
+    const h = /^(#{1,4})\s+(.*)$/.exec(line)
+    if (h) { flushP(); flushL(); const n = Math.min(4, h[1].length + 1); out.push(`<h${n}>${inline(h[2])}</h${n}>`); continue }
+    const li = /^\s*(?:([-*])|(\d+)\.)\s+(.*)$/.exec(line)
+    if (li) { flushP(); const t = li[2] ? 'ol' : 'ul'; if (!list || list.t !== t) { flushL(); list = { t, items: [] } } list.items.push(li[3]); continue }
+    if (/^>\s?/.test(line)) { flushP(); flushL(); out.push('<blockquote>' + inline(line.replace(/^>\s?/, '')) + '</blockquote>'); continue }
+    flushL(); para.push(line.trim())
+  }
+  if (code) out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>')
+  flushP(); flushL()
+  let html = out.join('\n')
+  if (truncated) html = html.replace(/(<\/(p|li|blockquote)>)(?![\s\S]*<\/(p|li|blockquote)>)/, '&hellip;$1')
+  return html
+}
+
+/* ---- audio.js ---- */
+/* Every sound here is synthesized. Nothing is sampled. The AudioContext is
+   only created inside a user gesture, and stays silent until sound is on. */
+const Sound = (() => {
+  let ctx = null, master, sfxBus, musicBus, verb, verbSend, analyser, noiseBuf
+  let on = false
+  const listeners = new Set()
+
+  function ensure() {
+    if (ctx) return ctx
+    const AC = window.AudioContext || window.webkitAudioContext
+    if (!AC) return null
+    ctx = new AC()
+    master = ctx.createGain(); master.gain.value = 0
+    const comp = ctx.createDynamicsCompressor()
+    comp.threshold.value = -18; comp.ratio.value = 3
+    master.connect(comp).connect(ctx.destination)
+    sfxBus = ctx.createGain(); sfxBus.gain.value = 0.9; sfxBus.connect(master)
+    musicBus = ctx.createGain(); musicBus.gain.value = 0.55
+    const tone = ctx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 5200
+    musicBus.connect(tone).connect(master)
+    analyser = ctx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.78
+    tone.connect(analyser)
+    // a generated room: decaying stereo noise
+    verb = ctx.createConvolver()
+    const len = ctx.sampleRate * 2.4, ir = ctx.createBuffer(2, len, ctx.sampleRate)
+    for (let c = 0; c < 2; c++) {
+      const d = ir.getChannelData(c)
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2)
+    }
+    verb.buffer = ir
+    verbSend = ctx.createGain(); verbSend.gain.value = 0.32
+    verbSend.connect(verb).connect(master)
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate)
+    const nd = noiseBuf.getChannelData(0)
+    for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1
+    return ctx
+  }
+
+  function setOn(v) {
+    on = !!v
+    if (on) { ensure(); if (!ctx) return; ctx.resume() }
+    if (ctx) master.gain.setTargetAtTime(on ? 0.8 : 0, ctx.currentTime, 0.05)
+    if (on && !Jingle.playing && Jingle.wanted) Jingle.start()
+    if (!on && Jingle.playing) Jingle.stop(true)
+    listeners.forEach((f) => f())
+  }
+
+  const live = () => on && ctx && ctx.state === 'running'
+
+  function env(g, t, a, peak, dec) {
+    g.gain.setValueAtTime(0.0001, t)
+    g.gain.exponentialRampToValueAtTime(peak, t + a)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + dec)
+  }
+
+  function voice(type, f0, f1, t, dur, peak, dest, send) {
+    const o = ctx.createOscillator(), g = ctx.createGain()
+    o.type = type
+    o.frequency.setValueAtTime(f0, t)
+    if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur * 0.6)
+    env(g, t, 0.006, peak, dur)
+    o.connect(g).connect(dest || sfxBus)
+    if (send) g.connect(verbSend)
+    o.start(t); o.stop(t + dur + 0.1)
+  }
+
+  const PENTA = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24]
+  const hz = (midi) => 440 * Math.pow(2, (midi - 69) / 12)
+
+  return {
+    get on() { return on },
+    get ctx() { return ctx },
+    get analyser() { return analyser },
+    get musicBus() { return musicBus },
+    get verbSend() { return verbSend },
+    get noise() { return noiseBuf },
+    ensure, setOn, hz,
+    onChange(f) { listeners.add(f) },
+    bloop(i = 0) {
+      if (!live()) return
+      const t = ctx.currentTime, f = hz(72 + PENTA[i % PENTA.length])
+      voice('sine', f * 0.75, f, t, 0.16, 0.12, null, true)
+      voice('triangle', f * 2, f * 2, t, 0.05, 0.025)
+    },
+    tick() {
+      if (!live()) return
+      const t = ctx.currentTime
+      voice('sine', 1900, 1500, t, 0.03, 0.03)
+    },
+    select() {
+      if (!live()) return
+      const t = ctx.currentTime
+      voice('sine', hz(84), hz(84), t, 0.5, 0.12, null, true)
+      voice('sine', hz(91), hz(91), t + 0.07, 0.6, 0.09, null, true)
+      voice('triangle', hz(96), hz(96), t + 0.07, 0.25, 0.02)
+    },
+    whoosh(up = true) {
+      if (!live()) return
+      const t = ctx.currentTime, s = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain()
+      s.buffer = noiseBuf; bp.type = 'bandpass'; bp.Q.value = 1.4
+      bp.frequency.setValueAtTime(up ? 380 : 2400, t)
+      bp.frequency.exponentialRampToValueAtTime(up ? 2600 : 340, t + 0.42)
+      g.gain.setValueAtTime(0.0001, t)
+      g.gain.exponentialRampToValueAtTime(0.18, t + 0.12)
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5)
+      s.connect(bp).connect(g).connect(sfxBus); g.connect(verbSend)
+      s.start(t); s.stop(t + 0.55)
+      voice('sine', up ? hz(67) : hz(79), up ? hz(79) : hz(67), t + 0.05, 0.35, 0.05, null, true)
+    },
+    back() {
+      if (!live()) return
+      const t = ctx.currentTime
+      voice('sine', hz(79), hz(72), t, 0.18, 0.1, null, true)
+      voice('sine', hz(72), hz(67), t + 0.08, 0.25, 0.08, null, true)
+    },
+  }
+})()
+
+/* ---------- the ambient jingle: an original 8-bar loop, composed in code ----------
+   Chords are fixed; the melody is grown from a seed with motif repetition, so
+   "Remix" gives a new tune over the same changes. Seed 2006 is the house tune. */
+const Jingle = (() => {
+  const BPM = 94, SPB = 60 / BPM, SWING = 0.6
+  // [bass midi, voicing midis, name]
+  const CHORDS = [
+    [41, [57, 60, 64, 67], 'Fmaj9'],
+    [40, [55, 59, 62, 67], 'Em7'],
+    [45, [55, 59, 60, 64], 'Am9'],
+    [38, [54, 57, 60, 64], 'D9'],
+    [38, [53, 57, 60, 64], 'Dm9'],
+    [43, [53, 59, 64, 69], 'G13'],
+    [36, [52, 55, 59, 62], 'Cmaj9'],
+    [44, [55, 60, 63, 67], 'Abmaj7'],
+  ]
+  const SCALE = [0, 2, 4, 5, 7, 9, 11]
+  const RHYTHMS = [
+    [[0, 3], [3, 1], [4, 2], [6, 2]],
+    [[0, 2], [2, 2], [5, 3]],
+    [[1, 1], [2, 1], [3, 1], [4, 4]],
+    [[0, 4], [5, 1], [6, 2]],
+    [[0, 1], [1, 1], [2, 2], [4, 1], [5, 3]],
+    [[2, 2], [4, 2], [6, 2]],
+  ]
+  let seed = 2006, notes = [], wanted = false, playing = false
+  let timer = 0, startAt = 0, nextBar = 0, barIdx = 0
+
+  function rng(a) {
+    return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
+  }
+  const inScale = (m) => SCALE.includes(((m % 12) + 12) % 12)
+  function snap(m, chord, prefer) {
+    const tones = chord[1].map((x) => x % 12)
+    let best = m, bd = 99
+    for (let d = -3; d <= 3; d++) {
+      const c = m + d, pc = ((c % 12) + 12) % 12
+      const score = Math.abs(d) + (tones.includes(pc) ? 0 : prefer ? 2.5 : 0.8) + (inScale(c) || tones.includes(pc) ? 0 : 9)
+      if (score < bd) { bd = score; best = c }
+    }
+    return Math.max(70, Math.min(86, best))
+  }
+
+  function compose(s) {
+    const r = rng(s), out = []
+    let pitch = 76
+    const bars = []
+    for (let b = 0; b < 8; b++) {
+      const chord = CHORDS[b]
+      let rhythm, contour
+      if (b === 4 || b === 5) { rhythm = bars[b - 4].rhythm; contour = bars[b - 4].contour }
+      else if (b === 7) { rhythm = [[0, 2], [2, 6]]; contour = [-2, -1] }
+      else {
+        rhythm = RHYTHMS[Math.floor(r() * RHYTHMS.length)]
+        contour = rhythm.map(() => Math.round((r() - 0.5) * 5))
+      }
+      bars.push({ rhythm, contour })
+      rhythm.forEach(([at, len], i) => {
+        pitch = snap(pitch + contour[i], chord, i === 0 || len >= 3)
+        if (b === 7 && i === rhythm.length - 1) pitch = snap(72 + (r() < 0.5 ? 7 : 4), chord, true)
+        out.push({ bar: b, at, len, midi: pitch })
+      })
+      if (pitch > 82) pitch -= 3
+      if (pitch < 72) pitch += 3
+    }
+    return out
+  }
+  notes = compose(seed)
+
+  // eighth-note slot -> seconds from bar start, swung
+  const slot = (i) => Math.floor(i / 2) * SPB + (i % 2 ? SPB * 2 * SWING : 0)
+
+  function epiano(ctx, t, midi, dur, vel) {
+    const f = Sound.hz(midi), car = ctx.createOscillator(), mod = ctx.createOscillator()
+    const mg = ctx.createGain(), g = ctx.createGain()
+    car.frequency.value = f; mod.frequency.value = f
+    mg.gain.setValueAtTime(f * 1.6, t); mg.gain.exponentialRampToValueAtTime(f * 0.15, t + 0.5)
+    mod.connect(mg).connect(car.frequency)
+    g.gain.setValueAtTime(0.0001, t)
+    g.gain.exponentialRampToValueAtTime(vel, t + 0.008)
+    g.gain.exponentialRampToValueAtTime(vel * 0.35, t + 0.25)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.6)
+    car.connect(g).connect(Sound.musicBus); g.connect(Sound.verbSend)
+    car.start(t); mod.start(t); car.stop(t + dur + 0.7); mod.stop(t + dur + 0.7)
+  }
+  function mallet(ctx, t, midi, dur, vel) {
+    const f = Sound.hz(midi)
+    for (const [mul, v, d] of [[1, vel, dur + 0.5], [4, vel * 0.22, 0.12], [10, vel * 0.05, 0.04]]) {
+      const o = ctx.createOscillator(), g = ctx.createGain()
+      o.frequency.value = f * mul
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.004)
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d)
+      o.connect(g).connect(Sound.musicBus); g.connect(Sound.verbSend)
+      o.start(t); o.stop(t + d + 0.05)
+    }
+  }
+  function bass(ctx, t, midi, dur) {
+    const o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain()
+    o.type = 'triangle'; o.frequency.value = Sound.hz(midi)
+    lp.type = 'lowpass'; lp.frequency.value = 700
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.32, t + 0.01)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
+    o.connect(lp).connect(g).connect(Sound.musicBus)
+    o.start(t); o.stop(t + dur + 0.05)
+  }
+  function brush(ctx, t, v) {
+    const s = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), g = ctx.createGain()
+    s.buffer = Sound.noise; hp.type = 'highpass'; hp.frequency.value = 6500
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.004)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07)
+    s.connect(hp).connect(g).connect(Sound.musicBus)
+    s.start(t, Math.random() * 0.5); s.stop(t + 0.1)
+  }
+
+  function scheduleBar(ctx, b, t0) {
+    const [root, voicing] = CHORDS[b]
+    // comp: beat 1 and the and-of-2
+    for (const [sl, len, v] of [[0, 1.6, 0.05], [3, 1.2, 0.035]]) voicing.forEach((m, i) => epiano(ctx, t0 + slot(sl) + i * 0.012, m, len * SPB, v))
+    bass(ctx, t0, root, SPB * 1.8)
+    bass(ctx, t0 + 2 * SPB, root + 7, SPB * 1.4)
+    const nextRoot = CHORDS[(b + 1) % 8][0]
+    bass(ctx, t0 + 3 * SPB + SPB * SWING * 0.0, nextRoot + (nextRoot > root ? -1 : 1), SPB * 0.9)
+    for (let i = 0; i < 8; i++) brush(ctx, t0 + slot(i), i % 2 ? 0.012 : (i % 4 === 2 ? 0.03 : 0.018))
+    for (const n of notes) if (n.bar === b) mallet(ctx, t0 + slot(n.at), n.midi, n.len * SPB * 0.5, 0.075)
+  }
+
+  function pump() {
+    const ctx = Sound.ctx
+    if (!ctx || !playing) return
+    while (nextBar < ctx.currentTime + 0.25) {
+      scheduleBar(ctx, barIdx, nextBar)
+      nextBar += 4 * SPB
+      barIdx = (barIdx + 1) % 8
+    }
+  }
+
+  return {
+    CHORDS, SPB, slot,
+    get notes() { return notes },
+    get seed() { return seed },
+    get playing() { return playing },
+    get wanted() { return wanted },
+    set wanted(v) { wanted = v },
+    /** position in the 8-bar loop, in bars (0..8), or -1 */
+    position() {
+      const ctx = Sound.ctx
+      if (!playing || !ctx) return -1
+      const p = (ctx.currentTime - startAt) / (4 * SPB)
+      return p < 0 ? -1 : p % 8
+    },
+    start() {
+      wanted = true
+      const ctx = Sound.ctx
+      if (!ctx || !Sound.on || playing) return
+      playing = true
+      startAt = nextBar = ctx.currentTime + 0.08; barIdx = 0
+      pump(); timer = setInterval(pump, 40)
+    },
+    stop(keepWanted) {
+      if (!keepWanted) wanted = false
+      playing = false; clearInterval(timer)
+    },
+    remix() {
+      seed = (Math.random() * 1e9) | 0
+      notes = compose(seed)
+      if (playing) { this.stop(true); this.start() }
+    },
+    reset() { seed = 2006; notes = compose(seed); if (playing) { this.stop(true); this.start() } },
+  }
+})()
+
+/* ---- renderers.js ---- */
+/* Channel previews. Each renderer is (ctx, w, h, t, state) and draws a whole
+   frame in CSS pixels; the caller has already scaled for devicePixelRatio.
+   The same function draws the tiny tile and the full-screen splash. */
+const FONT = '"M PLUS Rounded 1c", "Nunito", "Varela Round", ui-rounded, system-ui, sans-serif'
+const TAU = Math.PI * 2
+const R = {}
+
+function rr(c, x, y, w, h, r) {
+  r = Math.max(0, Math.min(r, w / 2, h / 2))
+  c.beginPath()
+  c.moveTo(x + r, y)
+  c.arcTo(x + w, y, x + w, y + h, r)
+  c.arcTo(x + w, y + h, x, y + h, r)
+  c.arcTo(x, y + h, x, y, r)
+  c.arcTo(x, y, x + w, y, r)
+  c.closePath()
+}
+const font = (c, px, wt = 800) => (c.font = `${wt} ${px.toFixed(1)}px ${FONT}`)
+const ease = (x) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2)
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v))
+
+/** Channel label: white, fat coloured outline, soft drop. */
+function label(c, text, x, y, px, color) {
+  font(c, px, 800)
+  c.textBaseline = 'alphabetic'
+  c.textAlign = 'left'
+  c.lineJoin = 'round'
+  c.lineWidth = px * 0.3
+  c.strokeStyle = 'rgba(0,0,0,.12)'
+  c.strokeText(text, x, y + px * 0.07)
+  c.strokeStyle = color
+  c.strokeText(text, x, y)
+  const g = c.createLinearGradient(0, y - px, 0, y)
+  g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#f1f4f7')
+  c.fillStyle = g
+  c.fillText(text, x, y)
+}
+
+const wrapCache = new Map()
+function wrap(c, text, maxW, maxLines = 3) {
+  const key = c.font + '|' + Math.round(maxW) + '|' + maxLines + '|' + text
+  let lines = wrapCache.get(key)
+  if (lines) return lines
+  lines = []
+  let cur = ''
+  for (const word of text.split(/\s+/)) {
+    const next = cur ? cur + ' ' + word : word
+    if (c.measureText(next).width > maxW && cur) { lines.push(cur); cur = word } else cur = next
+  }
+  if (cur) lines.push(cur)
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines)
+    let l = lines[maxLines - 1]
+    while (l.length > 1 && c.measureText(l + '…').width > maxW) l = l.slice(0, -1)
+    lines[maxLines - 1] = l.replace(/\s+\S*$/, '') + '…'
+  }
+  if (wrapCache.size > 600) wrapCache.clear()
+  wrapCache.set(key, lines)
+  return lines
+}
+
+function vgrad(c, h, a, b, y0 = 0) {
+  const g = c.createLinearGradient(0, y0, 0, h)
+  g.addColorStop(0, a); g.addColorStop(1, b)
+  return g
+}
+const K = (w, h) => Math.min(h / 140, w / 250)
+
+/* ------------------------------------------------------------- Blog */
+R.blog = (c, w, h, t) => {
+  const k = K(w, h), P = DATA.posts
+  c.fillStyle = vgrad(c, h, '#fffaf1', '#ffe6c4'); c.fillRect(0, 0, w, h)
+  c.fillStyle = 'rgba(240,138,36,.09)'
+  const sp = 14 * k, off = (t * 3 * k) % sp
+  for (let y = -sp; y < h + sp; y += sp) for (let x = -sp; x < w + sp; x += sp) {
+    c.beginPath(); c.arc(x + off + ((y / sp) & 1 ? sp / 2 : 0), y + off, 1.6 * k, 0, TAU); c.fill()
+  }
+  const bw = Math.min(w * 0.58, h * 1.2), bh = bw * 0.62, pw = bw / 2
+  const cx = w - bw / 2 - 16 * k, cy = h * 0.6, top = cy - bh / 2
+  // cover + shadow
+  c.save(); c.shadowColor = 'rgba(120,70,20,.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 4 * k
+  rr(c, cx - pw - 5 * k, top - 4 * k, bw + 10 * k, bh + 10 * k, 7 * k)
+  c.fillStyle = vgrad(c, top + bh + 6 * k, '#4b95e6', '#2f6fc0', top); c.fill(); c.restore()
+
+  const period = 3.4, ph = t / period, n = Math.floor(ph), p = ph - n
+  const f = p > 0.5 ? ease((p - 0.5) / 0.5) : 0
+  const post = (j) => P[(((n * 2 + j) % P.length) + P.length) % P.length]
+  function page(x, item, side, shade) {
+    c.save()
+    rr(c, x, top, pw, bh, 3 * k)
+    const g = c.createLinearGradient(x, 0, x + pw, 0)
+    if (side < 0) { g.addColorStop(0, '#fffefb'); g.addColorStop(0.85, '#fbf6ec'); g.addColorStop(1, '#e9e0cf') }
+    else { g.addColorStop(0, '#e9e0cf'); g.addColorStop(0.15, '#fbf6ec'); g.addColorStop(1, '#fffefb') }
+    c.fillStyle = g; c.fill(); c.clip()
+    const px = x + 9 * k, iw = pw - 18 * k
+    font(c, 6.4 * k, 700); c.fillStyle = '#f08a24'; c.textBaseline = 'top'; c.textAlign = 'left'
+    c.fillText(item.date.toUpperCase(), px, top + 8 * k)
+    font(c, 8.6 * k, 800); c.fillStyle = '#3b3f46'
+    const lines = wrap(c, item.t, iw, 3)
+    lines.forEach((l, i) => c.fillText(l, px, top + 17 * k + i * 10.5 * k))
+    c.fillStyle = 'rgba(80,90,100,.16)'
+    let ly = top + 22 * k + lines.length * 10.5 * k
+    for (let i = 0; ly < top + bh - 8 * k; i++, ly += 6.5 * k) rr(c, px, ly, iw * (i % 3 === 2 ? 0.6 : 0.95), 2.4 * k, 1.2 * k), c.fill()
+    if (shade) { c.fillStyle = `rgba(60,40,10,${shade})`; c.fillRect(x, top, pw, bh) }
+    c.restore()
+  }
+  page(cx - pw, post(0), -1, 0)
+  page(cx, f > 0 ? post(3) : post(1), 1, 0)
+  if (f > 0) {
+    const sx = Math.cos(f * Math.PI)
+    c.save(); c.translate(cx, 0)
+    if (sx > 0) { c.scale(sx, 1); page(0, post(1), 1, (1 - sx) * 0.25) }
+    else { c.scale(-sx, 1); page(-pw, post(2), -1, (1 + sx) * 0.25) }
+    c.restore()
+    c.save(); c.globalAlpha = Math.sin(f * Math.PI) * 0.25
+    c.fillStyle = '#000'; c.filter = 'none'
+    c.fillRect(cx - 1 * k, top, 2 * k, bh); c.restore()
+  }
+  const sg = c.createLinearGradient(cx - 8 * k, 0, cx + 8 * k, 0)
+  sg.addColorStop(0, 'rgba(0,0,0,0)'); sg.addColorStop(0.5, 'rgba(90,60,20,.22)'); sg.addColorStop(1, 'rgba(0,0,0,0)')
+  c.fillStyle = sg; c.fillRect(cx - 8 * k, top, 16 * k, bh)
+  label(c, 'Blog', 12 * k, 30 * k, 24 * k, '#f08a24')
+  font(c, 8.5 * k, 700); c.fillStyle = 'rgba(150,90,30,.75)'; c.textBaseline = 'alphabetic'
+  c.fillText(P.length + ' posts', 14 * k, 43 * k)
+}
+
+/* ------------------------------------------------------------- Notes */
+R.notes = (c, w, h, t) => {
+  const k = K(w, h), N = DATA.notes
+  c.fillStyle = vgrad(c, h, '#f1fbf5', '#d6f0df'); c.fillRect(0, 0, w, h)
+  c.strokeStyle = 'rgba(47,174,107,.10)'; c.lineWidth = 1
+  for (let x = 0; x < w; x += 12 * k) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke() }
+  for (let y = 0; y < h; y += 12 * k) { c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke() }
+  const cycle = 4.4, n = Math.floor(t / cycle), local = t - n * cycle, active = ((n % 3) + 3) % 3
+  const s = Math.min(h * 0.58, w * 0.28)
+  const slots = [
+    [w * 0.25, h * 0.64, -0.09, '#ffe768', '#f7d93c'],
+    [w * 0.53, h * 0.6, 0.05, '#ffc4d8', '#f9a9c4'],
+    [w * 0.8, h * 0.64, -0.035, '#bfe5ff', '#9dd3f8'],
+  ]
+  slots.forEach(([x, y, rot, col, col2], j) => {
+    let m = n - ((active - j + 3) % 3)
+    const item = N[(((m % N.length) + N.length) % N.length)]
+    const isActive = j === active
+    const lift = isActive ? Math.min(1, local * 4) * (local > cycle - 0.3 ? (cycle - local) / 0.3 : 1) : 0
+    c.save()
+    c.translate(x, y - lift * 3 * k)
+    c.rotate(rot + Math.sin(t * 1.3 + j) * 0.012)
+    c.scale(1 + lift * 0.05, 1 + lift * 0.05)
+    c.shadowColor = 'rgba(30,60,40,.25)'; c.shadowBlur = (6 + lift * 6) * k; c.shadowOffsetY = (3 + lift * 3) * k
+    c.beginPath()
+    c.moveTo(-s / 2, -s / 2); c.lineTo(s / 2, -s / 2); c.lineTo(s / 2, s / 2 - 9 * k)
+    c.lineTo(s / 2 - 9 * k, s / 2); c.lineTo(-s / 2, s / 2); c.closePath()
+    c.fillStyle = vgrad(c, s / 2, col, col2, -s / 2); c.fill()
+    c.shadowColor = 'transparent'
+    c.beginPath(); c.moveTo(s / 2, s / 2 - 9 * k); c.lineTo(s / 2 - 9 * k, s / 2 - 9 * k); c.lineTo(s / 2 - 9 * k, s / 2); c.closePath()
+    c.fillStyle = 'rgba(0,0,0,.12)'; c.fill()
+    c.save(); c.rotate(0.05 - rot * 0.6)
+    c.fillStyle = 'rgba(255,255,255,.6)'; c.fillRect(-s * 0.2, -s / 2 - 4 * k, s * 0.4, 9 * k); c.restore()
+    font(c, 7.6 * k, 700); c.fillStyle = '#4a3f2a'; c.textBaseline = 'top'; c.textAlign = 'left'
+    let text = item.t
+    if (isActive) text = text.slice(0, Math.floor(Math.max(0, local - 0.25) * 18))
+    const lines = text ? wrap(c, isActive ? item.t : text, s - 14 * k, 5) : []
+    let remaining = text.length, lastX = -s / 2 + 7 * k, lastY = -s / 2 + 9 * k
+    lines.forEach((l, i) => {
+      const shown = isActive ? l.slice(0, Math.max(0, remaining)) : l
+      remaining -= l.length + 1
+      const ly = -s / 2 + 9 * k + i * 9.6 * k
+      c.fillText(shown, -s / 2 + 7 * k, ly)
+      if (shown.length) { lastX = -s / 2 + 7 * k + c.measureText(shown).width; lastY = ly }
+    })
+    if (isActive && Math.floor(t * 2.6) % 2 === 0) { c.fillStyle = '#2fae6b'; c.fillRect(lastX + 1 * k, lastY, 1.4 * k, 8 * k) }
+    c.restore()
+  })
+  label(c, 'Notes', 12 * k, 30 * k, 24 * k, '#2fae6b')
+}
+
+/* ------------------------------------------------------------- Projects */
+const SHAPES = (() => {
+  const cube = { v: [], f: [[0, 1, 3, 2], [4, 6, 7, 5], [0, 4, 5, 1], [2, 3, 7, 6], [0, 2, 6, 4], [1, 5, 7, 3]] }
+  for (let i = 0; i < 8; i++) cube.v.push([i & 4 ? 1 : -1, i & 2 ? 1 : -1, i & 1 ? 1 : -1])
+  const oct = { v: [[1.35, 0, 0], [-1.35, 0, 0], [0, 1.35, 0], [0, -1.35, 0], [0, 0, 1.35], [0, 0, -1.35]], f: [] }
+  for (const a of [0, 1]) for (const b of [2, 3]) for (const cc of [4, 5]) oct.f.push([a, b, cc])
+  const prism = { v: [], f: [] }
+  for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU; prism.v.push([Math.cos(a) * 1.15, -0.8, Math.sin(a) * 1.15]) }
+  for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU; prism.v.push([Math.cos(a) * 1.15, 0.8, Math.sin(a) * 1.15]) }
+  prism.f.push([0, 1, 2, 3, 4, 5], [6, 7, 8, 9, 10, 11])
+  for (let i = 0; i < 6; i++) prism.f.push([i, (i + 1) % 6, 6 + ((i + 1) % 6), 6 + i])
+  return [cube, oct, prism]
+})()
+const LIGHT = (() => { const l = [-0.45, -0.75, -0.5], m = Math.hypot(...l); return l.map((x) => x / m) })()
+
+function solid(c, shape, cx, cy, size, ax, ay, rgb) {
+  const ca = Math.cos(ay), sa = Math.sin(ay), cb = Math.cos(ax), sb = Math.sin(ax)
+  const pts = shape.v.map(([x, y, z]) => {
+    let x1 = x * ca + z * sa, z1 = -x * sa + z * ca
+    let y1 = y * cb - z1 * sb, z2 = y * sb + z1 * cb
+    const p = 4.2 / (z2 + 5)
+    return { x: cx + x1 * size * p, y: cy + y1 * size * p, X: x1, Y: y1, Z: z2 }
+  })
+  const faces = shape.f.map((f) => {
+    const a = pts[f[0]], b = pts[f[1]], d = pts[f[2]]
+    let nx = (b.Y - a.Y) * (d.Z - a.Z) - (b.Z - a.Z) * (d.Y - a.Y)
+    let ny = (b.Z - a.Z) * (d.X - a.X) - (b.X - a.X) * (d.Z - a.Z)
+    let nz = (b.X - a.X) * (d.Y - a.Y) - (b.Y - a.Y) * (d.X - a.X)
+    let mx = 0, my = 0, mz = 0
+    for (const i of f) { mx += pts[i].X; my += pts[i].Y; mz += pts[i].Z }
+    if (nx * mx + ny * my + nz * mz < 0) { nx = -nx; ny = -ny; nz = -nz }
+    const nm = Math.hypot(nx, ny, nz) || 1
+    const lam = Math.max(0, (nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]) / nm)
+    return { f, z: mz / f.length, s: 0.62 + lam * 0.62 }
+  }).sort((a, b) => b.z - a.z)
+  for (const fc of faces) {
+    c.beginPath()
+    fc.f.forEach((i, j) => (j ? c.lineTo(pts[i].x, pts[i].y) : c.moveTo(pts[i].x, pts[i].y)))
+    c.closePath()
+    const s = fc.s
+    const col = s <= 1 ? rgb.map((v) => v * s) : rgb.map((v) => v + (255 - v) * (s - 1) * 1.4)
+    c.fillStyle = `rgb(${col.map((v) => clamp(v, 0, 255) | 0).join(',')})`
+    c.fill()
+    c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 0.8; c.lineJoin = 'round'; c.stroke()
+  }
+}
+
+R.projects = (c, w, h, t) => {
+  const k = K(w, h), P = DATA.projects
+  c.fillStyle = vgrad(c, h, '#e4efff', '#fbfdff'); c.fillRect(0, 0, w, h)
+  const fl = c.createLinearGradient(0, h * 0.7, 0, h)
+  fl.addColorStop(0, 'rgba(138,90,214,0)'); fl.addColorStop(1, 'rgba(138,90,214,.12)')
+  c.fillStyle = fl; c.fillRect(0, h * 0.7, w, h * 0.3)
+  const sz = Math.min(h * 0.17, w * 0.1)
+  const items = [[w * 0.24, '#4f9ef0', [79, 158, 240], 0], [w * 0.52, '#ff9b42', [255, 155, 66], 1], [w * 0.8, '#5fcf86', [95, 207, 134], 2]]
+  items.forEach(([x, _, rgb, i]) => {
+    const bob = Math.sin(t * 1.7 + i * 2) * 4 * k, y = h * 0.53 + bob
+    c.fillStyle = `rgba(60,40,110,${0.16 - bob / k * 0.008})`
+    c.beginPath(); c.ellipse(x, h * 0.53 + sz * 1.55, sz * (1.05 - bob / k * 0.02), sz * 0.24, 0, 0, TAU); c.fill()
+    solid(c, SHAPES[i], x, y, sz, 0.45 + Math.sin(t * 0.6 + i) * 0.3, t * (0.8 + i * 0.25) + i, rgb)
+  })
+  const cyc = 2.6, idx = Math.floor(t / cyc) % P.length, lt = (t % cyc) / cyc
+  const a = Math.min(1, lt * 8, (1 - lt) * 8)
+  font(c, 9 * k, 800)
+  const name = P[idx].t.length > 28 ? P[idx].t.slice(0, 26) + '…' : P[idx].t
+  const tw = c.measureText(name).width + 22 * k
+  c.save(); c.globalAlpha = a
+  rr(c, w / 2 - tw / 2, h - 23 * k + (1 - a) * 4 * k, tw, 16 * k, 8 * k)
+  c.fillStyle = 'rgba(255,255,255,.92)'; c.fill(); c.strokeStyle = 'rgba(138,90,214,.45)'; c.lineWidth = 1.2 * k; c.stroke()
+  c.fillStyle = '#6b44b8'; c.textAlign = 'center'; c.textBaseline = 'middle'
+  c.fillText(name, w / 2, h - 15 * k + (1 - a) * 4 * k); c.restore()
+  label(c, 'Projects', 12 * k, 30 * k, 24 * k, '#8a5ad6')
+}
+
+/* ------------------------------------------------------------- Work */
+R.work = (c, w, h, t) => {
+  const k = K(w, h), W = DATA.work
+  c.fillStyle = vgrad(c, h, '#f5f8fc', '#e3ebf5'); c.fillRect(0, 0, w, h)
+  const hb = 30 * k, tk = 17 * k
+  c.fillStyle = vgrad(c, hb, '#3a82e0', '#1e52a3'); c.fillRect(0, 0, w, hb)
+  c.fillStyle = 'rgba(255,255,255,.18)'; c.fillRect(0, 0, w, hb * 0.45)
+  font(c, 17 * k, 800); c.fillStyle = '#fff'; c.textBaseline = 'middle'; c.textAlign = 'left'
+  c.fillText('Work', 11 * k, hb / 2 + 1 * k)
+  const ww = c.measureText('Work').width
+  font(c, 7.5 * k, 700); c.fillStyle = 'rgba(255,255,255,.78)'
+  c.fillText('writing & launches', 17 * k + ww, hb / 2 + 2 * k)
+  // live pill
+  font(c, 7.5 * k, 800)
+  const lw = 34 * k, lx = w - lw - 9 * k
+  rr(c, lx, hb / 2 - 7 * k, lw, 14 * k, 7 * k); c.fillStyle = 'rgba(255,255,255,.95)'; c.fill()
+  c.fillStyle = Math.sin(t * 5) > -0.3 ? '#ff4d4d' : '#ffb3b3'
+  c.beginPath(); c.arc(lx + 8 * k, hb / 2, 3 * k, 0, TAU); c.fill()
+  c.fillStyle = '#1e52a3'; c.fillText('LIVE', lx + 13 * k, hb / 2 + 0.5 * k)
+  // cards
+  const ch = 38 * k, gap = 6 * k, step = ch + gap, total = step * W.length
+  const off = (t * 9 * k) % total
+  c.save(); c.beginPath(); c.rect(0, hb, w, h - hb - tk); c.clip()
+  for (let rep = 0; rep < 2; rep++) W.forEach((it, i) => {
+    const y = hb + 7 * k + i * step + rep * total - off
+    if (y > h || y + ch < hb) return
+    c.save(); c.shadowColor = 'rgba(20,50,100,.15)'; c.shadowBlur = 4 * k; c.shadowOffsetY = 1.5 * k
+    rr(c, 9 * k, y, w - 18 * k, ch, 7 * k); c.fillStyle = '#fff'; c.fill(); c.restore()
+    rr(c, 9 * k, y, 4 * k, ch, 2 * k); c.fillStyle = '#3a82e0'; c.fill()
+    font(c, 6.5 * k, 800); c.fillStyle = '#3a82e0'; c.textBaseline = 'top'
+    c.fillText(it.date.toUpperCase(), 19 * k, y + 6 * k)
+    font(c, 8.8 * k, 800); c.fillStyle = '#29313c'
+    wrap(c, it.t, w - 40 * k, 2).forEach((l, j) => c.fillText(l, 19 * k, y + 15 * k + j * 10 * k))
+  })
+  c.restore()
+  const fade = c.createLinearGradient(0, hb, 0, hb + 10 * k)
+  fade.addColorStop(0, 'rgba(0,0,0,.18)'); fade.addColorStop(1, 'rgba(0,0,0,0)')
+  c.fillStyle = fade; c.fillRect(0, hb, w, 10 * k)
+  // ticker
+  c.fillStyle = vgrad(c, h, '#22324d', '#141f33', h - tk); c.fillRect(0, h - tk, w, tk)
+  font(c, 8 * k, 700); c.fillStyle = '#e8f1ff'; c.textBaseline = 'middle'
+  const tick = W.map((x) => x.t).join('   •   ') + '   •   '
+  const tw = c.measureText(tick).width, tx = -((t * 28 * k) % tw)
+  c.fillText(tick, tx, h - tk / 2 + 0.5 * k); c.fillText(tick, tx + tw, h - tk / 2 + 0.5 * k)
+}
+
+/* ------------------------------------------------------------- About: an original little "pal" */
+function pal(c, cx, base, s, t, opts = {}) {
+  const wave = opts.wave !== false
+  const headR = s * 0.5, hy = base - s * 1.32
+  const tilt = wave ? Math.sin(t * 3.4) * 0.05 : 0
+  // body
+  c.save()
+  const bw = s * 1.15
+  c.beginPath()
+  c.moveTo(cx - bw / 2, base + s * 0.2)
+  c.bezierCurveTo(cx - bw / 2, base - s * 0.55, cx - bw * 0.36, base - s * 0.8, cx, base - s * 0.8)
+  c.bezierCurveTo(cx + bw * 0.36, base - s * 0.8, cx + bw / 2, base - s * 0.55, cx + bw / 2, base + s * 0.2)
+  c.closePath()
+  const bg = c.createLinearGradient(cx - bw / 2, 0, cx + bw / 2, 0)
+  bg.addColorStop(0, '#ff9a52'); bg.addColorStop(0.6, '#ff7f33'); bg.addColorStop(1, '#ec6a20')
+  c.fillStyle = bg; c.fill()
+  // hood rim + strings
+  c.strokeStyle = '#e8661f'; c.lineWidth = s * 0.08; c.lineCap = 'round'
+  c.beginPath(); c.arc(cx, base - s * 0.86, s * 0.3, 0.15 * Math.PI, 0.85 * Math.PI); c.stroke()
+  c.strokeStyle = '#fff6ec'; c.lineWidth = s * 0.035
+  for (const d of [-1, 1]) { c.beginPath(); c.moveTo(cx + d * s * 0.1, base - s * 0.62); c.lineTo(cx + d * s * 0.12, base - s * 0.36); c.stroke() }
+  c.restore()
+  // waving arm (character's left, viewer's right)
+  const sx = cx + bw * 0.4, sy = base - s * 0.55
+  const ang = wave ? -0.8 + Math.sin(t * 7.5) * 0.1 : 1.25
+  const ex = sx + Math.cos(ang) * s * 0.4, ey = sy + Math.sin(ang) * s * 0.4
+  const ang2 = wave ? -1.45 + Math.sin(t * 7.5 + 0.7) * 0.42 : 1.45
+  const hx = ex + Math.cos(ang2) * s * 0.36, hyy = ey + Math.sin(ang2) * s * 0.36
+  c.strokeStyle = '#f57a2f'; c.lineWidth = s * 0.24; c.lineCap = 'round'; c.lineJoin = 'round'
+  c.beginPath(); c.moveTo(sx, sy); c.lineTo(ex, ey); c.lineTo(hx, hyy); c.stroke()
+  c.fillStyle = '#ffd6b0'; c.beginPath(); c.arc(hx, hyy, s * 0.15, 0, TAU); c.fill()
+  c.fillStyle = '#ffd6b0'; c.beginPath(); c.ellipse(hx + Math.cos(ang2 - 1.2) * s * 0.13, hyy + Math.sin(ang2 - 1.2) * s * 0.13, s * 0.05, s * 0.08, ang2, 0, TAU); c.fill()
+  // head
+  c.save(); c.translate(cx, hy); c.rotate(tilt)
+  c.fillStyle = '#ffd6b0'
+  for (const d of [-1, 1]) { c.beginPath(); c.arc(d * headR * 0.95, headR * 0.12, headR * 0.17, 0, TAU); c.fill() }
+  const hg = c.createRadialGradient(-headR * 0.3, -headR * 0.35, headR * 0.2, 0, 0, headR * 1.05)
+  hg.addColorStop(0, '#ffe4c8'); hg.addColorStop(1, '#f9c79c')
+  c.fillStyle = hg; c.beginPath(); c.ellipse(0, 0, headR * 0.98, headR, 0, 0, TAU); c.fill()
+  // hair: a soft cap with a swoop and a cowlick
+  c.fillStyle = '#4a2f23'
+  c.beginPath()
+  c.moveTo(-headR * 1.0, headR * 0.05)
+  c.bezierCurveTo(-headR * 1.12, -headR * 0.95, -headR * 0.3, -headR * 1.22, headR * 0.25, -headR * 1.1)
+  c.bezierCurveTo(headR * 0.9, -headR * 1.0, headR * 1.12, -headR * 0.45, headR * 1.0, headR * 0.05)
+  c.bezierCurveTo(headR * 0.9, -headR * 0.35, headR * 0.6, -headR * 0.55, headR * 0.15, -headR * 0.5)
+  c.bezierCurveTo(-headR * 0.25, -headR * 0.42, -headR * 0.55, -headR * 0.62, -headR * 0.7, -headR * 0.3)
+  c.bezierCurveTo(-headR * 0.82, -headR * 0.1, -headR * 0.9, 0, -headR * 1.0, headR * 0.05)
+  c.fill()
+  c.strokeStyle = '#4a2f23'; c.lineWidth = headR * 0.13; c.lineCap = 'round'
+  c.beginPath(); c.moveTo(headR * 0.05, -headR * 1.08); c.quadraticCurveTo(headR * 0.1, -headR * 1.45, headR * 0.42, -headR * 1.38); c.stroke()
+  c.fillStyle = 'rgba(255,255,255,.18)'
+  c.beginPath(); c.ellipse(-headR * 0.35, -headR * 0.85, headR * 0.28, headR * 0.09, -0.35, 0, TAU); c.fill()
+  // glasses + eyes
+  const blink = (t % 3.7) < 0.12 ? 0.12 : 1
+  for (const d of [-1, 1]) {
+    c.fillStyle = '#2b2730'
+    c.beginPath(); c.ellipse(d * headR * 0.36, headR * 0.02, headR * 0.075, headR * 0.11 * blink, 0, 0, TAU); c.fill()
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(d * headR * 0.36 + headR * 0.025, -headR * 0.03, headR * 0.025 * blink, 0, TAU); c.fill()
+    c.strokeStyle = '#33303a'; c.lineWidth = headR * 0.07
+    c.beginPath(); c.arc(d * headR * 0.36, headR * 0.02, headR * 0.24, 0, TAU); c.stroke()
+    c.fillStyle = 'rgba(255,255,255,.22)'; c.beginPath(); c.arc(d * headR * 0.36 - headR * 0.08, -headR * 0.06, headR * 0.07, 0, TAU); c.fill()
+  }
+  c.beginPath(); c.moveTo(-headR * 0.13, -headR * 0.0); c.quadraticCurveTo(0, -headR * 0.08, headR * 0.13, 0); c.stroke()
+  c.fillStyle = 'rgba(255,120,120,.32)'
+  for (const d of [-1, 1]) { c.beginPath(); c.ellipse(d * headR * 0.6, headR * 0.38, headR * 0.15, headR * 0.09, 0, 0, TAU); c.fill() }
+  // mouth
+  const open = wave ? 0.5 + 0.5 * Math.sin(t * 3.4) : 0
+  c.fillStyle = '#b5413b'
+  c.beginPath(); c.moveTo(-headR * 0.2, headR * 0.45)
+  c.quadraticCurveTo(0, headR * (0.62 + open * 0.14), headR * 0.2, headR * 0.45)
+  c.quadraticCurveTo(0, headR * (0.5 + open * 0.03), -headR * 0.2, headR * 0.45); c.fill()
+  c.restore()
+}
+
+function cloud(c, x, y, s) {
+  c.beginPath()
+  c.arc(x, y, s, 0, TAU); c.arc(x + s * 1.1, y - s * 0.35, s * 1.15, 0, TAU)
+  c.arc(x + s * 2.2, y, s * 0.9, 0, TAU); c.rect(x, y, s * 2.2, s * 0.9)
+  c.fill()
+}
+
+R.about = (c, w, h, t) => {
+  const k = K(w, h)
+  c.fillStyle = vgrad(c, h, '#9fd8ff', '#eaf8ff'); c.fillRect(0, 0, w, h)
+  c.fillStyle = 'rgba(255,255,255,.85)'
+  cloud(c, ((t * 6 * k) % (w + 80 * k)) - 50 * k, h * 0.3, 9 * k)
+  cloud(c, ((t * 4 * k + w * 0.6) % (w + 80 * k)) - 50 * k, h * 0.16, 6 * k)
+  const hill = c.createLinearGradient(0, h * 0.72, 0, h)
+  hill.addColorStop(0, '#a9e27c'); hill.addColorStop(1, '#6cbf4b')
+  c.fillStyle = hill
+  c.beginPath(); c.ellipse(w * 0.55, h * 1.18, w * 0.85, h * 0.45, 0, 0, TAU); c.fill()
+  c.fillStyle = '#fff'
+  for (let i = 0; i < 9; i++) { const fx = ((i * 97) % 100) / 100 * w, fy = h * 0.86 + ((i * 37) % 10) * k; c.beginPath(); c.arc(fx, fy, 1.4 * k, 0, TAU); c.fill() }
+  const s = h * 0.36
+  pal(c, w * 0.68, h * 0.98, s, t)
+  // speech bubble
+  const ph = t % 6.5
+  if (ph < 4) {
+    const a = Math.min(1, ph * 5), sc = 0.8 + 0.2 * (ph < 0.25 ? ease(ph / 0.25) : 1)
+    c.save(); c.globalAlpha = a * Math.min(1, (4 - ph) * 3)
+    const bx = w * 0.42, by = h * 0.42
+    c.translate(bx, by); c.scale(sc, sc)
+    font(c, 9.5 * k, 800)
+    const txt = "hi! I'm Max", tw = c.measureText(txt).width + 18 * k
+    c.shadowColor = 'rgba(30,80,120,.2)'; c.shadowBlur = 5 * k; c.shadowOffsetY = 2 * k
+    rr(c, -tw / 2, -11 * k, tw, 22 * k, 11 * k); c.fillStyle = '#fff'; c.fill()
+    c.beginPath(); c.moveTo(tw / 2 - 12 * k, 6 * k); c.lineTo(tw / 2 + 4 * k, 15 * k); c.lineTo(tw / 2 - 2 * k, 3 * k); c.fill()
+    c.shadowColor = 'transparent'
+    c.fillStyle = '#2a76b8'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(txt, 0, 0.5 * k)
+    c.restore()
+  }
+  label(c, 'About', 12 * k, 30 * k, 24 * k, '#3a9be0')
+}
+
+/* ------------------------------------------------------------- Links */
+function plane(c, x, y, ang, s) {
+  c.save(); c.translate(x, y); c.rotate(ang)
+  c.fillStyle = '#fff'; c.strokeStyle = '#b28be8'; c.lineWidth = s * 0.08; c.lineJoin = 'round'
+  c.beginPath(); c.moveTo(s, 0); c.lineTo(-s * 0.8, -s * 0.62); c.lineTo(-s * 0.35, 0); c.closePath(); c.fill(); c.stroke()
+  c.fillStyle = '#e9e0fb'
+  c.beginPath(); c.moveTo(s, 0); c.lineTo(-s * 0.8, s * 0.5); c.lineTo(-s * 0.35, 0); c.closePath(); c.fill(); c.stroke()
+  c.restore()
+}
+R.links = (c, w, h, t) => {
+  const k = K(w, h)
+  c.fillStyle = vgrad(c, h, '#f3ecff', '#fff4fa'); c.fillRect(0, 0, w, h)
+  for (let i = 0; i < 3; i++) {
+    const sp = 0.09 + i * 0.025, pr = ((t * sp + i * 0.37) % 1.3) - 0.15
+    const x = pr * w, base = h * (0.32 + i * 0.17)
+    const y = base + Math.sin(pr * 7 + i) * 9 * k
+    const dy = Math.cos(pr * 7 + i) * 9 * k * 7 / w
+    c.strokeStyle = 'rgba(178,139,232,.5)'; c.lineWidth = 1.3 * k; c.setLineDash([3 * k, 4 * k])
+    c.beginPath()
+    for (let q = 0; q < 26; q++) { const px = x - q * 4 * k, pp = px / w; const py = base + Math.sin(pp * 7 + i) * 9 * k; q ? c.lineTo(px, py) : c.moveTo(px, py) }
+    c.stroke(); c.setLineDash([])
+    plane(c, x, y, Math.atan(dy * w / w), (9 + i * 2) * k)
+  }
+  const chips = [['GitHub', '#2b2f36'], ['X', '#2b2f36'], ['RSS', '#f08a24']]
+  font(c, 9 * k, 800)
+  let total = 0
+  const widths = chips.map(([s]) => c.measureText(s).width + 20 * k)
+  widths.forEach((x) => (total += x + 6 * k))
+  let x = w / 2 - total / 2 + 3 * k
+  chips.forEach(([s, col], i) => {
+    const y = h - 26 * k + Math.sin(t * 2.2 + i) * 2.5 * k
+    c.save(); c.shadowColor = 'rgba(90,50,140,.2)'; c.shadowBlur = 4 * k; c.shadowOffsetY = 2 * k
+    rr(c, x, y, widths[i], 17 * k, 8.5 * k); c.fillStyle = '#fff'; c.fill(); c.restore()
+    c.strokeStyle = 'rgba(178,139,232,.6)'; c.lineWidth = 1.2 * k; rr(c, x, y, widths[i], 17 * k, 8.5 * k); c.stroke()
+    c.fillStyle = col; c.textAlign = 'center'; c.textBaseline = 'middle'
+    c.fillText(s, x + widths[i] / 2, y + 9 * k)
+    x += widths[i] + 6 * k
+  })
+  label(c, 'Links', 12 * k, 30 * k, 24 * k, '#e0559a')
+}
+
+/* ------------------------------------------------------------- Forecast */
+R.forecast = (c, w, h, t) => {
+  const k = K(w, h)
+  c.fillStyle = vgrad(c, h, '#5db8f0', '#cdeeff'); c.fillRect(0, 0, w, h)
+  const sx = w * 0.79, sy = h * 0.4, sr = Math.min(h * 0.17, w * 0.1)
+  c.save(); c.translate(sx, sy); c.rotate(t * 0.35)
+  c.fillStyle = 'rgba(255,220,90,.55)'
+  for (let i = 0; i < 12; i++) {
+    c.rotate(TAU / 12)
+    c.beginPath(); c.moveTo(-sr * 0.18, sr * 1.18); c.lineTo(0, sr * (1.62 + 0.08 * Math.sin(t * 3 + i))); c.lineTo(sr * 0.18, sr * 1.18); c.fill()
+  }
+  c.restore()
+  const sg = c.createRadialGradient(sx - sr * 0.3, sy - sr * 0.3, sr * 0.1, sx, sy, sr)
+  sg.addColorStop(0, '#fff8c4'); sg.addColorStop(0.6, '#ffd84a'); sg.addColorStop(1, '#ffb81f')
+  c.fillStyle = sg; c.beginPath(); c.arc(sx, sy, sr, 0, TAU); c.fill()
+  c.fillStyle = '#c47a00'
+  for (const d of [-1, 1]) { c.beginPath(); c.arc(sx + d * sr * 0.32, sy - sr * 0.08, sr * 0.08, 0, TAU); c.fill() }
+  c.strokeStyle = '#c47a00'; c.lineWidth = sr * 0.08; c.lineCap = 'round'
+  c.beginPath(); c.arc(sx, sy + sr * 0.05, sr * 0.36, 0.2 * Math.PI, 0.8 * Math.PI); c.stroke()
+  c.fillStyle = 'rgba(255,255,255,.95)'
+  cloud(c, ((t * 7 * k + w * 0.55) % (w + 90 * k)) - 60 * k, h * 0.52, 10 * k)
+  label(c, 'Forecast', 12 * k, 30 * k, 22 * k, '#f29b1e')
+  font(c, 40 * k, 900); c.lineJoin = 'round'; c.textBaseline = 'alphabetic'; c.textAlign = 'left'
+  c.lineWidth = 7 * k; c.strokeStyle = '#2a86cc'; c.strokeText('350', 13 * k, h * 0.76); c.fillStyle = '#fff'; c.fillText('350', 13 * k, h * 0.76)
+  const nw = c.measureText('350').width
+  font(c, 16 * k, 900); c.lineWidth = 5 * k; c.strokeText('ms', 17 * k + nw, h * 0.76); c.fillText('ms', 17 * k + nw, h * 0.76)
+  font(c, 8.5 * k, 800); c.fillStyle = '#ffffff'
+  c.fillText('Build time · clear skies · 78 routes', 14 * k, h * 0.76 + 15 * k)
+}
+
+/* ------------------------------------------------------------- Jukebox */
+const SPECTRUM = new Uint8Array(128)
+R.jukebox = (c, w, h, t) => {
+  const k = K(w, h), playing = Jingle.playing
+  c.fillStyle = vgrad(c, h, '#fff0f7', '#ffd9ea'); c.fillRect(0, 0, w, h)
+  const dx = w * 0.3, dy = h * 0.6, dr = Math.min(h * 0.33, w * 0.2)
+  c.save(); c.shadowColor = 'rgba(120,20,70,.3)'; c.shadowBlur = 8 * k; c.shadowOffsetY = 3 * k
+  c.fillStyle = '#26232c'; c.beginPath(); c.arc(dx, dy, dr, 0, TAU); c.fill(); c.restore()
+  c.strokeStyle = 'rgba(255,255,255,.07)'; c.lineWidth = 1
+  for (let r = dr * 0.45; r < dr * 0.97; r += 2.2 * k) { c.beginPath(); c.arc(dx, dy, r, 0, TAU); c.stroke() }
+  const rot = t * (playing ? 3.4 : 0.6)
+  c.save(); c.translate(dx, dy); c.rotate(rot)
+  const sh = c.createLinearGradient(-dr, 0, dr, 0)
+  sh.addColorStop(0.3, 'rgba(255,255,255,0)'); sh.addColorStop(0.5, 'rgba(255,255,255,.16)'); sh.addColorStop(0.7, 'rgba(255,255,255,0)')
+  c.fillStyle = sh; c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, dr * 0.97, -0.5, 0.5); c.closePath(); c.fill()
+  c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, dr * 0.97, Math.PI - 0.5, Math.PI + 0.5); c.closePath(); c.fill()
+  c.fillStyle = '#ff5fa8'; c.beginPath(); c.arc(0, 0, dr * 0.36, 0, TAU); c.fill()
+  c.fillStyle = '#ffd1e6'; c.fillRect(-dr * 0.2, -dr * 0.04, dr * 0.4, dr * 0.08)
+  c.fillStyle = '#26232c'; c.beginPath(); c.arc(0, 0, dr * 0.05, 0, TAU); c.fill()
+  c.restore()
+  // bars
+  const an = playing && Sound.analyser
+  if (an) an.getByteFrequencyData(SPECTRUM)
+  const n = 7, x0 = w * 0.56, x1 = w * 0.93, bw = (x1 - x0) / n, seg = 5 * k, top = h * 0.3, bot = h * 0.86
+  for (let i = 0; i < n; i++) {
+    let v = an ? SPECTRUM[2 + i * 5] / 255 : 0.18 + 0.12 * Math.sin(t * 2.2 + i * 0.9) + 0.06 * Math.sin(t * 5.3 + i * 2)
+    v = clamp(v, 0.05, 1)
+    const segs = Math.round(((bot - top) / seg) * v)
+    for (let s = 0; s < segs; s++) {
+      const y = bot - (s + 1) * seg, f = s / ((bot - top) / seg)
+      c.fillStyle = f > 0.75 ? '#ff7a59' : f > 0.45 ? '#ff5fa8' : '#d6409f'
+      rr(c, x0 + i * bw + 1.5 * k, y + 0.8 * k, bw - 3 * k, seg - 1.6 * k, 1.2 * k); c.fill()
+    }
+  }
+  font(c, 12 * k, 800); c.textAlign = 'center'; c.textBaseline = 'middle'
+  for (let i = 0; i < 4; i++) {
+    const p = ((t * 0.22 + i * 0.25) % 1)
+    c.fillStyle = `rgba(214,64,159,${Math.sin(p * Math.PI) * 0.6})`
+    c.fillText(i % 2 ? '♫' : '♪', dx + dr * 0.9 + Math.sin(p * 9 + i) * 8 * k, dy - dr * 0.6 - p * h * 0.4)
+  }
+  label(c, 'Jukebox', 12 * k, 30 * k, 22 * k, '#d6409f')
+  font(c, 7.5 * k, 800); c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.fillStyle = 'rgba(160,40,110,.7)'
+  c.fillText(playing ? 'NOW PLAYING · ' + Jingle.CHORDS[Math.floor(Math.max(0, Jingle.position())) % 8][2] : 'AN ORIGINAL LOOP', 14 * k, 42 * k)
+}
+
+/* ------------------------------------------------------------- Empty slot */
+let NOISE = null
+function noiseTile() {
+  if (NOISE) return NOISE
+  NOISE = document.createElement('canvas'); NOISE.width = NOISE.height = 96
+  const x = NOISE.getContext('2d'), d = x.createImageData(96, 96)
+  for (let i = 0; i < d.data.length; i += 4) { const v = (Math.random() * 255) | 0; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255 }
+  x.putImageData(d, 0, 0)
+  return NOISE
+}
+R.empty = (c, w, h, t, st) => {
+  c.fillStyle = vgrad(c, h, '#eef0f3', '#dfe3e8'); c.fillRect(0, 0, w, h)
+  c.save(); c.globalAlpha = 0.045
+  const nz = noiseTile(), ox = ((t * 977) % 96) | 0, oy = ((t * 613) % 96) | 0
+  for (let y = -oy; y < h; y += 96) for (let x = -ox; x < w; x += 96) c.drawImage(nz, x, y)
+  c.restore()
+  const p = ((t * 0.18 + (st.phase || 0)) % 1.5) - 0.25
+  const bx = p * w * 1.6 - w * 0.3
+  const g = c.createLinearGradient(bx - h, 0, bx + h * 0.2, h)
+  g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,.55)'); g.addColorStop(1, 'rgba(255,255,255,0)')
+  c.fillStyle = g; c.fillRect(0, 0, w, h)
+  c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1
+  for (let y = 2; y < h; y += 4) { c.beginPath(); c.moveTo(0, y + 0.5); c.lineTo(w, y + 0.5); c.stroke() }
+}
+
+/* ---- app.js ---- */
+/* ================================================================ app */
+const $ = (s, r = document) => r.querySelector(s)
+const $$ = (s, r = document) => [...r.querySelectorAll(s)]
+const root = document.documentElement
+const mqReduce = matchMedia('(prefers-reduced-motion: reduce)')
+let RM = mqReduce.matches
+mqReduce.addEventListener?.('change', (e) => { RM = e.matches; surfaces.forEach((s) => (s.dirty = true)) })
+const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches
+const COARSE = matchMedia('(pointer: coarse)').matches
+
+const CH = [
+  { id: 'blog', name: 'Blog', color: '#f08a24', sub: `${DATA.posts.length} posts, newest first`, r: R.blog },
+  { id: 'notes', name: 'Notes', color: '#2fae6b', sub: `${DATA.notes.length} short notes`, r: R.notes },
+  { id: 'projects', name: 'Projects', color: '#8a5ad6', sub: `${DATA.projects.length} things I've made`, r: R.projects },
+  { id: 'work', name: 'Work', color: '#2f74d0', sub: 'Writing and launches at Vercel', r: R.work },
+  { id: 'about', name: 'About', color: '#3a9be0', sub: 'Hello there', r: R.about },
+  { id: 'links', name: 'Links', color: '#e0559a', sub: 'Elsewhere on the internet', r: R.links },
+  { id: 'forecast', name: 'Forecast', color: '#f29b1e', sub: "Today's build conditions", r: R.forecast },
+  { id: 'jukebox', name: 'Jukebox', color: '#d6409f', sub: 'An original procedural loop', r: R.jukebox },
+  { id: 'empty1', empty: true }, { id: 'empty2', empty: true }, { id: 'empty3', empty: true }, { id: 'empty4', empty: true },
+]
+const byId = Object.fromEntries(CH.map((c) => [c.id, c]))
+
+/* ---------------------------------------------------------------- surfaces */
+const surfaces = new Set()
+const ro = new ResizeObserver((ents) => ents.forEach((e) => fit(e.target.__s)))
+const io = new IntersectionObserver((ents) => ents.forEach((e) => { e.target.__s.visible = e.isIntersecting; e.target.__s.dirty = true }))
+
+function surface(canvas, draw, opts = {}) {
+  const s = { canvas, ctx: canvas.getContext('2d'), draw, st: opts.st || {}, w: 0, h: 0, dpr: 1, visible: true, dirty: true, off: opts.off || 0, cull: !!opts.cull }
+  canvas.__s = s
+  surfaces.add(s)
+  ro.observe(canvas)
+  if (s.cull) io.observe(canvas)
+  fit(s)
+  return s
+}
+function fit(s) {
+  if (!s) return
+  const r = s.canvas.getBoundingClientRect()
+  const dpr = Math.min(2, window.devicePixelRatio || 1)
+  if (!r.width || !r.height) return
+  const W = Math.round(r.width * dpr), H = Math.round(r.height * dpr)
+  if (W !== s.canvas.width || H !== s.canvas.height) { s.canvas.width = W; s.canvas.height = H }
+  s.w = r.width; s.h = r.height; s.dpr = dpr; s.dirty = true
+}
+function paint(s, t) {
+  if (!s.w) return
+  s.ctx.setTransform(s.dpr, 0, 0, s.dpr, 0, 0)
+  s.draw(s.ctx, s.w, s.h, t + s.off, s.st)
+  s.dirty = false
+}
+function drop(s) { if (!s) return; ro.unobserve(s.canvas); io.unobserve(s.canvas); surfaces.delete(s) }
+
+/* ---------------------------------------------------------------- tiles */
+const track = $('#track')
+const tiles = CH.map((ch, i) => {
+  const el = document.createElement(ch.empty ? 'div' : 'button')
+  el.className = 'tile' + (ch.empty ? ' empty' : '')
+  el.style.setProperty('--i', i)
+  el.style.setProperty('--d', (i * 0.73) % 9 + 's')
+  if (ch.empty) el.setAttribute('aria-hidden', 'true')
+  else { el.type = 'button'; el.setAttribute('aria-label', `${ch.name} channel`); el.dataset.ch = ch.id }
+  el.innerHTML = '<span class="bezel"><span class="screen"><canvas></canvas><span class="glare"></span></span></span>'
+  el.__ch = ch
+  return el
+})
+let perPage = 0, pageCount = 1, curPage = 0, isMobile = false, dockGeo = null
+
+function layout() {
+  const W = innerWidth, H = innerHeight
+  isMobile = W < 700
+  dockGeo = isMobile
+    ? { H: 134, cx: 58, cy: 74, R: 50, r: 38, top: 52 }
+    : { H: 150, cx: Math.min(118, W * 0.09), cy: 86, R: 74, r: 56, top: 58 }
+  drawDock(W)
+  const availH = H - dockGeo.H - (isMobile ? 64 : 44)
+  let cols = 4, rows = 3
+  if (isMobile) { cols = 2; rows = availH > 520 ? 4 : 3 }
+  else if (W < 1000) { cols = 3; rows = 3 }
+  const gx = isMobile ? 14 : Math.max(14, Math.min(26, W * 0.018)), gy = isMobile ? 14 : gx
+  const aspect = isMobile ? 1.38 : 1.72
+  const availW = W - (isMobile ? 32 : Math.max(48, W * 0.1))
+  const tw = Math.floor(Math.min((availW - gx * (cols - 1)) / cols, ((availH - gy * (rows - 1)) / rows) * aspect))
+  // phones: let tiles grow taller to use the height, within a sane aspect
+  const th = isMobile ? Math.round(Math.min(tw / 1.12, Math.max(tw / aspect, (availH - gy * (rows - 1)) / rows))) : Math.round(tw / aspect)
+  const set = (k, v) => root.style.setProperty(k, v)
+  set('--tw', tw + 'px'); set('--th', th + 'px'); set('--gx', gx + 'px'); set('--gy', gy + 'px'); set('--cols', cols)
+  set('--tr', Math.round(th * 0.15) + 'px'); set('--bz', Math.max(4, Math.round(th * 0.042)) + 'px')
+  set('--dh', dockGeo.H + 'px'); set('--ocx', dockGeo.cx + 'px'); set('--ocy', dockGeo.cy + 'px'); set('--or', dockGeo.r + 'px'); set('--btop', dockGeo.top + 'px')
+  const per = cols * rows
+  if (per !== perPage) {
+    perPage = per
+    track.textContent = ''
+    pageCount = Math.ceil(tiles.length / per)
+    for (let p = 0; p < pageCount; p++) {
+      const page = document.createElement('div')
+      page.className = 'page'
+      page.setAttribute('role', 'group')
+      page.setAttribute('aria-label', `Page ${p + 1} of ${pageCount}`)
+      tiles.slice(p * per, p * per + per).forEach((t) => page.appendChild(t))
+      track.appendChild(page)
+    }
+    $('#dots').innerHTML = pageCount > 1 ? Array.from({ length: pageCount }, (_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('') : ''
+    curPage = 0; track.scrollLeft = 0
+  }
+  $('#prevPage').hidden = $('#nextPage').hidden = isMobile || pageCount < 2
+  updatePageUI()
+}
+
+function drawDock(W) {
+  const g = dockGeo, svg = $('#dockShape'), H = g.H
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`)
+  const a = 0.95, fil = g.R * 0.75
+  const ax = g.R * Math.sin(a), ay = g.cy - g.R * Math.cos(a)
+  const L = g.cx, Rr = W - g.cx
+  const top = `M0 ${g.cy - g.R} H${L} A${g.R} ${g.R} 0 0 1 ${L + ax} ${ay} C${L + ax + fil * 0.45} ${g.top} ${L + g.R + fil * 0.2} ${g.top} ${L + g.R + fil} ${g.top} H${Rr - g.R - fil} C${Rr - g.R - fil * 0.2} ${g.top} ${Rr - ax - fil * 0.45} ${g.top} ${Rr - ax} ${ay} A${g.R} ${g.R} 0 0 1 ${Rr} ${g.cy - g.R} H${W}`
+  svg.querySelector('.fill').setAttribute('d', top + ` V${H} H0 Z`)
+  svg.querySelector('.line').setAttribute('d', top)
+  svg.querySelector('.hi').setAttribute('d', top)
+}
+
+function updatePageUI() {
+  $$('#dots i').forEach((d, i) => d.classList.toggle('on', i === curPage))
+  $('#prevPage').classList.toggle('dim', curPage === 0)
+  $('#nextPage').classList.toggle('dim', curPage >= pageCount - 1)
+}
+function goPage(p, smooth = true) {
+  p = Math.max(0, Math.min(pageCount - 1, p))
+  track.scrollTo({ left: p * track.clientWidth, behavior: smooth && !RM ? 'smooth' : 'auto' })
+  if (p !== curPage) Sound.tick()
+  curPage = p; updatePageUI()
+}
+track.addEventListener('scroll', () => {
+  const p = Math.round(track.scrollLeft / Math.max(1, track.clientWidth))
+  if (p !== curPage) { curPage = p; updatePageUI(); Sound.tick(); hideBubble() }
+}, { passive: true })
+$('#prevPage').onclick = () => goPage(curPage - 1)
+$('#nextPage').onclick = () => goPage(curPage + 1)
+
+/* ---------------------------------------------------------------- hover, bubble, rumble */
+const bubble = $('#bubble')
+let hot = null
+function setHot(el, via) {
+  if (hot === el) return
+  if (hot) hot.classList.remove('hot')
+  hot = el
+  if (!el) return hideBubble()
+  el.classList.add('hot')
+  if (el.classList.contains('tile') && !el.__ch.empty) {
+    if (!RM) { el.classList.remove('rumble'); void el.offsetWidth; el.classList.add('rumble') }
+    Sound.bloop(tiles.indexOf(el))
+    showBubble(el)
+    if (via === 'pad') padRumble(0.25)
+    if (via === 'touch') navigator.vibrate?.(8)
+  }
+}
+function showBubble(el) {
+  const r = el.getBoundingClientRect()
+  bubble.textContent = el.__ch.name
+  bubble.style.left = r.left + r.width / 2 + 'px'
+  const above = r.top > 70
+  bubble.style.top = (above ? r.top - 6 : r.bottom + 50) + 'px'
+  bubble.classList.toggle('below', !above)
+  bubble.classList.add('show')
+}
+function hideBubble(now) {
+  if (now) { bubble.style.transition = 'none'; bubble.classList.remove('show'); void bubble.offsetWidth; bubble.style.transition = ''; return }
+  bubble.classList.remove('show')
+}
+for (const t of tiles) {
+  if (t.__ch.empty) continue
+  t.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'touch') setHot(t, 'mouse') })
+  t.addEventListener('pointerleave', (e) => { if (hot === t && e.pointerType !== 'touch') setHot(null) })
+  t.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') setHot(t, 'touch') })
+  t.addEventListener('focus', () => setHot(t, 'key'))
+  t.addEventListener('blur', () => { if (hot === t) setHot(null) })
+  t.addEventListener('click', () => openChannel(t.__ch))
+}
+for (const b of $$('.orb, .pill-sm')) b.addEventListener('pointerenter', () => Sound.bloop(3))
+
+/* ---------------------------------------------------------------- clock */
+function tickClock() {
+  const d = new Date(), h = d.getHours(), m = d.getMinutes()
+  $('#hh').textContent = String(h % 12 || 12)
+  $('#mm').textContent = String(m).padStart(2, '0')
+  $('#ampm').textContent = h < 12 ? 'AM' : 'PM'
+  $('#date').textContent = `${DAY_NAMES[d.getDay()]} ${d.getMonth() + 1}/${d.getDate()}`
+  $('#chClock').textContent = `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
+}
+tickClock(); setInterval(tickClock, 1000)
+
+/* ---------------------------------------------------------------- toast */
+let toastT = 0
+function toast(msg, ms = 2600) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show')
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms)
+}
+
+/* ---------------------------------------------------------------- sound UI */
+Jingle.wanted = true
+function syncSound() {
+  const on = Sound.on
+  $('#soundBtn').setAttribute('aria-pressed', on)
+  $('#soundBtn').classList.toggle('on', on)
+  $('#soundBtn .lbl').textContent = on ? 'Sound on' : 'Sound off'
+  $('#stSound').setAttribute('aria-checked', on)
+  $('#stJingle').setAttribute('aria-checked', Jingle.wanted)
+  const jb = $('#jbPlay'); if (jb) jb.textContent = Jingle.playing ? 'Stop' : 'Play'
+}
+Sound.onChange(syncSound)
+$('#soundBtn').onclick = () => { Sound.setOn(!Sound.on); if (Sound.on) { Sound.select(); toast(Jingle.wanted ? 'Sound on. Enjoy the little tune.' : 'Sound on.') } }
+$('#stSound').onclick = () => { Sound.setOn(!Sound.on); if (Sound.on) Sound.select() }
+$('#stJingle').onclick = () => {
+  if (Jingle.wanted) Jingle.stop(); else { Jingle.wanted = true; if (Sound.on) Jingle.start() }
+  syncSound()
+}
+
+/* ---------------------------------------------------------------- zoom transitions */
+let busy = false
+async function zoom(from, to, update, back) {
+  hideBubble(true)
+  if (RM || !from) { update(); return }
+  if (document.startViewTransition) {
+    const a = from, other = to
+    a.style.viewTransitionName = 'zoom'
+    root.classList.add(back ? 'vt-back' : 'vt-in')
+    let ran = false
+    const vt = document.startViewTransition(() => { ran = true; a.style.viewTransitionName = ''; update(); other.style.viewTransitionName = 'zoom' })
+    // some GPU-less configurations never capture; skipping still runs the update
+    const guard = setTimeout(() => { if (!ran) vt.skipTransition() }, 700)
+    try { await vt.finished } catch (e) {} finally { clearTimeout(guard); other.style.viewTransitionName = ''; root.classList.remove('vt-back', 'vt-in') }
+    return
+  }
+  // FLIP fallback: animate the overlay between the tile's box and the viewport
+  const tileEl = back ? to : from, overlay = back ? from : to
+  const r = tileEl.getBoundingClientRect(), W = innerWidth, H = innerHeight
+  const small = { transform: `translate(${r.left}px, ${r.top}px) scale(${r.width / W}, ${r.height / H})`, borderRadius: '60px', opacity: 0.4 }
+  const big = { transform: 'none', borderRadius: '0px', opacity: 1 }
+  if (!back) update()
+  overlay.style.transformOrigin = '0 0'
+  await overlay.animate(back ? [big, small] : [small, big], { duration: 480, easing: 'cubic-bezier(.2,.85,.25,1)' }).finished.catch(() => {})
+  if (back) update()
+}
+
+/* ---------------------------------------------------------------- channel */
+const channel = $('#channel'), splash = $('#splash'), chView = $('#chView'), chBody = $('#chBody')
+const splashS = surface($('#splashCanvas'), () => {})
+let cur = null, chState = 'splash', listScroll = 0, extra = [], filterYear = 'all'
+let view = 'boot'
+
+function setInert(on) { $('#menu').inert = on }
+
+async function openChannel(ch, opts = {}) {
+  if (busy || !ch || ch.empty) return
+  busy = true
+  const tile = tiles.find((t) => t.__ch === ch)
+  cur = ch
+  Sound.select(); setTimeout(() => Sound.whoosh(true), 60)
+  channel.style.setProperty('--cc', ch.color)
+  $('#chTitle').textContent = ch.name
+  $('#chSub').textContent = ch.sub
+  splashS.draw = ch.r
+  const update = () => {
+    setInert(true)
+    channel.hidden = false
+    splash.hidden = !!opts.skipSplash; chView.hidden = !opts.skipSplash
+    chState = 'splash'
+    view = 'channel'
+    if (opts.skipSplash) showList(true)
+    fit(splashS); paint(splashS, T)
+  }
+  await zoom(opts.instant ? null : tile, channel, update)
+  if (!opts.skipSplash) $('#splashStart').focus({ preventScroll: true })
+  busy = false
+  return true
+}
+
+async function closeChannel() {
+  if (busy || view !== 'channel') return
+  busy = true
+  Sound.back(); Sound.whoosh(false)
+  const tile = tiles.find((t) => t.__ch === cur)
+  const page = tile ? [...track.children].indexOf(tile.parentElement) : 0
+  if (page !== curPage) goPage(page, false)
+  const update = () => {
+    channel.hidden = true
+    setInert(false)
+    clearExtra()
+    view = 'menu'
+    setHash('')
+  }
+  await zoom(channel, tile, update, true)
+  tile?.focus({ preventScroll: true })
+  busy = false
+}
+
+function startChannel() {
+  Sound.select()
+  splash.hidden = true
+  chView.hidden = false
+  showList(true)
+}
+
+function clearExtra() { extra.forEach(drop); extra = [] }
+
+function setHash(h) { try { history.replaceState(null, '', h ? '#/' + h : location.pathname + location.search) } catch (e) {} }
+
+const fmtBadge = (date) => {
+  const d = parseDate(date)
+  if (!d) return '<span class="cal-badge"><b>&nbsp;</b><i>&middot;</i></span>'
+  return `<span class="cal-badge"><b>${MONTH_NAMES[d.getMonth()].slice(0, 3)}</b><i>${d.getDate()}</i><s>${d.getFullYear()}</s></span>`
+}
+const host = (u) => { try { return new URL(abs(u)).host.replace(/^www\./, '') } catch (e) { return '' } }
+
+const LIST = {
+  blog() {
+    const years = [...new Set(DATA.posts.map((p) => parseDate(p.date)?.getFullYear()).filter(Boolean))]
+    const chips = ['all', ...years].map((y) => `<button class="chip${String(y) === String(filterYear) ? ' on' : ''}" data-nav data-year="${y}">${y === 'all' ? 'All' : y}</button>`).join('')
+    const rows = DATA.posts.map((p, i) => [p, i]).filter(([p]) => filterYear === 'all' || parseDate(p.date)?.getFullYear() === +filterYear)
+      .map(([p, i]) => `<button class="row" data-nav data-art="post:${i}">${fmtBadge(p.date)}<span class="row-main"><span class="row-title">${esc(p.t)}</span><span class="row-desc">${esc(p.d || 'Blog post')}</span></span><span class="chev" aria-hidden="true"></span></button>`).join('')
+    return { html: `<div class="chips" role="toolbar" aria-label="Filter by year">${chips}</div><div class="list">${rows}</div>`, mid: `${DATA.posts.length} posts` }
+  },
+  notes() {
+    const html = DATA.notes.map((n, i) => `<button class="sticky s${i % 4}" data-nav data-art="note:${i}" style="--rot:${[-2, 1.5, -1, 2.2][i % 4]}deg"><span class="tape" aria-hidden="true"></span><span class="st-title">${esc(n.t)}</span><span class="st-date">${esc(n.date)}</span></button>`).join('')
+    return { html: `<div class="stickies">${html}</div>`, mid: `${DATA.notes.length} notes` }
+  },
+  projects() {
+    const html = DATA.projects.map((p, i) => {
+      const ini = p.t.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
+      return `<a class="card" data-nav href="${abs(p.href)}" target="_blank" rel="noopener" style="--h:${(i * 47 + 250) % 360}"><span class="card-ico" aria-hidden="true">${esc(ini)}</span><span class="card-main"><b>${esc(p.t)}</b><span>${esc(p.d)}</span><em>${esc(host(p.href))} &rsaquo;</em></span></a>`
+    }).join('')
+    return { html: `<div class="cards">${html}</div>`, mid: 'Opens in a new tab' }
+  },
+  work() {
+    const html = DATA.work.map((p) => `<a class="row news" data-nav href="${abs(p.href)}" target="_blank" rel="noopener">${fmtBadge(p.date)}<span class="row-main"><span class="row-title">${esc(p.t)}</span><span class="row-desc">${esc(p.d)}</span></span><span class="host">${esc(host(p.href))}</span></a>`).join('')
+    return { html: `<div class="list">${html}</div>`, mid: 'Writing on vercel.com' }
+  },
+  about() {
+    const first = ITEMS.filter((x) => x.kind === 'post').at(-1)
+    return {
+      html: `<div class="about"><div class="about-art"><canvas id="palCanvas" aria-hidden="true"></canvas></div>
+      <div class="about-text"><p class="hello">Hi, I'm Max.</p><p class="blurb">${esc(DATA.site.blurb)}</p>
+      <div class="facts"><div><b>${DATA.posts.length}</b><span>posts</span></div><div><b>${DATA.notes.length}</b><span>notes</span></div><div><b>${parseDate(first.date).getFullYear()}</b><span>writing since</span></div></div>
+      <div class="btnrow"><a class="pill" data-nav href="${DATA.site.github}" target="_blank" rel="noopener">GitHub</a><a class="pill" data-nav href="${DATA.site.x}" target="_blank" rel="noopener">X / Twitter</a><button class="pill primary" data-nav data-go="blog">Read the blog</button></div></div></div>`,
+      mid: 'maxleiter.com',
+      after() {
+        const s = surface($('#palCanvas'), (c, w, h, t) => {
+          c.clearRect(0, 0, w, h)
+          const g = c.createRadialGradient(w / 2, h * 0.55, 10, w / 2, h * 0.55, w * 0.6)
+          g.addColorStop(0, '#e3f4ff'); g.addColorStop(1, 'rgba(227,244,255,0)')
+          c.fillStyle = g; c.fillRect(0, 0, w, h)
+          c.fillStyle = 'rgba(40,90,140,.12)'; c.beginPath(); c.ellipse(w / 2, h * 0.93, w * 0.3, h * 0.04, 0, 0, TAU); c.fill()
+          pal(c, w / 2, h * 0.92, Math.min(h * 0.4, w * 0.36), t)
+        })
+        extra.push(s)
+      },
+    }
+  },
+  links() {
+    const L = [
+      ['GitHub', 'Code, dotfiles and half-finished ideas', DATA.site.github, '</>'],
+      ['X / Twitter', 'Short posts, mostly about the web', DATA.site.x, '@'],
+      ['RSS feed', 'Every post and note, in your reader', SITE + '/feed.xml', 'rss'],
+      ['maxleiter.com', 'The real site, no bezels', SITE, 'www'],
+    ]
+    const html = L.map(([t, d, h, g]) => `<a class="link-card" data-nav href="${h}" target="_blank" rel="noopener"><span class="lc-ico${g === 'rss' ? ' rss' : ''}" aria-hidden="true">${g === 'rss' ? '<i></i><i></i><i></i>' : esc(g)}</span><span class="lc-main"><b>${esc(t)}</b><span>${esc(d)}</span></span><span class="chev" aria-hidden="true"></span></a>`).join('')
+    return { html: `<div class="link-grid">${html}</div>`, mid: 'Opens in a new tab' }
+  },
+  forecast() {
+    const byYear = {}
+    ITEMS.forEach((x) => { if (x.when && x.kind !== 'work') byYear[x.when.getFullYear()] = (byYear[x.when.getFullYear()] || 0) + 1 })
+    const years = Object.keys(byYear).sort().slice(-6)
+    const icon = (n) => (n >= 5 ? 'sun' : n >= 3 ? 'part' : n >= 2 ? 'cloud' : 'drizzle')
+    const word = { sun: 'Sunny', part: 'Partly sunny', cloud: 'Cloudy', drizzle: 'Light drizzle' }
+    const days = years.map((y) => `<div class="fc-day"><span class="fc-y">${y}</span><span class="wx ${icon(byYear[y])}" aria-hidden="true"><i></i><i></i></span><b>${byYear[y]}</b><span class="fc-w">${word[icon(byYear[y])]}</span></div>`).join('')
+    const stats = [['350', 'ms', 'full build'], ['78', '', 'routes'], ['4', '', 'islands'], ['~1', 'KB', 'JS per article'], ['17', 'KB', 'homepage JS'], ['0', '', 'servers']]
+      .map(([v, u, l]) => `<div class="stat"><b>${v}<small>${u}</small></b><span>${l}</span></div>`).join('')
+    return {
+      html: `<div class="fc"><div class="fc-now"><canvas id="fcCanvas" aria-hidden="true"></canvas></div><div class="stats">${stats}</div></div>
+      <h3 class="sec">Writing outlook <span>posts and notes per year</span></h3><div class="fc-days">${days}</div>
+      <p class="fine">Figures are from the real site's architecture notes: a bespoke static generator, every route rendered to a file at build time.</p>`,
+      mid: 'Conditions as of the last build',
+      after() { extra.push(surface($('#fcCanvas'), R.forecast)) },
+    }
+  },
+  jukebox() {
+    return {
+      html: `<div class="jb"><div class="jb-screen"><canvas id="rollCanvas" aria-label="Piano roll of the loop"></canvas></div>
+      <div class="btnrow center"><button class="pill primary" data-nav id="jbPlay">${Jingle.playing ? 'Stop' : 'Play'}</button><button class="pill" data-nav id="jbRemix">Remix</button><button class="pill" data-nav id="jbHouse">House tune</button></div>
+      <p class="jb-info" id="jbInfo"></p>
+      <p class="fine">Nothing here is a recording. An FM electric piano, a mallet lead, a triangle bass and brushed noise are synthesized live with WebAudio over eight fixed chords. The melody grows from a seed, and bars five and six repeat the rhythm of one and two so it sounds like a tune rather than dice.</p></div>`,
+      mid: 'Sound starts muted until you press Play',
+      after() {
+        const info = () => ($('#jbInfo').innerHTML = `Seed <b>${Jingle.seed}</b> &middot; 94 bpm swing &middot; ${Jingle.CHORDS.map((c) => c[2]).join(' &rarr; ')}`)
+        info()
+        $('#jbPlay').onclick = () => {
+          if (Jingle.playing) Jingle.stop()
+          else { if (!Sound.on) Sound.setOn(true); Jingle.wanted = true; Jingle.start() }
+          syncSound()
+        }
+        $('#jbRemix').onclick = () => { Jingle.remix(); info(); Sound.tick() }
+        $('#jbHouse').onclick = () => { Jingle.reset(); info(); Sound.tick() }
+        extra.push(surface($('#rollCanvas'), drawRoll))
+      },
+    }
+  },
+}
+
+function drawRoll(c, w, h, t) {
+  c.fillStyle = vgrad(c, h, '#2a2533', '#1a1720'); c.fillRect(0, 0, w, h)
+  const pad = 14, gw = w - pad * 2, gh = h - pad * 2 - 18, lo = 69, hi = 87
+  const bar = gw / 8, sl = bar / 8
+  for (let b = 0; b < 8; b++) {
+    c.fillStyle = b % 2 ? 'rgba(255,255,255,.03)' : 'rgba(255,255,255,.06)'
+    c.fillRect(pad + b * bar, pad, bar, gh)
+    font(c, 11, 800); c.fillStyle = 'rgba(255,190,225,.65)'; c.textAlign = 'left'; c.textBaseline = 'top'
+    c.fillText(Jingle.CHORDS[b][2], pad + b * bar + 6, pad + gh + 5)
+  }
+  c.strokeStyle = 'rgba(255,255,255,.05)'
+  for (let m = lo; m <= hi; m++) { const y = pad + gh - ((m - lo) / (hi - lo)) * gh; c.beginPath(); c.moveTo(pad, y); c.lineTo(pad + gw, y); c.stroke() }
+  const pos = Jingle.position()
+  for (const n of Jingle.notes) {
+    const x = pad + n.bar * bar + n.at * sl, nw = n.len * sl - 3
+    const y = pad + gh - ((n.midi - lo) / (hi - lo)) * gh
+    const startBars = n.bar + n.at / 8, active = pos >= startBars && pos < startBars + n.len / 8
+    c.save()
+    if (active) { c.shadowColor = '#ff79c0'; c.shadowBlur = 16 }
+    rr(c, x + 1, y - 5, nw, 10, 5)
+    c.fillStyle = active ? '#ffd1ea' : '#ff5fa8'; c.fill(); c.restore()
+  }
+  if (pos >= 0) {
+    const x = pad + (pos / 8) * gw
+    c.fillStyle = 'rgba(255,255,255,.75)'; c.fillRect(x - 1, pad, 2, gh)
+  }
+}
+
+function showList(fresh) {
+  const L = LIST[cur.id]()
+  clearExtra()
+  chBody.innerHTML = `<div class="ch-inner ch-${cur.id}">${L.html}</div>`
+  $('#chFootMid').textContent = L.mid || ''
+  chState = 'list'
+  L.after?.()
+  chBody.scrollTop = fresh ? 0 : listScroll
+  setHash(cur.id)
+  const first = chBody.querySelector('[data-art], .card, .link-card, .row, #jbPlay, .about .pill')
+  if (fresh) (first || chBody).focus({ preventScroll: true })
+}
+
+function articleHTML(item, kind) {
+  const label = kind === 'note' ? 'Note' : 'Blog post'
+  return `<article class="article"><div class="art-meta"><span class="tag ${kind}">${label}</span><span>${esc(item.date)}</span></div>
+    <h1>${esc(item.t)}</h1>${item.d ? `<p class="art-desc">${esc(item.d)}</p>` : ''}
+    <div class="prose">${md(item.ex, item.ex.length >= 1190)}</div>
+    <div class="art-cta"><a class="pill primary" href="${abs(item.href)}" target="_blank" rel="noopener">Read it all on maxleiter.com</a></div></article>`
+}
+
+function openArticle(kind, i, fromList = true) {
+  const item = (kind === 'note' ? DATA.notes : DATA.posts)[i]
+  if (!item) return
+  if (fromList) listScroll = chBody.scrollTop
+  Sound.select()
+  clearExtra()
+  chBody.innerHTML = `<div class="ch-inner">${articleHTML(item, kind)}</div>`
+  chBody.scrollTop = 0
+  $('#chFootMid').textContent = `Reading · ${item.date}`
+  chState = 'article'
+  setHash(`${cur.id}/${slugOf(item.href)}`)
+  chBody.focus({ preventScroll: true })
+}
+
+chBody.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-art]')
+  if (a) { const [k, i] = a.dataset.art.split(':'); return openArticle(k, +i) }
+  const y = e.target.closest('[data-year]')
+  if (y) { filterYear = y.dataset.year; Sound.tick(); showList(false); chBody.querySelector(`[data-year="${filterYear}"]`)?.focus(); return }
+  const g = e.target.closest('[data-go]')
+  if (g) { const id = g.dataset.go; cur = byId[id]; channel.style.setProperty('--cc', cur.color); $('#chTitle').textContent = cur.name; $('#chSub').textContent = cur.sub; Sound.whoosh(true); showList(true) }
+})
+chBody.addEventListener('pointerover', (e) => { const n = e.target.closest('[data-nav]'); if (n && n !== chBody.__last) { chBody.__last = n; Sound.tick() } })
+
+$('#splashStart').onclick = startChannel
+$('#splashMenu').onclick = closeChannel
+$('#chMenu').onclick = closeChannel
+$('#chBack').onclick = () => back()
+
+/* ---------------------------------------------------------------- message board */
+const board = $('#board')
+const MONTHLY = new Map()
+for (const it of ITEMS) {
+  if (!it.when) continue
+  const k = it.when.getFullYear() + '-' + it.when.getMonth()
+  if (!MONTHLY.has(k)) MONTHLY.set(k, [])
+  MONTHLY.get(k).push(it)
+}
+const MKEYS = [...MONTHLY.keys()].sort((a, b) => { const [y1, m1] = a.split('-').map(Number), [y2, m2] = b.split('-').map(Number); return y1 - y2 || m1 - m2 })
+let bdKey = MKEYS.at(-1), bdSel = null
+
+function renderBoard(focusDay) {
+  const [Y, M] = bdKey.split('-').map(Number)
+  const items = MONTHLY.get(bdKey) || []
+  $('#bdMonth').textContent = `${MONTH_NAMES[M]} ${Y}`
+  const first = new Date(Y, M, 1).getDay(), days = new Date(Y, M + 1, 0).getDate()
+  const prevDays = new Date(Y, M, 0).getDate()
+  const today = new Date()
+  let html = DAY_NAMES.map((d, i) => `<div class="cal-h${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}" role="columnheader">${d}</div>`).join('')
+  for (let i = 0; i < 42; i++) {
+    const day = i - first + 1
+    if (day < 1 || day > days) {
+      if (i >= 35 && day > days && (first + days) <= 35) continue
+      html += `<div class="cell out" aria-hidden="true"><span class="dn">${day < 1 ? prevDays + day : day - days}</span></div>`
+      continue
+    }
+    const its = items.filter((x) => x.when.getDate() === day)
+    const isToday = today.getFullYear() === Y && today.getMonth() === M && today.getDate() === day
+    const icons = its.slice(0, 3).map((x) => `<i class="env ${x.kind}"></i>`).join('') + (its.length > 3 ? `<em>+${its.length - 3}</em>` : '')
+    const lbl = `${MONTH_NAMES[M]} ${day}${its.length ? ': ' + its.map((x) => x.t).join('; ') : ''}`
+    html += `<button class="cell${its.length ? ' has' : ''}${isToday ? ' today' : ''}${bdSel === day ? ' sel' : ''}${(i % 7 === 0) ? ' sun' : (i % 7 === 6) ? ' sat' : ''}" data-day="${day}" tabindex="${(bdSel || (its.length ? day : 0)) === day ? 0 : -1}" aria-label="${esc(lbl)}"><span class="dn">${day}</span><span class="envs">${icons}</span>${its.length ? `<span class="peek">${esc(its[0].t)}</span>` : ''}</button>`
+  }
+  $('#cal').innerHTML = html
+  if (!$('#cal [tabindex="0"]')) $('#cal .cell[data-day]')?.setAttribute('tabindex', '0')
+  // side panel
+  const list = bdSel ? items.filter((x) => x.when.getDate() === bdSel) : items
+  const head = bdSel ? `${MONTH_NAMES[M]} ${bdSel}` : `All of ${MONTH_NAMES[M]}`
+  $('#bdDay').innerHTML = `<h3>${head}<span>${list.length} ${list.length === 1 ? 'message' : 'messages'}</span></h3>` + (list.length ? '<ul>' + list.map((x) => {
+    const idx = x.kind === 'post' ? DATA.posts.findIndex((p) => p.href === x.href) : x.kind === 'note' ? DATA.notes.findIndex((p) => p.href === x.href) : -1
+    const inner = `<i class="env ${x.kind}"></i><span><b>${esc(x.t)}</b><small>${x.kind === 'post' ? 'Blog post' : x.kind === 'note' ? 'Note' : 'Work · ' + esc(host(x.href))} &middot; ${esc(x.date)}</small></span>`
+    return `<li>${x.kind === 'work' ? `<a class="msg" href="${abs(x.href)}" target="_blank" rel="noopener">${inner}</a>` : `<button class="msg" data-letter="${x.kind}:${idx}">${inner}</button>`}</li>`
+  }).join('') + '</ul>' : '<p class="empty-day">No messages on this day. Pick a day with an envelope.</p>')
+  // year strip
+  const y0 = +MKEYS[0].split('-')[0], y1 = Math.max(+MKEYS.at(-1).split('-')[0], today.getFullYear())
+  let strip = ''
+  for (let y = y0; y <= y1; y++) {
+    strip += `<div class="yr"><span>${y}</span><div class="pips">`
+    for (let m = 0; m < 12; m++) {
+      const k = y + '-' + m, n = (MONTHLY.get(k) || []).length
+      strip += `<button class="pip${n ? ' has' : ''}${k === bdKey ? ' cur' : ''}" ${n ? `data-key="${k}"` : 'disabled'} style="--n:${Math.min(n, 4)}" aria-label="${MONTH_NAMES[m]} ${y}${n ? `, ${n} messages` : ''}" tabindex="${n ? 0 : -1}"></button>`
+    }
+    strip += '</div></div>'
+  }
+  $('#bdStrip').innerHTML = strip
+  const sp = $('#bdStrip'), cp = sp.querySelector('.cur')
+  if (cp && sp.scrollWidth > sp.clientWidth) sp.scrollLeft = cp.offsetLeft - sp.clientWidth / 2
+  const ki = MKEYS.indexOf(bdKey)
+  $('#bdPrev').disabled = ki <= 0
+  $('#bdNext').disabled = ki >= MKEYS.length - 1
+  if (focusDay) $(`#cal [data-day="${focusDay}"]`)?.focus()
+}
+
+function bdMonth(delta) {
+  const i = MKEYS.indexOf(bdKey) + delta
+  if (i < 0 || i >= MKEYS.length) return
+  bdKey = MKEYS[i]; bdSel = null; Sound.tick(); renderBoard()
+}
+$('#bdPrev').onclick = () => bdMonth(-1)
+$('#bdNext').onclick = () => bdMonth(1)
+$('#cal').addEventListener('click', (e) => {
+  const c = e.target.closest('[data-day]'); if (!c) return
+  const d = +c.dataset.day
+  bdSel = bdSel === d ? null : d; Sound.bloop(d % 7); renderBoard(d)
+  if (bdSel && (MONTHLY.get(bdKey) || []).filter((x) => x.when.getDate() === d).length === 1 && e.detail > 1) $('#bdDay .msg')?.click()
+})
+$('#cal').addEventListener('keydown', (e) => {
+  const c = e.target.closest('[data-day]'); if (!c) return
+  const d = +c.dataset.day, [Y, M] = bdKey.split('-').map(Number), days = new Date(Y, M + 1, 0).getDate()
+  const delta = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key]
+  if (delta) {
+    e.preventDefault(); e.stopPropagation()
+    const n = d + delta
+    if (n >= 1 && n <= days) { $$('#cal [data-day]').forEach((x) => x.tabIndex = -1); const el = $(`#cal [data-day="${n}"]`); el.tabIndex = 0; el.focus(); Sound.tick() }
+    else if (delta === 7 || delta === 1) $('#bdDay .msg')?.focus()
+  }
+  if (e.key === 'PageUp') { e.preventDefault(); bdMonth(-1) }
+  if (e.key === 'PageDown') { e.preventDefault(); bdMonth(1) }
+})
+$('#bdStrip').addEventListener('click', (e) => { const p = e.target.closest('[data-key]'); if (p) { bdKey = p.dataset.key; bdSel = null; Sound.tick(); renderBoard() } })
+$('#bdDay').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-letter]'); if (!b) return
+  const [k, i] = b.dataset.letter.split(':')
+  openLetter(k, +i)
+})
+
+function openLetter(kind, i) {
+  const item = (kind === 'note' ? DATA.notes : DATA.posts)[i]
+  if (!item) return
+  Sound.select()
+  $('#letter').innerHTML = `<div class="letter-top"><span class="stamp ${kind}" aria-hidden="true"></span><span>From <b>Max Leiter</b> &middot; ${esc(item.date)}</span><button class="x" id="letterClose" aria-label="Close letter">&times;</button></div>` + articleHTML(item, kind)
+  $('#letterWrap').hidden = false
+  $('#letterClose').onclick = closeLetter
+  $('#letter').focus({ preventScroll: true })
+  $('#letter').scrollTop = 0
+}
+function closeLetter() { $('#letterWrap').hidden = true; Sound.back(); $('#bdDay .msg')?.focus() }
+$('#letterWrap').addEventListener('click', (e) => { if (e.target.id === 'letterWrap') closeLetter() })
+
+async function openBoard(instant) {
+  if (busy) return
+  busy = true
+  Sound.select(); setTimeout(() => Sound.whoosh(true), 60)
+  bdSel = +(MONTHLY.get(bdKey) || [])[0]?.when.getDate() || null
+  renderBoard()
+  await zoom(instant ? null : $('#orbMail'), board, () => { setInert(true); board.hidden = false; view = 'board'; setHash('board') })
+  $(`#cal [tabindex="0"]`)?.focus({ preventScroll: true })
+  busy = false
+}
+async function closeBoard() {
+  if (busy) return
+  busy = true
+  Sound.back(); Sound.whoosh(false)
+  await zoom(board, $('#orbMail'), () => { board.hidden = true; $('#letterWrap').hidden = true; setInert(false); view = 'menu'; setHash('') }, true)
+  $('#orbMail').focus({ preventScroll: true })
+  busy = false
+}
+$('#orbMail').onclick = () => openBoard()
+$('#bdBack').onclick = () => back()
+$('#bdMenu').onclick = closeBoard
+
+/* ---------------------------------------------------------------- settings */
+const settings = $('#settings')
+let settingsReturn = null
+function openSettings() {
+  settingsReturn = document.activeElement
+  Sound.select(); settings.hidden = false; syncSound()
+  $('#stTiltRow').hidden = !('DeviceOrientationEvent' in window) || !COARSE
+  $('#stSound').focus()
+}
+function closeSettings() { settings.hidden = true; Sound.back(); settingsReturn?.focus?.() }
+$('#orbMenu').onclick = openSettings
+$('#stClose').onclick = closeSettings
+$('#stIntro').onclick = () => { settings.hidden = true; showBoot() }
+settings.addEventListener('click', (e) => { if (e.target === settings) closeSettings() })
+
+/* ---------------------------------------------------------------- back / esc */
+function back() {
+  if (view === 'boot') return dismissBoot()
+  if (!settings.hidden) return closeSettings()
+  if (view === 'board') { if (!$('#letterWrap').hidden) return closeLetter(); return closeBoard() }
+  if (view === 'channel') {
+    if (chState === 'article') { Sound.back(); showList(false); const k = location.hash; return }
+    return closeChannel()
+  }
+}
+
+/* ---------------------------------------------------------------- spatial navigation */
+function visibleFocusables(scope) {
+  return $$('button:not([disabled]), a[href], [data-nav]', scope).filter((el) => {
+    if (el.closest('[hidden]') || el.tabIndex < 0 && !el.matches('[data-day]')) return false
+    const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0
+  })
+}
+function spatial(dir, cands, from) {
+  const fr = from.getBoundingClientRect(), fx = fr.left + fr.width / 2, fy = fr.top + fr.height / 2
+  let best = null, bs = Infinity
+  for (const el of cands) {
+    if (el === from) continue
+    const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2
+    const dx = cx - fx, dy = cy - fy
+    const p = dir === 'left' ? -dx : dir === 'right' ? dx : dir === 'up' ? -dy : dy
+    if (p <= 4) continue
+    const s = p + (dir === 'left' || dir === 'right' ? Math.abs(dy) : Math.abs(dx)) * 2.4
+    if (s < bs) { bs = s; best = el }
+  }
+  return best
+}
+function nav(dir, via = 'key') {
+  if (view === 'menu') {
+    const live = tiles.filter((t) => !t.__ch.empty && [...track.children].indexOf(t.parentElement) === curPage || t === document.activeElement)
+    const all = tiles.filter((t) => !t.__ch.empty)
+    const dockBtns = $$('#dock button').filter((b) => !b.hidden)
+    const ae = document.activeElement
+    if (dockBtns.includes(ae)) {
+      const next = dir === 'up' ? spatial('up', live, ae) || live[0] : dir === 'down' ? null : spatial(dir, dockBtns, ae)
+      if (next) { next.focus({ preventScroll: true }); Sound.tick() }
+      return
+    }
+    const from = ae?.classList?.contains('tile') ? ae : null
+    let next
+    if (!from) next = hot && !hot.__ch.empty ? hot : live[0] || all[0]
+    else next = spatial(dir, all, from)
+    if (!next && from && dir === 'down') { const d = spatial('down', dockBtns, from); if (d) { d.focus({ preventScroll: true }); Sound.tick(); return } }
+    if (next) {
+      const pg = [...track.children].indexOf(next.parentElement)
+      if (pg >= 0 && pg !== curPage) goPage(pg)
+      next.focus({ preventScroll: true })
+      if (via === 'pad') setHot(next, 'pad')
+    } else if (from && pageCount > 1 && (dir === 'left' || dir === 'right')) goPage(curPage + (dir === 'right' ? 1 : -1))
+    return
+  }
+  const scope = !settings.hidden ? settings : view === 'board' ? (!$('#letterWrap').hidden ? $('#letterWrap') : board) : view === 'channel' ? channel : null
+  if (!scope) return
+  if (view === 'channel' && chState === 'article' && (dir === 'up' || dir === 'down')) { chBody.scrollBy({ top: dir === 'down' ? 120 : -120, behavior: RM ? 'auto' : 'smooth' }); return }
+  const from = scope.contains(document.activeElement) && document.activeElement !== chBody ? document.activeElement : null
+  const cands = visibleFocusables(scope)
+  const next = from ? spatial(dir, cands, from) : cands[0]
+  if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' }); Sound.tick() }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (view === 'boot') { if (!e.metaKey && !e.ctrlKey && e.key !== 'Tab') { e.preventDefault(); dismissBoot(true) } return }
+  const inField = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)
+  if (e.key === 'Escape' || (e.key === 'Backspace' && !inField)) { e.preventDefault(); back(); return }
+  const dir = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }[e.key]
+  if (dir && !inField) {
+    if (view === 'channel' && chState === 'article') return
+    e.preventDefault(); nav(dir)
+  }
+})
+
+/* ---------------------------------------------------------------- the hand */
+const handEl = $('#hand')
+const hand = { x: innerWidth / 2, y: innerHeight / 2, vx: 0, vy: 0, tx: innerWidth / 2, ty: innerHeight / 2, rot: -6, down: false, on: false }
+if (FINE) {
+  root.classList.add('hand-ok')
+  addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch') return
+    hand.tx = e.clientX; hand.ty = e.clientY
+    if (!hand.on) { hand.on = true; hand.x = hand.tx; hand.y = hand.ty; root.classList.add('hand-on') }
+  }, { passive: true })
+  addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') hand.down = true })
+  addEventListener('pointerup', () => (hand.down = false))
+  document.addEventListener('pointerleave', () => { hand.on = false; root.classList.remove('hand-on') })
+  document.documentElement.addEventListener('mouseleave', () => { hand.on = false; root.classList.remove('hand-on') })
+}
+function updateHand(dt) {
+  if (!hand.on) return
+  if (RM) { hand.x = hand.tx; hand.y = hand.ty; hand.vx = hand.vy = 0 }
+  else {
+    // a lightly under-damped spring: smooths the jumps, keeps the lag ~50 ms
+    const Kk = 900, D = 2 * Math.sqrt(Kk) * 0.82, n = Math.max(1, Math.ceil(dt / 0.008)), h = dt / n
+    for (let i = 0; i < n; i++) {
+      hand.vx += ((hand.tx - hand.x) * Kk - hand.vx * D) * h
+      hand.vy += ((hand.ty - hand.y) * Kk - hand.vy * D) * h
+      hand.x += hand.vx * h; hand.y += hand.vy * h
+    }
+  }
+  const jx = RM ? 0 : Math.sin(T * 11.3) * 0.45 + Math.sin(T * 17.9 + 1.3) * 0.3 + Math.sin(T * 5.1 + 0.4) * 0.35
+  const jy = RM ? 0 : Math.sin(T * 9.7 + 2) * 0.45 + Math.sin(T * 19.3) * 0.25 + Math.sin(T * 4.3 + 1) * 0.35
+  const target = RM ? -6 : clamp(-6 + hand.vx * 0.012, -24, 14)
+  hand.rot += (target - hand.rot) * Math.min(1, dt * 9)
+  handEl.style.transform = `translate3d(${(hand.x + jx - 15).toFixed(2)}px, ${(hand.y + jy - 2).toFixed(2)}px, 0) rotate(${hand.rot.toFixed(2)}deg) scale(${hand.down ? 0.9 : 1})`
+}
+
+/* ---------------------------------------------------------------- tilt */
+const tilt = { on: false, x: 0, y: 0, tx: 0, ty: 0 }
+function onOrient(e) {
+  if (e.gamma == null) return
+  tilt.tx = clamp(e.gamma / 25, -1, 1)
+  tilt.ty = clamp((e.beta - 45) / 25, -1, 1)
+}
+async function enableTilt() {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const r = await DeviceOrientationEvent.requestPermission()
+      if (r !== 'granted') { toast('Tilt permission was declined.'); return false }
+    }
+    addEventListener('deviceorientation', onOrient)
+    tilt.on = true; toast('Tilt on. Lean your phone.')
+    return true
+  } catch (e) { toast('Tilt is not available here.'); return false }
+}
+function disableTilt() { removeEventListener('deviceorientation', onOrient); tilt.on = false; tilt.tx = tilt.ty = 0 }
+function syncTilt() { $('#tiltBtn').setAttribute('aria-pressed', tilt.on); $('#tiltBtn').classList.toggle('on', tilt.on); $('#stTilt').setAttribute('aria-checked', tilt.on) }
+const toggleTilt = async () => { if (tilt.on) disableTilt(); else await enableTilt(); syncTilt() }
+$('#tiltBtn').onclick = toggleTilt
+$('#stTilt').onclick = toggleTilt
+if (COARSE && 'DeviceOrientationEvent' in window) $('#tiltBtn').hidden = false
+function updateTilt(dt) {
+  if (!tilt.on && Math.abs(tilt.x) < 0.001 && Math.abs(tilt.y) < 0.001) return
+  const a = Math.min(1, dt * 6)
+  tilt.x += (tilt.tx - tilt.x) * a; tilt.y += (tilt.ty - tilt.y) * a
+  if (RM) return
+  root.style.setProperty('--px', tilt.x.toFixed(3)); root.style.setProperty('--py', tilt.y.toFixed(3))
+}
+
+/* ---------------------------------------------------------------- gamepad */
+const pad = { dir: null, rep: 0, prev: [], active: null }
+addEventListener('gamepadconnected', (e) => { pad.active = e.gamepad.index; toast('Controller connected: stick to move, bottom button to open, right button to go back.', 4200) })
+addEventListener('gamepaddisconnected', () => { pad.active = null })
+function padRumble(m) {
+  const g = pad.active != null && navigator.getGamepads?.()[pad.active]
+  g?.vibrationActuator?.playEffect?.('dual-rumble', { duration: 45, strongMagnitude: 0, weakMagnitude: m }).catch?.(() => {})
+}
+function pollPad(dt) {
+  if (pad.active == null || !navigator.getGamepads) return
+  const g = navigator.getGamepads()[pad.active]
+  if (!g) return
+  const b = (i) => !!g.buttons[i]?.pressed
+  const ax = g.axes[0] || 0, ay = g.axes[1] || 0
+  let dir = b(14) || ax < -0.55 ? 'left' : b(15) || ax > 0.55 ? 'right' : b(12) || ay < -0.55 ? 'up' : b(13) || ay > 0.55 ? 'down' : null
+  if (view === 'boot') { if (g.buttons.some((x) => x.pressed)) dismissBoot(true); return }
+  if (dir) {
+    pad.rep -= dt
+    if (dir !== pad.dir) { nav(dir, 'pad'); pad.rep = 0.38 } else if (pad.rep <= 0) { nav(dir, 'pad'); pad.rep = 0.13 }
+  }
+  pad.dir = dir
+  const edge = (i) => b(i) && !pad.prev[i]
+  if (edge(0)) { const el = document.activeElement; if (el && el !== document.body) el.click() }
+  if (edge(1)) back()
+  if (edge(9)) settings.hidden ? openSettings() : closeSettings()
+  if (edge(4) && view === 'menu') goPage(curPage - 1)
+  if (edge(5) && view === 'menu') goPage(curPage + 1)
+  // right stick nudges the hand, like waving a remote
+  const rx = g.axes[2] || 0, ry = g.axes[3] || 0
+  if (Math.abs(rx) > 0.2 || Math.abs(ry) > 0.2) {
+    if (!hand.on) { hand.on = true; root.classList.add('hand-on') }
+    hand.tx = clamp(hand.tx + rx * 900 * dt, 0, innerWidth); hand.ty = clamp(hand.ty + ry * 900 * dt, 0, innerHeight)
+    const el = document.elementFromPoint(hand.tx, hand.ty)?.closest('.tile:not(.empty)')
+    if (el && view === 'menu' && document.activeElement !== el) el.focus({ preventScroll: true })
+  }
+  pad.prev = g.buttons.map((x) => x.pressed)
+}
+
+/* ---------------------------------------------------------------- boot */
+const boot = $('#boot')
+function showBoot() {
+  view = 'boot'; boot.hidden = false; boot.classList.remove('out'); setInert(true)
+  requestAnimationFrame(() => boot.focus({ preventScroll: true }))
+}
+let bootDone = false
+function dismissBoot(viaKey) {
+  if (view !== 'boot' || bootDone) return
+  bootDone = true
+  Sound.tick()
+  boot.classList.add('out')
+  setTimeout(() => {
+    boot.hidden = true; bootDone = false
+    view = 'menu'; setInert(false)
+    const m = $('#menu'); m.classList.remove('enter'); void m.offsetWidth; m.classList.add('enter')
+    if (viaKey) tiles[0].focus({ preventScroll: true })
+  }, RM ? 0 : 520)
+}
+boot.addEventListener('pointerup', () => dismissBoot(false))
+
+/* ---------------------------------------------------------------- main loop */
+let T = 0, last = performance.now(), frameN = 0
+tiles.forEach((t, i) => { t.__s = surface(t.querySelector('canvas'), t.__ch.empty ? R.empty : t.__ch.r, { cull: true, off: i * 1.37, st: { phase: i * 0.31 } }) })
+function frame(now) {
+  const dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now; T += dt; frameN++
+  pollPad(dt)
+  updateHand(dt)
+  updateTilt(dt)
+  const t = RM ? 3.1 : T
+  if (view === 'menu' || view === 'boot') {
+    for (const tl of tiles) {
+      const s = tl.__s
+      if (!s.visible) continue
+      if (RM && !s.dirty) continue
+      if (tl.__ch.empty && frameN % 2 && !s.dirty) continue
+      paint(s, t)
+    }
+  }
+  if (view === 'channel') {
+    if (!splash.hidden && (!RM || splashS.dirty)) paint(splashS, t)
+    for (const s of extra) if (!RM || s.dirty || s.canvas.id === 'rollCanvas') paint(s, t)
+  }
+  requestAnimationFrame(frame)
+}
+
+/* ---------------------------------------------------------------- start */
+addEventListener('resize', () => { layout(); if (hot && view === 'menu') showBubble(hot) })
+layout()
+document.fonts?.ready.then(() => { wrapCache.clear(); surfaces.forEach((s) => (s.dirty = true)) })
+const newest = ITEMS[0]?.when
+if (newest && Date.now() - newest < 1000 * 60 * 60 * 24 * 30) $('#orbMail').classList.add('new')
+$('#mailBadge').textContent = ''
+
+async function route() {
+  const h = location.hash.replace(/^#\/?/, '')
+  if (!h) return showBoot()
+  boot.hidden = true; view = 'menu'; setInert(false)
+  const [a, b] = h.split('/')
+  if (a === 'board') return openBoard(true)
+  const ch = byId[a]
+  if (!ch || ch.empty) return
+  await openChannel(ch, { instant: true, skipSplash: !!b || h.endsWith('list') })
+  if (b && b !== 'list') {
+    const pi = DATA.posts.findIndex((p) => slugOf(p.href) === b)
+    const ni = DATA.notes.findIndex((p) => slugOf(p.href) === b)
+    if (pi >= 0) openArticle('post', pi); else if (ni >= 0) openArticle('note', ni)
+  }
+}
+route()
+syncSound()
+requestAnimationFrame(frame)
+
+</script>
+</body>
+</html>

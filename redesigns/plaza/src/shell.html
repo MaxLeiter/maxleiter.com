@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Max Leiter · Plaza</title>
+<meta name="description" content="Max Leiter's site as a friendly 2006-era console home menu.">
+<meta name="theme-color" content="#f2f3f5">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/*__CSS__*/
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-hand" viewBox="0 0 64 80">
+      <!-- original pointing mitten: finger up, three tucked fingers, thumb, cuff -->
+      <path d="M22 6c0-3.4 2.7-6 6-6s6 2.6 6 6v26.5c1.1-1.8 3-3 5.3-3 3 0 5.5 2.2 6 5.1 1-1 2.5-1.6 4.1-1.6 3.2 0 5.8 2.6 5.8 5.8v.9c.9-.5 1.9-.8 3-.8 3.2 0 5.8 2.6 5.8 5.8V58c0 11.6-9.4 21-21 21h-6.8c-6.7 0-12.7-3.4-16.2-9L5 52.3c-1.7-2.8-.9-6.4 1.8-8.2 2.6-1.7 6-1.1 7.9 1.3L22 54.6V6z"/>
+    </symbol>
+    <symbol id="i-mail" viewBox="0 0 48 36">
+      <rect x="2" y="3" width="44" height="30" rx="5"/>
+      <path d="M4 7l20 14L44 7" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="boot" class="boot" role="dialog" aria-modal="true" aria-labelledby="boot-title" tabindex="-1">
+  <div class="boot-inner">
+    <div class="boot-head">
+      <svg class="boot-sign" viewBox="0 0 64 58" aria-hidden="true"><path d="M27.6 4.6a5 5 0 0 1 8.8 0l25 44.2A5 5 0 0 1 57 56H7a5 5 0 0 1-4.4-7.2z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><rect x="29" y="18" width="6" height="20" rx="3"/><circle cx="32" cy="46" r="3.6"/></svg>
+      <h1 id="boot-title">WARNING &ndash; OPINIONS AND SAFETY</h1>
+    </div>
+    <p class="boot-lead">BEFORE BROWSING, READ THE BLOG POSTS ABOUT NODE TOOLING.</p>
+    <p>This site contains strongly held opinions about package managers, code formatters, and pinning your dependencies. Side effects may include rewriting your prompts.</p>
+    <p class="boot-small">Do not read about Linux on an iPad while operating heavy machinery. Take a 15-minute break every hour, or whenever a build takes longer than 350&nbsp;ms.</p>
+    <hr>
+    <p class="boot-press"><svg class="boot-hand" aria-hidden="true"><use href="#i-hand"/></svg><span>Press anywhere to continue.</span></p>
+    <p class="boot-foot">Sound starts muted. Flip it on from the menu if you'd like a little jingle.</p>
+  </div>
+</div>
+
+<main id="menu" class="menu" aria-label="Home menu">
+  <div class="stripes" aria-hidden="true"></div>
+  <h1 class="sr-only">Max Leiter</h1>
+  <div id="track" class="track" aria-label="Channels"></div>
+  <button class="page-arrow prev" id="prevPage" aria-label="Previous page" hidden><span></span></button>
+  <button class="page-arrow next" id="nextPage" aria-label="Next page" hidden><span></span></button>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+
+  <footer class="dock" id="dock">
+    <svg class="dock-shape" id="dockShape" aria-hidden="true" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="dockFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f6f7f9"/><stop offset=".45" stop-color="#e6e8ec"/><stop offset="1" stop-color="#d3d6db"/>
+        </linearGradient>
+      </defs>
+      <path class="fill" fill="url(#dockFill)"/>
+      <path class="hi"/>
+      <path class="line"/>
+    </svg>
+    <button class="orb orb-left" id="orbMenu" aria-label="Plaza settings"><span class="orb-face"><span class="orb-word">Plaza</span></span></button>
+    <div class="clock" aria-live="off">
+      <div class="time" id="time"><span id="hh">12</span><i>:</i><span id="mm">00</span><small id="ampm">PM</small></div>
+      <div class="date" id="date">Sat 10/10</div>
+    </div>
+    <button class="pill-sm sound" id="soundBtn" aria-pressed="false"><span class="spk" aria-hidden="true"></span><span class="lbl">Sound off</span></button>
+    <button class="pill-sm tilt" id="tiltBtn" hidden aria-pressed="false"><span class="lbl">Tilt</span></button>
+    <button class="orb orb-right" id="orbMail" aria-label="Message board"><span class="orb-face"><svg class="mail-ico" aria-hidden="true"><use href="#i-mail"/></svg><span class="badge" id="mailBadge"></span></span></button>
+  </footer>
+</main>
+
+<section id="channel" class="channel" role="dialog" aria-modal="true" aria-labelledby="chTitle" hidden>
+  <div class="stripes" aria-hidden="true"></div>
+  <div class="splash" id="splash">
+    <div class="splash-art"><canvas id="splashCanvas" aria-hidden="true"></canvas><span class="glass" aria-hidden="true"></span></div>
+    <div class="splash-bar">
+      <button class="pill" id="splashMenu">Menu</button>
+      <button class="pill primary" id="splashStart">Start</button>
+    </div>
+  </div>
+  <div class="ch-view" id="chView" hidden>
+    <header class="ch-head">
+      <span class="ch-badge" id="chBadge" aria-hidden="true"></span>
+      <h2 id="chTitle">Blog</h2>
+      <span class="ch-sub" id="chSub"></span>
+      <span class="ch-clock" id="chClock"></span>
+    </header>
+    <div class="ch-body" id="chBody" tabindex="-1"></div>
+    <footer class="ch-foot">
+      <button class="round-back" id="chBack" aria-label="Back"><span>Back</span></button>
+      <div class="ch-foot-mid" id="chFootMid"></div>
+      <button class="pill pill-mid" id="chMenu">Menu</button>
+    </footer>
+  </div>
+</section>
+
+<section id="board" class="board" role="dialog" aria-modal="true" aria-labelledby="bdTitle" hidden>
+  <div class="stripes" aria-hidden="true"></div>
+  <header class="bd-head">
+    <svg class="bd-ico" aria-hidden="true"><use href="#i-mail"/></svg>
+    <h2 id="bdTitle">Message Board</h2>
+    <div class="bd-month">
+      <button class="arrow-btn" id="bdPrev" aria-label="Previous month with posts">&lsaquo;</button>
+      <div class="bd-mname" id="bdMonth" aria-live="polite">September 2026</div>
+      <button class="arrow-btn" id="bdNext" aria-label="Next month with posts">&rsaquo;</button>
+    </div>
+  </header>
+  <div class="bd-main">
+    <div class="cal" id="cal" role="grid" aria-labelledby="bdMonth"></div>
+    <aside class="bd-day" id="bdDay" aria-live="polite"></aside>
+  </div>
+  <div class="bd-strip" id="bdStrip" aria-label="Years"></div>
+  <footer class="ch-foot">
+    <button class="round-back" id="bdBack" aria-label="Back"><span>Back</span></button>
+    <div class="ch-foot-mid legend"><span class="lg post"></span>Blog post <span class="lg note"></span>Note <span class="lg work"></span>Work</div>
+    <button class="pill pill-mid" id="bdMenu">Menu</button>
+  </footer>
+  <div class="letter-wrap" id="letterWrap" hidden>
+    <article class="letter" id="letter" tabindex="-1"></article>
+  </div>
+</section>
+
+<div class="settings-wrap" id="settings" hidden>
+  <div class="settings" role="dialog" aria-modal="true" aria-labelledby="stTitle">
+    <h2 id="stTitle">Plaza Settings</h2>
+    <div class="st-row"><span>Sound effects &amp; jingle</span><button class="toggle" id="stSound" role="switch" aria-checked="false"><i></i></button></div>
+    <div class="st-row"><span>Ambient jingle</span><button class="toggle" id="stJingle" role="switch" aria-checked="true"><i></i></button></div>
+    <div class="st-row" id="stTiltRow"><span>Tilt parallax <small>(phones)</small></span><button class="toggle" id="stTilt" role="switch" aria-checked="false"><i></i></button></div>
+    <div class="st-help">
+      <p><b>Keyboard</b> arrows move, Enter opens, Esc goes back.</p>
+      <p><b>Controller</b> stick or d-pad moves, bottom face button opens, right face button goes back.</p>
+      <p><b>Phone</b> swipe between pages, tilt to lean the menu.</p>
+    </div>
+    <div class="st-actions"><button class="pill" id="stIntro">Replay intro</button><button class="pill primary" id="stClose">Done</button></div>
+  </div>
+</div>
+
+<div class="bubble" id="bubble" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="hand" id="hand" aria-hidden="true"><svg class="hand-shadow"><use href="#i-hand"/></svg><svg class="hand-glyph"><use href="#i-hand"/></svg></div>
+
+<script>
+/*__JS__*/
+</script>
+</body>
+</html>

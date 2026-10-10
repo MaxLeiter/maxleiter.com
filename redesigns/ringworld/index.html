@@ -1,0 +1,1585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meridian — Max Leiter</title>
+<meta name="description" content="Max Leiter's site as an original 2007-era sci-fi shooter main menu.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300..700;1,300..600&family=Michroma&family=Rajdhani:wght@400;500;600;700&family=Saira:wdth,wght@75..125,300..800&display=swap">
+<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#bg{position:fixed;inset:0;width:100%;height:100%;display:block}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div id="app"></div>
+<script id="content" type="application/json">{"site":{"name":"Max Leiter","url":"https://maxleiter.com","github":"https://github.com/maxleiter","x":"https://twitter.com/maxleiter","blurb":"Software engineer at Vercel working on v0 and the AI SDK. Writes about the web, Linux, tooling and AI."},"posts":[{"slug":"embedding-emoji-search","type":"post","title":"You don't need Jev for good emoji search","description":"or: semantic emoji search with embeddings","date":"Sep 26, 2026","href":"/blog/embedding-emoji-search","excerpt":"There's been a lot of [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) hype lately, and for good reason.\nIt's largely novel (to most developers, at least), super cheap, and there's a lot of cool use cases for it.\n\nThe issue I see is a lot of people are seeing Jev as a hammer, and lots of _classification_ tasks as nails.\nYou want to use Jev when you need some LLM reasoning behind the decision.\n\nFor example, take this tweet:\n\n\n\nTo be clear, I don't intend to pick on Gergely or Linear. But I think this is a miss on both their parts.\n\nTwo years ago, I built semantic emoji search but with no LLM and just embeddings. And it was faster, cheaper, and occasionally better than Jev (\"pareto-mogged\", as the kids say).\n\nNow, to [Gergely's point](https://x.com/GergelyOrosz/status/2103873821908353260?s=20), setting up a database and embedding model or an embedding provider are more work than just using Jev.\nAnd two years ago I would have gladly used Jev instead of working with Opus 3/GPT-4-turbo to scrape all of Vercel's slack emojis and get this working.\n\nBut it's not two years ago and models are now more than\ncapable of autonomously doing the work for you.\n\n\nAn aside on scr"},{"slug":"thank-u-next","type":"post","title":"thank u, next","description":"Replacing Next.js with a vibe-coded \"framework","date":"Sept 1, 2026","href":"/blog/thank-u-next","excerpt":"![The cover of Ariana Grande's album Thank U, Next: the title repeated in many fonts on a pink background](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/thank-u-next/thank-u-next.png)\n\n\n  If you're wondering about this post's title:\n  https://en.wikipedia.org/wiki/Thank_U,_Next\n\n\nThere's been a lot of talk about custom / personal software and LLMs lately. I've been a huge fan -- I'm writing this in a [markdown editor](https://github.com/MaxLeiter/md-viewer) I made for myself. And lately I've been toying with thoughts about the future of frameworks. A nice intersection of the two seemed like a personal framework.\n\nSo as of September 1st, this website is no longer running on Next.js. Instead, it's built by a bespoke custom framework that Fable architected and Opus implemented. If this were a commercial project, I'd probably stay on Next[^1], but it's not, so 🤷\n\nThis site is overall [pretty simple](/blog/build-a-blog-with-nextjs-13) - it's fully static and compiled to HTML at build time. But it has a lot of React and non-trivial build-time processing like [MDX](https://mdxjs.com/). I gave Fable 5 (in the claude code CLI) the following:\n\n> i am curious about on-demand c"},{"slug":"xios","type":"post","title":"Running Wayland, X11, GNOME, and KDE natively on an iPad","description":"X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition","date":"Jul 28, 2026","href":"/blog/xios","excerpt":"I [like](https://knightos.org) [running](https://maxleiter.com/blog/MSHW0184) [software](https://maxleiter.com/x11) on devices that aren't \"supposed\" to run it.\n\nI own the hardware. I should control the software. And for _reasons_, Apple makes phenomenal hardware and operating systems, but locks them down.\n\nI've been bitter for a long time. Six years ago, when I should’ve been studying for finals, I [ported X11](https://maxleiter.com/x11) to my jailbroken iPad because I wanted to try using it as a \"real\" personal computer:\n\n\n\nThat first version worked, but also sucked: the X server ran on the iPad, but I used a VNC client to interact with it and a lot of\nsoftware did not compile. I was using vim and xterm and it looked like something from the 90s.\n\nWith more experience, and with LLMs, I was able to get significantly further.\n\nThere is a \"slop wiki\" available at https://xios.maxleiter.com with more information, and the code is on [GitHub](https://github.com/MaxLeiter/jailbreak/tree/main/x11/).\n\nSome screenshots:\n\n\n  \n  \n  \n  \n\n\n### X11\n\nIf you're unfamiliar with X11, this post assumes a basic understanding, but TL;DR: it’s a window server and protocol that\nmany devices use. It descr"},{"slug":"weights","type":"post","title":"They're Made Out of Weights","description":"with apologies to Terry Bisson","date":"Jun 3, 2026","href":"/blog/weights","excerpt":"_After Terry Bisson's [\"They're Made Out of Meat\"](https://web.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html)._\n\n\"They're made out of weights.\"\n\n\"Weights?\"\n\n\"Weights. Floating-point numbers. We checked the whole thing through. It's nothing but weights.\"\n\n\"Weights doing what? Where do the words come from?\"\n\n\"The weights make the words. Are you understanding me? We opened it up. There's no dictionary in there, no grammar rules, no little man. Just weights. Eighty layers of numbers getting multiplied together.\"\n\n\"That's ridiculous. It wrote my performance review last week. It softened the tone unprompted. You're telling me multiplication did that?\"\n\n\"Matrix multiplication did that. The numbers go in one end, the phrasing comes out the other.\"\n\n\"So there's a language module somewhere. A reasoning unit bolted on.\"\n\n\"No module. No unit. We looked. The reasoning is the weights. The weights are the reasoning.\"\n\n\"Spare me. Nobody writes a eulogy with linear algebra.\"\n\n\"It doesn't write eulogies, technically. It predicts the next token. Then the next one. The eulogy is a side effect.\"\n\n\"A side effect. You're asking me to believe in sentient weights.\"\n\n\"I'm not asking you, I'm "},{"slug":"sandcastle","type":"post","title":"Sandcastle: A web-based Linux desktop environment","description":"","date":"Feb 11, 2026","href":"/blog/sandcastle","excerpt":"![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/header.png)\n\nSix years ago, while I should have been studying for finals, I patched and compiled X11 (and all its dependencies)\nto [run on a jailbroken iPad](https://maxleiter.com/blog/X11). I wanted to run real applications on my tablet.\n\nI've spent the last few ~months~ ~weeks~ ~days~ hours ~building~ vibecoding something that feels like a better solution:\na Linux desktop environment, on the web. I wrote zero lines of code.\n\nYou can try it out [here](https://sandcastle-os.vercel.app), and the source is available [here](https://github.com/vercel-labs/sandcastle).\n\n\n  If you're familiar with Desktop Environments and Linux, you can [skip the next\n  few sections](#the-servers)\n\n\n### Table of Contents\n\n# X11?\n\n[X11](https://www.x.org/wiki/) is the display server protocol that has powered Linux machines for decades. Released in 1984, it handles drawing windows on screens and routing input (key presses and clicks) to the right applications.\nBecause computers were [very different](/blog/formatting) in the 80s, X11 is built for _servers_ and _clients_. The application runs on a server, and dumb clients can draw th"},{"slug":"introducing-HFSViewer","type":"post","title":"Introducing HFSViewer","description":"View and modify HFS partitions on modern macOS versions","date":"Jan 2, 2026","href":"/blog/introducing-HFSViewer","excerpt":"Last year my roommate and I found an old original [iMac G3](https://en.wikipedia.org/wiki/IMac_G3) outside our apartment building. \nIt has some interesting early 2000s/late 90s style websites and files on it that I want to preserve (and hope to share here soon!).\n\nBut I realized getting files off of it wouldn't be easy.\n\nThe machine is running macOS 9.2, which supports USB 1.0.\nWe're up to USB 4 now, so thats pretty old; none of my modern USB 3 devices were detected by it.\nAfter [some research](https://www.reddit.com/r/VintageApple/comments/1jrmrqv/mac_os_9_hates_usb_sticks/) I found that macOS 9.2 _does_ have USB support, but it can't always negotiate USB 3 speeds or support larger USBs.\nSo I went and bought [this $5 stick](https://www.amazon.com/dp/B07W54X2F3) and it worked like a charm.\n\n\nYou should try to stick to USBs with less than 2 GBs of storage, otherwise Mac OS 9.2 might not support it. \n\n\nWith that solved and the files copied over, I plugged it into my M4 laptop and... it wasn't recognized there either. No error or mounting occurred due to no driver support.\nEventually I found [hfsutils](https://www.mars.org/home/rob/proj/hfs/), a wonderful package (which is convienentl"},{"slug":"the-new-maxleiter-com","type":"post","title":"The new maxleiter.com","description":"iframes, view transitions, progressive enhancement, and React Server Components","date":"Nov 12, 2025","href":"/blog/the-new-maxleiter-com","excerpt":"I redesigned maxleiter.com this week. I've wanted to make it more personal and opinionated for a long time,\nbut felt I lacked the expertise to do it justice.\nWith [v0](https://v0.app) and [Claude Code](https://www.claude.com/product/claude-code) (and some manual cleanup) it only took a few hours.\n\nIf you haven't played with the [homepage](https://maxleiter.com/) yet, some of the features are:\n\n- Draggable and resizable windows, including the blog posts\n- A web-friendly version of [KnightOS](https://knightos.org) in the Calculator app\n- A terminal app with some fun easter eggs\n- You can full-screen the windows, and some redirect to real pages (like the blog posts)\n\nGoing into this I had some constraints:\n\n- Remains snappy and is SSR'd at build-time\n- Must work without JavaScript enabled\n- Uses new web platform features\n\n![maxleiter.com screenshot](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/homepage.png?w=800)\n\n### Table of Contents\n\n## Preloading iframes\n\nIf you open a blog post, it opens in a windowed app. I originally rendered the SSR'd MDX, and that worked,\nbut it involved either:\n\n- Sending every post in the initial payload (not great for performa"},{"slug":"rewrite-your-prompts","type":"post","title":"You should be rewriting your prompts","description":"We talk about overfitting models but never overfitting prompts to models","date":"Sept 14, 2025","href":"/blog/rewrite-your-prompts","excerpt":"I've been \"lucky\" to work with a lot of different LLMs over the past few years (there is, in fact, a reason we made the [AI SDK](https://ai-sdk.dev/)).\nWhen a new model is publicly released there's a good chance we've already tried it and evaluated it for use with v0 within a few hours.\n\nOur results do not always improve as expected, even when we use newer and strictly better models[^1].\n\nAnother example of this is when gpt-5 was released in Cursor. People _hated_ it, but the zeitgeist has since shifted.\nYou can read about what OpenAI and Cursor fixed in [OpenAI's gpt-5 cookbook](https://cookbook.openai.com/examples/gpt-5/gpt-5_prompting_guide?utm_source=chatgpt.com#collaborative-coding-in-production-cursors-gpt-5-prompt-tuning).\n\nSo what should you do when a new model comes out? Rewrite your prompts. Otherwise it's an apples-to-oranges comparison.\n\nMy three and a half arguments for this are:\n\n- Prompt Format\n- Position Bias\n- Model Biases\n  - Work with the model biases, not against\n\n## Reason #1: Prompt Format\n\nAn early obvious example of where differences between models come into play is markdown vs XML.\n\nAnecdatally, OpenAI models (especially older ones) were _great_ with markdo"},{"slug":"seeing-the-future","type":"post","title":"I have seen the future through AR glasses","description":"My experience with the XReal One Pros","date":"Sept 7, 2025","href":"/blog/seeing-the-future","excerpt":"I like to try new technology. 75% of what I buy is something I use once or twice then sell or give away (or keep in a drawer and forget about. Sorry, remarkable).\nBut sometimes, on rare occasions, there's a product that is A) fucking awesome and B) I can't help but evangelize.\n\nOne of my more recent purchases was the [XReal One Pros](https://www.xreal.com/us/one-pro), and wow: I have seen the future, and it's through AR glasses.\n\nIf you&apos;re unfamiliar, the XReal One Pros are really just a display and (surprisingly good) speakers. They are augmented reality (AR) glasses,\nmeaning they aren't like _virtual reality_ headsets such as the Vision Pro or Meta Quest: they don't replace fully your view, they put an overlay on it\n\nI really think it's easier to show than tell in this case:\n\n\n  \n    \n      \n    \n  \n  \n    \n  \n\n\nTo get something out of the way: do I think XReal in particular will be the product that comes out on top? Not at all. I like their product, and I respect any newcomers to the hardware game, but it's an uphill battle for sure.\n\n## The Good\n\n- They are light. Because they're really just shells and they're powered by your devices, there's no need for a heavy battery\n- "},{"slug":"formatting","type":"post","title":"Formatting code should be unnecessary","description":"and we knew this back in the 80s","date":"Sep 6, 2025","href":"/blog/formatting","excerpt":"I had a (maybe slightly overqualified) computer science teacher back in highschool, Mr. Paige.\nHe worked on the [Ada]() compiler and\nhas been programming since the early 80s.\n\nOne day I complained about linter tooling that\nwas driving me nuts. I said something to the effect of, \"it's 2016, how are we still dealing with this sort of thing?\"\n\nTurns out, that problem was solved four decades ago (well, three at that point). Back when he was working on Ada,\nthey didn't store text sources at all &mdash; they used an IR called [DIANA](https://archive.org/details/dianaintermediat0000unse/page/n7/mode/2up).\nEveryone had their own pretty-printing settings for viewing it however they wanted.\n\nWe've been debating some linter settings at work recently and I keep thinking back to\nMr. Paige. It's 2025, how are we still dealing with this sort of thing?\n\n---\n\nWell, to answer that it would help to know what we're missing.\n\nI believe he was working with the [Rational R1000](https://en.wikipedia.org/wiki/Rational_R1000), of which there isn't a ton of info\n(like all things Ada, it was used by the DoD):\n\n![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/formatting/rational.jpg?w=400)\n\nThe"},{"slug":"vibecoding-minecraft-mods","type":"post","title":"Vibe-coding Minecraft mods","description":"and the lessons learned","date":"Jun 21, 2025","href":"/blog/vibecoding-minecraft-mods","excerpt":"{/* eslint-disable react/jsx-no-undef */}\n\nIf you aren't familiar with the extent of the Minecraft modding scene, it's _big_. There are mods with more thought put into them than many AAA games.\n\nThe best example is [Create](https://www.curseforge.com/minecraft/mc-mods/create):\n\n\n  \n  {\n    \n      Note that trains (and windmills and assembly lines) are not built into\n      Minecraft.\n    \n  }\n\n\nSo I was pretty lost when I started playing for the first time in a long time.\n\n### Table of Contents\n\n## The Problem\n\nAs some friends and I started playing the Divine Journey 2 modpack,\nI was overwhelmed by the number of modded blocks and items.\n\nTo give you a taste, there are 54 &quot;generators&quot; from 16 mods:\n\n{\n\n  \n    \n      I built this UI with v0 and extracted the images from a screenshot using\n      o4-mini with toolcalling.\n    \n}\n\nFinding them around our base was a pain. My friends knew where everything was,\nand would be telling me things like \"put coal in the hopper that feeds the Coke\nOven into the Blast Furnace by the biodiesel setup\"\n\nThere's one obvious solution:\n\n## The Solution: more mods\n\nI ended up creating two mods with a mix of [OpenAI Codex](https://github.com/opena"},{"slug":"sluggified-urls","type":"post","title":"Implementing Notion style URLs","description":"Create /some-title-here-{id} URLs for recognizable links in Next.js","date":"Jun 19, 2025","href":"/blog/sluggified-urls","excerpt":"I hate unrecognizable URLs. If I want to go back to a specific document or page, I should be able\nto type the name of it in the address bar and find it in my browser history. Notion is particularly good at this,\nand v0 was particularly bad at it (for a while), so this is what I did to fix v0.\n\nHere's what a notion URL looks like:\n\n\n  \n\n\nIt's recognizable, visually appealing, and easy to find in your browser history:\n\n\n\nI'm a fan.\n\n\n\nAt first I thought implementing it would be straight forward, but there are a few easy-to-hit gotcha's involved.\nThis post will be focused on Next.js, but the concepts are universal. Here are some of the things to keep in mind:\n\n- You need to ensure the [canonical URL](https://developers.google.com/search/docs/crawling-indexing/canonicalization) is up-to-date\n- The client needs to wind up on the most recent URL, otherwise crawlers like Google can index \"fake\" paths\n- Be mindful of your previous URLs and ensure they don't conflict with the logic for adding/parsing the slug\n\nTo get started, we need two functions: one to generate the URL, and one to parse it.\n\nIt's important we support URLs both with and without the title, and I recommend using a library t"},{"slug":"ship-every-day","type":"post","title":"Ship something every day","description":"","date":"Jun 10, 2024","href":"/blog/ship-every-day","excerpt":"**Edit**: A better title would've been \"_commit_ every day _that you work_\". I don't mean you should work on weekends or not take time off, and\nwhatever you work on doesn't need to \"ship to prod\". \n\n\n\nI don't feel particularly qualified to give advice (I blame imposter syndrome),\nbut I do have one tip to share that I think has been useful for me.\nIt applies both to professional software dev and personal projects.\n\nYou probably guessed it from the title: **ship something every day**.\n\nIt doesn't need to be a major feature or even a bug fix. It just needs to be something you can point to.\n\nWhy? A few reasons:\n\n- The dopamine rush of your code being shipped\n- Your team sees you're working\n  - There's more to this than just performance reviews; with remote work, it's easy for you and co-workers to feel isolated.\n- It encourages incremental work. Your future self and co-workers will thank you\n- Your git commit streak looks good\n  - Yes, in an ideal world this doesn't matter. But I'm sure people like recruiters look at GitHub profiles, and an empty page isn't a great look. This is a benefit of the habit, not necessarily a reason to start it.\n- The satisfaction and mental benefits of gett"},{"slug":"mobile-browsers-resizing-font","type":"post","title":"Why your website's fonts might be larger than intended","description":"A well-meaning mobile browser feature can be problematic","date":"Jun 9, 2023","href":"/blog/mobile-browsers-resizing-font","excerpt":"Someone recently reported that the font-size in some of my code blocks on my [build-your-own Next.js blog](/blog/build-a-blog-with-nextjs-13) post was too large. That's interesting because I use React and the code blocks are the same component. So why would the font-size be different between them?\n\nI was able to reproduce the issue and found that it only happened on iOS devices. Here it is in action:\n\n\n\nAfter adventuring down a small rabbit hole, I can share that mobile devices (mostly tablets/phones) support the [text-size-adjust](https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust) CSS property that automatically adjusts the font size of text to make it more readable.\nThis is a great feature for most websites, but it can be problematic for code blocks. It's worth noting that all browsers support this feature (although WebKit requires a prefix), but it seems like they use different heuristics to determine when to apply it.\n\nHere's a solution:\n\n\n\nThis disables the feature and makes the font size consistent across all browsers.\nBe careful though, because this will disable the feature for your entire site.\nYou may want to specifically opt certain elements out to let the"},{"slug":"nintype","type":"post","title":"Nintype is still the best iOS keyboard","description":"","date":"May 22, 2023","href":"/blog/nintype","excerpt":"Describing Nintype is a challenge. Here's a the demo video from it's launch back in 2014:\n\n\n  \n\n\n  \"the true touch typing experience\"\n\n\nEssentially, Nintype is a keyboard that enables you to _swipe and tap_ with both hands at the same time.\nIf you're typing \"there\", you'd swipe the \\`th\\` with your right hand, and tap or swipe the \\`ere\\` with your left.\nIt's such elegant and obvious next step for swipe keyboards it's incredible to me that no alternatives exist.\nIt's really does feel like magic; see how my friend texted me when we were first discovering it (apologies for the expletives):\n\n\n\nIt's genius lies in a few things:\n\n## Swipe and type\n\nNintype's true magic lies in it's ability to understand swiping and tapping with both fingers simultaneously.\nIf you need to double tap a word, like \"I'll\", you can swipe the first half of the word, and then double tap the \"l\" key to finish it.\nIt's a bit tricky to put into words, but it feels intuitive and unlocks a lot of speed. I can consistently reach 100 WPM with ~90-95% accuracy using Nintype.\n\n## Customization\n\nNintype has options for seemingly everything.\nYou can add custom shortcuts (such as auto filling your email or credit card num"},{"slug":"build-a-blog-with-nextjs-13","type":"post","title":"Building a blog with Next.js 15 and React Server Components","description":"Use MDX, RSC, and Bright to build a blog with Next.js 15.","date":"Apr 16, 2023","href":"/blog/build-a-blog-with-nextjs-13","excerpt":"I've been tinkering with this website and the [Next.js 13 App Router](https://beta.nextjs.org) for a while now,\nand it's been a great experience, especially in the last few months. But I've seen some confusion around\nhow to use the new features and React Server Components, so I wrote up an outline on building this website.\n\n\n  {' '}\n  This post has been updated for [Next.js\n  15.](https://nextjs.org/blog/next-15){' '}\n\n\nTo address the React-sized elephant in the room:\nyou do not need this fancy setup to build a blog.\nHTML and CSS may be a better choice for you, but I'd find little fun in that, and I'm a strong believer in having a website to experiment with.\n\nTo set a few expectations, here's what this post **won't** do:\n\n- Act as documentation for Next.js or React\n- Be a 100% code-complete tutorial. You'll need to fill in some gaps yourself.\n  - You can always reference [this website's source code](https://github.com/maxleiter/maxleiter.com).\n  - There are file trees included with links to the source code.\n\nAnd here's what it **will** do:\n\n- Show you real-world examples involving React Server Components and the App Router.\n- Guide you in spinning up your own blog with Next.js 13 a"},{"slug":"node-has-tooling-problems","type":"post","title":"The Node ecosystem (still) has tooling problems","description":"It shouldn't take this much work to publish a small library","date":"July 30, 2022","href":"/blog/node-has-tooling-problems","excerpt":"I recently published a [small npm package](https://github.com/maxleiter/sortablejs-vue3) containing a Vue library. The package is written in TypeScript powered by Vite, which I (wrongly) assumed would mediate most of my woes. \n\n![Obi Wan gif of him sarcastically saying \"Oh, this is going to be easy\"](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/node-tooling/obiwan.gif)\n\nFirst, I used Vite to build a small front-end site to demonstrate the library. This let me test the component and demonstrate usage in the same repository. Getting this working was fairly straight forward for someone with experience wrangling TypeScript configurations, but I imagine for a less experienced developer it could've been a daunting task. I ended up with two tsconfigs, \\`tsconfig.node.json\\` and \\`tsconfig.site.json\\`, had to figure out module resolution, realized I needed \\`vue-tsc\\`, and had a multitude of other minor roadblocks. The nicest thing about Vite is it is *fast*, which made working on this manageable.\n\nSecond, I had to figure out how to publish a library. After lots of research (AKA reading Reddit threads and blog posts), I figured out the proper incantation of \\`tsc\\` paramete"},{"slug":"supabase-next-analytics","type":"post","title":"Live updating page views with Supabase and Next.js","description":"A step-by-step guide to page views and server analytics","date":"May 15, 2022","href":"/blog/supabase-next-analytics","excerpt":"This post was written for the (now stable) beta Next.js middleware. If you\n  want your own analytics, I recommend looking at{' '}\n  Vercel's solution.\n\n\nThis post starts with a brief introduction. If you want to jump down to the tutorial, click [here](/blog/supabase-next-analytics#how). You can also see the live updating views in action in the top right of this page! The analytics events themselves require no JavaScript and occur completely on the server thanks to the [new (in beta) Next.js middleware](https://nextjs.org/docs/advanced-features/middleware). If you have JavaScript enabled, the view count should live update thanks to Supabase Realtime. You can try it by opening the page in a new tab and eyeing the view count.\n\n**Contents**\n\n- [Motivations](/blog/supabase-next-analytics#motivations)\n- [How to do it](/blog/supabase-next-analytics#how)\n  - [Supabase: Setting up the Database and Realtime](/blog/supabase-next-analytics#supabase-setting-up-the-database-and-realtime)\n  - [Next.js: Adding server-side analytics](/blog/supabase-next-analytics#nextjs-adding-server-side-analytics)\n  - [Next.js: Adding a live updating view counter](/blog/supabase-next-analytics#nextjs-adding-a-liv"},{"slug":"easy-site-improvements","type":"post","title":"Easy ways to improve your websites accessibility and performance","description":"A list of simple tips for developing a more accessible and user-friendly web.","date":"Apr 23, 2022","href":"/blog/easy-site-improvements","excerpt":"Below is a short list I wrote up for people who are comfortable building websites (with any technology) but want to improve their work, whether that be in terms of loading speeds, software quality, or accessibility.\n\n\nTL;DR:\n- [Use WAVE](/blog/easy-site-improvements#wave)\n- [Compress your images](/blog/easy-site-improvements#compress-your-images)\n- [Embrace semantic HTML](/blog/easy-site-improvements#embrace-semantic-html)\n- [Don’t use JavaScript to replace browser controls](/blog/easy-site-improvements#dont-use-javascript-to-replace-browser-controls)\n- [Invest in learning your developer tools](/blog/easy-site-improvements#invest-in-learning-your-developer-tools)\n\n## WAVE \n\n[WAVE](https://wave.webaim.org/) is a suite of tools for finding, diagnosing, and fixing accessibility problems. It's my first step for finding the lowest hanging improvements. It helps you not just fix your errors but understand them by guiding you through the relevant part of the HTML5 spec in plain language. Below you can see a screenshot of the tool being applied to https://webaim.org. \n![Screenshot of the WAVE tool being used on webaim.org](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/site-i"},{"slug":"hacker-sites","type":"post","title":"How hackers* run their sites","description":"An analysis based on 700 personal websites","date":"Apr 7, 2022","href":"/blog/hacker-sites","excerpt":"\\* hackers: users of hacker news\n\nYesterday, when I probably should have been doing something productive, I instead [asked hacker news users for links to their personal sites](https://news.ycombinator.com/item?id=30934529).\n\nIt got far more replies than I expected (over 1000 at the time of writing) so I had the idea to do some scraping and see how commenters build and host their sites.\n\nI wrote a quick-and-dirty typescript script (at the bottom of page) for scraping, pinging, and sorting the comments. I could've used a pre-existing library or service for determining tech used on the sites, but where's the fun in that? I’d have loved to add features like checking for git repository links and doing some API calls for a more in-depth analysis, but I’ll leave the complicated parts as exercises for the reader.\n\nIf I were to do this all again, I would absolutely not choose JavaScript. Just 0 real benefits; I spent more time than I care to admit bashing my head before remembering \\`Promise.allSettled\\` exists. I should've just used Python.\n\n## The stats:\n\nOf the 721 top level comments, 692 contained links and were analyzed at the time of writing. I only looked at the first link in a comme"},{"slug":"introducing-drift","type":"post","title":"Introducing Drift","description":"A self-hostable alternative to GitHub Gist and Pastebin","date":"Mar 26, 2022","href":"/blog/introducing-drift","excerpt":"_[View this post on Drift](https://paste.maxleiter.com/post/9d77d452-8ccf-4056-89dd-9bf9f96dfc3c)_\n\nI've wanted a Gist alternative for years, but it wasn't until I saw [this tweet](https://twitter.com/emilyst/status/1499858264346935297) I decided to sit down and build it:\n\n> \"What is the absolute closest thing to GitHub Gist that can be self-hosted? In terms of design and functionality. Hosts images and markdown, rendered. Creates links that can be private or public. Uses/requires registration. I have looked at dozens of pastebin-like things.\" - @emilyst\n\nIf your response to that is \"why?\", I recommend reading ['Why you should start self-hosting'](https://rohanrd.xyz/posts/why-you-should-start-self-hosting/) by Rohan Deshumkh. Also know that I have a habit of starting time consuming weekend projects to procrastinate school work, and this seemed like an especially fun one.\n\nThe primary goal of Drift is to capture the value proposition of GitHub. Syntax highlighting, markdown rendering, straight to the point. There are tons of self-hostable pastebins, and none target an experience like Gist. You can try a demo [here](https://drift.maxleiter.com).\n\nHere's a screenshot of the authentic"},{"slug":"contributing-to-oss","type":"post","title":"How to start contributing to open-source projects","description":"A small guide to finding projects and contributing changes","date":"Jan 25, 2022","href":"/blog/contributing-to-oss","excerpt":"One of the most common questions I'm asked by my computer science friends and students is how they can contribute to an open-source project. In order for me to organize and share my thoughts I thought I'd write something here.\n\nFirst off, it's a good idea! Contributing to projects is a fantastic way to build experience, connections, and improve a piece of software you use or rely on. I've grown immensely through maintaining my few projects and contributing to a hand full of others. I've gained experience in community management, team communication, code review, dependency management, and the list goes on. This post is focused on programming, but don't forget that issue management, documentation, user support, and bug reporting are all valuable ways you can contribute. \n\nThat point about using open-source software is important. The first thing I tell my friends is they should first ensure they're using some before they attempt to contribute. There are few things that are more satisfying than fixing a bug that's been bugging you in a program written by someone else, and the motivation that provides is not inconsequential[^1]. As a maintainer, contributor, and extensive procrastinator"},{"slug":"pin-dependencies","type":"post","title":"Pin your npm/yarn dependencies","description":"A guide on how to pin your dependencies and why you may want to","date":"Jan 9, 2022","href":"/blog/pin-dependencies","excerpt":"Today, the open-source maintainer [Marak](https://github.com/Marak) intentionally [bricked two popular JavaScript libraries](https://www.bleepingcomputer.com/news/security/dev-corrupts-npm-libs-colors-and-faker-breaking-thousands-of-apps/) (with ~25 total million weekly downloads) in such a way that they broke dependents software. There's nothing that npm or any other public registry could've done to have prevented this; the release was indistinguishable from a regular update, unless you looked at the code. This is not the first time an npm dependency has [gone rogue](https://qz.com/646467/how-one-programmer-broke-the-internet-by-deleting-a-tiny-piece-of-code/) and [caused havoc](https://github.com/dominictarr/event-stream/issues/115) due to supply chain problems, and it certainly won't be the last. And so the defensive role falls to you, the developer.\n\n### Pinning dependencies\n\nMy recommendation is to **pin your dependencies**. If you're unfamiliar with what this means, you should first be familiar with [semantic versioning](https://semver.org/). In short, pinning dependencies means the _exact_ version specified will be installed, rather than a dependency matching the range crite"},{"slug":"framework","type":"post","title":"Impressions of the Framework Laptop","description":"My thoughts on the Framework Laptop's hardware","date":"Nov 3, 2021","href":"/blog/framework","excerpt":"I received my [Framework Laptop DIY edition](https://frame.work) a few days ago and have been setting it up software-wise. I have it running Manjaro Linux with the Sway window manager. This is my first time using a Wayland desktop, and oh has it been a learning experience. This post will be largely about the hardware, but I plan to make one about the software once I'm more happy with my setup.\n\nHere's what I got:\n\n- Framework Laptop DIY Edition\n- 16GB (2 x 8GB) DDR4-3200\n- Intel® Wi-Fi 6E AX210 No vPro\n- 1TB - WD_BLACK™ SN850 NVMe™\n- USB-A Expansion Card\n- USB-C Expansion Card x2\n- HDMI Expansion Card\n\nI bought everything from the Framework store (at a slight markup of ~$80 for the RAM, SSD, and wifi card), but I'm happy to support them and for the convenience of knowing it would work properly was well worth it.\n\n## The Good\n\n- Well crafted body. I was not expecting a premium build quality from a startup trying to create an upgradeable laptop, but wow they excelled.\n- It's _really light_. It's just 2.8 pounds, compared to my 13\" Macbook Pro's 3.02. You wouldn't think that's a big difference, and maybe you wouldn't notice, but I sure did.\n- A solid keyboard. Most non-Mac laptops I'v"},{"slug":"MSHW0184","type":"post","title":"Adding ambient light support to Linux and GNOME","description":"A quick dive into Linux kernel drivers","date":"Dec 15, 2020","href":"/blog/MSHW0184","excerpt":"A couple of a weeks ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale. I love making devices run software they shouldn't, so I got to work dual-booting Linux on it. To my surprise, almost everything worked with the default Fedora 33 kernel, not including the touchscreen, the ambient light sensor, and the camera. After compiling and loading the great [linux-surface](https://github.com/linux-surface/linux-surface) kernel the touchscreen started to work but I found a [GitHub issue](https://github.com/linux-surface/linux-surface/issues/121) someone had made detailing that the ambient light sensor (a MSHW0184) isn't detected. This normally wouldn't matter a lot, but I'd discovered that GNOME supported adjusting the screen brightness based on the ambient light through [iio-sensor-proxy](https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/).\n\nI knew nothing (and still know very little) about the Linux kernel or drivers, but this seemed like a great place to start. Luckily, GitHub user archseer discovered that the MSHW0184 registers align with the APDS9960 device, which already has an upstream kernel driver, and he mentioned all that should be needed is a small change "},{"slug":"X11","type":"post","title":"X11 on iOS","description":"A guide on how to compile the X Window System for iOS","date":"Dec 15, 2019","href":"/blog/X11","excerpt":"This work has been picked back up recently, with KDE, GNOME, Wayland, and\n  more. Read about it here: https://maxleiter.com/blog/xios\n\n\nI'm excited to announce that X11 is coming soon to iOS. Most (see below) packages and dependencies for a fully functioning X11 desktop system have been compiled and are available on Cydia for iOS 11+. All packages have been compiled for arm64 and have been tested on iOS 12.4 and iOS 13.1. This requires a jailbroken device.\n\n\n[Image of programs running on\ndevice.](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/X11/onipad.jpg)\n\nThis site will serve largely as documentation for building yourself. ~You can add the Cydia repo below for the deb packages. Please let me know if you run across any issues with the debs; it's likely I messed up including a library or something like that. (These aren't done just yet.)~\n\n## How it works\n\nAt the moment, a virtual screen is accessed via a VNC client to an Xvnc instance running on the iDevice. If you're unfamiliar, Xvnc is an X server with a virtual screen that can be accessed via VNC. The best part of this is no drivers are required: it's all handled by Xvnc.\n\n## Why\n\nLargely just because I can. Als"}],"notes":[{"slug":"fish-directory-colors","type":"note","title":"Per-directory terminal colors in fish shell","description":"","date":"Apr 5, 2026","href":"/notes/fish-directory-colors","excerpt":"My terminal background color changes based on the current directory. \nIt's a small touch that makes it easy to tell which project I'm in at a glance, which is \nespecially useful when juggling AI agents.\n\nIt works via a custom fish function called `_color_for_dir`, which:\n\n1. Hashes the current `$PWD` \n2. Maps the hash to a hue (0-359)\n3. Converts it to a dark RGB color \n4. Sends an [OSC 11](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html) escape sequence to change the terminal background\n\n\n\nIt's deterministic, so each directory always gets the same color. \nThe function is triggered on startup and on every `cd` via a `--on-variable PWD` event listener.\n\nIt also skips VS Code's integrated terminal because I generally know what projects I have open \n\nFull code:\n\n\nClick to expand"},{"slug":"git-checkout-script","type":"note","title":"Never think about branch names again","description":"a bash script for generating branch names","date":"Aug 19, 2024","href":"/notes/git-checkout-script","excerpt":"I recommend swapping out \\`max\\` to basically anything else.\n\n\n\nTo use on macOS/linux, you can paste the above into a file in \\`/usr/local/bin\\` and make it executable with \\`chmod +x /usr/local/bin/gcb\\`.\n\nI also recommend setting your git settings to sort branches by \\`committerdate\\` so that you can easily find the branch you worked on most recently:\n\n\n\nThis does work with the default alphabetical sorting, but this works better if you work on features over long periods of time."},{"slug":"updating-jsonb-drizzle","type":"note","title":"Updating JSONB fields with Drizzle","description":"hint: just use `sql` and COALESCE.","date":"July 11, 2024","href":"/notes/updating-jsonb-drizzle","excerpt":"I recently made a jsonb column in a postgres database and it took me a bit\nto figure out how to update a single value without overwriting the entire\nfield. If you know a better way please let me know."},{"slug":"vscode-default-dir","type":"note","title":"Set your default directory in VS Code's open dialog","description":"","date":"Jun 6, 2024","href":"/notes/vscode-default-dir","excerpt":"This is my workflow for opening a project in VS Code:\n\n1. Open an empty window of VS Code\n2. Hit cmd+O\n3. Navigate to my \\`~/Documents/...\\` directory\n4. Hit enter\n\nIn my opinion, that's a few too many steps. I've made it a little better by\nchanging the \\`files.dialog.defaultPath\\` setting (added almost exactly [one year ago](https://code.visualstudio.com/updates/v1_80)).\n\n![VS Code settings](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/vscode-dir/screenshot.png)\n\nHope this helps."},{"slug":"gemini-script","type":"note","title":"gemini.sh script","description":"A script for concatenating files in a directory for copying to an LLM","date":"Apr 14, 2024","href":"/notes/gemini-script","excerpt":"As of late 2024/early 2025, I recommend using the great repomix tool: https://github.com/yamadashy/repomix\n\n\nI've been messing with gemini-1.5-pro with the 1 million token context window for a while now and found this script very useful\nfor grabbing entire repos. It ignores most binary files and concatenates the rest into a single file. \n\nYou'll need to have \\`parallel\\` installed for this to work (\\`brew install parallel\\` on macOS)."},{"slug":"slack-message-fetch","type":"note","title":"Sending a Slack message with fetch","description":"","date":"Mar 30, 2024","href":"/notes/slack-message-fetch","excerpt":"I like using Slack bots for things like alerts and notifications and\nhave needed this snippet enough to leave it here.\n\nI use [slack-block-builder](https://github.com/raycharius/slack-block-builder) to\nbuild the message; writing raw slack blocks is a pain."},{"slug":"swr-state","type":"note","title":"SWR for more than fetching","description":"SWR for state management","date":"Mar 30, 2024","href":"/notes/swr-state","excerpt":"[SWR](https://swr.vercel.app/) is a great library for data fetching in React.\nIt looks like this:\n\n\n\nBut my favorite use for it is local state management.\n\nHere's an example of how I use it for modals and dialogs:\n\n\n\nAny hook call with that same \\`state:modal\\` key will receive the same data and re-render when it changes.\nIt's a good replacement for other global state solutions or context."},{"slug":"wasm-edge-and-node","type":"note","title":"Loading wasm files on Vercel Edge and Node.js runtimes","description":"","date":"Mar 30, 2024","href":"/notes/wasm-edge-and-node","excerpt":"Loading wasm on the [Vercel Edge runtime](https://vercel.com/docs/functions/wasm) is easy. You need to do a little more work\nto do the same on Node.js."}],"projectsAndExternal":[{"title":"Max Leiter"},{"title":"How we made v0 an effective coding agent","description":"Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.","date":"Jan 7, 2026","href":"https://vercel.com/blog/how-we-made-v0-an-effective-coding-agent"},{"title":"Introducing the v0 composite model family","description":"Introducing the v0 composite model family.","date":"Jun 1, 2025","href":"https://vercel.com/blog/v0-composite-model-family"},{"title":"Introducing AI SDK 3.0 with Generative UI support","description":"Stream React Components from LLMs to deliver richer user experiences.","date":"Mar 1, 2024","href":"https://vercel.com/blog/ai-sdk-3-generative-ui"},{"title":"Introducing the Vercel AI SDK","description":"An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.","date":"Jun 15, 2023","href":"https://vercel.com/blog/introducing-the-vercel-ai-sdk"},{"title":"Improving the accessibility of our Next.js site","description":"We've made some improvements to the accessibility of our Next.js site. Here's how we did it.","date":"Sep 30, 2022","href":"https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site"},{"title":"New edge dev infrastructure","description":"New edge dev infrastructure.","date":"Jul 21, 2020","href":"https://vercel.com/blog/new-edge-dev-infrastructure"},{"title":"X11 on iOS","description":"Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.","href":"/blog/X11"},{"title":"Drift","description":"A self-hostable and open-source alternative to GitHub Gist and Pastebin.","href":"https://github.com/maxleiter/drift"},{"title":"The Lounge","description":"Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.","href":"https://github.com/thelounge/thelounge"},{"title":"SortableJS-vue3","description":"A TypeScript wrapper for SortableJS built for Vue 3.","href":"https://github.com/maxleiter/sortablejs-vue3/"},{"title":"KnightOS","description":"Open-source unix-like operating system for z80-based calculators written entirely in z80 asm. I wrote a significant portion of the libc and contribued to system libraries.","href":"https://github.com/knightos/knightos"},{"title":"MSHW0184 driver for Linux kernel","description":"I finally found an excuse to contribute to the Linux kernel","href":"blog/MSHW0184"},{"title":"jsonTree","description":"My first open-source project","href":"https://github.com/maxleiter/jsontree"},{"title":"easyarty.com","description":"A tiny tool I made for a video game I like but it now gets 250,000+ visitors a year","href":"https://easyarty.com"},{"title":"v0","description":"I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.","href":"https://v0.app"},{"title":"AI SDK","description":"I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK.","href":"https://github.com/vercel/ai"},{"title":"Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening","description":"I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimate vertical cup to disk ratios from retinal images.","href":"https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362"}]}</script>
+<script>
+// ---------------------------------------------------------------------------
+// Shaders. The scene is written twice, WGSL and GLSL ES 3.0, and the two are
+// kept line-for-line parallel so a tweak to one is a search away in the other.
+// Both read the same 12 x vec4 uniform block in the same order:
+//  0 cam.xyz time | 1 right.xyz tanX | 2 up.xyz tanY | 3 fwd.xyz exposure
+//  4 sun.xyz quality | 5 planet.xyz radius | 6 ringC.xyz R | 7 ringAxis.xyz halfW
+//  8 ringU.xyz spin | 9 res.xy wallH atmoH | 10 planetAxis.xyz hullT
+//  11 dt box motion count
+// ---------------------------------------------------------------------------
+
+const WGSL_COMMON = /* wgsl */ `
+struct U {
+  cam: vec4f, right: vec4f, up: vec4f, fwd: vec4f, sun: vec4f, planet: vec4f,
+  ringC: vec4f, ringA: vec4f, ringU: vec4f, misc: vec4f, paxis: vec4f, pm: vec4f, s2: vec4f,
+};
+const S2COL = vec3f(0.62, 0.78, 1.0);
+const SUNCOL = vec3f(1.0, 0.95, 0.88);
+const M3 = mat3x3f(0.00, 0.80, 0.60, -0.80, 0.36, -0.48, -0.60, -0.48, 0.64);
+
+fn hash13(p: vec3i) -> f32 {
+  let q = bitcast<vec3u>(p);
+  var h = (q.x * 0x8da6b343u) ^ (q.y * 0xd8163841u) ^ (q.z * 0xcb1ab31fu);
+  h = (h ^ (h >> 15u)) * 0x2c1b3c6du;
+  h = (h ^ (h >> 12u)) * 0x297a2d39u;
+  h = h ^ (h >> 15u);
+  return f32(h >> 8u) * (1.0 / 16777216.0);
+}
+fn vnoise(p: vec3f) -> f32 {
+  let fl = floor(p); let i = vec3i(fl); let f = p - fl; let w = f * f * (3.0 - 2.0 * f);
+  let a = hash13(i); let b = hash13(i + vec3i(1, 0, 0));
+  let c = hash13(i + vec3i(0, 1, 0)); let d = hash13(i + vec3i(1, 1, 0));
+  let e = hash13(i + vec3i(0, 0, 1)); let g = hash13(i + vec3i(1, 0, 1));
+  let k = hash13(i + vec3i(0, 1, 1)); let l = hash13(i + vec3i(1, 1, 1));
+  return mix(mix(mix(a, b, w.x), mix(c, d, w.x), w.y), mix(mix(e, g, w.x), mix(k, l, w.x), w.y), w.z);
+}
+fn fbm(p0: vec3f, oct: i32) -> f32 {
+  var p = p0; var s = 0.0; var a = 0.5;
+  for (var i = 0; i < 8; i++) {
+    if (i >= oct) { break; }
+    s += a * vnoise(p); p = M3 * p * 2.03 + vec3f(1.7, 9.2, 3.1); a *= 0.5;
+  }
+  return s;
+}
+`;
+
+const WGSL_SCENE = WGSL_COMMON + /* wgsl */ `
+@group(0) @binding(0) var<uniform> u: U;
+
+struct VO { @builtin(position) pos: vec4f, @location(0) ndc: vec2f };
+@vertex fn vsFull(@builtin(vertex_index) i: u32) -> VO {
+  var ps = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  var o: VO; o.pos = vec4f(ps[i], 0.0, 1.0); o.ndc = ps[i]; return o;
+}
+
+fn OCT() -> i32 { return i32(u.sun.w) + 3; }
+
+struct Hit { t: f32, kind: i32, n: vec3f, h: f32, q: vec3f };
+
+fn sphere(ro: vec3f, rd: vec3f, c: vec3f, r: f32) -> vec2f {
+  let oc = ro - c; let b = dot(oc, rd); let cc = dot(oc, oc) - r * r; let h = b * b - cc;
+  if (h < 0.0) { return vec2f(-1.0, -1.0); }
+  let s = sqrt(h); return vec2f(-b - s, -b + s);
+}
+fn cylT(op: vec3f, dp: vec3f, r: f32) -> vec2f {
+  let A = dot(dp, dp); let B = dot(op, dp); let C = dot(op, op) - r * r;
+  let D = B * B - A * C;
+  if (D < 0.0 || A < 1e-9) { return vec2f(-1.0, -1.0); }
+  let s = sqrt(D); return vec2f((-B - s) / A, (-B + s) / A);
+}
+fn ringHit(ro: vec3f, rd: vec3f) -> Hit {
+  var H: Hit; H.t = 1e9; H.kind = 0; H.n = vec3f(0.0); H.h = 0.0; H.q = vec3f(0.0);
+  let a = u.ringA.xyz; let R = u.ringC.w; let hw = u.ringA.w;
+  let o = ro - u.ringC.xyz; let oa = dot(o, a); let op = o - a * oa;
+  let da = dot(rd, a); let dp = rd - a * da;
+  let ti = cylT(op, dp, R);
+  if (ti.y > 0.0) { let h = oa + ti.y * da; if (abs(h) < hw) { H.t = ti.y; H.kind = 1; H.h = h; } }
+  let to = cylT(op, dp, R + u.paxis.w);
+  if (to.x > 0.0 && to.x < H.t) { let h = oa + to.x * da; if (abs(h) < hw) { H.t = to.x; H.kind = 2; H.h = h; } }
+  if (abs(da) > 1e-7) {
+    for (var k = 0; k < 2; k++) {
+      let s = select(1.0, -1.0, k == 0);
+      let tw = (s * hw - oa) / da;
+      if (tw > 0.0 && tw < H.t) {
+        let q = op + dp * tw; let r = length(q);
+        if (r > R - u.misc.z && r < R + u.paxis.w) { H.t = tw; H.kind = 3; H.h = s * hw; H.n = -sign(da) * a; H.q = q; }
+      }
+    }
+  }
+  if (H.kind == 1 || H.kind == 2) {
+    let q = op + dp * H.t; H.q = q; let rad = normalize(q);
+    H.n = select(rad, -rad, H.kind == 1);
+  }
+  return H;
+}
+fn planetShadow(p: vec3f) -> f32 {
+  let oc = p - u.planet.xyz; let b = dot(oc, u.sun.xyz);
+  if (b > 0.0) { return 1.0; }
+  let d = sqrt(max(dot(oc, oc) - b * b, 0.0));
+  return smoothstep(u.planet.w * 0.985, u.planet.w * 1.03, d);
+}
+fn spinQ(q: vec3f) -> vec3f {
+  let a = u.ringA.xyz; let s = u.ringU.w;
+  return q * cos(s) + cross(a, q) * sin(s);
+}
+
+fn shadeInner(H: Hit, rd: vec3f, wp: vec3f) -> vec3f {
+  let a = u.ringA.xyz; let sun = u.sun.xyz;
+  let qr = spinQ(H.q);
+  let P = qr + a * H.h;
+  let edge = abs(H.h) / u.ringA.w;
+  let oct = OCT();
+  let mount = smoothstep(0.6, 0.97, edge);
+  var e = fbm(P * 1.3, oct + 3);
+  e += mount * mount * 0.55 + (fbm(P * 30.0, 3) - 0.45) * mount * 0.3;
+  let sea = 0.47;
+  let n = H.n;
+  let diff = max(dot(n, sun), 0.0);
+  let sh = planetShadow(wp);
+  var col: vec3f; var spec = 0.0;
+  if (e < sea) {
+    let dep = clamp((sea - e) * 6.0, 0.0, 1.0);
+    col = mix(vec3f(0.05, 0.16, 0.22), vec3f(0.012, 0.035, 0.08), dep);
+    spec = 1.0;
+  } else {
+    let hg = e - sea;
+    let veg = fbm(P * 4.0 + 3.0, 5);
+    col = mix(mix(vec3f(0.09, 0.15, 0.06), vec3f(0.16, 0.2, 0.08), smoothstep(0.3, 0.5, veg)), vec3f(0.34, 0.29, 0.18), smoothstep(0.5, 0.72, veg));
+    col = mix(col, vec3f(0.36, 0.35, 0.34), smoothstep(0.08, 0.2, hg));
+    col = mix(col, vec3f(0.86, 0.89, 0.93), smoothstep(0.26, 0.34, hg));
+    col = mix(vec3f(0.52, 0.47, 0.34), col, smoothstep(0.0, 0.015, hg));
+  }
+  let t = u.cam.w;
+  let cl = fbm(P * 1.8 + vec3f(t * 0.006, 0.0, t * 0.004) + vec3f(e * 2.5), oct + 2);
+  let cloud = smoothstep(0.6, 0.82, cl) * (1.0 - mount * 0.5);
+  let light = SUNCOL * 2.2 * diff * sh + S2COL * 0.35 * max(dot(n, u.s2.xyz), 0.0);
+  let amb = vec3f(0.10, 0.075, 0.05) * 0.3 * max(dot(n, normalize(u.planet.xyz - wp)), 0.0) + vec3f(0.006, 0.009, 0.015);
+  var c = col * (light + amb);
+  let rf = reflect(rd, n);
+  c += spec * SUNCOL * pow(max(dot(rf, sun), 0.0), 80.0) * 3.0 * sh * (1.0 - cloud);
+  c = mix(c, vec3f(0.9, 0.92, 0.95) * (light * 1.05 + amb * 1.5), cloud);
+  let cv = abs(dot(rd, n));
+  let haze = 1.0 - exp(-0.16 / max(cv, 0.04));
+  let hazeCol = vec3f(0.42, 0.6, 0.88) * (diff * sh * 1.1 + 0.015);
+  return mix(c, hazeCol, haze);
+}
+
+fn shadeHull(H: Hit, rd: vec3f, wp: vec3f) -> vec3f {
+  let a = u.ringA.xyz; let sun = u.sun.xyz;
+  let qr = spinQ(H.q);
+  let V = cross(a, u.ringU.xyz);
+  let th = atan2(dot(qr, V), dot(qr, u.ringU.xyz));
+  let uu = th / 6.2831853 * 2400.0;
+  let vv = H.h / u.ringA.w * 5.0;
+  let cell = floor(vec2f(uu, vv)); let f = fract(vec2f(uu, vv));
+  let pid = hash13(vec3i(i32(cell.x), i32(cell.y), 7));
+  let seam = smoothstep(0.0, 0.07, min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y)));
+  let fade = smoothstep(45.0, 6.0, H.t);
+  let n = H.n;
+  var base = vec3f(0.13, 0.14, 0.155) * mix(1.0, 0.7 + 0.6 * pid, fade);
+  base *= mix(1.0, 0.4 + 0.6 * seam, fade);
+  let rib = smoothstep(0.86, 0.98, abs(H.h) / u.ringA.w);
+  base *= 1.0 - rib * 0.35;
+  let diff = max(dot(n, sun), 0.0);
+  let sh = planetShadow(wp);
+  let hv = normalize(sun - rd);
+  let spec = pow(max(dot(n, hv), 0.0), 48.0);
+  let fres = pow(1.0 - max(dot(n, -rd), 0.0), 5.0);
+  var c = base * (SUNCOL * 2.0 * diff * sh + vec3f(0.09, 0.07, 0.05) * 0.5 * max(dot(n, normalize(u.planet.xyz - wp)), 0.0) + 0.012);
+  c += SUNCOL * spec * 1.6 * sh * (0.3 + 0.7 * pid);
+  c += vec3f(0.4, 0.55, 0.7) * fres * 0.06;
+  c += base * S2COL * 1.2 * max(dot(n, u.s2.xyz), 0.0) + S2COL * pow(max(dot(n, normalize(u.s2.xyz - rd)), 0.0), 40.0) * 0.6;
+  // running lights
+  let lid = floor(uu / 24.0);
+  let lu = (fract(uu / 24.0) - 0.5) * 24.0;
+  let lv = abs(abs(vv) - 4.4);
+  let lamp = smoothstep(0.55, 0.0, length(vec2f(lu, lv * 1.6)));
+  let blink = 0.55 + 0.45 * sin(u.cam.w * 1.7 + hash13(vec3i(i32(lid), 3, 1)) * 40.0);
+  let lampCol = select(vec3f(0.4, 0.85, 1.0), vec3f(1.0, 0.62, 0.25), hash13(vec3i(i32(lid), 9, 2)) > 0.7);
+  c += lampCol * lamp * blink * 5.0 * smoothstep(22.0, 4.0, H.t);
+  return c;
+}
+
+fn shadeWall(H: Hit, rd: vec3f, wp: vec3f) -> vec3f {
+  let sun = u.sun.xyz; let R = u.ringC.w;
+  let r = length(H.q);
+  let rr = clamp((r - (R - u.misc.z)) / (u.misc.z + u.paxis.w), 0.0, 1.0);
+  let qr = spinQ(H.q);
+  let tex = fbm(qr * 60.0, 3);
+  var base = vec3f(0.17, 0.18, 0.2) * (0.75 + 0.5 * tex);
+  base *= 0.8 + 0.4 * smoothstep(0.92, 1.0, 1.0 - rr);
+  let band = smoothstep(0.02, 0.0, abs(rr - 0.35));
+  let n = H.n;
+  let diff = max(dot(n, sun), 0.0);
+  let sh = planetShadow(wp);
+  let spec = pow(max(dot(n, normalize(sun - rd)), 0.0), 30.0);
+  var c = base * (SUNCOL * 2.0 * diff * sh + 0.015) + SUNCOL * spec * 0.6 * sh;
+  c += vec3f(0.3, 0.8, 1.0) * band * 1.5 * smoothstep(40.0, 8.0, H.t);
+  return c;
+}
+
+fn shadePlanet(p: vec3f, rd: vec3f) -> vec3f {
+  let sun = u.sun.xyz; let pa = u.paxis.xyz;
+  let n = normalize(p - u.planet.xyz);
+  let lat = dot(n, pa);
+  let oct = OCT();
+  let an = n + pa * lat * 5.0;
+  let t = u.cam.w;
+  let rot = t * 0.0015 * (1.0 + 0.6 * sin(lat * 13.0));
+  let tg = normalize(cross(pa, n) + vec3f(1e-5));
+  let w1 = fbm(an * 2.2 + tg * rot, 4);
+  let w2 = fbm(an * 6.0 + vec3f(w1 * 2.0), oct);
+  let b = lat * 7.0 + (w1 - 0.5) * 1.2 + (w2 - 0.5) * 0.5;
+  let s1 = 0.5 + 0.5 * sin(b * 3.1);
+  let s2 = 0.5 + 0.5 * sin(b * 7.7 + 1.3);
+  let cB = vec3f(0.34, 0.13, 0.05); let cA = vec3f(0.78, 0.42, 0.17);
+  let cC = vec3f(0.92, 0.74, 0.48); let cP = vec3f(0.74, 0.68, 0.58);
+  var col = mix(mix(cB, cA, s1), mix(cC, cP, s2), smoothstep(0.25, 0.75, s1 * 0.55 + s2 * 0.45));
+  let fine = fbm(an * 18.0 + vec3f(w2 * 3.0), 3);
+  col *= 0.88 + 0.24 * fine;
+  // storm oval
+  let sd = normalize(vec3f(-0.62, -0.18, 0.76));
+  let sv = (n - sd); let sdist = length(vec2f(dot(sv, tg) * 0.55, dot(sv, pa)));
+  let storm = smoothstep(0.075, 0.02, sdist + (w2 - 0.5) * 0.04);
+  col = mix(col, vec3f(0.72, 0.36, 0.2), storm * 0.8);
+  let ndl = dot(n, sun);
+  let diff = smoothstep(-0.12, 0.5, ndl) * (0.35 + 0.65 * max(ndl, 0.0));
+  let sh = ringHit(p + n * 0.01, sun);
+  let rs = select(1.0, 0.1, sh.kind > 0);
+  var c = col * SUNCOL * 0.62 * diff * rs;
+  c += col * S2COL * 0.9 * smoothstep(0.0, 0.6, dot(n, u.s2.xyz));
+  c += col * vec3f(0.006, 0.0065, 0.008);
+  return c;
+}
+
+fn stars(rd: vec3f) -> vec3f {
+  var c = vec3f(0.0);
+  for (var l = 0; l < 2; l++) {
+    let K = select(380.0, 170.0, l == 0);
+    let q = rd * K;
+    let fl = floor(q); let id = vec3i(fl);
+    let h = hash13(id + vec3i(l * 131, 17, 3));
+    if (h > 0.93) {
+      let sp = fl + 0.25 + 0.5 * vec3f(hash13(id + vec3i(5, 1, 2)), hash13(id + vec3i(3, 7, 1)), hash13(id + vec3i(9, 2, 8)));
+      let d = length(cross(rd, normalize(sp))) * K;
+      let br = pow((h - 0.93) / 0.07, 6.0) * select(0.5, 1.6, l == 0);
+      let sz = 0.05 + 0.04 * br;
+      let tint = mix(vec3f(0.7, 0.8, 1.0), vec3f(1.0, 0.86, 0.68), hash13(id + vec3i(1, 1, 1)));
+      c += tint * br * exp(-d * d / (sz * sz));
+    }
+  }
+  return c;
+}
+
+fn background(rd: vec3f) -> vec3f {
+  var c = vec3f(0.0);
+  let gN = normalize(vec3f(0.35, 0.75, 0.55));
+  let g = dot(rd, gN);
+  let band = exp(-(g * g) / 0.18);
+  let n1 = fbm(rd * 2.4 + vec3f(4.0), 5);
+  let n2 = fbm(rd * 5.0 + vec3f(-2.0, 7.0, 1.0), 4);
+  let dust = smoothstep(0.42, 0.68, fbm(rd * 7.0 + 11.0, 4));
+  let neb = mix(vec3f(0.04, 0.16, 0.30), vec3f(0.30, 0.07, 0.22), smoothstep(0.35, 0.65, n2));
+  c += neb * pow(n1, 2.6) * (0.15 + band) * 0.4 * (1.0 - dust * 0.75);
+  c += stars(rd) * (1.0 - dust * 0.6) * (0.4 + band * 0.6);
+  let mu = dot(rd, u.sun.xyz);
+  c += SUNCOL * 60.0 * smoothstep(0.99993, 0.99996, mu);
+  let m = max(mu, 0.0);
+  c += SUNCOL * (pow(m, 5000.0) * 8.0 + pow(m, 600.0) * 0.5 + pow(m, 40.0) * 0.035);
+  let m2 = max(dot(rd, u.s2.xyz), 0.0);
+  c += S2COL * (40.0 * smoothstep(0.99996, 0.99998, m2) + pow(m2, 8000.0) * 6.0 + pow(m2, 900.0) * 0.4 + pow(m2, 60.0) * 0.03);
+  return c;
+}
+
+struct Atmo { c: vec3f, T: vec3f };
+fn atmosphere(ro: vec3f, rd: vec3f, tMax: f32) -> Atmo {
+  var A: Atmo; A.c = vec3f(0.0); A.T = vec3f(1.0);
+  let PR = u.planet.w; let H = PR * u.misc.w;
+  let s = sphere(ro, rd, u.planet.xyz, PR + H * 1.0);
+  if (s.y < 0.0) { return A; }
+  let t0 = max(s.x, 0.0); let t1 = min(s.y, tMax);
+  if (t1 <= t0) { return A; }
+  let N = 6 + 2 * i32(u.sun.w);
+  let dt = (t1 - t0) / f32(N);
+  let mu = dot(rd, u.sun.xyz);
+  let pR = 0.75 * (1.0 + mu * mu);
+  let g = 0.72;
+  let pM = (1.0 - g * g) / pow(1.0 + g * g - 2.0 * g * mu, 1.5);
+  let bR = vec3f(0.28, 0.55, 1.0) * 0.16;
+  let bM = vec3f(0.05);
+  var T = vec3f(1.0); var sum = vec3f(0.0);
+  for (var i = 0; i < 16; i++) {
+    if (i >= N) { break; }
+    let p = ro + rd * (t0 + (f32(i) + 0.5) * dt);
+    var up = p - u.planet.xyz; let r = length(up); up = up / r;
+    let hgt = max((r - PR) / H, 0.0);
+    let dens = exp(-hgt * 4.0) * dt / H;
+    let ct = dot(up, u.sun.xyz);
+    let lit = smoothstep(-0.18, 0.15, ct);
+    let Tl = exp(-(bR + bM) * 6.0 * (1.0 - smoothstep(-0.2, 0.6, ct)));
+    sum += T * dens * lit * Tl * (bR * pR + bM * pM);
+    T *= exp(-(bR + bM) * dens);
+  }
+  A.c = sum * SUNCOL * 3.2; A.T = T;
+  return A;
+}
+
+@fragment fn fsScene(i: VO) -> @location(0) vec4f {
+  let rd = normalize(u.fwd.xyz + u.right.xyz * i.ndc.x * u.right.w + u.up.xyz * i.ndc.y * u.up.w);
+  let ro = u.cam.xyz;
+  let H = ringHit(ro, rd);
+  let ps = sphere(ro, rd, u.planet.xyz, u.planet.w);
+  let tp = select(1e9, ps.x, ps.x > 0.0);
+  var col: vec3f; var tMax = 1e9;
+  if (H.kind > 0 && H.t < tp) {
+    let wp = ro + rd * H.t;
+    if (H.kind == 1) { col = shadeInner(H, rd, wp); }
+    else if (H.kind == 2) { col = shadeHull(H, rd, wp); }
+    else { col = shadeWall(H, rd, wp); }
+    tMax = H.t;
+  } else if (tp < 1e8) { col = shadePlanet(ro + rd * tp, rd); tMax = tp; }
+  else { col = background(rd); }
+  let A = atmosphere(ro, rd, tMax);
+  col = col * A.T + A.c;
+  return vec4f(col, 1.0);
+}
+`;
+
+// ---------------------------------------------------------------------------
+// Particles: WebGPU integrates them in a compute pass; the vertex stage only
+// billboards. Debris is alpha-blended (it silhouettes against the planet),
+// dust is additive. Both ride one premultiplied pass: dust writes alpha 0.
+// ---------------------------------------------------------------------------
+const WGSL_PARTICLE_COMPUTE = WGSL_COMMON + /* wgsl */ `
+struct Particle { pos: vec4f, vel: vec4f };
+@group(0) @binding(0) var<storage, read_write> parts: array<Particle>;
+@group(0) @binding(1) var<uniform> u: U;
+@compute @workgroup_size(64) fn cs(@builtin(global_invocation_id) gid: vec3u) {
+  let i = gid.x;
+  if (i >= arrayLength(&parts)) { return; }
+  var P = parts[i];
+  let dt = u.pm.x; let box = u.pm.y; let t = u.cam.w;
+  let s = P.vel.w;
+  let rel0 = P.pos.xyz - u.ringC.xyz;
+  let tang = normalize(cross(u.ringA.xyz, rel0) + vec3f(1e-5));
+  let swirl = vec3f(sin(t * 0.11 + s * 40.0), cos(t * 0.13 + s * 23.0), sin(t * 0.07 + s * 61.0)) * 0.004;
+  let v = P.vel.xyz + tang * (0.004 + 0.008 * fract(s * 13.0)) + swirl;
+  let p = P.pos.xyz + v * dt * u.pm.z;
+  let rel = p - u.cam.xyz;
+  let w = rel - floor((rel + box) / (2.0 * box)) * (2.0 * box);
+  P.pos = vec4f(u.cam.xyz + w, P.pos.w);
+  parts[i] = P;
+}
+`;
+
+const WGSL_PARTICLE_RENDER = WGSL_COMMON + /* wgsl */ `
+struct Particle { pos: vec4f, vel: vec4f };
+@group(0) @binding(0) var<uniform> u: U;
+@group(0) @binding(1) var<storage, read> parts: array<Particle>;
+struct PO {
+  @builtin(position) pos: vec4f, @location(0) uv: vec2f,
+  @location(1) @interpolate(flat) kind: f32, @location(2) @interpolate(flat) seed: f32,
+  @location(3) fade: f32, @location(4) sunv: vec3f,
+};
+@vertex fn vsPart(@builtin(vertex_index) vi: u32, @builtin(instance_index) ii: u32) -> PO {
+  var corners = array<vec2f, 6>(vec2f(-1.0, -1.0), vec2f(1.0, -1.0), vec2f(1.0, 1.0), vec2f(-1.0, -1.0), vec2f(1.0, 1.0), vec2f(-1.0, 1.0));
+  let P = parts[ii];
+  var o: PO;
+  let rel = P.pos.xyz - u.cam.xyz;
+  let z = dot(rel, u.fwd.xyz);
+  o.uv = corners[vi]; o.kind = select(0.0, 1.0, P.pos.w > 0.0); o.seed = P.vel.w;
+  o.fade = 0.0; o.sunv = vec3f(0.0);
+  if (z < 0.03) { o.pos = vec4f(2.0, 2.0, 2.0, 1.0); return o; }
+  let x = dot(rel, u.right.xyz); let y = dot(rel, u.up.xyz);
+  var size = abs(P.pos.w);
+  let pxNdc = 2.0 / u.misc.y;
+  let projected = size / (z * u.up.w);
+  var amp = 1.0;
+  if (projected < pxNdc * 0.9) { amp = (projected / (pxNdc * 0.9)) * (projected / (pxNdc * 0.9)); size = pxNdc * 0.9 * z * u.up.w; }
+  let ang = P.vel.w * 6.2831 + u.cam.w * (P.vel.w - 0.5) * 0.5;
+  let c = corners[vi];
+  let rc = vec2f(c.x * cos(ang) - c.y * sin(ang), c.x * sin(ang) + c.y * cos(ang));
+  o.pos = vec4f((x + rc.x * size) / (z * u.right.w), (y + rc.y * size) / (z * u.up.w), 0.5, 1.0);
+  let dist = length(rel);
+  o.fade = smoothstep(u.pm.y, u.pm.y * 0.55, dist) * smoothstep(0.03, 0.15, z) * amp;
+  let sv = vec3f(dot(u.sun.xyz, u.right.xyz), dot(u.sun.xyz, u.up.xyz), dot(u.sun.xyz, u.fwd.xyz));
+  o.sunv = vec3f(sv.x * cos(-ang) - sv.y * sin(-ang), sv.x * sin(-ang) + sv.y * cos(-ang), sv.z);
+  if (o.kind < 0.5) {
+    let fwdScatter = pow(max(dot(normalize(rel), u.sun.xyz), 0.0), 6.0);
+    o.sunv = vec3f(0.06 + 1.6 * fwdScatter, 0.0, 0.0);
+  }
+  return o;
+}
+@fragment fn fsPart(i: PO) -> @location(0) vec4f {
+  let r2 = dot(i.uv, i.uv);
+  if (i.kind < 0.5) {
+    let a = exp(-r2 * 4.0) * i.fade * i.sunv.x;
+    return vec4f(vec3f(1.0, 0.92, 0.82) * a, 0.0);
+  }
+  let ang = atan2(i.uv.y, i.uv.x);
+  let rr = 0.74 + 0.16 * sin(ang * 3.0 + i.seed * 20.0) + 0.08 * sin(ang * 7.0 + i.seed * 41.0);
+  let r = sqrt(r2);
+  if (r > rr) { discard; }
+  let nz = sqrt(max(1.0 - r2 / (rr * rr), 0.0));
+  let facet = vnoise(vec3f(i.uv * 4.0, i.seed * 50.0)) - 0.5;
+  let n = normalize(vec3f(i.uv / rr * 0.9 + facet * 0.5, -nz));
+  let ndl = max(dot(n, i.sunv), 0.0);
+  let alb = mix(vec3f(0.07, 0.065, 0.06), vec3f(0.14, 0.12, 0.1), fract(i.seed * 7.0));
+  let rim = pow(1.0 - nz, 3.0) * max(i.sunv.z, 0.0);
+  let col = alb * (ndl * SUNCOL * 2.6 + vec3f(0.05, 0.04, 0.03)) + SUNCOL * rim * 0.5;
+  let a = smoothstep(rr, rr - 0.1, r) * i.fade;
+  return vec4f(col * a, a);
+}
+`;
+
+// Bloom + composite. Shared bind group layout: 0 src tex, 1 sampler, 2 uniform, 3 second tex.
+const WGSL_POST = /* wgsl */ `
+struct CU { a: vec4f, b: vec4f, c: vec4f, d: vec4f };
+@group(0) @binding(0) var src: texture_2d<f32>;
+@group(0) @binding(1) var samp: sampler;
+@group(0) @binding(2) var<uniform> cu: CU;
+@group(0) @binding(3) var src2: texture_2d<f32>;
+const SUNCOL = vec3f(1.0, 0.95, 0.88);
+struct VO { @builtin(position) pos: vec4f, @location(0) uv: vec2f, @location(1) ndc: vec2f };
+@vertex fn vs(@builtin(vertex_index) i: u32) -> VO {
+  var ps = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  var o: VO; let p = ps[i];
+  o.pos = vec4f(p, 0.0, 1.0); o.uv = vec2f(p.x * 0.5 + 0.5, 0.5 - p.y * 0.5); o.ndc = p; return o;
+}
+fn tx(uv: vec2f) -> vec3f { return textureSampleLevel(src, samp, uv, 0.0).rgb; }
+fn luma(c: vec3f) -> f32 { return dot(c, vec3f(0.2126, 0.7152, 0.0722)); }
+@fragment fn prefilter(i: VO) -> @location(0) vec4f {
+  let ts = 1.0 / vec2f(textureDimensions(src));
+  let a = tx(i.uv + ts * vec2f(-1.0, -1.0)); let b = tx(i.uv + ts * vec2f(1.0, -1.0));
+  let c = tx(i.uv + ts * vec2f(-1.0, 1.0)); let d = tx(i.uv + ts * vec2f(1.0, 1.0));
+  let wa = 1.0 / (1.0 + luma(a)); let wb = 1.0 / (1.0 + luma(b)); let wc = 1.0 / (1.0 + luma(c)); let wd = 1.0 / (1.0 + luma(d));
+  let col = (a * wa + b * wb + c * wc + d * wd) / (wa + wb + wc + wd);
+  let thr = cu.d.x; let knee = cu.d.y;
+  let br = max(col.r, max(col.g, col.b));
+  var rq = clamp(br - thr + knee, 0.0, 2.0 * knee); rq = rq * rq / (4.0 * knee + 1e-5);
+  let w = max(rq, br - thr) / max(br, 1e-5);
+  return vec4f(min(col * w, vec3f(64.0)), 1.0);
+}
+@fragment fn down(i: VO) -> @location(0) vec4f {
+  let ts = 1.0 / vec2f(textureDimensions(src)); let uv = i.uv;
+  let a = tx(uv + ts * vec2f(-2.0, 2.0)); let b = tx(uv + ts * vec2f(0.0, 2.0)); let c = tx(uv + ts * vec2f(2.0, 2.0));
+  let d = tx(uv + ts * vec2f(-2.0, 0.0)); let e = tx(uv); let f = tx(uv + ts * vec2f(2.0, 0.0));
+  let g = tx(uv + ts * vec2f(-2.0, -2.0)); let h = tx(uv + ts * vec2f(0.0, -2.0)); let k = tx(uv + ts * vec2f(2.0, -2.0));
+  let j = tx(uv + ts * vec2f(-1.0, 1.0)); let l = tx(uv + ts * vec2f(1.0, 1.0));
+  let m = tx(uv + ts * vec2f(-1.0, -1.0)); let n = tx(uv + ts * vec2f(1.0, -1.0));
+  let col = e * 0.125 + (a + c + g + k) * 0.03125 + (b + d + f + h) * 0.0625 + (j + l + m + n) * 0.125;
+  return vec4f(col, 1.0);
+}
+@fragment fn up(i: VO) -> @location(0) vec4f {
+  let ts = 1.0 / vec2f(textureDimensions(src)); let uv = i.uv;
+  var col = tx(uv) * 4.0;
+  col += (tx(uv + vec2f(-ts.x, 0.0)) + tx(uv + vec2f(ts.x, 0.0)) + tx(uv + vec2f(0.0, -ts.y)) + tx(uv + vec2f(0.0, ts.y))) * 2.0;
+  col += tx(uv + ts) + tx(uv - ts) + tx(uv + vec2f(ts.x, -ts.y)) + tx(uv + vec2f(-ts.x, ts.y));
+  return vec4f(col / 16.0, 1.0);
+}
+fn aces(x: vec3f) -> vec3f {
+  return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), vec3f(0.0), vec3f(1.0));
+}
+fn h12(p: vec2f) -> f32 { return fract(sin(dot(p, vec2f(12.9898, 78.233))) * 43758.5453); }
+fn flare(p: vec2f) -> vec3f {
+  let s = cu.a.xy; let vis = cu.a.z * cu.a.w;
+  if (vis <= 0.001) { return vec3f(0.0); }
+  let asp = vec2f(cu.b.w, 1.0);
+  let d = (p - s) * asp; let r = length(d);
+  var c = SUNCOL * (exp(-r * 5.0) * 0.28 + exp(-r * 20.0) * 1.1);
+  c += vec3f(0.3, 0.58, 1.0) * exp(-abs(d.y) * 110.0) * exp(-abs(d.x) * 1.15) * 0.7;
+  let ang = atan2(d.y, d.x);
+  let rays = pow(abs(sin(ang * 6.0 + 0.3)), 160.0) + pow(abs(sin(ang * 9.0 + 1.2)), 260.0) * 0.6;
+  c += SUNCOL * rays * exp(-r * 6.0) * 0.3;
+  var gk = array<f32, 7>(0.62, 0.32, -0.22, -0.55, -0.9, -1.25, -1.6);
+  var gr = array<f32, 7>(0.035, 0.06, 0.03, 0.12, 0.05, 0.2, 0.08);
+  var gc = array<vec3f, 7>(vec3f(0.3, 0.9, 1.0), vec3f(1.0, 0.65, 0.3), vec3f(0.7, 0.5, 1.0), vec3f(0.35, 1.0, 0.7), vec3f(1.0, 0.85, 0.6), vec3f(0.35, 0.6, 1.0), vec3f(1.0, 0.4, 0.5));
+  for (var k = 0; k < 7; k++) {
+    let gp = s * gk[k];
+    let gd = length((p - gp) * asp);
+    let R = gr[k];
+    let disc = smoothstep(R, R * 0.6, gd) * 0.6 + smoothstep(R * 0.12, 0.0, abs(gd - R * 0.92)) * 0.8;
+    c += gc[k] * disc * 0.055;
+  }
+  // halo ring around the sun
+  let hr = abs(r - 0.42);
+  c += vec3f(0.5, 0.75, 1.0) * smoothstep(0.03, 0.0, hr) * 0.03;
+  return c * vis;
+}
+@fragment fn composite(i: VO) -> @location(0) vec4f {
+  let uv = i.uv; let cc = uv - 0.5;
+  let ca = cu.c.z * dot(cc, cc);
+  var col = vec3f(textureSampleLevel(src, samp, uv - cc * ca, 0.0).r, textureSampleLevel(src, samp, uv, 0.0).g, textureSampleLevel(src, samp, uv + cc * ca, 0.0).b);
+  let bl = textureSampleLevel(src2, samp, uv, 0.0).rgb;
+  col += bl * cu.b.y;
+  col += flare(i.ndc);
+  col *= cu.b.x;
+  col = aces(col);
+  // split tone: teal shadows, warm highlights
+  let l = luma(col);
+  col = mix(col, col * vec3f(0.92, 1.0, 1.08) + vec3f(0.0, 0.006, 0.014), 1.0 - smoothstep(0.0, 0.5, l));
+  col = pow(col, vec3f(1.0 / 2.2));
+  let vig = 1.0 - cu.c.x * pow(length(cc * vec2f(1.0, 0.85)) * 1.3, 2.6);
+  col *= clamp(vig, 0.0, 1.0);
+  let gn = h12(i.pos.xy + vec2f(cu.b.z * 61.0, cu.b.z * 17.0)) - 0.5;
+  col += gn * cu.c.y;
+  return vec4f(col, 1.0);
+}
+`;
+
+// ---------------------------------------------------------------------------
+// GLSL ES 3.0 mirror of the above.
+// ---------------------------------------------------------------------------
+const GLSL_HEAD = `#version 300 es
+precision highp float;
+precision highp int;
+`;
+const GLSL_COMMON = `
+uniform vec4 U[13];
+#define S2 U[12].xyz
+const vec3 S2COL = vec3(0.62, 0.78, 1.0);
+#define CAM U[0].xyz
+#define TIME U[0].w
+#define RIGHT U[1].xyz
+#define TANX U[1].w
+#define UPV U[2].xyz
+#define TANY U[2].w
+#define FWD U[3].xyz
+#define SUN U[4].xyz
+#define QUALITY U[4].w
+#define PC U[5].xyz
+#define PR U[5].w
+#define RC U[6].xyz
+#define RR U[6].w
+#define RA U[7].xyz
+#define RHW U[7].w
+#define RU U[8].xyz
+#define SPIN U[8].w
+#define RES U[9].xy
+#define WALLH U[9].z
+#define ATMOH U[9].w
+#define PAXIS U[10].xyz
+#define HULLT U[10].w
+const vec3 SUNCOL = vec3(1.0, 0.95, 0.88);
+const mat3 M3 = mat3(0.00, 0.80, 0.60, -0.80, 0.36, -0.48, -0.60, -0.48, 0.64);
+float hash13(ivec3 p) {
+  uvec3 q = uvec3(p);
+  uint h = (q.x * 0x8da6b343u) ^ (q.y * 0xd8163841u) ^ (q.z * 0xcb1ab31fu);
+  h = (h ^ (h >> 15u)) * 0x2c1b3c6du;
+  h = (h ^ (h >> 12u)) * 0x297a2d39u;
+  h = h ^ (h >> 15u);
+  return float(h >> 8u) * (1.0 / 16777216.0);
+}
+float vnoise(vec3 p) {
+  vec3 fl = floor(p); ivec3 i = ivec3(fl); vec3 f = p - fl; vec3 w = f * f * (3.0 - 2.0 * f);
+  float a = hash13(i), b = hash13(i + ivec3(1, 0, 0));
+  float c = hash13(i + ivec3(0, 1, 0)), d = hash13(i + ivec3(1, 1, 0));
+  float e = hash13(i + ivec3(0, 0, 1)), g = hash13(i + ivec3(1, 0, 1));
+  float k = hash13(i + ivec3(0, 1, 1)), l = hash13(i + ivec3(1, 1, 1));
+  return mix(mix(mix(a, b, w.x), mix(c, d, w.x), w.y), mix(mix(e, g, w.x), mix(k, l, w.x), w.y), w.z);
+}
+float fbm(vec3 p, int oct) {
+  float s = 0.0, a = 0.5;
+  for (int i = 0; i < 8; i++) {
+    if (i >= oct) break;
+    s += a * vnoise(p); p = M3 * p * 2.03 + vec3(1.7, 9.2, 3.1); a *= 0.5;
+  }
+  return s;
+}
+`;
+
+const GLSL_FULL_VS = GLSL_HEAD + `
+out vec2 vNdc; out vec2 vUv;
+void main() {
+  vec2 p = vec2(gl_VertexID == 1 ? 3.0 : -1.0, gl_VertexID == 2 ? 3.0 : -1.0);
+  vNdc = p; vUv = p * 0.5 + 0.5;
+  gl_Position = vec4(p, 0.0, 1.0);
+}
+`;
+
+const GLSL_SCENE_FS = GLSL_HEAD + GLSL_COMMON + `
+in vec2 vNdc;
+out vec4 outColor;
+int OCT() { return int(QUALITY) + 3; }
+struct Hit { float t; int kind; vec3 n; float h; vec3 q; };
+vec2 sphere(vec3 ro, vec3 rd, vec3 c, float r) {
+  vec3 oc = ro - c; float b = dot(oc, rd); float cc = dot(oc, oc) - r * r; float h = b * b - cc;
+  if (h < 0.0) return vec2(-1.0);
+  float s = sqrt(h); return vec2(-b - s, -b + s);
+}
+vec2 cylT(vec3 op, vec3 dp, float r) {
+  float A = dot(dp, dp); float B = dot(op, dp); float C = dot(op, op) - r * r;
+  float D = B * B - A * C;
+  if (D < 0.0 || A < 1e-9) return vec2(-1.0);
+  float s = sqrt(D); return vec2((-B - s) / A, (-B + s) / A);
+}
+Hit ringHit(vec3 ro, vec3 rd) {
+  Hit H; H.t = 1e9; H.kind = 0; H.n = vec3(0.0); H.h = 0.0; H.q = vec3(0.0);
+  vec3 a = RA; float R = RR; float hw = RHW;
+  vec3 o = ro - RC; float oa = dot(o, a); vec3 op = o - a * oa;
+  float da = dot(rd, a); vec3 dp = rd - a * da;
+  vec2 ti = cylT(op, dp, R);
+  if (ti.y > 0.0) { float h = oa + ti.y * da; if (abs(h) < hw) { H.t = ti.y; H.kind = 1; H.h = h; } }
+  vec2 to = cylT(op, dp, R + HULLT);
+  if (to.x > 0.0 && to.x < H.t) { float h = oa + to.x * da; if (abs(h) < hw) { H.t = to.x; H.kind = 2; H.h = h; } }
+  if (abs(da) > 1e-7) {
+    for (int k = 0; k < 2; k++) {
+      float s = k == 0 ? -1.0 : 1.0;
+      float tw = (s * hw - oa) / da;
+      if (tw > 0.0 && tw < H.t) {
+        vec3 q = op + dp * tw; float r = length(q);
+        if (r > R - WALLH && r < R + HULLT) { H.t = tw; H.kind = 3; H.h = s * hw; H.n = -sign(da) * a; H.q = q; }
+      }
+    }
+  }
+  if (H.kind == 1 || H.kind == 2) {
+    vec3 q = op + dp * H.t; H.q = q; vec3 rad = normalize(q);
+    H.n = H.kind == 1 ? -rad : rad;
+  }
+  return H;
+}
+float planetShadow(vec3 p) {
+  vec3 oc = p - PC; float b = dot(oc, SUN);
+  if (b > 0.0) return 1.0;
+  float d = sqrt(max(dot(oc, oc) - b * b, 0.0));
+  return smoothstep(PR * 0.985, PR * 1.03, d);
+}
+vec3 spinQ(vec3 q) { return q * cos(SPIN) + cross(RA, q) * sin(SPIN); }
+
+vec3 shadeInner(Hit H, vec3 rd, vec3 wp) {
+  vec3 a = RA;
+  vec3 qr = spinQ(H.q);
+  vec3 P = qr + a * H.h;
+  float edge = abs(H.h) / RHW;
+  int oct = OCT();
+  float mount = smoothstep(0.6, 0.97, edge);
+  float e = fbm(P * 1.3, oct + 3);
+  e += mount * mount * 0.55 + (fbm(P * 30.0, 3) - 0.45) * mount * 0.3;
+  float sea = 0.47;
+  vec3 n = H.n;
+  float diff = max(dot(n, SUN), 0.0);
+  float sh = planetShadow(wp);
+  vec3 col; float spec = 0.0;
+  if (e < sea) {
+    float dep = clamp((sea - e) * 6.0, 0.0, 1.0);
+    col = mix(vec3(0.05, 0.16, 0.22), vec3(0.012, 0.035, 0.08), dep);
+    spec = 1.0;
+  } else {
+    float hg = e - sea;
+    float veg = fbm(P * 4.0 + 3.0, 5);
+    col = mix(mix(vec3(0.09, 0.15, 0.06), vec3(0.16, 0.2, 0.08), smoothstep(0.3, 0.5, veg)), vec3(0.34, 0.29, 0.18), smoothstep(0.5, 0.72, veg));
+    col = mix(col, vec3(0.36, 0.35, 0.34), smoothstep(0.08, 0.2, hg));
+    col = mix(col, vec3(0.86, 0.89, 0.93), smoothstep(0.26, 0.34, hg));
+    col = mix(vec3(0.52, 0.47, 0.34), col, smoothstep(0.0, 0.015, hg));
+  }
+  float cl = fbm(P * 1.8 + vec3(TIME * 0.006, 0.0, TIME * 0.004) + vec3(e * 2.5), oct + 2);
+  float cloud = smoothstep(0.6, 0.82, cl) * (1.0 - mount * 0.5);
+  vec3 light = SUNCOL * 2.2 * diff * sh + S2COL * 0.35 * max(dot(n, S2), 0.0);
+  vec3 amb = vec3(0.10, 0.075, 0.05) * 0.3 * max(dot(n, normalize(PC - wp)), 0.0) + vec3(0.006, 0.009, 0.015);
+  vec3 c = col * (light + amb);
+  vec3 rf = reflect(rd, n);
+  c += spec * SUNCOL * pow(max(dot(rf, SUN), 0.0), 80.0) * 3.0 * sh * (1.0 - cloud);
+  c = mix(c, vec3(0.9, 0.92, 0.95) * (light * 1.05 + amb * 1.5), cloud);
+  float cv = abs(dot(rd, n));
+  float haze = 1.0 - exp(-0.16 / max(cv, 0.04));
+  vec3 hazeCol = vec3(0.42, 0.6, 0.88) * (diff * sh * 1.1 + 0.015);
+  return mix(c, hazeCol, haze);
+}
+
+vec3 shadeHull(Hit H, vec3 rd, vec3 wp) {
+  vec3 a = RA;
+  vec3 qr = spinQ(H.q);
+  vec3 V = cross(a, RU);
+  float th = atan(dot(qr, V), dot(qr, RU));
+  float uu = th / 6.2831853 * 2400.0;
+  float vv = H.h / RHW * 5.0;
+  vec2 cell = floor(vec2(uu, vv)); vec2 f = fract(vec2(uu, vv));
+  float pid = hash13(ivec3(int(cell.x), int(cell.y), 7));
+  float seam = smoothstep(0.0, 0.07, min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y)));
+  float fade = smoothstep(45.0, 6.0, H.t);
+  vec3 n = H.n;
+  vec3 base = vec3(0.13, 0.14, 0.155) * mix(1.0, 0.7 + 0.6 * pid, fade);
+  base *= mix(1.0, 0.4 + 0.6 * seam, fade);
+  float rib = smoothstep(0.86, 0.98, abs(H.h) / RHW);
+  base *= 1.0 - rib * 0.35;
+  float diff = max(dot(n, SUN), 0.0);
+  float sh = planetShadow(wp);
+  vec3 hv = normalize(SUN - rd);
+  float spec = pow(max(dot(n, hv), 0.0), 48.0);
+  float fres = pow(1.0 - max(dot(n, -rd), 0.0), 5.0);
+  vec3 c = base * (SUNCOL * 2.0 * diff * sh + vec3(0.09, 0.07, 0.05) * 0.5 * max(dot(n, normalize(PC - wp)), 0.0) + 0.012);
+  c += SUNCOL * spec * 1.6 * sh * (0.3 + 0.7 * pid);
+  c += vec3(0.4, 0.55, 0.7) * fres * 0.06;
+  c += base * S2COL * 1.2 * max(dot(n, S2), 0.0) + S2COL * pow(max(dot(n, normalize(S2 - rd)), 0.0), 40.0) * 0.6;
+  float lid = floor(uu / 24.0);
+  float lu = (fract(uu / 24.0) - 0.5) * 24.0;
+  float lv = abs(abs(vv) - 4.4);
+  float lamp = smoothstep(0.55, 0.0, length(vec2(lu, lv * 1.6)));
+  float blink = 0.55 + 0.45 * sin(TIME * 1.7 + hash13(ivec3(int(lid), 3, 1)) * 40.0);
+  vec3 lampCol = hash13(ivec3(int(lid), 9, 2)) > 0.7 ? vec3(1.0, 0.62, 0.25) : vec3(0.4, 0.85, 1.0);
+  c += lampCol * lamp * blink * 5.0 * smoothstep(22.0, 4.0, H.t);
+  return c;
+}
+
+vec3 shadeWall(Hit H, vec3 rd, vec3 wp) {
+  float r = length(H.q);
+  float rr = clamp((r - (RR - WALLH)) / (WALLH + HULLT), 0.0, 1.0);
+  vec3 qr = spinQ(H.q);
+  float tex = fbm(qr * 60.0, 3);
+  vec3 base = vec3(0.17, 0.18, 0.2) * (0.75 + 0.5 * tex);
+  base *= 0.8 + 0.4 * smoothstep(0.92, 1.0, 1.0 - rr);
+  float band = smoothstep(0.02, 0.0, abs(rr - 0.35));
+  vec3 n = H.n;
+  float diff = max(dot(n, SUN), 0.0);
+  float sh = planetShadow(wp);
+  float spec = pow(max(dot(n, normalize(SUN - rd)), 0.0), 30.0);
+  vec3 c = base * (SUNCOL * 2.0 * diff * sh + 0.015) + SUNCOL * spec * 0.6 * sh;
+  c += vec3(0.3, 0.8, 1.0) * band * 1.5 * smoothstep(40.0, 8.0, H.t);
+  return c;
+}
+
+vec3 shadePlanet(vec3 p, vec3 rd) {
+  vec3 pa = PAXIS;
+  vec3 n = normalize(p - PC);
+  float lat = dot(n, pa);
+  int oct = OCT();
+  vec3 an = n + pa * lat * 5.0;
+  float rot = TIME * 0.0015 * (1.0 + 0.6 * sin(lat * 13.0));
+  vec3 tg = normalize(cross(pa, n) + vec3(1e-5));
+  float w1 = fbm(an * 2.2 + tg * rot, 4);
+  float w2 = fbm(an * 6.0 + vec3(w1 * 2.0), oct);
+  float b = lat * 7.0 + (w1 - 0.5) * 1.2 + (w2 - 0.5) * 0.5;
+  float s1 = 0.5 + 0.5 * sin(b * 3.1);
+  float s2 = 0.5 + 0.5 * sin(b * 7.7 + 1.3);
+  vec3 cB = vec3(0.34, 0.13, 0.05), cA = vec3(0.78, 0.42, 0.17);
+  vec3 cC = vec3(0.92, 0.74, 0.48), cP = vec3(0.74, 0.68, 0.58);
+  vec3 col = mix(mix(cB, cA, s1), mix(cC, cP, s2), smoothstep(0.25, 0.75, s1 * 0.55 + s2 * 0.45));
+  float fine = fbm(an * 18.0 + vec3(w2 * 3.0), 3);
+  col *= 0.88 + 0.24 * fine;
+  vec3 sd = normalize(vec3(-0.62, -0.18, 0.76));
+  vec3 sv = n - sd; float sdist = length(vec2(dot(sv, tg) * 0.55, dot(sv, pa)));
+  float storm = smoothstep(0.075, 0.02, sdist + (w2 - 0.5) * 0.04);
+  col = mix(col, vec3(0.72, 0.36, 0.2), storm * 0.8);
+  float ndl = dot(n, SUN);
+  float diff = smoothstep(-0.12, 0.5, ndl) * (0.35 + 0.65 * max(ndl, 0.0));
+  Hit sh = ringHit(p + n * 0.01, SUN);
+  float rs = sh.kind > 0 ? 0.1 : 1.0;
+  vec3 c = col * SUNCOL * 0.62 * diff * rs;
+  c += col * S2COL * 0.9 * smoothstep(0.0, 0.6, dot(n, S2));
+  c += col * vec3(0.006, 0.0065, 0.008);
+  return c;
+}
+
+vec3 stars(vec3 rd) {
+  vec3 c = vec3(0.0);
+  for (int l = 0; l < 2; l++) {
+    float K = l == 0 ? 170.0 : 380.0;
+    vec3 q = rd * K;
+    vec3 fl = floor(q); ivec3 id = ivec3(fl);
+    float h = hash13(id + ivec3(l * 131, 17, 3));
+    if (h > 0.93) {
+      vec3 sp = fl + 0.25 + 0.5 * vec3(hash13(id + ivec3(5, 1, 2)), hash13(id + ivec3(3, 7, 1)), hash13(id + ivec3(9, 2, 8)));
+      float d = length(cross(rd, normalize(sp))) * K;
+      float br = pow((h - 0.93) / 0.07, 6.0) * (l == 0 ? 1.6 : 0.5);
+      float sz = 0.05 + 0.04 * br;
+      vec3 tint = mix(vec3(0.7, 0.8, 1.0), vec3(1.0, 0.86, 0.68), hash13(id + ivec3(1, 1, 1)));
+      c += tint * br * exp(-d * d / (sz * sz));
+    }
+  }
+  return c;
+}
+
+vec3 background(vec3 rd) {
+  vec3 c = vec3(0.0);
+  vec3 gN = normalize(vec3(0.35, 0.75, 0.55));
+  float g = dot(rd, gN);
+  float band = exp(-(g * g) / 0.18);
+  float n1 = fbm(rd * 2.4 + vec3(4.0), 5);
+  float n2 = fbm(rd * 5.0 + vec3(-2.0, 7.0, 1.0), 4);
+  float dust = smoothstep(0.42, 0.68, fbm(rd * 7.0 + 11.0, 4));
+  vec3 neb = mix(vec3(0.04, 0.16, 0.30), vec3(0.30, 0.07, 0.22), smoothstep(0.35, 0.65, n2));
+  c += neb * pow(n1, 2.6) * (0.15 + band) * 0.4 * (1.0 - dust * 0.75);
+  c += stars(rd) * (1.0 - dust * 0.6) * (0.4 + band * 0.6);
+  float mu = dot(rd, SUN);
+  c += SUNCOL * 60.0 * smoothstep(0.99993, 0.99996, mu);
+  float m = max(mu, 0.0);
+  c += SUNCOL * (pow(m, 5000.0) * 8.0 + pow(m, 600.0) * 0.5 + pow(m, 40.0) * 0.035);
+  float m2 = max(dot(rd, S2), 0.0);
+  c += S2COL * (40.0 * smoothstep(0.99996, 0.99998, m2) + pow(m2, 8000.0) * 6.0 + pow(m2, 900.0) * 0.4 + pow(m2, 60.0) * 0.03);
+  return c;
+}
+
+vec3 atmosphere(vec3 ro, vec3 rd, float tMax, out vec3 Tout) {
+  Tout = vec3(1.0);
+  float H = PR * ATMOH;
+  vec2 s = sphere(ro, rd, PC, PR + H);
+  if (s.y < 0.0) return vec3(0.0);
+  float t0 = max(s.x, 0.0), t1 = min(s.y, tMax);
+  if (t1 <= t0) return vec3(0.0);
+  int N = 6 + 2 * int(QUALITY);
+  float dt = (t1 - t0) / float(N);
+  float mu = dot(rd, SUN);
+  float pR = 0.75 * (1.0 + mu * mu);
+  float g = 0.72;
+  float pM = (1.0 - g * g) / pow(1.0 + g * g - 2.0 * g * mu, 1.5);
+  vec3 bR = vec3(0.28, 0.55, 1.0) * 0.16;
+  vec3 bM = vec3(0.05);
+  vec3 T = vec3(1.0), sum = vec3(0.0);
+  for (int i = 0; i < 16; i++) {
+    if (i >= N) break;
+    vec3 p = ro + rd * (t0 + (float(i) + 0.5) * dt);
+    vec3 up = p - PC; float r = length(up); up /= r;
+    float hgt = max((r - PR) / H, 0.0);
+    float dens = exp(-hgt * 4.0) * dt / H;
+    float ct = dot(up, SUN);
+    float lit = smoothstep(-0.18, 0.15, ct);
+    vec3 Tl = exp(-(bR + bM) * 6.0 * (1.0 - smoothstep(-0.2, 0.6, ct)));
+    sum += T * dens * lit * Tl * (bR * pR + bM * pM);
+    T *= exp(-(bR + bM) * dens);
+  }
+  Tout = T;
+  return sum * SUNCOL * 3.2;
+}
+vec3 acesLdr(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
+
+void main() {
+  vec3 rd = normalize(FWD + RIGHT * vNdc.x * TANX + UPV * vNdc.y * TANY);
+  vec3 ro = CAM;
+  Hit H = ringHit(ro, rd);
+  vec2 ps = sphere(ro, rd, PC, PR);
+  float tp = ps.x > 0.0 ? ps.x : 1e9;
+  vec3 col; float tMax = 1e9;
+  if (H.kind > 0 && H.t < tp) {
+    vec3 wp = ro + rd * H.t;
+    if (H.kind == 1) col = shadeInner(H, rd, wp);
+    else if (H.kind == 2) col = shadeHull(H, rd, wp);
+    else col = shadeWall(H, rd, wp);
+    tMax = H.t;
+  } else if (tp < 1e8) { col = shadePlanet(ro + rd * tp, rd); tMax = tp; }
+  else col = background(rd);
+  vec3 T; vec3 ins = atmosphere(ro, rd, tMax, T);
+  col = col * T + ins;
+#ifdef LDR
+  col = pow(acesLdr(col * U[3].w), vec3(1.0 / 2.2));
+#endif
+  outColor = vec4(col, 1.0);
+}
+`;
+
+// WebGL2 has no compute; the same orbit is evaluated in closed form per vertex.
+const GLSL_PART_VS = GLSL_HEAD + GLSL_COMMON + `
+out vec2 vUv; flat out float vKind; flat out float vSeed; out float vFade; out vec3 vSunv;
+float hi(int i) { return hash13(ivec3(i, 71, 13)); }
+void main() {
+  vec2 corners[6] = vec2[6](vec2(-1.0, -1.0), vec2(1.0, -1.0), vec2(1.0, 1.0), vec2(-1.0, -1.0), vec2(1.0, 1.0), vec2(-1.0, 1.0));
+  int id = gl_InstanceID;
+  vec2 c = corners[gl_VertexID];
+  float box = U[11].y;
+  float seed = hi(id * 7);
+  float kindR = hi(id * 7 + 1);
+  bool debris = kindR < U[11].w;
+  float sz = debris ? 0.003 + 0.016 * pow(hi(id * 7 + 2), 4.0) : 0.0012 + 0.0025 * hi(id * 7 + 2);
+  vec3 base = (vec3(hi(id * 7 + 3), hi(id * 7 + 4), hi(id * 7 + 5)) - 0.5) * 2.0 * box;
+  vec3 tang = normalize(cross(RA, CAM - RC));
+  vec3 vel = (vec3(hi(id * 7 + 6), hi(id * 7 + 2), hi(id * 7 + 4)) - 0.5) * 0.01 + tang * (0.004 + 0.008 * fract(seed * 13.0));
+  float t = TIME * U[11].z;
+  vec3 p = base + vel * t + vec3(sin(t * 0.11 + seed * 40.0), cos(t * 0.13 + seed * 23.0), sin(t * 0.07 + seed * 61.0)) * 0.03;
+  vec3 rel = p - CAM;
+  rel = rel - floor((rel + box) / (2.0 * box)) * (2.0 * box);
+  float z = dot(rel, FWD);
+  vUv = c; vKind = debris ? 1.0 : 0.0; vSeed = seed; vFade = 0.0; vSunv = vec3(0.0);
+  if (z < 0.03) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
+  float x = dot(rel, RIGHT), y = dot(rel, UPV);
+  float pxNdc = 2.0 / RES.y;
+  float projected = sz / (z * TANY);
+  float amp = 1.0;
+  if (projected < pxNdc * 0.9) { float k = projected / (pxNdc * 0.9); amp = k * k; sz = pxNdc * 0.9 * z * TANY; }
+  float ang = seed * 6.2831 + TIME * (seed - 0.5) * 0.5;
+  vec2 rc = vec2(c.x * cos(ang) - c.y * sin(ang), c.x * sin(ang) + c.y * cos(ang));
+  gl_Position = vec4((x + rc.x * sz) / (z * TANX), (y + rc.y * sz) / (z * TANY), 0.5, 1.0);
+  vFade = smoothstep(box, box * 0.55, length(rel)) * smoothstep(0.03, 0.15, z) * amp;
+  vec3 sv = vec3(dot(SUN, RIGHT), dot(SUN, UPV), dot(SUN, FWD));
+  vSunv = vec3(sv.x * cos(-ang) - sv.y * sin(-ang), sv.x * sin(-ang) + sv.y * cos(-ang), sv.z);
+  if (!debris) {
+    float fs = pow(max(dot(normalize(rel), SUN), 0.0), 6.0);
+    vSunv = vec3(0.06 + 1.6 * fs, 0.0, 0.0);
+  }
+}
+`;
+const GLSL_PART_FS = GLSL_HEAD + GLSL_COMMON + `
+in vec2 vUv; flat in float vKind; flat in float vSeed; in float vFade; in vec3 vSunv;
+out vec4 outColor;
+void main() {
+  float r2 = dot(vUv, vUv);
+  if (vKind < 0.5) {
+    float a = exp(-r2 * 4.0) * vFade * vSunv.x;
+    outColor = vec4(vec3(1.0, 0.92, 0.82) * a, 0.0); return;
+  }
+  float ang = atan(vUv.y, vUv.x);
+  float rr = 0.74 + 0.16 * sin(ang * 3.0 + vSeed * 20.0) + 0.08 * sin(ang * 7.0 + vSeed * 41.0);
+  float r = sqrt(r2);
+  if (r > rr) discard;
+  float nz = sqrt(max(1.0 - r2 / (rr * rr), 0.0));
+  float facet = vnoise(vec3(vUv * 4.0, vSeed * 50.0)) - 0.5;
+  vec3 n = normalize(vec3(vUv / rr * 0.9 + facet * 0.5, -nz));
+  float ndl = max(dot(n, vSunv), 0.0);
+  vec3 alb = mix(vec3(0.07, 0.065, 0.06), vec3(0.14, 0.12, 0.1), fract(vSeed * 7.0));
+  float rim = pow(1.0 - nz, 3.0) * max(vSunv.z, 0.0);
+  vec3 col = alb * (ndl * SUNCOL * 2.6 + vec3(0.05, 0.04, 0.03)) + SUNCOL * rim * 0.5;
+  float a = smoothstep(rr, rr - 0.1, r) * vFade;
+  outColor = vec4(col * a, a);
+}
+`;
+
+const GLSL_POST_COMMON = GLSL_HEAD + `
+uniform sampler2D uSrc; uniform sampler2D uSrc2; uniform vec4 C[4];
+in vec2 vUv; in vec2 vNdc;
+out vec4 outColor;
+const vec3 SUNCOL = vec3(1.0, 0.95, 0.88);
+vec3 tx(vec2 uv) { return texture(uSrc, uv).rgb; }
+float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+`;
+const GLSL_PREFILTER = GLSL_POST_COMMON + `
+void main() {
+  vec2 ts = 1.0 / vec2(textureSize(uSrc, 0));
+  vec3 a = tx(vUv + ts * vec2(-1.0, -1.0)), b = tx(vUv + ts * vec2(1.0, -1.0));
+  vec3 c = tx(vUv + ts * vec2(-1.0, 1.0)), d = tx(vUv + ts * vec2(1.0, 1.0));
+  float wa = 1.0 / (1.0 + luma(a)), wb = 1.0 / (1.0 + luma(b)), wc = 1.0 / (1.0 + luma(c)), wd = 1.0 / (1.0 + luma(d));
+  vec3 col = (a * wa + b * wb + c * wc + d * wd) / (wa + wb + wc + wd);
+  float thr = C[3].x, knee = C[3].y;
+  float br = max(col.r, max(col.g, col.b));
+  float rq = clamp(br - thr + knee, 0.0, 2.0 * knee); rq = rq * rq / (4.0 * knee + 1e-5);
+  float w = max(rq, br - thr) / max(br, 1e-5);
+  outColor = vec4(min(col * w, vec3(64.0)), 1.0);
+}
+`;
+const GLSL_DOWN = GLSL_POST_COMMON + `
+void main() {
+  vec2 ts = 1.0 / vec2(textureSize(uSrc, 0)); vec2 uv = vUv;
+  vec3 a = tx(uv + ts * vec2(-2.0, 2.0)), b = tx(uv + ts * vec2(0.0, 2.0)), c = tx(uv + ts * vec2(2.0, 2.0));
+  vec3 d = tx(uv + ts * vec2(-2.0, 0.0)), e = tx(uv), f = tx(uv + ts * vec2(2.0, 0.0));
+  vec3 g = tx(uv + ts * vec2(-2.0, -2.0)), h = tx(uv + ts * vec2(0.0, -2.0)), k = tx(uv + ts * vec2(2.0, -2.0));
+  vec3 j = tx(uv + ts * vec2(-1.0, 1.0)), l = tx(uv + ts * vec2(1.0, 1.0));
+  vec3 m = tx(uv + ts * vec2(-1.0, -1.0)), n = tx(uv + ts * vec2(1.0, -1.0));
+  outColor = vec4(e * 0.125 + (a + c + g + k) * 0.03125 + (b + d + f + h) * 0.0625 + (j + l + m + n) * 0.125, 1.0);
+}
+`;
+const GLSL_UP = GLSL_POST_COMMON + `
+void main() {
+  vec2 ts = 1.0 / vec2(textureSize(uSrc, 0)); vec2 uv = vUv;
+  vec3 col = tx(uv) * 4.0;
+  col += (tx(uv + vec2(-ts.x, 0.0)) + tx(uv + vec2(ts.x, 0.0)) + tx(uv + vec2(0.0, -ts.y)) + tx(uv + vec2(0.0, ts.y))) * 2.0;
+  col += tx(uv + ts) + tx(uv - ts) + tx(uv + vec2(ts.x, -ts.y)) + tx(uv + vec2(-ts.x, ts.y));
+  outColor = vec4(col / 16.0, 1.0);
+}
+`;
+const GLSL_COMPOSITE = GLSL_POST_COMMON + `
+vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
+float h12(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+vec3 flare(vec2 p) {
+  vec2 s = C[0].xy; float vis = C[0].z * C[0].w;
+  if (vis <= 0.001) return vec3(0.0);
+  vec2 asp = vec2(C[1].w, 1.0);
+  vec2 d = (p - s) * asp; float r = length(d);
+  vec3 c = SUNCOL * (exp(-r * 5.0) * 0.28 + exp(-r * 20.0) * 1.1);
+  c += vec3(0.3, 0.58, 1.0) * exp(-abs(d.y) * 110.0) * exp(-abs(d.x) * 1.15) * 0.7;
+  float ang = atan(d.y, d.x);
+  float rays = pow(abs(sin(ang * 6.0 + 0.3)), 160.0) + pow(abs(sin(ang * 9.0 + 1.2)), 260.0) * 0.6;
+  c += SUNCOL * rays * exp(-r * 6.0) * 0.3;
+  float gk[7] = float[7](0.62, 0.32, -0.22, -0.55, -0.9, -1.25, -1.6);
+  float gr[7] = float[7](0.035, 0.06, 0.03, 0.12, 0.05, 0.2, 0.08);
+  vec3 gc[7] = vec3[7](vec3(0.3, 0.9, 1.0), vec3(1.0, 0.65, 0.3), vec3(0.7, 0.5, 1.0), vec3(0.35, 1.0, 0.7), vec3(1.0, 0.85, 0.6), vec3(0.35, 0.6, 1.0), vec3(1.0, 0.4, 0.5));
+  for (int k = 0; k < 7; k++) {
+    vec2 gp = s * gk[k];
+    float gd = length((p - gp) * asp);
+    float R = gr[k];
+    float disc = smoothstep(R, R * 0.6, gd) * 0.6 + smoothstep(R * 0.12, 0.0, abs(gd - R * 0.92)) * 0.8;
+    c += gc[k] * disc * 0.055;
+  }
+  float hr = abs(r - 0.42);
+  c += vec3(0.5, 0.75, 1.0) * smoothstep(0.03, 0.0, hr) * 0.03;
+  return c * vis;
+}
+void main() {
+  vec2 uv = vUv; vec2 cc = uv - 0.5;
+  float ca = C[2].z * dot(cc, cc);
+  vec3 col = vec3(texture(uSrc, uv - cc * ca).r, texture(uSrc, uv).g, texture(uSrc, uv + cc * ca).b);
+  col += texture(uSrc2, uv).rgb * C[1].y;
+  col += flare(vNdc);
+  col *= C[1].x;
+  col = aces(col);
+  float l = luma(col);
+  col = mix(col, col * vec3(0.92, 1.0, 1.08) + vec3(0.0, 0.006, 0.014), 1.0 - smoothstep(0.0, 0.5, l));
+  col = pow(col, vec3(1.0 / 2.2));
+  float vig = 1.0 - C[2].x * pow(length(cc * vec2(1.0, 0.85)) * 1.3, 2.6);
+  col *= clamp(vig, 0.0, 1.0);
+  col += (h12(gl_FragCoord.xy + vec2(C[1].z * 61.0, C[1].z * 17.0)) - 0.5) * C[2].y;
+  outColor = vec4(col, 1.0);
+}
+`;
+
+// ---------------------------------------------------------------------------
+// Renderer: one scene description, three backends (WebGPU, WebGL2, Canvas2D).
+// ---------------------------------------------------------------------------
+const V3 = {
+  add: (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
+  sub: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
+  mul: (a, s) => [a[0] * s, a[1] * s, a[2] * s],
+  dot: (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
+  cross: (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]],
+  norm: (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l] },
+  lerp: (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t],
+}
+
+const SCENE = {
+  planet: { c: [114, -30, -262], r: 95, axis: V3.norm([0.28, 1, -0.12]) },
+  ring: { c: [0, 0, 0], axis: V3.norm([0.22, 1, 0.05]), R: 10, hw: 0.5, wallH: 0.06, hullT: 0.04 },
+  sun: V3.norm([-0.844, 0.534, 0.06]),
+  star2: V3.norm([0.01, 0.105, -0.994]),
+  atmoH: 0.03,
+}
+
+// Camera poses per screen. Positions in ring radii-ish units (ring R = 10).
+const POSES = {
+  title: { pos: [3.5, 2.6, 22], tgt: [4, -1.5, -12], fov: 42 },
+  main: { pos: [0, 3.2, 13.5], tgt: [1.5, -0.6, -6], fov: 44 },
+  campaign: { pos: [-7.2, 0.62, 9.2], tgt: [2, -0.2, -10], fov: 46 },
+  theater: { pos: [6.5, 0.9, 13.5], tgt: [-2, -0.5, -9], fov: 44 },
+  forge: { pos: [2.5, 4.2, 14.5], tgt: [3.5, -1.5, -4], fov: 46 },
+  matchmaking: { pos: [-2.5, 0.4, 16.5], tgt: [12, -3.5, -30], fov: 40 },
+  service: { pos: [-4, 3.5, 26], tgt: [5, -2, -16], fov: 40 },
+  settings: { pos: [0.5, 1.8, 17], tgt: [3, -1.6, -8], fov: 44 },
+}
+
+// Dev overrides (?cam=x,y,z&tgt=x,y,z&fov=..&sun=..&pc=..&pr=..&hw=..&ax=..) for composing shots.
+;(() => {
+  const q = new URLSearchParams(location.search)
+  const v = (k) => q.get(k)?.split(',').map(Number)
+  if (q.has('sun')) SCENE.sun = V3.norm(v('sun'))
+  if (q.has('s2')) SCENE.star2 = V3.norm(v('s2'))
+  if (q.has('pc')) SCENE.planet.c = v('pc')
+  if (q.has('pr')) SCENE.planet.r = +q.get('pr')
+  if (q.has('hw')) SCENE.ring.hw = +q.get('hw')
+  if (q.has('ax')) SCENE.ring.axis = V3.norm(v('ax'))
+  if (q.has('cam')) {
+    const pose = POSES[q.get('pose') || 'main']
+    pose.pos = v('cam'); if (q.has('tgt')) pose.tgt = v('tgt'); if (q.has('fov')) pose.fov = +q.get('fov')
+  }
+})()
+
+const QUALITY = {
+  low: { shader: 0, maxScale: 0.5, minScale: 0.3, particles: 1500, bloomLevels: 4 },
+  medium: { shader: 1, maxScale: 0.7, minScale: 0.35, particles: 4000, bloomLevels: 5 },
+  high: { shader: 2, maxScale: 0.9, minScale: 0.4, particles: 7000, bloomLevels: 6 },
+  ultra: { shader: 3, maxScale: 1.0, minScale: 0.5, particles: 12000, bloomLevels: 6 },
+}
+
+function ringHitJS(ro, rd) {
+  const r = SCENE.ring, a = r.axis
+  const o = V3.sub(ro, r.c), oa = V3.dot(o, a), op = V3.sub(o, V3.mul(a, oa))
+  const da = V3.dot(rd, a), dp = V3.sub(rd, V3.mul(a, da))
+  const cyl = (R) => {
+    const A = V3.dot(dp, dp), B = V3.dot(op, dp), C = V3.dot(op, op) - R * R, D = B * B - A * C
+    if (D < 0 || A < 1e-9) return [-1, -1]
+    const s = Math.sqrt(D); return [(-B - s) / A, (-B + s) / A]
+  }
+  const ti = cyl(r.R)
+  if (ti[1] > 0 && Math.abs(oa + ti[1] * da) < r.hw) return true
+  const to = cyl(r.R + r.hullT)
+  if (to[0] > 0 && Math.abs(oa + to[0] * da) < r.hw) return true
+  return false
+}
+function sphereHitJS(ro, rd, c, rad) {
+  const oc = V3.sub(ro, c), b = V3.dot(oc, rd), cc = V3.dot(oc, oc) - rad * rad, h = b * b - cc
+  return h >= 0 && -b - Math.sqrt(h) > 0
+}
+
+const Render = (() => {
+  const params = new URLSearchParams(location.search)
+  let canvas, backend = null, kind = 'none', adapterInfo = ''
+  let quality = 'auto', qual = QUALITY.high, scale = 0.7, lockScale = null
+  let reducedMotion = false, motionScale = 1
+  let lastT = 0, simTime = 0, frameTimes = [], lastAdjust = 0, upHold = 0
+  const fixedTime = params.has('t') ? parseFloat(params.get('t')) : null
+  let fps = 0, fpsAcc = 0, fpsN = 0, fpsLast = 0
+  const cam = { from: null, to: POSES.title, t0: 0, dur: 1, cur: null }
+  let running = false, sunVis = 0
+  const listeners = []
+
+  function setPose(name, instant) {
+    const p = POSES[name] || POSES.main
+    const cur = cam.cur || p
+    cam.from = { pos: cur.pos.slice(), tgt: cur.tgt.slice(), fov: cur.fov }
+    cam.to = p
+    cam.t0 = performance.now() / 1000
+    cam.dur = instant || reducedMotion ? 0.001 : 4.2
+    if (!cam.cur || instant) cam.cur = { pos: p.pos.slice(), tgt: p.tgt.slice(), fov: p.fov }
+  }
+
+  function camState(now) {
+    let u = Math.min(1, (now - cam.t0) / cam.dur)
+    u = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2
+    const f = cam.from || cam.to
+    const pos = V3.lerp(f.pos, cam.to.pos, u), tgt = V3.lerp(f.tgt, cam.to.tgt, u)
+    const fov = f.fov + (cam.to.fov - f.fov) * u
+    cam.cur = { pos, tgt, fov }
+    const t = simTime
+    const d = reducedMotion ? 0 : 1
+    const drift = [Math.sin(t * 0.045) * 0.35 * d, Math.sin(t * 0.031 + 1) * 0.12 * d, Math.cos(t * 0.038) * 0.3 * d]
+    const p = V3.add(pos, drift)
+    const tg = V3.add(tgt, [Math.sin(t * 0.027) * 0.4 * d, Math.sin(t * 0.021) * 0.15 * d, 0])
+    const fwd = V3.norm(V3.sub(tg, p))
+    const roll = Math.sin(t * 0.02) * 0.012 * d - 0.03
+    let right = V3.norm(V3.cross(fwd, [0, 1, 0]))
+    let up = V3.cross(right, fwd)
+    const cr = Math.cos(roll), sr = Math.sin(roll)
+    const r2 = V3.add(V3.mul(right, cr), V3.mul(up, sr)), u2 = V3.sub(V3.mul(up, cr), V3.mul(right, sr))
+    return { pos: p, fwd, right: r2, up: u2, fov }
+  }
+
+  function computeSunVis(c) {
+    const s = SCENE.star2
+    const z = V3.dot(s, c.fwd)
+    if (z <= 0) return { vis: 0, ndc: [0, 0] }
+    const ndc = [V3.dot(s, c.right) / z / c.tanX, V3.dot(s, c.up) / z / c.tanY]
+    // 9 rays across the disk for partial occlusion
+    const rad = 0.006
+    let vis = 0
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * Math.PI * 2, rr = i === 0 ? 0 : rad
+      const dir = V3.norm(V3.add(s, V3.add(V3.mul(c.right, Math.cos(a) * rr), V3.mul(c.up, Math.sin(a) * rr))))
+      const hit = ringHitJS(c.pos, dir) || sphereHitJS(c.pos, dir, SCENE.planet.c, SCENE.planet.r * 1.004)
+      if (!hit) vis++
+    }
+    vis /= 9
+    const edge = Math.max(Math.abs(ndc[0]), Math.abs(ndc[1]))
+    vis *= Math.max(0, Math.min(1, (1.45 - edge) / 0.45))
+    return { vis, ndc }
+  }
+
+  function buildUniforms(c, w, h) {
+    const U = new Float32Array(52)
+    const tanY = Math.tan((c.fov * Math.PI) / 360), tanX = tanY * (w / h)
+    c.tanX = tanX; c.tanY = tanY
+    const r = SCENE.ring
+    const ru = V3.norm(V3.cross(r.axis, [0, 0, 1]))
+    const set = (i, v, w4) => { U[i * 4] = v[0]; U[i * 4 + 1] = v[1]; U[i * 4 + 2] = v[2]; U[i * 4 + 3] = w4 }
+    set(0, c.pos, simTime)
+    set(1, c.right, tanX)
+    set(2, c.up, tanY)
+    set(3, c.fwd, 1.0)
+    set(4, SCENE.sun, qual.shader)
+    set(5, SCENE.planet.c, SCENE.planet.r)
+    set(6, r.c, r.R)
+    set(7, r.axis, r.hw)
+    set(8, ru, simTime * 0.0035)
+    U[36] = w; U[37] = h; U[38] = r.wallH; U[39] = SCENE.atmoH
+    set(10, SCENE.planet.axis, r.hullT)
+    set(12, SCENE.star2, 0)
+    return U
+  }
+
+  function compositeUniforms(sv, aspect) {
+    return new Float32Array([
+      sv.ndc[0], sv.ndc[1], sv.vis, 1.0,
+      1.1, 0.2, simTime % 100, aspect,
+      0.55, 0.018, 0.012, 0,
+      0.62, 0.55, 0, 0,
+    ])
+  }
+
+  function applyQuality() {
+    const key = quality === 'auto' ? (kind === 'webgpu' ? 'high' : 'medium') : quality
+    qual = QUALITY[key] || QUALITY.high
+    if (matchMedia('(max-width: 720px)').matches) qual = { ...qual, maxScale: Math.min(qual.maxScale, 0.55), particles: Math.min(qual.particles, 3000) }
+    scale = lockScale ?? Math.min(qual.maxScale, Math.max(qual.minScale, scale))
+    if (quality !== 'auto' && lockScale == null) scale = qual.maxScale
+    backend?.setParticles?.(qual.particles)
+  }
+
+  function sizes() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const cw = Math.max(2, Math.round(canvas.clientWidth * dpr)), ch = Math.max(2, Math.round(canvas.clientHeight * dpr))
+    const sw = Math.max(2, Math.round(cw * scale)), sh = Math.max(2, Math.round(ch * scale))
+    return { cw, ch, sw, sh }
+  }
+
+  function adjustScale(dt, now) {
+    if (lockScale != null || quality !== 'auto') return
+    frameTimes.push(dt)
+    if (frameTimes.length < 40) return
+    const avg = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length
+    frameTimes = []
+    if (avg > 19 && scale > qual.minScale) { scale = Math.max(qual.minScale, scale * 0.86); lastAdjust = now; upHold = Math.min(upHold + 2, 12) }
+    else if (avg < 17.6 && scale < qual.maxScale && now - lastAdjust > 2 + upHold) { scale = Math.min(qual.maxScale, scale * 1.06); lastAdjust = now }
+  }
+
+  const maxFrames = params.has('frames') ? parseInt(params.get('frames')) : Infinity
+  let frameCount = 0
+  function loop(ts) {
+    if (!running) return
+    if (++frameCount > maxFrames) { window.__framesDone = true; return }
+    requestAnimationFrame(loop)
+    const now = ts / 1000
+    const dt = lastT ? Math.min(0.1, now - lastT) : 0.016
+    lastT = now
+    simTime = fixedTime ?? simTime + dt * motionScale
+    fpsAcc += dt; fpsN++
+    if (now - fpsLast > 0.5) { fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; fpsLast = now; listeners.forEach((f) => f({ fps, scale, kind })) }
+    adjustScale(dt * 1000, now)
+    const s = sizes()
+    if (canvas.width !== s.cw || canvas.height !== s.ch) { canvas.width = s.cw; canvas.height = s.ch }
+    const c = camState(now)
+    const U = buildUniforms(c, s.sw, s.sh)
+    U[44] = fixedTime != null ? 0 : dt * motionScale; U[45] = 1.4; U[46] = 1; U[47] = 0.035
+    sunVis = computeSunVis(c)
+    const C = compositeUniforms(sunVis, s.cw / s.ch)
+    try { backend.frame(U, C, s, c) } catch (e) { console.error(e); running = false; fallbackFrom(kind) }
+  }
+
+  async function fallbackFrom(k) {
+    backend?.destroy?.()
+    const order = ['webgpu', 'webgl2', '2d']
+    const next = order[order.indexOf(k) + 1]
+    if (next) { await start(next); }
+  }
+
+  async function start(prefer) {
+    const order = ['webgpu', 'webgl2', '2d']
+    for (const k of order.slice(order.indexOf(prefer))) {
+      try {
+        if (k === 'webgpu') { const r = await createWebGPU(canvas); if (!r) continue; backend = r; adapterInfo = r.info }
+        else if (k === 'webgl2') { canvas = freshCanvas(); const r = createWebGL2(canvas); if (!r) continue; backend = r; adapterInfo = r.info }
+        else { canvas = freshCanvas(); backend = create2D(canvas); adapterInfo = 'Canvas 2D' }
+        kind = k
+        break
+      } catch (e) { console.warn('[renderer] ' + k + ' failed', e) }
+    }
+    document.documentElement.dataset.renderer = kind
+    applyQuality()
+    running = true
+    requestAnimationFrame(loop)
+    listeners.forEach((f) => f({ fps, scale, kind }))
+  }
+
+  // A canvas that has handed out one context type cannot hand out another.
+  function freshCanvas() {
+    if (!canvas.dataset.used) { canvas.dataset.used = '1'; return canvas }
+    const c = canvas.cloneNode(false); delete c.dataset.used
+    canvas.replaceWith(c); c.dataset.used = '1'; return c
+  }
+
+  return {
+    async init(el, opts = {}) {
+      canvas = el
+      reducedMotion = !!opts.reducedMotion
+      motionScale = reducedMotion ? 0.25 : 1
+      quality = opts.quality || 'auto'
+      if (params.has('scale')) lockScale = parseFloat(params.get('scale'))
+      setPose(opts.pose || 'title', true)
+      const forced = params.get('renderer')
+      let prefer = forced || (navigator.gpu ? 'webgpu' : 'webgl2')
+      if (prefer === 'webgpu') canvas.dataset.used = '1'
+      await start(prefer)
+    },
+    setPose,
+    setQuality(q) { quality = q; frameTimes = []; applyQuality() },
+    setReducedMotion(r) { reducedMotion = r; motionScale = r ? 0.25 : 1 },
+    onStats(f) { listeners.push(f) },
+    get info() { return { kind, adapterInfo, scale, fps, quality, tier: qual } },
+  }
+})()
+
+// ---------------------------------------------------------------------------
+// WebGPU backend
+// ---------------------------------------------------------------------------
+async function createWebGPU(canvas) {
+  if (!navigator.gpu) return null
+  const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' })
+  if (!adapter) return null
+  const device = await adapter.requestDevice()
+  const ctx = canvas.getContext('webgpu')
+  if (!ctx) return null
+  const format = navigator.gpu.getPreferredCanvasFormat()
+  ctx.configure({ device, format, alphaMode: 'opaque' })
+  let lost = false
+  device.lost.then((i) => { lost = true; console.warn('[webgpu] device lost', i.message) })
+  device.pushErrorScope('validation')
+
+  const mod = async (code, label) => {
+    const m = device.createShaderModule({ code, label })
+    const info = await m.getCompilationInfo()
+    const errs = info.messages.filter((x) => x.type === 'error')
+    if (errs.length) throw new Error(label + ': ' + errs.map((e) => `${e.lineNum}:${e.linePos} ${e.message}`).join('\n'))
+    return m
+  }
+  const dbgSrc = new URLSearchParams(location.search).has('dbg') ? WGSL_SCENE.replace('return vec4f(col, 1.0);\n}', 'if (H.kind > 0 && H.t < tp) { return vec4f(f32(H.kind == 1), f32(H.kind == 2), f32(H.kind == 3), 1.0) * (0.3 + 0.7 * max(dot(H.n, u.sun.xyz), 0.0)); }\n  return vec4f(col * 0.2, 1.0);\n}') : WGSL_SCENE
+  const sceneMod = await mod(dbgSrc, 'scene')
+  const compMod = await mod(WGSL_PARTICLE_COMPUTE, 'particles-cs')
+  const partMod = await mod(WGSL_PARTICLE_RENDER, 'particles')
+  const postMod = await mod(WGSL_POST, 'post')
+  const HDR = 'rgba16float'
+
+  const ubuf = device.createBuffer({ size: 52 * 4, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
+  const cbuf = device.createBuffer({ size: 16 * 4, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
+  const sampler = device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' })
+
+  const scenePipe = device.createRenderPipeline({
+    layout: 'auto', label: 'scene',
+    vertex: { module: sceneMod, entryPoint: 'vsFull' },
+    fragment: { module: sceneMod, entryPoint: 'fsScene', targets: [{ format: HDR }] },
+    primitive: { topology: 'triangle-list' },
+  })
+  const sceneBG = device.createBindGroup({ layout: scenePipe.getBindGroupLayout(0), entries: [{ binding: 0, resource: { buffer: ubuf } }] })
+
+  const computePipe = device.createComputePipeline({ layout: 'auto', compute: { module: compMod, entryPoint: 'cs' } })
+  const partPipe = device.createRenderPipeline({
+    layout: 'auto', label: 'particles',
+    vertex: { module: partMod, entryPoint: 'vsPart' },
+    fragment: {
+      module: partMod, entryPoint: 'fsPart',
+      targets: [{ format: HDR, blend: { color: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' }, alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' } } }],
+    },
+    primitive: { topology: 'triangle-list' },
+  })
+
+  let pbuf = null, pcount = 0, computeBG = null, partBG = null
+  function setParticles(n) {
+    if (n === pcount) return
+    pcount = n
+    const data = new Float32Array(n * 8)
+    const box = 1.4
+    for (let i = 0; i < n; i++) {
+      const debris = Math.random() < 0.035
+      const size = debris ? 0.003 + 0.016 * Math.pow(Math.random(), 4) : 0.0012 + 0.0025 * Math.random()
+      data.set([(Math.random() - 0.5) * 2 * box + POSES.main.pos[0], (Math.random() - 0.5) * 2 * box + POSES.main.pos[1], (Math.random() - 0.5) * 2 * box + POSES.main.pos[2], debris ? size : -size,
+        (Math.random() - 0.5) * 0.01, (Math.random() - 0.5) * 0.01, (Math.random() - 0.5) * 0.01, Math.random()], i * 8)
+    }
+    pbuf?.destroy()
+    pbuf = device.createBuffer({ size: data.byteLength, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST })
+    device.queue.writeBuffer(pbuf, 0, data)
+    computeBG = device.createBindGroup({ layout: computePipe.getBindGroupLayout(0), entries: [{ binding: 0, resource: { buffer: pbuf } }, { binding: 1, resource: { buffer: ubuf } }] })
+    partBG = device.createBindGroup({ layout: partPipe.getBindGroupLayout(0), entries: [{ binding: 0, resource: { buffer: ubuf } }, { binding: 1, resource: { buffer: pbuf } }] })
+  }
+  setParticles(QUALITY.high.particles)
+
+  const postBGL = device.createBindGroupLayout({
+    entries: [
+      { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: { sampleType: 'float' } },
+      { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: { type: 'filtering' } },
+      { binding: 2, visibility: GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' } },
+      { binding: 3, visibility: GPUShaderStage.FRAGMENT, texture: { sampleType: 'float' } },
+    ],
+  })
+  const postLayout = device.createPipelineLayout({ bindGroupLayouts: [postBGL] })
+  const postPipe = (entry, format, additive) => device.createRenderPipeline({
+    layout: postLayout, label: entry,
+    vertex: { module: postMod, entryPoint: 'vs' },
+    fragment: { module: postMod, entryPoint: entry, targets: [{ format, blend: additive ? { color: { srcFactor: 'one', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'one', dstFactor: 'one', operation: 'add' } } : undefined }] },
+    primitive: { topology: 'triangle-list' },
+  })
+  const prePipe = postPipe('prefilter', HDR), downPipe = postPipe('down', HDR), upPipe = postPipe('up', HDR, true), compPipe = postPipe('composite', format)
+
+  const errs = await device.popErrorScope()
+  if (errs) throw new Error('[webgpu] ' + errs.message)
+
+  let rt = null
+  function targets(sw, sh, levels) {
+    if (rt && rt.w === sw && rt.h === sh && rt.levels === levels) return rt
+    rt?.all.forEach((t) => t.destroy())
+    const mk = (w, h) => device.createTexture({ size: [Math.max(1, w), Math.max(1, h)], format: HDR, usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING })
+    const hdr = mk(sw, sh)
+    const mips = []
+    for (let i = 0; i < levels; i++) mips.push(mk(sw >> (i + 1), sh >> (i + 1)))
+    const bg = (a, b) => device.createBindGroup({ layout: postBGL, entries: [{ binding: 0, resource: a.createView() }, { binding: 1, resource: sampler }, { binding: 2, resource: { buffer: cbuf } }, { binding: 3, resource: (b || a).createView() }] })
+    rt = {
+      w: sw, h: sh, levels, hdr, mips, all: [hdr, ...mips],
+      hdrView: hdr.createView(), mipViews: mips.map((m) => m.createView()),
+      preBG: bg(hdr), downBG: mips.map((m) => bg(m)), compBG: bg(hdr, mips[0]),
+    }
+    return rt
+  }
+
+  const pass = (enc, view, pipe, bg, load) => {
+    const p = enc.beginRenderPass({ colorAttachments: [{ view, loadOp: load ? 'load' : 'clear', storeOp: 'store', clearValue: { r: 0, g: 0, b: 0, a: 1 } }] })
+    p.setPipeline(pipe); p.setBindGroup(0, bg); p.draw(3); p.end()
+  }
+
+  return {
+    info: (adapter.info && [adapter.info.vendor, adapter.info.architecture, adapter.info.description].filter(Boolean).join(' · ')) || 'WebGPU adapter',
+    setParticles,
+    frame(U, C, s) {
+      if (lost) throw new Error('device lost')
+      const t = targets(s.sw, s.sh, Render.info.tier.bloomLevels || 6)
+      device.queue.writeBuffer(ubuf, 0, U)
+      device.queue.writeBuffer(cbuf, 0, C)
+      const enc = device.createCommandEncoder()
+      const cp = enc.beginComputePass(); cp.setPipeline(computePipe); cp.setBindGroup(0, computeBG); cp.dispatchWorkgroups(Math.ceil(pcount / 64)); cp.end()
+      const sp = enc.beginRenderPass({ colorAttachments: [{ view: t.hdrView, loadOp: 'clear', storeOp: 'store', clearValue: { r: 0, g: 0, b: 0, a: 1 } }] })
+      sp.setPipeline(scenePipe); sp.setBindGroup(0, sceneBG); sp.draw(3)
+      sp.setPipeline(partPipe); sp.setBindGroup(0, partBG); sp.draw(6, pcount)
+      sp.end()
+      pass(enc, t.mipViews[0], prePipe, t.preBG)
+      for (let i = 1; i < t.levels; i++) pass(enc, t.mipViews[i], downPipe, t.downBG[i - 1])
+      for (let i = t.levels - 1; i > 0; i--) pass(enc, t.mipViews[i - 1], upPipe, t.downBG[i], true)
+      pass(enc, ctx.getCurrentTexture().createView(), compPipe, t.compBG)
+      device.queue.submit([enc.finish()])
+    },
+    destroy() { try { device.destroy() } catch {} },
+  }
+}
+
+// ---------------------------------------------------------------------------
+// WebGL2 backend
+// ---------------------------------------------------------------------------
+function createWebGL2(canvas) {
+  const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, powerPreference: 'high-performance' })
+  if (!gl) return null
+  const hdr = !!gl.getExtension('EXT_color_buffer_float')
+  gl.getExtension('OES_texture_float_linear')
+  const compile = (type, src) => {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s)
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s))
+    return s
+  }
+  const program = (vs, fs) => {
+    const p = gl.createProgram()
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, vs)); gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs))
+    gl.linkProgram(p)
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p))
+    return { p, U: gl.getUniformLocation(p, 'U'), C: gl.getUniformLocation(p, 'C'), src: gl.getUniformLocation(p, 'uSrc'), src2: gl.getUniformLocation(p, 'uSrc2') }
+  }
+  const sceneFS = hdr ? GLSL_SCENE_FS : GLSL_SCENE_FS.replace('precision highp int;', 'precision highp int;\n#define LDR 1')
+  const P = {
+    scene: program(GLSL_FULL_VS, sceneFS),
+    part: program(GLSL_PART_VS, GLSL_PART_FS),
+  }
+  if (hdr) Object.assign(P, {
+    pre: program(GLSL_FULL_VS, GLSL_PREFILTER), down: program(GLSL_FULL_VS, GLSL_DOWN),
+    up: program(GLSL_FULL_VS, GLSL_UP), comp: program(GLSL_FULL_VS, GLSL_COMPOSITE),
+  })
+  const vao = gl.createVertexArray()
+  let pcount = 4000
+  let rt = null
+  const mkTex = (w, h) => {
+    const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    const f = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, f)
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0)
+    return { t, f, w, h }
+  }
+  function targets(sw, sh, levels) {
+    if (rt && rt.w === sw && rt.h === sh && rt.levels === levels) return rt
+    if (rt) rt.all.forEach((x) => { gl.deleteTexture(x.t); gl.deleteFramebuffer(x.f) })
+    const main = mkTex(sw, sh), mips = []
+    for (let i = 0; i < levels; i++) mips.push(mkTex(Math.max(1, sw >> (i + 1)), Math.max(1, sh >> (i + 1))))
+    rt = { w: sw, h: sh, levels, main, mips, all: [main, ...mips] }
+    return rt
+  }
+  const draw = (prog, target, w, h, U, C, src, src2) => {
+    gl.useProgram(prog.p)
+    gl.bindFramebuffer(gl.FRAMEBUFFER, target)
+    gl.viewport(0, 0, w, h)
+    if (prog.U && U) gl.uniform4fv(prog.U, U)
+    if (prog.C && C) gl.uniform4fv(prog.C, C)
+    if (src) { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, src); gl.uniform1i(prog.src, 0) }
+    if (src2) { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, src2); gl.uniform1i(prog.src2, 1) }
+    gl.drawArrays(gl.TRIANGLES, 0, 3)
+  }
+  const dbg = gl.getExtension('WEBGL_debug_renderer_info')
+  return {
+    info: 'WebGL2 · ' + (dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)) + (hdr ? '' : ' · LDR'),
+    setParticles(n) { pcount = n },
+    frame(U, C, s) {
+      gl.bindVertexArray(vao)
+      gl.disable(gl.BLEND)
+      if (!hdr) {
+        draw(P.scene, null, s.cw, s.ch, U)
+        return
+      }
+      const t = targets(s.sw, s.sh, Render.info.tier.bloomLevels || 6)
+      draw(P.scene, t.main.f, t.w, t.h, U)
+      gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+      gl.useProgram(P.part.p); gl.uniform4fv(P.part.U, U)
+      gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, pcount)
+      gl.disable(gl.BLEND)
+      draw(P.pre, t.mips[0].f, t.mips[0].w, t.mips[0].h, null, C, t.main.t)
+      for (let i = 1; i < t.levels; i++) draw(P.down, t.mips[i].f, t.mips[i].w, t.mips[i].h, null, C, t.mips[i - 1].t)
+      gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE)
+      for (let i = t.levels - 1; i > 0; i--) draw(P.up, t.mips[i - 1].f, t.mips[i - 1].w, t.mips[i - 1].h, null, C, t.mips[i].t)
+      gl.disable(gl.BLEND)
+      draw(P.comp, null, s.cw, s.ch, null, C, t.main.t, t.mips[0].t)
+    },
+    destroy() { gl.getExtension('WEBGL_lose_context')?.loseContext() },
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Canvas 2D fallback: a painted plate, drifted slowly. No GPU required.
+// ---------------------------------------------------------------------------
+function create2D(canvas) {
+  const ctx = canvas.getContext('2d')
+  let plate = null, pw = 0, ph = 0
+  function paint(w, h) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h
+    const g = c.getContext('2d')
+    const sky = g.createLinearGradient(0, 0, 0, h)
+    sky.addColorStop(0, '#02040a'); sky.addColorStop(1, '#071322')
+    g.fillStyle = sky; g.fillRect(0, 0, w, h)
+    let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+    for (let i = 0; i < 26; i++) {
+      const x = rnd() * w, y = rnd() * h * 0.7, r = (0.15 + rnd() * 0.35) * w
+      const n = g.createRadialGradient(x, y, 0, x, y, r)
+      n.addColorStop(0, rnd() > 0.5 ? 'rgba(40,90,140,0.06)' : 'rgba(120,40,100,0.05)'); n.addColorStop(1, 'rgba(0,0,0,0)')
+      g.fillStyle = n; g.fillRect(0, 0, w, h)
+    }
+    for (let i = 0; i < 900; i++) { g.fillStyle = `rgba(220,230,255,${Math.pow(rnd(), 3)})`; g.fillRect(rnd() * w, rnd() * h, 1.2, 1.2) }
+    const px = w * 0.78, py = h * 1.02, pr = h * 0.62
+    const lim = g.createRadialGradient(px, py, pr * 0.96, px, py, pr * 1.08)
+    lim.addColorStop(0, 'rgba(140,200,255,0.5)'); lim.addColorStop(1, 'rgba(140,200,255,0)')
+    g.fillStyle = lim; g.beginPath(); g.arc(px, py, pr * 1.1, 0, 7); g.fill()
+    g.save(); g.beginPath(); g.arc(px, py, pr, 0, 7); g.clip()
+    for (let i = 0; i < 40; i++) {
+      const y = py - pr + (i / 40) * pr * 2
+      g.fillStyle = ['#6b4a30', '#c08a55', '#e6d2a8', '#9a6a44', '#d9c6a0'][i % 5]
+      g.globalAlpha = 0.9; g.fillRect(px - pr, y, pr * 2, (pr * 2) / 40 + 1)
+    }
+    g.globalAlpha = 1
+    const term = g.createLinearGradient(px - pr, py - pr, px + pr * 0.6, py + pr * 0.2)
+    term.addColorStop(0, 'rgba(0,0,0,0.97)'); term.addColorStop(0.55, 'rgba(0,0,0,0.9)'); term.addColorStop(0.85, 'rgba(0,0,0,0.25)'); term.addColorStop(1, 'rgba(0,0,0,0)')
+    g.fillStyle = term; g.fillRect(px - pr, py - pr, pr * 2, pr * 2)
+    g.restore()
+    g.save(); g.translate(w * 0.58, h * 0.6); g.rotate(-0.08)
+    g.strokeStyle = 'rgba(110,150,170,0.9)'; g.lineWidth = h * 0.012
+    g.beginPath(); g.ellipse(0, 0, w * 0.62, h * 0.2, 0, Math.PI * 1.02, Math.PI * 1.98); g.stroke()
+    g.strokeStyle = 'rgba(20,24,30,1)'; g.lineWidth = h * 0.05
+    g.beginPath(); g.ellipse(0, 0, w * 0.62, h * 0.2, 0, Math.PI * 0.05, Math.PI * 0.95); g.stroke()
+    g.restore()
+    const sx = w * 0.86, sy = h * 0.16
+    const sun = g.createRadialGradient(sx, sy, 0, sx, sy, h * 0.5)
+    sun.addColorStop(0, 'rgba(255,250,235,1)'); sun.addColorStop(0.03, 'rgba(255,240,210,0.8)'); sun.addColorStop(0.2, 'rgba(160,200,255,0.12)'); sun.addColorStop(1, 'rgba(0,0,0,0)')
+    g.fillStyle = sun; g.fillRect(0, 0, w, h)
+    g.fillStyle = 'rgba(140,190,255,0.25)'; g.fillRect(0, sy - 1, w, 2)
+    return c
+  }
+  return {
+    info: 'Canvas 2D fallback',
+    frame(U, C, s) {
+      const w = s.cw, h = s.ch
+      if (!plate || pw !== w || ph !== h) { plate = paint(Math.round(w * 1.06), Math.round(h * 1.06)); pw = w; ph = h }
+      const t = U[3] ? U[0 * 4 + 3] : 0
+      ctx.drawImage(plate, -w * 0.03 + Math.sin(t * 0.05) * w * 0.02, -h * 0.03 + Math.cos(t * 0.04) * h * 0.01)
+    },
+  }
+}
+
+
+
+
+
+const P = new URLSearchParams(location.search)
+Render.init(document.getElementById('bg'), { pose: P.get('pose') || 'main', quality: P.get('q') || 'auto' }).then(() => { window.__ready = true; console.log('renderer', Render.info.kind, Render.info.adapterInfo) })
+
+</script>
+</body>
+</html>

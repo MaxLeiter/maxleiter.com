@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Max Leiter — Wave</title>
+<meta name="description" content="Max Leiter's site as a mid-2000s console menu, with articles rendered through HTML-in-Canvas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #f4f8ff;
+  --ink-dim: rgba(240, 246, 255, .62);
+  --ink-faint: rgba(240, 246, 255, .38);
+  --glow: 0 0 7px rgba(255, 255, 255, .45), 0 1px 2px rgba(0, 0, 0, .35);
+  --font: "M PLUS 1p", "Hiragino Kaku Gothic ProN", "Segoe UI", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+  --ease: cubic-bezier(.22, .8, .24, 1);
+  --t: .32s;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #071233; }
+body {
+  font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+  touch-action: none; overscroll-behavior: none;
+}
+/* when WebGL2 is unavailable the body itself carries the gradient */
+body.nogl { background: linear-gradient(180deg, var(--c0, #0a2f75), var(--c1, #1b5fb0) 55%, var(--c2, #071a46)); }
+#stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* ---------------- article sheet (shared by both render paths) ---------------- */
+.sheet {
+  width: 720px; padding: 26px 4px 40px; color: #eef4ff; font: 400 16.5px/1.72 var(--font);
+  user-select: text; -webkit-user-select: text; background: transparent; outline: none;
+}
+.sheet .sh-head { display: flex; gap: 18px; align-items: flex-start; padding-bottom: 18px; margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,.18); box-shadow: 0 1px 0 rgba(0,0,0,.25); }
+.sheet .sh-ic { flex: 0 0 64px; width: 64px; height: 64px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
+.sheet .sh-ic svg { width: 100%; height: 100%; display: block; }
+.sheet .sh-kicker { font-size: 13px; letter-spacing: .06em; color: rgba(225,236,255,.7); text-transform: uppercase; }
+.sheet h1 { font-size: 30px; line-height: 1.22; font-weight: 500; margin: 2px 0 6px; color: #fff;
+  text-shadow: 0 0 12px rgba(255,255,255,.28); letter-spacing: .005em; }
+.sheet .sh-desc { margin: 0; color: rgba(230,240,255,.78); font-size: 15.5px; }
+.sheet h2, .sheet h3 { font-weight: 500; color: #fff; margin: 1.6em 0 .5em; line-height: 1.3; }
+.sheet h2 { font-size: 22px; } .sheet h3 { font-size: 18.5px; }
+.sheet p { margin: 0 0 1em; }
+.sheet ul, .sheet ol { margin: 0 0 1em; padding-left: 1.4em; }
+.sheet li { margin: .2em 0; }
+.sheet a { color: #9fd4ff; text-decoration: underline; text-decoration-color: rgba(159,212,255,.45); text-underline-offset: 3px; }
+.sheet a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 3px; }
+.sheet code { font: 14px/1.5 var(--mono); background: rgba(0,10,30,.45); border: 1px solid rgba(255,255,255,.12);
+  padding: 1px 5px; border-radius: 4px; }
+.sheet pre { margin: 1.2em 0; padding: 14px 18px; border-radius: 8px; overflow: hidden; white-space: pre-wrap;
+  background: linear-gradient(180deg, rgba(0,6,20,.72), rgba(0,12,32,.6)); border: 1px solid rgba(255,255,255,.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 8px 18px rgba(0,0,0,.35); }
+.sheet pre code { background: none; border: 0; padding: 0; font-size: 13.5px; color: #dfe9ff; }
+.sheet .k { color: #8fd0ff; } .sheet .s { color: #ffd59a; } .sheet .c { color: rgba(220,230,255,.45); }
+.sheet .sh-more { margin-top: 1.6em; font-size: 15px; }
+.sheet .sh-more a { display: inline-flex; gap: 8px; align-items: center; padding: 8px 16px; border-radius: 999px;
+  text-decoration: none; color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.08));
+  border: 1px solid rgba(255,255,255,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 8px rgba(0,0,0,.25); }
+.sheet .sh-grid { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; font-size: 15px; margin: 0 0 1em; }
+.sheet .sh-grid dt { color: rgba(225,236,255,.6); } .sheet .sh-grid dd { margin: 0; }
+.sheet .ellip { color: rgba(230,240,255,.55); }
+.sheet ::selection { background: rgba(120,190,255,.55); color: #fff; }
+
+/* ---------------- DOM-overlay fallback panel ---------------- */
+#glass { position: fixed; z-index: 4; border-radius: 16px; overflow: hidden; visibility: hidden; opacity: 0;
+  transform-origin: var(--ox, 50%) var(--oy, 50%);
+  background: linear-gradient(180deg, rgba(14,26,58,.52), rgba(4,10,28,.66));
+  -webkit-backdrop-filter: blur(18px) saturate(1.35) brightness(.9); backdrop-filter: blur(18px) saturate(1.35) brightness(.9);
+  border: 1px solid rgba(255,255,255,.34);
+  box-shadow: 0 24px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 0 1px rgba(255,255,255,.04);
+  transition: opacity .25s ease, visibility 0s linear .3s; }
+#glass.on { visibility: visible; opacity: 1; transition: opacity .2s ease; animation: jelly .9s var(--ease) both; }
+#glass::before { content: ""; position: absolute; inset: 0 0 auto; height: 120px; pointer-events: none; z-index: 2;
+  background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0)); }
+#glass::after { content: ""; position: absolute; inset: -40%; pointer-events: none; z-index: 2; opacity: .9;
+  background: linear-gradient(115deg, transparent 44%, rgba(255,255,255,.12) 50%, transparent 56%);
+  transform: translateX(-70%); }
+#glass.on::after { animation: sheen 8s linear .35s infinite; }
+#glass .scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 0 var(--pad, 40px);
+  overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.35) transparent;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent);
+          mask-image: linear-gradient(180deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent); }
+#glass .scroller .sheet { width: auto; transform: skewY(calc(var(--vel, 0) * .02deg)); transform-origin: 50% 0; }
+@keyframes jelly {
+  0% { transform: translate(var(--fx, 0), var(--fy, 0)) scale(.55) perspective(900px) rotateX(16deg); }
+  45% { transform: scale(1.025, .985) perspective(900px) rotateX(-2deg); }
+  70% { transform: scale(.992, 1.008); }
+  100% { transform: none; }
+}
+@keyframes sheen { 0% { transform: translateX(-70%); } 30%, 100% { transform: translateX(70%); } }
+
+/* ---------------- console menu ---------------- */
+#ui { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+#ui button, #ui a, #ui .hit { pointer-events: auto; }
+#menu { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0;
+  transition: opacity .35s ease, filter .35s ease; }
+body.open #menu { opacity: .16; filter: blur(3px); }
+body.open.hic #menu { opacity: 0; }
+body.open #menu * { pointer-events: none !important; }
+.cat { position: absolute; left: 0; top: 0; width: 120px; height: 140px; margin: 0; padding: 0; border: 0; background: none;
+  color: inherit; font: inherit; cursor: pointer; transition: transform var(--t) var(--ease), opacity var(--t) ease;
+  will-change: transform; outline: none; }
+.cat .ic { position: absolute; left: 22px; top: 0; width: 76px; height: 76px; transform: scale(.7); transform-origin: 50% 50%;
+  transition: transform var(--t) var(--ease), filter var(--t) ease; filter: drop-shadow(0 3px 3px rgba(0,0,0,.3)); }
+.cat .ic svg { width: 100%; height: 100%; display: block; }
+.cat .lbl { position: absolute; left: -30px; right: -30px; top: 82px; text-align: center; font-size: 17px; font-weight: 400;
+  text-shadow: var(--glow); opacity: 0; transition: opacity var(--t) ease; letter-spacing: .02em; }
+.cat.on .ic { transform: scale(1); filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)) drop-shadow(0 0 10px rgba(255,255,255,.35)); }
+.cat.on .lbl { opacity: 1; }
+.cat:not(.on) { opacity: .72; }
+.cat:focus-visible .ic { outline: 2px solid rgba(255,255,255,.7); outline-offset: 4px; border-radius: 12px; }
+
+.list { position: absolute; left: 0; top: 0; transition: opacity .25s ease; }
+.list[hidden] { display: block; opacity: 0; visibility: hidden; }
+.item { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 0; width: 720px; height: 64px;
+  color: inherit; text-decoration: none; cursor: pointer; outline: none;
+  transition: transform var(--t) var(--ease), opacity var(--t) ease; will-change: transform; }
+.item .ic { flex: 0 0 76px; width: 76px; height: 76px; transform: scale(.62); transition: transform var(--t) var(--ease), filter var(--t) ease;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+.item .ic svg { width: 100%; height: 100%; display: block; }
+.item .tx { margin-left: 14px; min-width: 0; flex: 1; }
+.item .t, .item .s { display: block; }
+.item .t { font-size: 20px; font-weight: 400; line-height: 1.25; text-shadow: 0 1px 3px rgba(0,0,0,.4); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; opacity: .8; transition: opacity var(--t) ease; }
+.item .s { font-size: 14px; color: var(--ink-dim); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-height: 0; opacity: 0; transition: opacity var(--t) ease, max-height var(--t) ease; }
+.item .v { margin-left: 18px; font-size: 18px; color: var(--ink-dim); white-space: nowrap; opacity: .85; }
+.item.on .ic { transform: scale(1); filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)) drop-shadow(0 0 12px rgba(255,255,255,.42)); }
+.item.on .t { opacity: 1; font-weight: 500; text-shadow: var(--glow); }
+.item.on .s { max-height: 22px; opacity: 1; }
+.item.on .v { color: var(--ink); text-shadow: var(--glow); }
+.item.up .t { opacity: .62; }
+.item.on::before { content: ""; position: absolute; left: -6px; top: -8px; width: 88px; height: 88px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255,255,255,.22), rgba(255,255,255,0)); pointer-events: none; }
+
+/* ---------------- chrome: clock, badge, hints ---------------- */
+#clock { position: absolute; right: 36px; top: 26px; display: flex; gap: 14px; align-items: baseline; font-size: 16px;
+  text-shadow: var(--glow); letter-spacing: .03em; font-weight: 300; }
+#clock b { font-weight: 400; font-size: 19px; }
+#clock .line { position: absolute; right: -36px; left: -18px; bottom: -8px; height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.5)); }
+#snd { position: absolute; right: 34px; top: 66px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3);
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,.22), rgba(255,255,255,.04)); color: #fff; cursor: pointer; padding: 0;
+  display: grid; place-items: center; box-shadow: 0 2px 6px rgba(0,0,0,.25); opacity: .8; }
+#snd svg { width: 18px; height: 18px; }
+#snd:hover, #snd:focus-visible { opacity: 1; outline: none; box-shadow: 0 0 0 2px rgba(255,255,255,.5); }
+#hints { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 22px; font-size: 13.5px;
+  color: var(--ink-dim); text-shadow: 0 1px 2px rgba(0,0,0,.4); flex-wrap: wrap; padding: 0 140px; }
+#hints span { display: inline-flex; align-items: center; gap: 7px; }
+#hints kbd { font: 500 11px/1 var(--font); min-width: 22px; height: 20px; padding: 0 6px; display: inline-grid; place-items: center;
+  border-radius: 6px; color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.3), rgba(255,255,255,.08));
+  border: 1px solid rgba(255,255,255,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
+#hints button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; gap: 7px; align-items: center; }
+#hints .touch { display: none; } body.phone #hints .touch { display: inline-flex; } body.phone #hints .when-menu:not(.touch) { display: none; }
+#hints .when-open { display: none; } body.open #hints .when-open { display: inline-flex; } body.open #hints .when-menu { display: none; }
+#badge { position: absolute; right: 18px; bottom: 16px; display: inline-flex; white-space: nowrap; align-items: center; gap: 7px; font-size: 11px;
+  padding: 5px 10px 5px 8px; border-radius: 999px; color: rgba(255,255,255,.85); letter-spacing: .03em; pointer-events: auto;
+  background: rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.18); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: help; }
+#badge i { width: 7px; height: 7px; border-radius: 50%; background: #ffc35a; box-shadow: 0 0 6px #ffc35a; }
+#badge.hic i { background: #7dffb0; box-shadow: 0 0 6px #7dffb0; }
+#live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ---------------- phone ---------------- */
+body.phone .item { width: calc(100vw - 72px); }
+body.phone .item .t { font-size: 17px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+body.phone .item .s { font-size: 12.5px; }
+body.phone .item .v { font-size: 15px; margin-left: 8px; }
+body.phone .item .ic, body.phone .cat .ic { width: 60px; height: 60px; flex-basis: 60px; }
+body.phone .cat { width: 90px; } body.phone .cat .ic { left: 15px; } body.phone .cat .lbl { top: 64px; font-size: 15px; }
+body.phone .item.on::before { width: 70px; height: 70px; left: -5px; top: -3px; }
+body.phone #clock { right: 18px; top: 18px; font-size: 14px; } body.phone #clock b { font-size: 16px; }
+body.phone #snd { right: 16px; top: 52px; }
+body.phone.open #snd { display: none; }
+body.phone #hints { padding: 0 12px; bottom: 46px; gap: 14px; font-size: 12.5px; }
+body.phone #hints .kb { display: none; }
+body.phone #badge { left: 50%; right: auto; transform: translateX(-50%); bottom: 14px; }
+body.phone .sheet { font-size: 15.5px; }
+body.phone .sheet h1 { font-size: 23px; }
+body.phone .sheet .sh-ic { flex-basis: 46px; width: 46px; height: 46px; }
+
+body.rm *, body.rm *::before, body.rm *::after { transition-duration: .01s !important; animation: none !important; }
+</style>
+</head>
+<body>
+<!-- The stage. With HTML-in-Canvas the article sheet is a child of this canvas and is drawn into it. -->
+<canvas id="stage" aria-label="Article"></canvas>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="ig" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#eef3f9"/><stop offset="1" stop-color="#c3cfdd"/>
+    </linearGradient>
+    <linearGradient id="ig2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7fafd"/><stop offset="1" stop-color="#aebdcf"/>
+    </linearGradient>
+    <linearGradient id="ig3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9e3ee"/><stop offset="1" stop-color="#93a6bc"/>
+    </linearGradient>
+    <linearGradient id="ish" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="iglobe" cx=".38" cy=".3" r=".8">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#dfe7f1"/><stop offset="1" stop-color="#9fb1c6"/>
+    </radialGradient>
+  </defs>
+  <filter id="fx-ripple" x="-4%" y="-4%" width="108%" height="108%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.003 0.016" numOctaves="1" seed="7" result="n"/>
+    <feDisplacementMap id="fx-disp" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div id="glass" aria-hidden="true"><div class="scroller" tabindex="-1"></div></div>
+
+<div id="ui">
+  <div id="menu" role="application" aria-roledescription="console menu" aria-label="Max Leiter">
+    <div id="cats" role="tablist" aria-label="Categories"></div>
+    <div id="lists"></div>
+  </div>
+  <div id="clock" aria-hidden="true"><span id="cdate"></span><b id="ctime"></b><span class="line"></span></div>
+  <button id="snd" type="button" aria-pressed="false" aria-label="Sound off. Turn sound on"></button>
+  <div id="hints">
+    <span class="when-menu kb"><kbd>←</kbd><kbd>→</kbd> Category</span>
+    <span class="when-menu kb"><kbd>↑</kbd><kbd>↓</kbd> Select</span>
+    <span class="when-menu"><kbd>↵</kbd> Open</span>
+    <span class="when-menu touch">Swipe to browse · tap to open</span>
+    <span class="when-open kb"><kbd>↑</kbd><kbd>↓</kbd> Scroll</span>
+    <button class="when-open hit" type="button" id="back"><kbd>Esc</kbd> Back</button>
+  </div>
+  <div id="badge" title="" tabindex="0"><i></i><span id="badge-t">Detecting…</span></div>
+  <div id="live" aria-live="polite"></div>
+</div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+'use strict'
+const DATA = JSON.parse(document.getElementById('data').textContent)
+const SITE = 'https://maxleiter.com'
+const $ = (s) => document.querySelector(s)
+const qs = new URLSearchParams(location.search)
+const reducedMQ = matchMedia('(prefers-reduced-motion: reduce)')
+
+/* =====================================================================
+   Icons — original glossy line icons, drawn here, no assets.
+   ===================================================================== */
+const G = 'url(#ig)', G2 = 'url(#ig2)', G3 = 'url(#ig3)', LN = '#8ea2b9', SH = 'url(#ish)'
+const ICONS = {
+  about: `<circle cx="32" cy="19" r="11" fill="${G}"/><path d="M11 56c0-13 9-21 21-21s21 8 21 21z" fill="${G}"/>
+    <ellipse cx="29" cy="14" rx="6" ry="3.5" fill="${SH}" opacity=".8"/>`,
+  settings: `<rect x="7" y="9" width="50" height="46" rx="6" fill="${G}"/><rect x="7" y="9" width="50" height="10" rx="5" fill="${SH}" opacity=".8"/>
+    <g stroke="${LN}" stroke-width="3" stroke-linecap="round"><path d="M19 18v30M32 18v30M45 18v30"/></g>
+    <g fill="${G2}" stroke="${LN}" stroke-width="1.4"><rect x="13" y="34" width="12" height="7" rx="2"/><rect x="26" y="22" width="12" height="7" rx="2"/><rect x="39" y="38" width="12" height="7" rx="2"/></g>`,
+  blog: `<path d="M15 6h25l13 13v39H15z" fill="${G}"/><path d="M40 6v13h13z" fill="${G3}"/>
+    <path d="M22 28h24M22 35h24M22 42h17" stroke="${LN}" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M46 37l9-9 4 4-9 9-6 2z" fill="${G2}" stroke="${LN}" stroke-width="1.2"/>`,
+  notes: `<rect x="13" y="10" width="38" height="47" rx="3.5" fill="${G}"/>
+    <path d="M20 26h24M20 33h24M20 40h24M20 47h14" stroke="${LN}" stroke-width="2.2" stroke-linecap="round"/>
+    <g fill="none" stroke="${G3}" stroke-width="3"><path d="M21 15V7"/><path d="M29 15V7"/><path d="M37 15V7"/><path d="M45 15V7"/></g>
+    <rect x="13" y="13" width="38" height="5" fill="#fff" opacity=".7"/>`,
+  projects: `<path d="M32 6l22 12-22 12-22-12z" fill="#fff"/><path d="M10 18l22 12v26L10 44z" fill="${G2}"/><path d="M54 18L32 30v26l22-12z" fill="${G3}"/>
+    <path d="M32 6l22 12-22 12-22-12z" fill="${SH}" opacity=".6"/><path d="M21 12l22 12" stroke="#fff" stroke-width="1.5" opacity=".7"/>`,
+  work: `<path d="M23 18v-5a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v5" fill="none" stroke="${G3}" stroke-width="4"/>
+    <rect x="6" y="17" width="52" height="36" rx="5" fill="${G}"/><path d="M6 31h52" stroke="${LN}" stroke-width="2"/>
+    <rect x="28" y="27" width="8" height="8" rx="1.5" fill="${G3}"/><rect x="9" y="19" width="46" height="8" rx="3" fill="${SH}" opacity=".7"/>`,
+  doc: `<path d="M16 6h23l11 11v41H16z" fill="${G}"/><path d="M39 6v11h11z" fill="${G3}"/>
+    <path d="M23 27h20M23 34h20M23 41h20M23 48h12" stroke="${LN}" stroke-width="2.6" stroke-linecap="round"/>`,
+  note: `<path d="M11 11h42v30L39 55H11z" fill="${G}"/><path d="M53 41H39v14z" fill="${G3}"/>
+    <path d="M19 23h26M19 31h26M19 39h14" stroke="${LN}" stroke-width="2.6" stroke-linecap="round"/><rect x="11" y="11" width="42" height="6" fill="${G3}"/>`,
+  cube: `<path d="M32 8l20 11-20 11-20-11z" fill="#fff"/><path d="M12 19l20 11v24L12 43z" fill="${G2}"/><path d="M52 19L32 30v24l20-11z" fill="${G3}"/>`,
+  globe: `<circle cx="32" cy="32" r="23" fill="url(#iglobe)"/><g fill="none" stroke="${LN}" stroke-width="2"><ellipse cx="32" cy="32" rx="10" ry="23"/>
+    <path d="M9 32h46M13 20h38M13 44h38"/></g><ellipse cx="25" cy="20" rx="9" ry="5" fill="${SH}" opacity=".7"/>`,
+  person: `<circle cx="32" cy="21" r="10" fill="${G}"/><path d="M13 55c0-12 8-19 19-19s19 7 19 19z" fill="${G}"/>`,
+  code: `<rect x="6" y="11" width="52" height="42" rx="5" fill="${G}"/><rect x="6" y="11" width="52" height="9" rx="4" fill="${G3}"/>
+    <path d="M26 29l-8 8 8 8M38 29l8 8-8 8" fill="none" stroke="${LN}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>`,
+  bubble: `<path d="M10 14h44a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H30l-12 10v-10h-8a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z" fill="${G}"/>
+    <circle cx="22" cy="30" r="3" fill="${LN}"/><circle cx="32" cy="30" r="3" fill="${LN}"/><circle cx="42" cy="30" r="3" fill="${LN}"/>`,
+  house: `<path d="M32 8L6 30h7v24h38V30h7z" fill="${G}"/><rect x="27" y="38" width="10" height="16" fill="${G3}"/><path d="M32 8L6 30h7l19-16 19 16h7z" fill="${G2}"/>`,
+  speaker: `<path d="M10 24h10l14-12v40L20 40H10z" fill="${G}"/><path d="M42 22c4 6 4 14 0 20M48 16c8 9 8 23 0 32" fill="none" stroke="${G3}" stroke-width="3.4" stroke-linecap="round"/>`,
+  sun: `<circle cx="32" cy="32" r="12" fill="${G}"/><g stroke="${G3}" stroke-width="3.4" stroke-linecap="round">
+    <path d="M32 6v7M32 51v7M6 32h7M51 32h7M13.6 13.6l5 5M45.4 45.4l5 5M13.6 50.4l5-5M45.4 18.6l5-5"/></g>`,
+  wave: `<rect x="6" y="10" width="52" height="44" rx="6" fill="${G}"/><path d="M12 36c6-10 10-10 14 0s8 10 14 0 8-10 12 0" fill="none" stroke="${LN}" stroke-width="3" stroke-linecap="round"/>`,
+  chip: `<rect x="14" y="14" width="36" height="36" rx="4" fill="${G}"/><rect x="22" y="22" width="20" height="20" rx="2" fill="${G3}"/>
+    <g stroke="${G3}" stroke-width="3" stroke-linecap="round"><path d="M22 14V8M32 14V8M42 14V8M22 56v-6M32 56v-6M42 56v-6M14 22H8M14 32H8M14 42H8M56 22h-6M56 32h-6M56 42h-6"/></g>`,
+}
+const svgIcon = (n) => `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">${ICONS[n]}</svg>`
+const SND_ON = `<svg viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3z" fill="#fff"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>`
+const SND_OFF = `<svg viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3z" fill="#fff"/><path d="M16 9l5 6M21 9l-5 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>`
+
+/* =====================================================================
+   Content → markup (a tiny markdown subset; excerpts are real site prose)
+   ===================================================================== */
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const abs = (h) => (/^https?:/.test(h) ? h : SITE + (h.startsWith('/') ? h : '/' + h))
+function inline(s, base) {
+  let out = esc(s)
+  const codes = []
+  out = out.replace(/`([^`]+)`/g, (_, c) => `\u0000${codes.push(c) - 1}\u0000`)
+  out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, t, u) => {
+    const href = u.startsWith('#') ? base + u : abs(u.replace(/&amp;/g, '&'))
+    return `<a href="${esc(href)}" target="_blank" rel="noopener">${t}</a>`
+  })
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/(^|[\s(])_([^_]+)_/g, '$1<em>$2</em>')
+    .replace(/~([^~]+)~/g, '<s>$1</s>')
+  return out.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${esc(codes[i]).replace(/&amp;/g, '&')}</code>`)
+}
+function md(src, base, truncated = src.length >= 1150) {
+  const lines = src.replace(/\r/g, '').split('\n')
+  const out = []
+  let para = [], list = null, fence = null
+  const flushP = () => { if (para.length) out.push(`<p>${inline(para.join(' '), base)}</p>`); para = [] }
+  const flushL = () => { if (list) out.push(`<${list.t}>${list.items.map((i) => `<li>${inline(i, base)}</li>`).join('')}</${list.t}>`); list = null }
+  for (const raw of lines) {
+    const l = raw.trimEnd()
+    if (fence) { if (/^\s*```/.test(l)) { out.push(`<pre><code>${esc(fence.join('\n'))}</code></pre>`); fence = null } else fence.push(raw); continue }
+    if (/^\s*```/.test(l)) { flushP(); flushL(); fence = []; continue }
+    if (!l.trim()) { flushP(); flushL(); continue }
+    if (/^\s*!\[/.test(l) || /^\s*</.test(l) || /^Click to expand$/.test(l.trim())) { flushP(); continue }
+    let m
+    if ((m = l.match(/^(#{1,4})\s+(.*)$/))) {
+      flushP(); flushL()
+      if (/table of contents/i.test(m[2])) continue
+      const lv = Math.min(3, Math.max(2, m[1].length))
+      out.push(`<h${lv}>${inline(m[2], base)}</h${lv}>`); continue
+    }
+    if ((m = l.match(/^\s*(?:[-*]|(\d+)\.)\s+(.*)$/))) {
+      flushP(); const t = m[1] ? 'ol' : 'ul'
+      if (!list || list.t !== t) { flushL(); list = { t, items: [] } }
+      list.items.push(m[2]); continue
+    }
+    if (list && /^\s{2,}/.test(raw)) { list.items[list.items.length - 1] += ' ' + l.trim(); continue }
+    flushL(); para.push(l.trim())
+  }
+  if (fence) out.push(`<pre><code>${esc(fence.join('\n'))}</code></pre>`)
+  flushL()
+  if (para.length) { if (truncated) para[para.length - 1] += '…'; flushP() }
+  else if (truncated && out.length) out[out.length - 1] = out[out.length - 1].replace(/<\/(p|li)>(<\/[uo]l>)?$/, '<span class="ellip">…</span></$1>$2')
+  return out.join('')
+}
+const yaml = (o) => '<span class="c">---</span>\n' + Object.entries(o).filter(([, v]) => v)
+  .map(([k, v]) => `<span class="k">${k}</span>: <span class="s">${esc(JSON.stringify(v))}</span>`).join('\n') + '\n<span class="c">---</span>'
+
+function sheetFor(cat, it) {
+  const head = (kicker, title, desc, ic) => `<header class="sh-head"><div class="sh-ic">${svgIcon(ic)}</div><div>
+    <div class="sh-kicker">${esc(kicker)}</div><h1>${esc(title)}</h1>${desc ? `<p class="sh-desc">${esc(desc)}</p>` : ''}</div></header>`
+  const more = (href, label) => `<p class="sh-more"><a href="${esc(href)}" target="_blank" rel="noopener">${esc(label)} <span aria-hidden="true">↗</span></a></p>`
+  const d = it.data
+  if (it.kind === 'post' || it.kind === 'note') {
+    const href = abs(d.href)
+    const fm = { title: d.title, date: d.date, description: d.description, href: d.href }
+    return head(`${cat.label} · ${d.date}`, d.title, d.description, cat.icon)
+      + `<div class="sh-body">${md(d.excerpt || '', href)}</div>`
+      + `<h3>Frontmatter</h3><pre><code>${yaml(fm)}</code></pre>`
+      + more(href, it.kind === 'post' ? 'Continue reading on maxleiter.com' : 'Open the full note')
+  }
+  if (it.kind === 'project' || it.kind === 'work') {
+    const href = abs(d.href)
+    return head(it.kind === 'work' ? `Work · ${d.date}` : 'Project', d.title, '', cat.icon)
+      + `<p>${esc(d.description)}</p><dl class="sh-grid"><dt>Link</dt><dd><a href="${esc(href)}" target="_blank" rel="noopener">${esc(href.replace(/^https?:\/\//, ''))}</a></dd>
+      ${d.date ? `<dt>Published</dt><dd>${esc(d.date)}</dd>` : ''}</dl>`
+      + `<pre><code>${yaml({ title: d.title, date: d.date, href: d.href })}</code></pre>` + more(href, 'Open')
+  }
+  if (it.kind === 'profile') {
+    const s = DATA.site
+    return head('Profile', s.name, 'maxleiter.com', 'about')
+      + `<p>${esc(s.blurb)}</p><h3>Elsewhere</h3><ul><li><a href="${s.github}" target="_blank" rel="noopener">GitHub — ${esc(s.github.replace('https://', ''))}</a></li>
+      <li><a href="${s.x}" target="_blank" rel="noopener">X — ${esc(s.x.replace('https://', ''))}</a></li><li><a href="${s.url}" target="_blank" rel="noopener">${esc(s.url.replace('https://', ''))}</a></li></ul>
+      <h3>On this console</h3><p>${DATA.posts.length} blog posts, ${DATA.notes.length} notes, ${DATA.projects.length} projects and ${DATA.work.length} pieces written for work.</p>
+      <pre><code>${yaml({ name: s.name, url: s.url, github: s.github, x: s.x })}</code></pre>`
+  }
+  if (it.kind === 'sysinfo') {
+    const h = HIC.report
+    return head('Settings · Renderer', 'System information', HIC.active ? 'Articles are drawn with HTML-in-Canvas.' : 'Articles are a DOM overlay.', 'chip')
+      + `<dl class="sh-grid"><dt>Path</dt><dd>${esc(RENDER.label)}</dd><dt>Browser</dt><dd>${esc(h.ua)}</dd>
+      <dt>Generation</dt><dd>${esc(h.gen || 'none')}</dd><dt>WebGL2</dt><dd>${GL ? 'yes' : 'no'}</dd><dt>WebGPU</dt><dd>${navigator.gpu ? 'present (not used, see NOTES)' : 'absent'}</dd></dl>
+      <h3>Detected API names</h3><pre><code>${esc(h.lines.join('\n'))}</code></pre>
+      <p>This panel is itself a live element. ${HIC.active ? 'Select some of this text, or press <code>Tab</code> to reach the links below; the selection and focus ring are painted into the texture.' : 'Without the flag it is plain DOM over the canvas, blurred with <code>backdrop-filter</code>.'}</p>
+      <p><a href="?mode=${HIC.active ? 'dom' : 'auto'}">${HIC.active ? 'Reload with the DOM fallback' : 'Reload with auto-detection'}</a> · <a href="https://github.com/WICG/html-in-canvas" target="_blank" rel="noopener">WICG html-in-canvas explainer</a></p>`
+  }
+  return ''
+}
+
+/* =====================================================================
+   Menu model
+   ===================================================================== */
+const TOD = ['auto', 'dawn', 'day', 'dusk', 'night']
+const state = {
+  cat: 2, sel: {}, open: null, sound: false,
+  tod: TOD.includes(qs.get('tod')) ? qs.get('tod') : 'auto',
+  motion: reducedMQ.matches || qs.get('motion') === 'reduced' ? 'reduced' : 'full',
+}
+const CATS = [
+  { id: 'about', label: 'About', icon: 'about', items: [
+    { kind: 'profile', title: DATA.site.name, sub: DATA.site.blurb, icon: 'person', href: SITE },
+    { kind: 'link', title: 'GitHub', sub: DATA.site.github.replace('https://', ''), icon: 'code', href: DATA.site.github },
+    { kind: 'link', title: 'X', sub: DATA.site.x.replace('https://', ''), icon: 'bubble', href: DATA.site.x },
+    { kind: 'link', title: 'maxleiter.com', sub: 'The regular site', icon: 'house', href: SITE },
+  ] },
+  { id: 'settings', label: 'Settings', icon: 'settings', items: [
+    { kind: 'set', key: 'sound', title: 'Sound', sub: 'Soft synthesized ticks, made in WebAudio', icon: 'speaker' },
+    { kind: 'set', key: 'tod', title: 'Time of Day', sub: 'Background palette; Auto follows your clock', icon: 'sun' },
+    { kind: 'set', key: 'motion', title: 'Motion', sub: 'Wave, ripples and wobble', icon: 'wave' },
+    { kind: 'sysinfo', title: 'System Information', sub: 'Which render path is active, and why', icon: 'chip' },
+  ] },
+  { id: 'blog', label: 'Blog', icon: 'blog', items: DATA.posts.map((d) => ({ kind: 'post', title: d.title, sub: [d.date, d.description].filter(Boolean).join('  ·  '), icon: 'doc', href: abs(d.href), data: d })) },
+  { id: 'notes', label: 'Notes', icon: 'notes', items: DATA.notes.map((d) => ({ kind: 'note', title: d.title, sub: [d.date, d.description].filter(Boolean).join('  ·  '), icon: 'note', href: abs(d.href), data: d })) },
+  { id: 'projects', label: 'Projects', icon: 'projects', items: DATA.projects.map((d) => ({ kind: 'project', title: d.title, sub: d.description, icon: 'cube', href: abs(d.href), data: d })) },
+  { id: 'work', label: 'Work', icon: 'work', items: DATA.work.map((d) => ({ kind: 'work', title: d.title, sub: d.date + '  ·  ' + d.description, icon: 'globe', href: abs(d.href), data: d })) },
+]
+if (qs.has('cat')) { const i = CATS.findIndex((c) => c.id === qs.get('cat')); if (i >= 0) state.cat = i }
+CATS.forEach((c, i) => (state.sel[i] = 0))
+if (qs.has('item')) state.sel[state.cat] = Math.max(0, Math.min(CATS[state.cat].items.length - 1, +qs.get('item') || 0))
+
+const setValue = (key) => key === 'sound' ? (state.sound ? 'On' : 'Off')
+  : key === 'tod' ? (state.tod === 'auto' ? `Auto (${cap(todNow())})` : cap(state.tod))
+  : key === 'motion' ? (state.motion === 'full' ? 'Full' : 'Reduced') : ''
+const cap = (s) => s[0].toUpperCase() + s.slice(1)
+
+/* build DOM */
+const catsEl = $('#cats'), listsEl = $('#lists')
+const catEls = CATS.map((c, i) => {
+  const b = document.createElement('button')
+  b.className = 'cat'; b.type = 'button'; b.id = 'cat-' + c.id; b.setAttribute('role', 'tab')
+  b.innerHTML = `<span class="ic">${svgIcon(c.icon)}</span><span class="lbl">${c.label}</span>`
+  b.addEventListener('click', () => { if (swiped()) return; setCat(i) })
+  catsEl.appendChild(b); return b
+})
+const listEls = [], itemEls = []
+CATS.forEach((c, ci) => {
+  const l = document.createElement('div')
+  l.className = 'list'; l.setAttribute('role', 'tabpanel'); l.setAttribute('aria-labelledby', 'cat-' + c.id)
+  itemEls[ci] = c.items.map((it, ii) => {
+    const a = document.createElement('a')
+    a.className = 'item'; a.href = it.href || '#'; a.tabIndex = -1
+    if (it.kind === 'link') { a.target = '_blank'; a.rel = 'noopener' }
+    a.innerHTML = `<span class="ic">${svgIcon(it.icon)}</span><span class="tx"><span class="t"></span><span class="s"></span></span>${it.kind === 'set' ? '<span class="v"></span>' : ''}`
+    a.querySelector('.t').textContent = it.title
+    a.querySelector('.s').textContent = it.sub || ''
+    a.addEventListener('click', (e) => {
+      if (swiped()) { e.preventDefault(); return }
+      if (it.kind === 'link') { tone('open'); return } // real navigation
+      e.preventDefault()
+      if (state.cat !== ci) setCat(ci)
+      setSel(ii, true); activate()
+    })
+    l.appendChild(a); return a
+  })
+  listsEl.appendChild(l); listEls.push(l)
+})
+
+/* layout: menu is designed on a 1280×720 board and scaled; phone gets its own board */
+let W = innerWidth, H = innerHeight, PHONE = false, SCALE = 1
+function layout() {
+  W = innerWidth; H = innerHeight; PHONE = W < 700
+  document.body.classList.toggle('phone', PHONE)
+  const menu = $('#menu')
+  let bw, bh, catX, rowY, catGap, ic, itemGap, firstGap
+  if (PHONE) {
+    SCALE = 1; bw = W; bh = H; catX = 54; rowY = Math.max(128, H * 0.17); catGap = 96; ic = 60; itemGap = 66; firstGap = 64
+  } else {
+    SCALE = Math.min(W / 1280, H / 720); if (SCALE > 1) SCALE = Math.min(SCALE, 1.6)
+    bw = W / SCALE; bh = H / SCALE; catX = Math.max(220, bw * 0.235); rowY = bh * 0.262; catGap = 150; ic = 76; itemGap = 64; firstGap = 80
+  }
+  menu.style.width = bw + 'px'; menu.style.height = bh + 'px'; menu.style.transform = `scale(${SCALE})`
+  const cw = PHONE ? 90 : 120
+  catEls.forEach((el, i) => {
+    const d = i - state.cat
+    const x = catX + d * catGap - cw / 2 + (d < 0 ? -10 : d > 0 ? 8 : 0)
+    el.style.transform = `translate3d(${x}px, ${rowY - ic / 2}px, 0)`
+    el.classList.toggle('on', d === 0)
+    el.setAttribute('aria-selected', d === 0); el.tabIndex = d === 0 ? 0 : -1
+    el.style.opacity = d === 0 ? '' : String(Math.max(0.25, 0.75 - Math.abs(d) * 0.08))
+  })
+  listEls.forEach((l, ci) => {
+    const on = ci === state.cat
+    l.hidden = !on
+    l.style.transform = `translate3d(${catX - ic / 2}px, 0, 0)`
+    const sel = state.sel[ci]
+    itemEls[ci].forEach((el, ii) => {
+      const d = ii - sel
+      let y
+      if (d === 0) y = rowY + firstGap
+      else if (d > 0) y = rowY + firstGap + 22 + d * itemGap
+      else y = rowY - ic / 2 - 26 - (-d) * itemGap
+      el.style.transform = `translate3d(0, ${y - 6}px, 0)`
+      el.classList.toggle('on', d === 0); el.classList.toggle('up', d < 0)
+      const fade = Math.max(0, Math.min(1, (bh - (PHONE ? 110 : 64) - y) / 110, (y + 30) / 110))
+      el.style.opacity = d === 0 ? '' : String((d < 0 ? 0.78 : 1) * fade)
+      el.tabIndex = on && d === 0 ? 0 : -1
+      el.setAttribute('aria-current', d === 0 ? 'true' : 'false')
+      const it = CATS[ci].items[ii]
+      if (it.kind === 'set') el.querySelector('.v').textContent = setValue(it.key)
+    })
+  })
+  RENDER.layout?.()
+}
+function announce(t) { $('#live').textContent = t }
+function setCat(i, fromKey) {
+  i = Math.max(0, Math.min(CATS.length - 1, i))
+  if (i === state.cat) return
+  state.cat = i; tone('cat'); layout()
+  announce(`${CATS[i].label}: ${CATS[i].items[state.sel[i]].title}`)
+  if (fromKey !== false) focusCurrent()
+}
+function setSel(i, quiet) {
+  const n = CATS[state.cat].items.length
+  i = Math.max(0, Math.min(n - 1, i))
+  if (i === state.sel[state.cat]) return
+  state.sel[state.cat] = i; if (!quiet) tone('tick'); layout()
+  announce(CATS[state.cat].items[i].title)
+  if (!quiet) focusCurrent()
+}
+function focusCurrent() {
+  if (state.open) return
+  const el = itemEls[state.cat][state.sel[state.cat]]
+  if (document.activeElement && document.activeElement.closest?.('#menu')) el.focus({ preventScroll: true })
+}
+function activate() {
+  const cat = CATS[state.cat], it = cat.items[state.sel[state.cat]]
+  if (it.kind === 'link') { tone('open'); window.open(it.href, '_blank', 'noopener'); return }
+  if (it.kind === 'set') {
+    if (it.key === 'sound') { setSound(!state.sound) }
+    if (it.key === 'tod') { state.tod = TOD[(TOD.indexOf(state.tod) + 1) % TOD.length]; tone('tick') }
+    if (it.key === 'motion') { state.motion = state.motion === 'full' ? 'reduced' : 'full'; applyMotion(); tone('tick') }
+    layout(); announce(`${it.title}: ${setValue(it.key)}`); return
+  }
+  openSheet(cat, it)
+}
+
+/* =====================================================================
+   Sound — synthesized, off until the visitor opts in
+   ===================================================================== */
+let AC = null
+function setSound(on) {
+  state.sound = on
+  if (on) { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume() } catch { state.sound = false } }
+  const b = $('#snd'); b.innerHTML = state.sound ? SND_ON : SND_OFF
+  b.setAttribute('aria-pressed', state.sound); b.setAttribute('aria-label', state.sound ? 'Sound on. Turn sound off' : 'Sound off. Turn sound on')
+  if (state.sound) tone('open')
+  layout()
+}
+function tone(kind) {
+  if (!state.sound || !AC) return
+  const t = AC.currentTime, out = AC.createGain(); out.gain.value = 0.9; out.connect(AC.destination)
+  const blip = (f0, f1, dur, vol, type = 'sine', at = 0) => {
+    const o = AC.createOscillator(), g = AC.createGain()
+    o.type = type; o.frequency.setValueAtTime(f0, t + at); o.frequency.exponentialRampToValueAtTime(f1, t + at + dur)
+    g.gain.setValueAtTime(0, t + at); g.gain.linearRampToValueAtTime(vol, t + at + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + at + dur)
+    o.connect(g).connect(out); o.start(t + at); o.stop(t + at + dur + 0.02)
+  }
+  if (kind === 'tick') { blip(2300, 1500, 0.045, 0.05); blip(4600, 3000, 0.02, 0.012, 'triangle') }
+  if (kind === 'cat') { blip(1500, 1100, 0.07, 0.06); blip(3000, 2200, 0.03, 0.015, 'triangle') }
+  if (kind === 'open') { blip(660, 990, 0.32, 0.045); blip(990, 1320, 0.36, 0.03, 'sine', 0.05); whoosh(0.35, 0.03, 900, 3200) }
+  if (kind === 'back') { blip(1100, 520, 0.16, 0.05); whoosh(0.22, 0.02, 2400, 700) }
+  function whoosh(dur, vol, f0, f1) {
+    const n = AC.createBufferSource(), b = AC.createBuffer(1, AC.sampleRate * dur, AC.sampleRate), d = b.getChannelData(0)
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1
+    const f = AC.createBiquadFilter(), g = AC.createGain()
+    f.type = 'bandpass'; f.Q.value = 1.4; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur)
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + dur * 0.3); g.gain.linearRampToValueAtTime(0, t + dur)
+    n.buffer = b; n.connect(f).connect(g).connect(out); n.start(t)
+  }
+}
+$('#snd').addEventListener('click', () => setSound(!state.sound))
+
+/* =====================================================================
+   Time of day palettes (real clock, or the Settings override)
+   ===================================================================== */
+const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+const PAL = {
+  night: { top: '#040b26', mid: '#12307a', bot: '#030a24', tint: '#b4ccff', glow: 0.95 },
+  dawn:  { top: '#20214e', mid: '#9a4f86', bot: '#e3936f', tint: '#ffe6f0', glow: 1.0 },
+  day:   { top: '#062a6e', mid: '#1659ad', bot: '#2c7cc6', tint: '#ffffff', glow: 1.0 },
+  dusk:  { top: '#1d0c40', mid: '#8a2a6c', bot: '#e06a34', tint: '#ffe0cc', glow: 1.0 },
+}
+const KEYS = [[0, 'night'], [5, 'night'], [6.5, 'dawn'], [8.5, 'day'], [16.5, 'day'], [18.6, 'dusk'], [20.4, 'night'], [24, 'night']]
+function todNow() { const h = new Date().getHours(); return h < 6 ? 'night' : h < 8 ? 'dawn' : h < 17 ? 'day' : h < 20 ? 'dusk' : 'night' }
+function palette() {
+  if (state.tod !== 'auto') return mkPal(PAL[state.tod], PAL[state.tod], 0)
+  const d = new Date(), h = d.getHours() + d.getMinutes() / 60
+  for (let i = 0; i < KEYS.length - 1; i++) if (h >= KEYS[i][0] && h < KEYS[i + 1][0]) {
+    const f = (h - KEYS[i][0]) / (KEYS[i + 1][0] - KEYS[i][0])
+    return mkPal(PAL[KEYS[i][1]], PAL[KEYS[i + 1][1]], f * f * (3 - 2 * f))
+  }
+  return mkPal(PAL.night, PAL.night, 0)
+}
+function mkPal(a, b, f) {
+  const m = (k) => hex(a[k]).map((v, i) => v + (hex(b[k])[i] - v) * f)
+  return { top: m('top'), mid: m('mid'), bot: m('bot'), tint: m('tint'), glow: a.glow + (b.glow - a.glow) * f }
+}
+function tickClock() {
+  const d = new Date()
+  $('#cdate').textContent = `${d.getMonth() + 1}/${d.getDate()}`
+  $('#ctime').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`
+  if (!GL) { const p = palette(); const c = (v) => `rgb(${v.map((x) => x * 255 | 0)})`
+    document.body.style.setProperty('--c0', c(p.top)); document.body.style.setProperty('--c1', c(p.mid)); document.body.style.setProperty('--c2', c(p.bot)) }
+}
+
+/* =====================================================================
+   HTML-in-Canvas detection. Two API generations exist:
+   legacy (Chromium ~138–145): <canvas layoutsubtree>, ctx.drawElement / drawElementImage,
+     gl.texElement2D / texElementImage2D(target, level, ifmt, fmt, type, el),
+     ResizeObserver {fireOnEveryPaint}, ctx.setHitTestRegions([...])
+   current (2026 explainer): <canvas content="drawable"> + [drawable] children, canvas.onpaint /
+     requestPaint(), gl.texElementSubImage2D(target, level, x, y, el), getElementImageDefaultSize,
+     canvas.updateElementGeometry(el, {canvasTransform, canvasClip}), getElementTransform
+   ===================================================================== */
+const HIC = (() => {
+  const C = HTMLCanvasElement.prototype
+  const W2 = window.WebGL2RenderingContext?.prototype || {}
+  const X2 = window.CanvasRenderingContext2D?.prototype || {}
+  const has = (o, n) => typeof o[n] === 'function'
+  let fireOnEveryPaint = false
+  try { const ro = new ResizeObserver(() => {}); ro.observe(document.documentElement, { get fireOnEveryPaint() { fireOnEveryPaint = true; return true } }); ro.disconnect() } catch {}
+  const names = {
+    'canvas.layoutSubtree': 'layoutSubtree' in C, 'canvas.content (drawable)': 'content' in C,
+    'canvas.requestPaint()': has(C, 'requestPaint'), 'canvas.onpaint': 'onpaint' in C,
+    'canvas.updateElementGeometry()': has(C, 'updateElementGeometry'), 'canvas.getElementTransform()': has(C, 'getElementTransform'),
+    'canvas.captureElementImage()': has(C, 'captureElementImage'), 'canvas.getElementImageDefaultSize()': has(C, 'getElementImageDefaultSize'),
+    'ctx2d.drawElementImage()': has(X2, 'drawElementImage'), 'ctx2d.drawElement()': has(X2, 'drawElement'), 'ctx2d.drawHTMLElement()': has(X2, 'drawHTMLElement'),
+    'ctx2d.setHitTestRegions()': has(X2, 'setHitTestRegions'),
+    'gl2.texElementSubImage2D()': has(W2, 'texElementSubImage2D'), 'gl2.texElementImage2D()': has(W2, 'texElementImage2D'),
+    'gl2.texElement2D()': has(W2, 'texElement2D'), 'gl2.texHTMLElement2D()': has(W2, 'texHTMLElement2D'),
+    'gl2.setHitTestRegions()': has(W2, 'setHitTestRegions'), 'ResizeObserver {fireOnEveryPaint}': fireOnEveryPaint,
+  }
+  const lines = Object.entries(names).map(([k, v]) => `${v ? '✓' : '·'} ${k}`)
+  const modern = names['canvas.requestPaint()'] && (names['gl2.texElementSubImage2D()'] || names['gl2.texElementImage2D()'])
+  const legacy = names['canvas.layoutSubtree'] && (names['gl2.texElementImage2D()'] || names['gl2.texElement2D()'] || names['gl2.texHTMLElement2D()'])
+  const gen = modern ? 'current (paint event)' : legacy ? 'legacy (layoutsubtree)' : null
+  const upName = names['gl2.texElementSubImage2D()'] ? 'texElementSubImage2D' : names['gl2.texElementImage2D()'] ? 'texElementImage2D'
+    : names['gl2.texElement2D()'] ? 'texElement2D' : names['gl2.texHTMLElement2D()'] ? 'texHTMLElement2D' : null
+  const ua = (navigator.userAgentData?.brands || []).filter((b) => !/not.?a.?brand/i.test(b.brand)).map((b) => `${b.brand} ${b.version}`).join(', ') || navigator.userAgent
+  return { available: !!gen, modern, legacy, gen, upName, report: { lines, gen, ua }, active: false }
+})()
+
+/* =====================================================================
+   WebGL2 stage: background wave + sparkles → FBO (mipmapped for depth-of-field),
+   composite, then the glass article panel (HTML-in-Canvas texture) on top.
+   ===================================================================== */
+const canvas = $('#stage')
+let GL = null
+try { GL = qs.get('mode') === 'nogl' ? null : canvas.getContext('webgl2', { alpha: false, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: false }) } catch {}
+
+const WAVE_GLSL = `
+float rC(float u, float t){ return 0.600 + 0.068*sin(u*1.70 + t*0.21) + 0.032*sin(u*3.40 - t*0.29 + 1.3) + 0.012*sin(u*6.90 + t*0.43 + 0.4); }
+float rW(float u, float t){ return 0.064*sin(u*1.05 - t*0.15 + 2.0) + 0.020*sin(u*2.60 + t*0.27 + 0.5) + 0.010; }
+float sC(float u, float t){ return 0.610 + 0.052*sin(u*1.30 - t*0.17 + 2.4) + 0.028*sin(u*3.90 + t*0.33 + 0.2) + 0.010*sin(u*8.1 - t*0.5); }
+float sW(float u, float t){ return 0.044*sin(u*1.60 + t*0.19 + 0.3) + 0.012*sin(u*3.3 - t*0.23) - 0.006; }
+`
+const VS_QUAD = `#version 300 es
+in vec2 aP; void main(){ gl_Position = vec4(aP, 0., 1.); }`
+
+const FS_BG = `#version 300 es
+precision highp float;
+uniform vec2 uRes; uniform float uT, uDpr, uGlow;
+uniform vec3 uTop, uMid, uBot, uTint;
+out vec4 o;
+${WAVE_GLSL}
+float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+float ribbon(float u, float v, float t, float px, int which, float lw, float lineA){
+  float e = 0.002;
+  float c  = which == 0 ? rC(u,t) : sC(u,t);
+  float w  = which == 0 ? rW(u,t) : sW(u,t);
+  float cd = which == 0 ? (rC(u+e,t)-rC(u-e,t))/(2.*e) : (sC(u+e,t)-sC(u-e,t))/(2.*e);
+  float wd = which == 0 ? (rW(u+e,t)-rW(u-e,t))/(2.*e) : (sW(u+e,t)-sW(u-e,t))/(2.*e);
+  float acc = 0.;
+  const int N = 22;
+  for (int i = 0; i < N; i++) {
+    float s = float(i) / float(N - 1) * 2. - 1.;
+    float y = c + w * s;
+    float sl = cd + wd * s;
+    float d = abs(v - y) / sqrt(1. + sl * sl) / px;
+    float a = lineA * (0.45 + 1.6 * pow(abs(s), 6.));
+    acc += a * exp(-d * d / (lw * lw));
+  }
+  float lo = min(c - w, c + w), hi = max(c - w, c + w);
+  float inside = smoothstep(lo - px, lo + px, v) * (1. - smoothstep(hi - px, hi + px, v));
+  float fold = 1. - clamp(abs(w) / 0.085, 0., 1.);
+  float across = (v - c) / (abs(w) + 1e-4);
+  acc += inside * (0.030 + 0.16 * fold * fold + 0.05 * pow(abs(across), 3.));
+  acc += 0.07 * exp(-pow((v - c) / (abs(w) + 0.05), 2.));
+  return acc;
+}
+void main(){
+  vec2 fc = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
+  float Hh = uRes.y; float U = min(Hh, uRes.x * 1.25); float u = fc.x / U; float v = fc.y / Hh; float px = 1. / Hh;
+  float g = fc.y / uRes.y;
+  vec3 col = g < .5 ? mix(uTop, uMid, smoothstep(0., .5, g)) : mix(uMid, uBot, smoothstep(.5, 1., g));
+  // big soft light pools, like the gradient was lit from behind
+  vec2 n = fc / uRes;
+  col += uMid * 0.35 * exp(-dot((n - vec2(.28, .52)) * vec2(1.6, 2.2), (n - vec2(.28, .52)) * vec2(1.6, 2.2)) * 2.0);
+  col += uTint * 0.06 * exp(-pow((n.y - 0.62) * 4.0, 2.));
+  float L = ribbon(u, v, uT, px, 0, 0.85 * uDpr, 0.085) + 0.75 * ribbon(u + 0.3, v, uT * 1.07 + 4.0, px, 1, 0.8 * uDpr, 0.07);
+  col += uTint * L * uGlow;
+  // vignette + dither (kills gradient banding)
+  col *= 1. - 0.38 * pow(length((n - .5) * vec2(1.05, 1.2)), 2.4);
+  col += (hash(fc + fract(uT)) - .5) / 255.;
+  o = vec4(col, 1.);
+}`
+
+const VS_PT = `#version 300 es
+precision highp float;
+in float aId; uniform vec2 uRes; uniform float uT, uDpr, uDof;
+out float vA; out float vBig;
+${WAVE_GLSL}
+float h(float n){ return fract(sin(n * 91.3458) * 47453.5453); }
+void main(){
+  float U = min(uRes.y, uRes.x * 1.25); float asp = uRes.x / U;
+  float r1 = h(aId), r2 = h(aId + 17.), r3 = h(aId + 31.), r4 = h(aId + 47.), r5 = h(aId + 63.);
+  float spd = 0.008 + 0.026 * r2;
+  float u = mod(r1 * (asp + .3) + uT * spd, asp + .3) - .15;
+  bool second = r5 > .62;
+  float c = second ? sC(u + .3, uT * 1.07 + 4.) : rC(u, uT);
+  float w = second ? sW(u + .3, uT * 1.07 + 4.) : rW(u, uT);
+  float v = c + w * (r3 * 2. - 1.) * 1.25 + (r4 - .5) * 0.07 + 0.008 * sin(uT * (0.6 + r2) + r1 * 30.);
+  gl_Position = vec4(u / asp * 2. - 1., 1. - v * 2., 0., 1.);
+  float tw = pow(0.5 + 0.5 * sin(uT * (1.2 + 2.4 * r4) + r3 * 40.), 3.);
+  vBig = step(0.93, r2);
+  gl_PointSize = (2.2 + 4.0 * pow(r5, 3.) + vBig * 12.) * uDpr * (1. + uDof * 1.4);
+  vA = (0.3 + 0.9 * tw) * (vBig > .5 ? 1.0 : 0.85) * (1. - uDof * 0.35);
+}`
+const FS_PT = `#version 300 es
+precision highp float;
+in float vA; in float vBig; uniform vec3 uTint; out vec4 o;
+void main(){
+  vec2 p = gl_PointCoord * 2. - 1.; float r = length(p);
+  float core = exp(-r * r * 9.);
+  float flare = vBig * (exp(-abs(p.x) * 26.) + exp(-abs(p.y) * 26.)) * exp(-r * 2.2) * 0.7;
+  float a = (core + flare) * vA;
+  o = vec4(mix(uTint, vec3(1.), .6) * a, 0.);
+}`
+
+const FS_COMP = `#version 300 es
+precision highp float;
+uniform sampler2D uBg; uniform vec2 uRes; uniform float uDof; out vec4 o;
+void main(){
+  vec2 uv = gl_FragCoord.xy / uRes;
+  if (uDof < 0.01) { o = vec4(textureLod(uBg, uv, 0.).rgb, 1.); return; }
+  float l = uDof * 3.4; vec2 k = uDof * 5. / uRes;
+  vec3 c = textureLod(uBg, uv, l).rgb * .36
+    + textureLod(uBg, uv + vec2(k.x, k.y) * 1.3, l).rgb * .16 + textureLod(uBg, uv + vec2(-k.x, k.y) * 1.3, l).rgb * .16
+    + textureLod(uBg, uv + vec2(k.x, -k.y) * 1.3, l).rgb * .16 + textureLod(uBg, uv - k * 1.3, l).rgb * .16;
+  o = vec4(c * (1. - uDof * 0.12), 1.);
+}`
+
+const FS_PANEL = `#version 300 es
+precision highp float;
+uniform vec2 uRes; uniform float uDpr;
+uniform vec4 uRect, uContent; uniform vec2 uElSize, uFrom;
+uniform float uScroll, uMaxScroll, uProg, uT, uOpenT, uVel, uMotion, uHasEl, uRadius;
+uniform vec4 uRip[4];
+uniform sampler2D uBg, uEl;
+out vec4 o;
+float sdRR(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.)) + min(max(q.x, q.y), 0.) - r; }
+vec4 el(vec2 uv){ return (uv.x < 0. || uv.y < 0. || uv.x > 1. || uv.y > 1.) ? vec4(0.) : texture(uEl, uv); }
+void main(){
+  vec2 vp = uRes / uDpr;
+  vec2 p = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y) / uDpr;
+  float e = clamp(uProg, 0., 1.);
+  float ee = 1. - pow(1. - e, 3.);
+  float spring = exp(-uOpenT * 4.2) * sin(uOpenT * 15.) * uMotion;
+  vec2 hb = uRect.zw * .5, c = uRect.xy + hb;
+  vec2 c0 = mix(uFrom, c, ee);
+  vec2 sc = vec2(mix(.5, 1., ee)) * vec2(1. + .022 * spring, 1. - .018 * spring);
+  vec2 q = (p - c0) / sc + c;
+  vec2 disp = vec2(0.);
+  float jelly = (1. - ee) * uMotion;
+  disp += vec2(sin(q.y * .021 + uT * 7.) * 18., sin(q.x * .017 + uT * 6.) * 10.) * jelly;
+  disp += vec2(sin(q.y * .012 + uOpenT * 9.), cos(q.x * .010 + uOpenT * 8.)) * 6. * abs(spring);
+  for (int i = 0; i < 4; i++) {
+    vec4 r = uRip[i]; float age = uT - r.z;
+    if (age < 0. || age > 3.2 || r.w <= 0.) continue;
+    vec2 d = q - r.xy; float L = length(d) + 1e-3; float ring = age * 380.;
+    float w = sin((L - ring) * .06) * exp(-pow((L - ring) / 110., 2.)) * exp(-age * 1.5) * r.w;
+    disp += d / L * w * 10. * uMotion;
+  }
+  // scrolling makes the sheet slosh: a travelling wave that leans into the scroll direction
+  disp.x += sin(q.y * .03 - uT * 8.) * uVel * .16 * uMotion;
+  disp.y += (sin(q.x * .018 + uT * 3.) * .5 + .5) * uVel * .34 * uMotion;
+  vec2 qd = q + disp;
+  float sd = sdRR(qd - c, hb, uRadius);
+  float shadow = (1. - smoothstep(-10., 46., sd - 10.)) * .42 * ee;
+  float inside = 1. - smoothstep(-.8, .8, sd);
+  if (inside <= 0. && shadow <= .002) { o = vec4(0.); return; }
+  vec2 ex = vec2(1., 0.);
+  vec2 g = vec2(sdRR(qd - c + ex, hb, uRadius) - sdRR(qd - c - ex, hb, uRadius), sdRR(qd - c + ex.yx, hb, uRadius) - sdRR(qd - c - ex.yx, hb, uRadius)) * .5;
+  float edge = smoothstep(-30., 0., sd);
+  vec2 refr = -g * edge * edge * 34. + disp * 2.2;
+  vec2 buv = (p + refr) / vp; buv.y = 1. - buv.y;
+  vec3 bg = textureLod(uBg, buv, 3.6).rgb;
+  vec3 bgs = textureLod(uBg, buv, 1.2).rgb;
+  vec3 col = mix(bg, vec3(.012, .03, .075), .6) + bg * .12;
+  col = mix(col, bgs * .7, edge * edge * .5);          // the rim stays sharper: thick glass
+  float ty = qd.y - uRect.y;
+  col += vec3(1.) * .085 * (1. - smoothstep(0., 120., ty));
+  col += vec3(.7, .85, 1.) * .03 * smoothstep(uRect.w * .6, uRect.w, ty);
+  float s = (qd.x - uRect.x) + (qd.y - uRect.y) * .55;
+  float sweep = mod(uOpenT * 640. - 260., 5600.);
+  col += vec3(1.) * .14 * exp(-pow((s - sweep) / 80., 2.)) * uMotion;
+  col += vec3(1.) * .05 * exp(-pow((s - sweep + 140.) / 26., 2.)) * uMotion;
+  float rim = exp(-pow((sd + 1.) / 1.1, 2.));
+  vec2 nn = normalize(g + 1e-5);
+  col += vec3(.88, .94, 1.) * rim * (.28 + .5 * clamp(-nn.y, 0., 1.) + .15 * clamp(-nn.x, 0., 1.));
+  col += vec3(1.) * edge * edge * edge * .07;
+  // scroll thumb
+  if (uMaxScroll > 1.) {
+    float th = max(36., uContent.w * uContent.w / (uContent.w + uMaxScroll));
+    float ty0 = uContent.y + (uContent.w - th) * clamp(uScroll / uMaxScroll, 0., 1.);
+    vec2 tp = qd - vec2(uRect.x + uRect.z - 9., ty0 + th * .5);
+    float ts = sdRR(tp, vec2(2., th * .5), 2.);
+    col += vec3(1.) * .38 * (1. - smoothstep(-.6, .6, ts));
+  }
+  if (uHasEl > .5) {
+    vec2 lp = qd - uContent.xy + vec2(0., uScroll);
+    vec2 uv = lp / uElSize;
+    float ca = min(.0024, length(disp) * .00012 + abs(uVel) * .00002);
+    vec4 tg = el(uv);
+    vec4 t = vec4(el(uv + vec2(ca, 0.)).r, tg.g, el(uv - vec2(ca, 0.)).b, tg.a);
+    float m = smoothstep(uContent.y, uContent.y + 20., qd.y) * (1. - smoothstep(uContent.y + uContent.w - 20., uContent.y + uContent.w, qd.y));
+    col = col * (1. - t.a * m) + t.rgb * m;
+  }
+  float a = inside * ee;
+  o = vec4(col * a, a + shadow * (1. - a));
+}`
+
+const R = {}  // GL resources
+function glInit() {
+  const gl = GL
+  const sh = (t, s) => { const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); if (!gl.getShaderParameter(x, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(x)); return x }
+  const prog = (v, f) => { const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, v)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, f)); gl.bindAttribLocation(p, 0, 'aP'); gl.bindAttribLocation(p, 1, 'aId'); gl.linkProgram(p)
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p))
+    const u = {}; for (let i = 0, n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS); i < n; i++) { const a = gl.getActiveUniform(p, i); u[a.name.replace('[0]', '')] = gl.getUniformLocation(p, a.name) } return { p, u } }
+  R.bg = prog(VS_QUAD, FS_BG); R.pt = prog(VS_PT, FS_PT); R.comp = prog(VS_QUAD, FS_COMP); R.panel = prog(VS_QUAD, FS_PANEL)
+  R.quad = gl.createVertexArray(); gl.bindVertexArray(R.quad)
+  const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW)
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0)
+  R.NPT = 190
+  R.pts = gl.createVertexArray(); gl.bindVertexArray(R.pts)
+  const pb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, pb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([...Array(R.NPT).keys()]), gl.STATIC_DRAW)
+  gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 1, gl.FLOAT, false, 0, 0)
+  gl.bindVertexArray(null)
+  R.bgTex = gl.createTexture(); R.fbo = gl.createFramebuffer()
+  R.elTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, R.elTex)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4))
+  R.elSize = [0, 0]
+}
+let DPR = 1
+function glResize() {
+  const gl = GL
+  DPR = Math.min(2, devicePixelRatio || 1)
+  const w = Math.round(innerWidth * DPR), h = Math.round(innerHeight * DPR)
+  if (canvas.width === w && canvas.height === h && R.bgW) return
+  canvas.width = w; canvas.height = h
+  R.bgW = w; R.bgH = h
+  gl.bindTexture(gl.TEXTURE_2D, R.bgTex)
+  const levels = Math.floor(Math.log2(Math.max(w, h))) + 1
+  // texStorage is immutable, so a resize recreates the texture
+  gl.deleteTexture(R.bgTex); R.bgTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, R.bgTex)
+  gl.texStorage2D(gl.TEXTURE_2D, levels, gl.RGBA8, w, h)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  gl.bindFramebuffer(gl.FRAMEBUFFER, R.fbo); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, R.bgTex, 0)
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+}
+
+/* =====================================================================
+   Render paths
+   ===================================================================== */
+const sheet = document.createElement('article')
+sheet.className = 'sheet'; sheet.id = 'sheet'; sheet.setAttribute('aria-live', 'off')
+const P = { rect: [0, 0, 0, 0], content: [0, 0, 0, 0], pad: 40, scroll: 0, target: 0, max: 0, vel: 0, prog: 0, openAt: 0, from: [0, 0], rips: [], ready: false, closing: false }
+
+const RENDER = {}
+function choosePath() {
+  const want = qs.get('mode')
+  const hic = GL && HIC.available && want !== 'dom'
+  HIC.active = !!hic
+  document.body.classList.toggle('hic', HIC.active)
+  RENDER.label = hic ? `HTML-in-Canvas (${HIC.gen}, gl.${HIC.upName})` : GL ? 'DOM overlay over WebGL2' : 'DOM overlay, CSS gradient (no WebGL2)'
+  const badge = $('#badge')
+  badge.classList.toggle('hic', hic)
+  $('#badge-t').textContent = hic ? `HTML-in-Canvas · ${HIC.upName}` : GL ? 'DOM overlay · fallback' : 'DOM · no WebGL'
+  badge.title = HIC.report.lines.join('\n')
+  badge.setAttribute('aria-label', 'Renderer: ' + RENDER.label)
+  if (hic) {
+    canvas.setAttribute('layoutsubtree', '')   // legacy generation
+    canvas.setAttribute('content', 'drawable') // current generation
+    sheet.setAttribute('drawable', '')
+    canvas.appendChild(sheet)
+  } else {
+    $('#glass .scroller').appendChild(sheet)
+    canvas.setAttribute('aria-hidden', 'true')
+  }
+  sheet.inert = true; sheet.setAttribute('aria-hidden', 'true')
+}
+
+/* --- HTML-in-Canvas: upload the live element into a texture --- */
+let needUpload = false
+function uploadSheet() {
+  const gl = GL
+  if (!state.open || !HIC.active) return
+  gl.bindTexture(gl.TEXTURE_2D, R.elTex)
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true) // legacy uploads arrive unpremultiplied
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+  try {
+    if (HIC.upName === 'texElementSubImage2D') {
+      const { width, height } = canvas.getElementImageDefaultSize ? canvas.getElementImageDefaultSize(sheet) : { width: Math.round(sheet.offsetWidth * DPR), height: Math.round(sheet.offsetHeight * DPR) }
+      if (R.allocW !== width || R.allocH !== height) { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); R.allocW = width; R.allocH = height }
+      gl.texElementSubImage2D(gl.TEXTURE_2D, 0, 0, 0, sheet)
+    } else {
+      gl[HIC.upName](gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sheet)
+    }
+    R.elSize = [sheet.offsetWidth, sheet.offsetHeight]
+    P.ready = true
+  } catch (err) { console.warn('[wave] element upload failed', err) }
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)
+}
+function hicListen() {
+  if (HIC.modern) {
+    canvas.addEventListener('paint', (e) => {
+      const ch = e.changedElements ? Array.from(e.changedElements) : [sheet]
+      if (ch.includes(sheet) || !P.ready) uploadSheet()
+    })
+  } else {
+    // legacy: a ResizeObserver with fireOnEveryPaint reports any repaint of canvas descendants
+    new ResizeObserver(() => { needUpload = true; uploadSheet() }).observe(canvas, { box: 'device-pixel-content-box', fireOnEveryPaint: true })
+  }
+}
+/* --- keep hit testing / accessibility geometry in sync with where we draw --- */
+let lastGeom = ''
+function syncGeometry() {
+  if (!HIC.active) return
+  const gl = GL
+  if (!state.open || P.closing) {
+    if (lastGeom !== 'none') {
+      try { if (canvas.clearElementGeometry) canvas.clearElementGeometry(sheet); else gl.setHitTestRegions?.([]) } catch {}
+      lastGeom = 'none'
+    }
+    return
+  }
+  const e = 1 - Math.pow(1 - Math.min(1, P.prog), 3)
+  const [x, y, w, h] = P.rect, cx = x + w / 2, cy = y + h / 2
+  const fx = P.from[0] + (cx - P.from[0]) * e, fy = P.from[1] + (cy - P.from[1]) * e, s = 0.5 + 0.5 * e
+  const ox = fx + (P.content[0] - cx) * s, oy = fy + (P.content[1] - P.scroll - cy) * s
+  const key = [ox, oy, s].map((v) => v.toFixed(1)).join()
+  if (key === lastGeom) return
+  lastGeom = key
+  try {
+    if (canvas.updateElementGeometry) {
+      canvas.updateElementGeometry(sheet, { canvasTransform: new DOMMatrix([s, 0, 0, s, ox, oy]), canvasClip: { x: 0, y: P.scroll, width: P.content[2], height: P.content[3] } })
+    } else if (gl.setHitTestRegions) {
+      gl.setHitTestRegions([{ element: sheet, rect: { x: ox * DPR, y: oy * DPR, width: sheet.offsetWidth * s * DPR, height: sheet.offsetHeight * s * DPR } }])
+    }
+  } catch (err) { console.warn('[wave] geometry sync failed', err) }
+}
+
+function panelLayout() {
+  let x, y, w, h, pad
+  if (PHONE) { x = 10; w = W - 20; y = 58; h = H - y - 84; pad = 18 }
+  else { w = Math.min(880, W - 96); x = (W - w) / 2; y = Math.max(70, H * 0.1); h = H - y - Math.max(62, H * 0.09); pad = 44 }
+  P.rect = [x, y, w, h]; P.pad = pad
+  P.content = [x + pad, y + 6, w - pad * 2, h - 12]
+  sheet.style.width = HIC.active ? P.content[2] + 'px' : ''
+  const g = $('#glass')
+  Object.assign(g.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); g.style.setProperty('--pad', pad + 'px')
+  P.max = HIC.active ? Math.max(0, sheet.offsetHeight - P.content[3]) : 0
+}
+RENDER.layout = () => { if (state.open) panelLayout() }
+
+function openSheet(cat, it) {
+  const ci = state.cat, ii = state.sel[ci]
+  state.open = { cat, it }
+  sheet.innerHTML = sheetFor(cat, it)
+  sheet.inert = false; sheet.removeAttribute('aria-hidden')
+  sheet.setAttribute('aria-label', it.title)
+  document.body.classList.add('open')
+  $('#menu').inert = true
+  tone('open')
+  const r = itemEls[ci][ii].querySelector('.ic').getBoundingClientRect()
+  P.from = [r.left + r.width / 2, r.top + r.height / 2]
+  P.scroll = P.target = 0; P.vel = 0; P.prog = state.motion === 'full' ? 0 : 1; P.openAt = now(); P.rips = []; P.closing = false; P.ready = false
+  panelLayout()
+  if (HIC.active) {
+    canvas.removeAttribute('aria-hidden')
+    canvas.requestPaint?.()
+    // focus the sheet so screen readers land in the article; links inside are tabbable
+    sheet.tabIndex = -1; sheet.focus({ preventScroll: true })
+  } else {
+    const g = $('#glass'); g.removeAttribute('aria-hidden')
+    g.style.setProperty('--fx', (P.from[0] - (P.rect[0] + P.rect[2] / 2)) + 'px'); g.style.setProperty('--fy', (P.from[1] - (P.rect[1] + P.rect[3] / 2)) + 'px')
+    g.classList.remove('on'); void g.offsetWidth; g.classList.add('on')
+    const sc = g.querySelector('.scroller'); sc.scrollTop = 0; sc.focus({ preventScroll: true })
+  }
+  announce(`Opened ${it.title}`)
+}
+function closeSheet() {
+  if (!state.open) return
+  const { it } = state.open
+  tone('back')
+  document.body.classList.remove('open')
+  $('#menu').inert = false
+  P.closing = true; P.closeAt = now()
+  syncGeometry()
+  if (!HIC.active) { const g = $('#glass'); g.classList.remove('on'); g.setAttribute('aria-hidden', 'true') }
+  sheet.inert = true; sheet.setAttribute('aria-hidden', 'true')
+  getSelection()?.removeAllRanges()
+  setTimeout(() => { if (P.closing) { state.open = null; P.closing = false; P.ready = false; if (HIC.active) canvas.setAttribute('aria-hidden', 'true') } }, state.motion === 'full' ? 380 : 10)
+  itemEls[state.cat][state.sel[state.cat]].focus({ preventScroll: true })
+  announce(`Closed ${it.title}`)
+}
+$('#back').addEventListener('click', closeSheet)
+
+/* =====================================================================
+   Input: keyboard, wheel, touch/pointer, gamepad
+   ===================================================================== */
+function scrollBy(dy, x, y, amp) {
+  if (!state.open) return
+  if (!HIC.active) { const sc = $('#glass .scroller'); sc.scrollBy({ top: dy, behavior: state.motion === 'full' ? 'smooth' : 'auto' }); return }
+  P.target = Math.max(0, Math.min(P.max, P.target + dy))
+  if (amp > 0 && state.motion === 'full') ripple(x ?? P.rect[0] + P.rect[2] / 2, y ?? P.rect[1] + P.rect[3] * 0.5, amp)
+}
+function ripple(x, y, amp) {
+  const t = now()
+  const last = P.rips[P.rips.length - 1]
+  if (last && t - last[2] < 0.14) { last[3] = Math.min(1.6, last[3] + amp * 0.3); return }
+  P.rips.push([x, y, t, Math.min(1.4, amp)]); if (P.rips.length > 4) P.rips.shift()
+}
+addEventListener('keydown', (e) => {
+  if (e.altKey || e.ctrlKey || e.metaKey) return
+  const k = e.key
+  if (state.open) {
+    const page = P.content[3] * 0.85 || 400
+    if (k === 'Escape' || k === 'Backspace') { e.preventDefault(); closeSheet() }
+    else if (HIC.active) {
+      if (k === 'ArrowDown') { e.preventDefault(); scrollBy(70, undefined, undefined, 0.35) }
+      else if (k === 'ArrowUp') { e.preventDefault(); scrollBy(-70, undefined, undefined, 0.35) }
+      else if (k === 'PageDown' || (k === ' ' && !e.shiftKey)) { e.preventDefault(); scrollBy(page, undefined, undefined, 0.9) }
+      else if (k === 'PageUp' || (k === ' ' && e.shiftKey)) { e.preventDefault(); scrollBy(-page, undefined, undefined, 0.9) }
+      else if (k === 'Home') { e.preventDefault(); scrollBy(-1e6, undefined, undefined, 0.8) }
+      else if (k === 'End') { e.preventDefault(); scrollBy(1e6, undefined, undefined, 0.8) }
+    } else if (k === 'ArrowDown' || k === 'ArrowUp') {
+      e.preventDefault(); scrollBy(k === 'ArrowDown' ? 80 : -80)
+    }
+    return
+  }
+  if (k === 'ArrowRight') { e.preventDefault(); setCat(state.cat + 1) }
+  else if (k === 'ArrowLeft') { e.preventDefault(); setCat(state.cat - 1) }
+  else if (k === 'ArrowDown') { e.preventDefault(); setSel(state.sel[state.cat] + 1) }
+  else if (k === 'ArrowUp') { e.preventDefault(); setSel(state.sel[state.cat] - 1) }
+  else if (k === 'Home') { e.preventDefault(); setSel(0) }
+  else if (k === 'End') { e.preventDefault(); setSel(1e6) }
+  else if (k === 'Enter' || k === ' ') {
+    if (document.activeElement === $('#snd') || document.activeElement?.closest?.('#hints')) return
+    if (document.activeElement?.classList?.contains('cat')) { /* fallthrough: open current item */ }
+    e.preventDefault(); activate()
+  }
+})
+// keep keyboard focus visible inside the canvas sheet: scroll focused links into view
+sheet.addEventListener('focusin', (e) => {
+  if (!HIC.active || e.target === sheet) return
+  let y = 0, n = e.target; while (n && n !== sheet) { y += n.offsetTop; n = n.offsetParent }
+  if (y < P.target + 30 || y > P.target + P.content[3] - 60) { P.target = Math.max(0, Math.min(P.max, y - P.content[3] * 0.4)) }
+})
+
+let wheelAcc = 0, wheelT = 0
+addEventListener('wheel', (e) => {
+  const dy = e.deltaMode === 1 ? e.deltaY * 32 : e.deltaY
+  if (state.open) {
+    if (HIC.active) { e.preventDefault(); scrollBy(dy, e.clientX, e.clientY, Math.min(1.2, Math.abs(dy) / 160)) }
+    return
+  }
+  e.preventDefault()
+  const t = performance.now(); if (t - wheelT > 300) wheelAcc = 0
+  wheelT = t; wheelAcc += dy
+  if (Math.abs(wheelAcc) > 60) { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) setCat(state.cat + Math.sign(wheelAcc)); else setSel(state.sel[state.cat] + Math.sign(wheelAcc)); wheelAcc = 0 }
+}, { passive: false })
+
+// pointer: swipes on the menu, drag-scroll + text selection on the canvas sheet
+let ptr = null, lastSwipe = 0
+const swiped = () => performance.now() - lastSwipe < 350
+const inRect = (x, y, r) => x >= r[0] && y >= r[1] && x <= r[0] + r[2] && y <= r[1] + r[3]
+const caretAt = (x, y) => {
+  if (document.caretPositionFromPoint) { const c = document.caretPositionFromPoint(x, y); return c && { node: c.offsetNode, off: c.offset } }
+  if (document.caretRangeFromPoint) { const r = document.caretRangeFromPoint(x, y); return r && { node: r.startContainer, off: r.startOffset } }
+}
+addEventListener('pointerdown', (e) => {
+  ptr = { x: e.clientX, y: e.clientY, t: performance.now(), id: e.pointerId, type: e.pointerType, sy: P.target, mode: null, last: e.clientY, lt: performance.now(), v: 0 }
+  if (state.open) {
+    if (!inRect(e.clientX, e.clientY, P.rect) && !e.target.closest('#ui button, #badge, #snd')) { ptr.mode = 'outside'; return }
+    if (HIC.active && inRect(e.clientX, e.clientY, P.content)) {
+      if (e.pointerType === 'touch') { ptr.mode = 'drag'; return }
+      if (e.target.closest && e.target.closest('a')) return
+      // Chromium's legacy hit-test regions route clicks but not drag-selection, so selection is driven here
+      const c = caretAt(e.clientX, e.clientY)
+      if (c && sheet.contains(c.node)) { e.preventDefault(); ptr.mode = 'select'; getSelection().setBaseAndExtent(c.node, c.off, c.node, c.off) }
+    }
+  }
+})
+addEventListener('pointermove', (e) => {
+  if (!ptr || ptr.id !== e.pointerId) return
+  if (ptr.mode === 'select') {
+    const c = caretAt(e.clientX, e.clientY)
+    if (c && sheet.contains(c.node)) getSelection().extend(c.node, c.off)
+    if (e.clientY > P.content[1] + P.content[3] - 30) scrollBy(14)
+    if (e.clientY < P.content[1] + 30) scrollBy(-14)
+  } else if (ptr.mode === 'drag') {
+    const t = performance.now(), dy = ptr.last - e.clientY
+    ptr.v = dy / Math.max(1, t - ptr.lt) * 16; ptr.last = e.clientY; ptr.lt = t
+    P.target = Math.max(0, Math.min(P.max, P.target + dy)); P.scroll = P.target
+  }
+})
+addEventListener('pointerup', (e) => {
+  if (!ptr || ptr.id !== e.pointerId) return
+  const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y
+  if (ptr.mode === 'outside' && Math.hypot(dx, dy) < 10) { lastSwipe = performance.now(); closeSheet() }
+  else if (ptr.mode === 'drag') { scrollBy(ptr.v * 14, e.clientX, e.clientY, Math.min(1.2, Math.abs(ptr.v) / 18)) }
+  else if (!state.open && (e.pointerType === 'touch' || e.pointerType === 'pen')) {
+    if (Math.abs(dx) > 36 && Math.abs(dx) > Math.abs(dy) * 1.2) { lastSwipe = performance.now(); setCat(state.cat + (dx < 0 ? 1 : -1)) }
+    else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) { lastSwipe = performance.now(); setSel(state.sel[state.cat] + Math.round(-dy / 60) || (dy < 0 ? 1 : -1)) }
+  }
+  ptr = null
+})
+addEventListener('dblclick', (e) => {
+  if (!state.open || !HIC.active || !inRect(e.clientX, e.clientY, P.content)) return
+  const s = getSelection(); const c = caretAt(e.clientX, e.clientY)
+  if (!c || !sheet.contains(c.node)) return
+  s.setBaseAndExtent(c.node, c.off, c.node, c.off); s.modify('move', 'backward', 'word'); s.modify('extend', 'forward', 'word')
+})
+// native scroll in the fallback panel drives the CSS / SVG-filter wobble
+let fbLast = 0, fbVel = 0
+$('#glass .scroller').addEventListener('scroll', (e) => { const st = e.target.scrollTop; fbVel += (st - fbLast); fbLast = st }, { passive: true })
+
+// gamepad: d-pad / left stick to move, south button to open, east to go back
+const pad = { held: {}, next: {} }
+function pollPad(t) {
+  const gps = navigator.getGamepads ? navigator.getGamepads() : []
+  for (const gp of gps) {
+    if (!gp) continue
+    const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0
+    const dirs = { up: gp.buttons[12]?.pressed || ay < -0.55, down: gp.buttons[13]?.pressed || ay > 0.55,
+      left: gp.buttons[14]?.pressed || ax < -0.55, right: gp.buttons[15]?.pressed || ax > 0.55,
+      ok: gp.buttons[0]?.pressed, back: gp.buttons[1]?.pressed }
+    for (const [k, on] of Object.entries(dirs)) {
+      if (!on) { pad.held[k] = false; continue }
+      if (!pad.held[k] || (t > pad.next[k] && !['ok', 'back'].includes(k))) {
+        pad.next[k] = t + (pad.held[k] ? 90 : 380); pad.held[k] = true
+        const map = { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight', ok: 'Enter', back: 'Escape' }
+        dispatchEvent(new KeyboardEvent('keydown', { key: map[k] }))
+      }
+    }
+    if (state.open && HIC.active && Math.abs(gp.axes[3] || 0) > 0.2) scrollBy((gp.axes[3]) * 18, undefined, undefined, 0.15)
+  }
+}
+
+/* =====================================================================
+   Frame loop
+   ===================================================================== */
+const T0 = performance.now()
+const now = () => window.__tfix ?? (performance.now() - T0) / 1000  // __tfix: frozen clock for screenshot poses
+let tWave = qs.has('t') ? +qs.get('t') : (Date.now() / 1000) % 600, lastT = 0, dof = 0, fps = { n: 0, t: 0, v: 0 }
+function applyMotion() { document.body.classList.toggle('rm', state.motion !== 'full') }
+reducedMQ.addEventListener?.('change', (e) => { state.motion = e.matches ? 'reduced' : 'full'; applyMotion(); layout() })
+
+function frame(ms) {
+  const t = now(), dt = Math.min(0.05, t - lastT); lastT = t
+  pollPad(ms)
+  tWave += dt * (state.motion === 'full' ? 1 : 0.12) * (window.__waveSpeed ?? 1)
+  const open = !!state.open && !P.closing
+  dof += ((open ? 1 : 0) - dof) * Math.min(1, dt * 7)
+  if (state.open) {
+    if (P.closing) P.prog = state.motion === 'full' ? Math.max(0, 1 - (t - P.closeAt) / 0.32) : 0
+    else if (P.ready || !HIC.active) P.prog = Math.min(1, P.prog + dt / 0.62)
+    if (window.__hold != null) { P.prog = window.__hold; P.openAt = t - window.__hold * 0.62 }
+    const prev = P.scroll
+    P.scroll += (P.target - P.scroll) * Math.min(1, dt * 12)
+    if (Math.abs(P.target - P.scroll) < 0.3) P.scroll = P.target
+    const v = (P.scroll - prev) / Math.max(dt, 1e-3) / 60
+    P.vel += (v * 3 - P.vel) * Math.min(1, dt * 10)
+    if (HIC.active) { P.max = Math.max(0, R.elSize[1] - P.content[3]); syncGeometry() }
+  }
+  if (!HIC.active && state.open) {
+    // fallback wobble from native scroll velocity
+    fbVel *= Math.pow(0.86, dt * 60)
+    const sc = $('#glass .scroller'), d = document.getElementById('fx-disp')
+    const amp = state.motion === 'full' ? Math.min(16, Math.abs(fbVel) * 0.22) : 0
+    sc.style.setProperty('--vel', (fbVel * 0.6).toFixed(2))
+    if (amp > 0.5) { d.setAttribute('scale', amp.toFixed(1)); sc.querySelector('.sheet').style.filter = 'url(#fx-ripple)' }
+    else sc.querySelector('.sheet').style.filter = ''
+  }
+  if (GL) draw(t)
+  fps.n++; if (t - fps.t > 1) { fps.v = fps.n / (t - fps.t); fps.n = 0; fps.t = t; window.__fps = fps.v }
+  requestAnimationFrame(frame)
+}
+function draw(t) {
+  const gl = GL, pal = palette()
+  glResize()
+  const w = canvas.width, h = canvas.height
+  // 1. background into the mipmapped FBO
+  gl.bindFramebuffer(gl.FRAMEBUFFER, R.fbo); gl.viewport(0, 0, w, h)
+  gl.disable(gl.BLEND)
+  gl.useProgram(R.bg.p); const u = R.bg.u
+  gl.uniform2f(u.uRes, w, h); gl.uniform1f(u.uT, tWave); gl.uniform1f(u.uDpr, DPR); gl.uniform1f(u.uGlow, pal.glow)
+  gl.uniform3fv(u.uTop, pal.top); gl.uniform3fv(u.uMid, pal.mid); gl.uniform3fv(u.uBot, pal.bot); gl.uniform3fv(u.uTint, pal.tint)
+  gl.bindVertexArray(R.quad); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE)
+  gl.useProgram(R.pt.p); const pu = R.pt.u
+  gl.uniform2f(pu.uRes, w, h); gl.uniform1f(pu.uT, tWave); gl.uniform1f(pu.uDpr, DPR); gl.uniform1f(pu.uDof, dof); gl.uniform3fv(pu.uTint, pal.tint)
+  gl.bindVertexArray(R.pts); gl.drawArrays(gl.POINTS, 0, R.NPT)
+  gl.disable(gl.BLEND)
+  gl.bindTexture(gl.TEXTURE_2D, R.bgTex); gl.generateMipmap(gl.TEXTURE_2D)
+  // 2. composite with depth-of-field
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, w, h)
+  gl.useProgram(R.comp.p); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, R.bgTex)
+  gl.uniform1i(R.comp.u.uBg, 0); gl.uniform2f(R.comp.u.uRes, w, h); gl.uniform1f(R.comp.u.uDof, dof)
+  gl.bindVertexArray(R.quad); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+  // 3. the glass sheet, with the live element as a texture
+  if (HIC.active && state.open && P.prog > 0) {
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+    const q = R.panel.u; gl.useProgram(R.panel.p)
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, R.bgTex); gl.uniform1i(q.uBg, 0)
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, R.elTex); gl.uniform1i(q.uEl, 1)
+    gl.uniform2f(q.uRes, w, h); gl.uniform1f(q.uDpr, DPR)
+    gl.uniform4fv(q.uRect, P.rect); gl.uniform4fv(q.uContent, P.content); gl.uniform2fv(q.uElSize, R.elSize); gl.uniform2fv(q.uFrom, P.from)
+    gl.uniform1f(q.uScroll, P.scroll); gl.uniform1f(q.uMaxScroll, P.max); gl.uniform1f(q.uProg, P.prog); gl.uniform1f(q.uT, t)
+    gl.uniform1f(q.uOpenT, t - P.openAt); gl.uniform1f(q.uVel, Math.max(-45, Math.min(45, P.vel))); gl.uniform1f(q.uMotion, state.motion === 'full' ? 1 : 0)
+    gl.uniform1f(q.uHasEl, P.ready ? 1 : 0); gl.uniform1f(q.uRadius, PHONE ? 14 : 18)
+    const rr = new Float32Array(16); P.rips.forEach((r, i) => rr.set(r, i * 4)); gl.uniform4fv(q.uRip, rr)
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+    gl.disable(gl.BLEND); gl.activeTexture(gl.TEXTURE0)
+  }
+}
+
+/* =====================================================================
+   Boot
+   ===================================================================== */
+if (GL) { try { glInit() } catch (err) { console.error('[wave] WebGL2 init failed, using CSS background', err); GL = null } }
+if (!GL) { document.body.classList.add('nogl'); canvas.style.display = 'none' }
+choosePath()
+if (HIC.active) hicListen()
+applyMotion()
+setSound(false)
+layout(); tickClock(); setInterval(tickClock, 15000)
+addEventListener('resize', () => { layout(); if (state.open) panelLayout() })
+document.fonts?.ready.then(() => { layout(); if (state.open) panelLayout() })
+requestAnimationFrame(frame)
+// deep-link for screenshots/tests: ?open=1 opens the selected item
+itemEls[state.cat][state.sel[state.cat]].focus({ preventScroll: true })
+if (qs.get('open')) setTimeout(activate, 60)
+window.__wave = { state, P, HIC, RENDER, now, activate, closeSheet, scrollBy, ripple, setCat, setSel, layout }
+</script>
+</body>
+</html>

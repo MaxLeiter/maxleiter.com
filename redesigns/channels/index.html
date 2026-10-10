@@ -1,0 +1,1538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Max Leiter — Channels</title>
+<meta name="description" content="Max Leiter's writing, notes and projects, presented as a channel dashboard.">
+<meta name="theme-color" content="#07090c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap">
+<style>
+:root{
+  --ink:#f4f7fa; --ink-2:rgba(236,242,248,.72); --ink-3:rgba(226,234,242,.42);
+  --glass:rgba(14,19,26,.74); --glass-hi:rgba(255,255,255,.14); --edge:rgba(255,255,255,.16);
+  --accent:#4fb3ff; --bg:#07090c;
+  --font:"Open Sans","Segoe UI",Inter,system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);overflow:hidden;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+body{touch-action:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none}
+.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+
+/* ---------- HUD ---------- */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:3;transition:opacity .5s}
+#hud.dim{opacity:.0}
+.top{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;padding:max(18px,env(safe-area-inset-top)) 34px 0}
+.card{display:flex;align-items:center;gap:12px;padding:6px 18px 6px 6px;border-radius:40px;
+  background:linear-gradient(180deg,rgba(78,90,104,.62),rgba(22,27,34,.72) 52%,rgba(12,15,20,.8));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(0,0,0,.4),0 6px 22px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1)}
+.pfp{width:44px;height:44px;border-radius:50%;display:block;box-shadow:0 0 0 2px rgba(255,255,255,.22),0 2px 6px rgba(0,0,0,.5)}
+.card b{display:block;font-weight:600;font-size:16px;letter-spacing:.1px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.card span{display:block;font-size:12px;color:var(--ink-2);margin-top:1px}
+.card i{font-style:normal;display:inline-block;width:8px;height:8px;border-radius:50%;background:#7be36f;box-shadow:0 0 8px #7be36f;margin-right:6px;vertical-align:1px}
+.tr{display:flex;align-items:center;gap:14px}
+.clock{font-weight:300;font-size:26px;letter-spacing:.5px;text-shadow:0 2px 10px rgba(0,0,0,.6);font-variant-numeric:tabular-nums}
+#snd{pointer-events:auto;font:600 12px var(--font);letter-spacing:1.4px;text-transform:uppercase;color:var(--ink);cursor:pointer;
+  display:flex;align-items:center;gap:8px;padding:8px 14px 8px 11px;border-radius:30px;border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg,rgba(80,92,106,.55),rgba(20,25,32,.75) 55%,rgba(10,13,18,.85));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 4px 16px rgba(0,0,0,.4)}
+#snd:hover{border-color:rgba(255,255,255,.3)}
+#snd:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#snd svg{width:18px;height:18px}
+#snd[aria-pressed="true"] .x{display:none}
+#snd[aria-pressed="false"] .w{display:none}
+.topwrap{position:fixed;top:max(18px,env(safe-area-inset-top));right:34px;z-index:5;display:flex;align-items:center;gap:16px}
+
+.chans{position:absolute;left:0;top:0;width:0;height:0}
+.chan{position:absolute;left:0;top:0;white-space:nowrap;font-weight:300;font-size:56px;line-height:1;letter-spacing:-.5px;transform-origin:0 50%;
+  pointer-events:auto;cursor:pointer;color:var(--ink);text-shadow:0 2px 18px rgba(0,0,0,.55);will-change:transform,opacity}
+.chan small{font-size:.32em;font-weight:600;letter-spacing:2px;color:var(--ink-3);margin-left:.6em;vertical-align:.9em}
+.cap{position:absolute;left:0;top:0;width:520px;will-change:transform,opacity;text-shadow:0 2px 12px rgba(0,0,0,.8)}
+.cap .k{font-size:12px;font-weight:700;letter-spacing:2.6px;text-transform:uppercase;color:var(--accent)}
+.cap .t{font-size:24px;font-weight:600;margin-top:3px;line-height:1.2;letter-spacing:-.2px}
+.cap .d{font-size:14.5px;color:var(--ink-2);margin-top:5px;line-height:1.4;max-width:500px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pips{position:absolute;left:0;top:0;display:flex;gap:6px;align-items:center}
+.pips b{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .25s,transform .25s}
+.pips b.on{background:#fff;transform:scale(1.35);box-shadow:0 0 10px var(--accent)}
+.pips span{font-size:12px;font-weight:600;letter-spacing:1.5px;color:var(--ink-3);margin-left:8px;font-variant-numeric:tabular-nums}
+.guide{position:absolute;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));display:flex;gap:26px;justify-content:center;font-size:13px;color:var(--ink-2);font-weight:600;letter-spacing:.3px}
+.guide span{display:flex;align-items:center;gap:8px;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.key{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 7px;border-radius:13px;font-size:11px;font-weight:700;color:#e9eef3;
+  background:radial-gradient(circle at 50% 30%,#6b7682,#2a3139 70%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 4px rgba(0,0,0,.6);border:1px solid rgba(0,0,0,.5)}
+.pad{opacity:0;transition:opacity .4s}
+.pad.on{opacity:1}
+.ring{position:fixed;left:0;top:0;border-radius:18px;pointer-events:none;z-index:4;opacity:0;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--accent),0 0 30px var(--accent);transition:opacity .2s}
+.kbd .ring.on{opacity:1}
+
+/* ---------- reader ---------- */
+#reader{position:fixed;z-index:6;left:50%;top:50%;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;opacity:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(28,36,46,.86),rgba(9,12,17,.9) 140px);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 0 1px rgba(255,255,255,.1),0 30px 80px rgba(0,0,0,.6)}
+#reader.show{pointer-events:auto}
+#reader .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 22px 14px 28px;border-bottom:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,0))}
+#reader .bar .k{font-size:12px;font-weight:700;letter-spacing:2.6px;text-transform:uppercase;color:var(--accent)}
+#reader .bar .k em{font-style:normal;color:var(--ink-3);margin-left:10px;letter-spacing:1.5px}
+.x-btn{font:600 12px var(--font);letter-spacing:1.2px;text-transform:uppercase;color:var(--ink);background:none;border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:6px 12px 6px 8px;display:flex;gap:8px;align-items:center;cursor:pointer}
+.x-btn .key{min-width:22px;height:22px;font-size:10px}
+.x-btn:hover{background:rgba(255,255,255,.08)}
+.x-btn:focus-visible,#reader a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#reader .body{overflow:auto;padding:26px 44px 40px;overscroll-behavior:contain;touch-action:pan-y;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
+#reader h1{font-weight:300;font-size:40px;line-height:1.12;margin:0 0 8px;letter-spacing:-.6px;outline:none}
+#reader .desc{font-size:17px;color:var(--ink-2);margin:0 0 20px;font-style:italic}
+#reader .prose{font-size:16.5px;line-height:1.68;color:rgba(240,244,248,.9);max-width:68ch}
+#reader .prose p{margin:0 0 1em}
+#reader .prose h3,#reader .prose h4{font-weight:600;font-size:20px;margin:1.4em 0 .5em;color:#fff}
+#reader .prose a{color:#9fd4ff;text-decoration-color:rgba(159,212,255,.4);text-underline-offset:3px}
+#reader .prose code{font:14px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px}
+#reader .prose pre{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;overflow:auto;max-width:100%}
+#reader .prose pre code{background:none;padding:0;font-size:13px;line-height:1.55}
+#reader .prose ul,#reader .prose ol{padding-left:1.4em;margin:0 0 1em}
+#reader .prose blockquote{margin:0 0 1em;padding-left:14px;border-left:3px solid rgba(255,255,255,.2);color:var(--ink-2)}
+#reader .more{color:var(--ink-3);font-size:14px;margin:6px 0 22px}
+.go{display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:#fff;text-decoration:none;padding:11px 20px 11px 12px;border-radius:30px;
+  background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.06) 50%,rgba(0,0,0,.1));border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 18px rgba(0,0,0,.35)}
+.go:hover{background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.1) 50%,rgba(0,0,0,.1))}
+.go .key{background:radial-gradient(circle at 50% 30%,#8fd0ff,#2a76b8 70%)}
+
+/* ---------- CSS 3D fallback ---------- */
+#css3d{position:fixed;inset:0;perspective:1100px;perspective-origin:42% 40%;overflow:hidden;
+  background:radial-gradient(120% 80% at 45% 30%,#1c232c 0%,#0b0e12 55%,#050608 100%)}
+#css3d .floor{position:absolute;left:-50%;right:-50%;top:62%;height:120%;transform-origin:50% 0;transform:rotateX(82deg);
+  background:radial-gradient(closest-side at 50% 18%,rgba(140,170,200,.16),transparent),repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 120px),linear-gradient(#0d1116,#06080a)}
+#css3d .world{position:absolute;left:42%;top:42%;transform-style:preserve-3d}
+#css3d .tile{position:absolute;left:0;top:0;border-radius:16px;transform-style:preserve-3d;background-size:cover;cursor:pointer;
+  box-shadow:0 0 0 1px rgba(255,255,255,.2),0 18px 40px rgba(0,0,0,.5);-webkit-box-reflect:below 14px linear-gradient(transparent 55%,rgba(255,255,255,.22))}
+#css3d .tile.f{box-shadow:0 0 0 2px rgba(255,255,255,.75),0 0 40px var(--accent),0 18px 40px rgba(0,0,0,.5)}
+#css3d .tile::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(160deg,rgba(255,255,255,.28),rgba(255,255,255,0) 40%)}
+
+/* ---------- mobile ---------- */
+@media (max-width:700px){
+  .top{padding:max(12px,env(safe-area-inset-top)) 14px 0}
+  .topwrap{right:14px;top:max(14px,env(safe-area-inset-top))}
+  .card{padding:4px 12px 4px 4px;gap:9px}
+  .pfp{width:34px;height:34px}
+  .card b{font-size:14px} .card span{display:none}
+  .clock{display:none}
+  #snd{padding:7px 10px 7px 9px} #snd .lbl{display:none}
+  .chan{font-size:40px}
+  .cap{width:calc(100vw - 32px)}
+  .cap .t{font-size:20px} .cap .d{font-size:13.5px}
+  .guide{gap:14px;font-size:12px} .guide .kb{display:none}
+  #reader .body{padding:20px 20px 32px}
+  #reader h1{font-size:30px}
+  #reader .prose{font-size:16px}
+  #reader .bar{padding:12px 12px 12px 20px}
+}
+@media (hover:hover) and (pointer:fine){.guide .tp{display:none}}
+@media (hover:none){.guide .kb{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div id="css3d" aria-hidden="true" hidden><div class="floor"></div><div class="world"></div></div>
+
+<nav id="a11y" class="vh" aria-label="Site"></nav>
+<noscript><style>.vh{position:static!important;width:auto;height:auto;clip:auto;clip-path:none;white-space:normal;margin:0;padding:24px}body{overflow:auto;touch-action:auto}</style></noscript>
+
+<div id="hud" aria-hidden="true">
+  <div class="top">
+    <div class="card"><canvas class="pfp" width="96" height="96"></canvas><div><b>Max Leiter</b><span><i></i>Software engineer · v0 &amp; AI SDK</span></div></div>
+  </div>
+  <div class="chans"></div>
+  <div class="cap"><div class="k"></div><div class="t"></div><div class="d"></div></div>
+  <div class="pips"></div>
+  <div class="guide">
+    <span class="kb"><span class="key">← →</span>Browse</span>
+    <span class="kb"><span class="key">↑ ↓</span>Channels</span>
+    <span class="kb"><span class="key">Enter</span>Open</span>
+    <span class="kb"><span class="key">Esc</span>Back</span>
+    <span class="tp"><span class="key">⇆</span>Swipe</span>
+    <span class="tp"><span class="key">●</span>Tap to open</span>
+    <span class="pad"><span class="key">◎</span>Controller connected</span>
+  </div>
+</div>
+<div class="topwrap">
+  <span class="clock" aria-hidden="true"></span>
+  <button id="snd" type="button" aria-pressed="false" title="Toggle interface sounds (M)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="x" d="m16 9 6 6m0-6-6 6"/></svg>
+    <span class="lbl">Sound off</span>
+  </button>
+</div>
+<div class="ring" aria-hidden="true"></div>
+
+<div id="reader" role="dialog" aria-modal="true" aria-labelledby="r-title" hidden>
+  <div class="bar"><div class="k"></div><button class="x-btn" type="button"><span class="key">Esc</span>Back</button></div>
+  <div class="body"><h1 id="r-title" tabindex="-1"></h1><p class="desc"></p><div class="prose"></div><p class="more"></p><a class="go" href="#"><span class="key">↵</span><span class="gl">Read on maxleiter.com</span></a></div>
+</div>
+
+<script id="content" type="application/json">{"site":{"name":"Max Leiter","url":"https://maxleiter.com","github":"https://github.com/maxleiter","x":"https://twitter.com/maxleiter","blurb":"Software engineer at Vercel working on v0 and the AI SDK. Writes about the web, Linux, tooling and AI."},"posts":[{"slug":"embedding-emoji-search","type":"post","title":"You don't need Jev for good emoji search","description":"or: semantic emoji search with embeddings","date":"Sep 26, 2026","href":"/blog/embedding-emoji-search","excerpt":"There's been a lot of [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) hype lately, and for good reason.\nIt's largely novel (to most developers, at least), super cheap, and there's a lot of cool use cases for it.\n\nThe issue I see is a lot of people are seeing Jev as a hammer, and lots of _classification_ tasks as nails.\nYou want to use Jev when you need some LLM reasoning behind the decision.\n\nFor example, take this tweet:\n\n\n\nTo be clear, I don't intend to pick on Gergely or Linear. But I think this is a miss on both their parts.\n\nTwo years ago, I built semantic emoji search but with no LLM and just embeddings. And it was faster, cheaper, and occasionally better than Jev (\"pareto-mogged\", as the kids say).\n\nNow, to [Gergely's point](https://x.com/GergelyOrosz/status/2103873821908353260?s=20), setting up a database and embedding model or an embedding provider are more work than just using Jev.\nAnd two years ago I would have gladly used Jev instead of working with Opus 3/GPT-4-turbo to scrape all of Vercel's slack emojis and get this working.\n\nBut it's not two years ago and models are now more than\ncapable of autonomously doing the work for you.\n\n\nAn aside on scr"},{"slug":"thank-u-next","type":"post","title":"thank u, next","description":"Replacing Next.js with a vibe-coded \"framework","date":"Sept 1, 2026","href":"/blog/thank-u-next","excerpt":"![The cover of Ariana Grande's album Thank U, Next: the title repeated in many fonts on a pink background](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/thank-u-next/thank-u-next.png)\n\n\n  If you're wondering about this post's title:\n  https://en.wikipedia.org/wiki/Thank_U,_Next\n\n\nThere's been a lot of talk about custom / personal software and LLMs lately. I've been a huge fan -- I'm writing this in a [markdown editor](https://github.com/MaxLeiter/md-viewer) I made for myself. And lately I've been toying with thoughts about the future of frameworks. A nice intersection of the two seemed like a personal framework.\n\nSo as of September 1st, this website is no longer running on Next.js. Instead, it's built by a bespoke custom framework that Fable architected and Opus implemented. If this were a commercial project, I'd probably stay on Next[^1], but it's not, so 🤷\n\nThis site is overall [pretty simple](/blog/build-a-blog-with-nextjs-13) - it's fully static and compiled to HTML at build time. But it has a lot of React and non-trivial build-time processing like [MDX](https://mdxjs.com/). I gave Fable 5 (in the claude code CLI) the following:\n\n> i am curious about on-demand c"},{"slug":"xios","type":"post","title":"Running Wayland, X11, GNOME, and KDE natively on an iPad","description":"X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition","date":"Jul 28, 2026","href":"/blog/xios","excerpt":"I [like](https://knightos.org) [running](https://maxleiter.com/blog/MSHW0184) [software](https://maxleiter.com/x11) on devices that aren't \"supposed\" to run it.\n\nI own the hardware. I should control the software. And for _reasons_, Apple makes phenomenal hardware and operating systems, but locks them down.\n\nI've been bitter for a long time. Six years ago, when I should’ve been studying for finals, I [ported X11](https://maxleiter.com/x11) to my jailbroken iPad because I wanted to try using it as a \"real\" personal computer:\n\n\n\nThat first version worked, but also sucked: the X server ran on the iPad, but I used a VNC client to interact with it and a lot of\nsoftware did not compile. I was using vim and xterm and it looked like something from the 90s.\n\nWith more experience, and with LLMs, I was able to get significantly further.\n\nThere is a \"slop wiki\" available at https://xios.maxleiter.com with more information, and the code is on [GitHub](https://github.com/MaxLeiter/jailbreak/tree/main/x11/).\n\nSome screenshots:\n\n\n  \n  \n  \n  \n\n\n### X11\n\nIf you're unfamiliar with X11, this post assumes a basic understanding, but TL;DR: it’s a window server and protocol that\nmany devices use. It descr"},{"slug":"weights","type":"post","title":"They're Made Out of Weights","description":"with apologies to Terry Bisson","date":"Jun 3, 2026","href":"/blog/weights","excerpt":"_After Terry Bisson's [\"They're Made Out of Meat\"](https://web.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html)._\n\n\"They're made out of weights.\"\n\n\"Weights?\"\n\n\"Weights. Floating-point numbers. We checked the whole thing through. It's nothing but weights.\"\n\n\"Weights doing what? Where do the words come from?\"\n\n\"The weights make the words. Are you understanding me? We opened it up. There's no dictionary in there, no grammar rules, no little man. Just weights. Eighty layers of numbers getting multiplied together.\"\n\n\"That's ridiculous. It wrote my performance review last week. It softened the tone unprompted. You're telling me multiplication did that?\"\n\n\"Matrix multiplication did that. The numbers go in one end, the phrasing comes out the other.\"\n\n\"So there's a language module somewhere. A reasoning unit bolted on.\"\n\n\"No module. No unit. We looked. The reasoning is the weights. The weights are the reasoning.\"\n\n\"Spare me. Nobody writes a eulogy with linear algebra.\"\n\n\"It doesn't write eulogies, technically. It predicts the next token. Then the next one. The eulogy is a side effect.\"\n\n\"A side effect. You're asking me to believe in sentient weights.\"\n\n\"I'm not asking you, I'm "},{"slug":"sandcastle","type":"post","title":"Sandcastle: A web-based Linux desktop environment","description":"","date":"Feb 11, 2026","href":"/blog/sandcastle","excerpt":"![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/header.png)\n\nSix years ago, while I should have been studying for finals, I patched and compiled X11 (and all its dependencies)\nto [run on a jailbroken iPad](https://maxleiter.com/blog/X11). I wanted to run real applications on my tablet.\n\nI've spent the last few ~months~ ~weeks~ ~days~ hours ~building~ vibecoding something that feels like a better solution:\na Linux desktop environment, on the web. I wrote zero lines of code.\n\nYou can try it out [here](https://sandcastle-os.vercel.app), and the source is available [here](https://github.com/vercel-labs/sandcastle).\n\n\n  If you're familiar with Desktop Environments and Linux, you can [skip the next\n  few sections](#the-servers)\n\n\n### Table of Contents\n\n# X11?\n\n[X11](https://www.x.org/wiki/) is the display server protocol that has powered Linux machines for decades. Released in 1984, it handles drawing windows on screens and routing input (key presses and clicks) to the right applications.\nBecause computers were [very different](/blog/formatting) in the 80s, X11 is built for _servers_ and _clients_. The application runs on a server, and dumb clients can draw th"},{"slug":"introducing-HFSViewer","type":"post","title":"Introducing HFSViewer","description":"View and modify HFS partitions on modern macOS versions","date":"Jan 2, 2026","href":"/blog/introducing-HFSViewer","excerpt":"Last year my roommate and I found an old original [iMac G3](https://en.wikipedia.org/wiki/IMac_G3) outside our apartment building. \nIt has some interesting early 2000s/late 90s style websites and files on it that I want to preserve (and hope to share here soon!).\n\nBut I realized getting files off of it wouldn't be easy.\n\nThe machine is running macOS 9.2, which supports USB 1.0.\nWe're up to USB 4 now, so thats pretty old; none of my modern USB 3 devices were detected by it.\nAfter [some research](https://www.reddit.com/r/VintageApple/comments/1jrmrqv/mac_os_9_hates_usb_sticks/) I found that macOS 9.2 _does_ have USB support, but it can't always negotiate USB 3 speeds or support larger USBs.\nSo I went and bought [this $5 stick](https://www.amazon.com/dp/B07W54X2F3) and it worked like a charm.\n\n\nYou should try to stick to USBs with less than 2 GBs of storage, otherwise Mac OS 9.2 might not support it. \n\n\nWith that solved and the files copied over, I plugged it into my M4 laptop and... it wasn't recognized there either. No error or mounting occurred due to no driver support.\nEventually I found [hfsutils](https://www.mars.org/home/rob/proj/hfs/), a wonderful package (which is convienentl"},{"slug":"the-new-maxleiter-com","type":"post","title":"The new maxleiter.com","description":"iframes, view transitions, progressive enhancement, and React Server Components","date":"Nov 12, 2025","href":"/blog/the-new-maxleiter-com","excerpt":"I redesigned maxleiter.com this week. I've wanted to make it more personal and opinionated for a long time,\nbut felt I lacked the expertise to do it justice.\nWith [v0](https://v0.app) and [Claude Code](https://www.claude.com/product/claude-code) (and some manual cleanup) it only took a few hours.\n\nIf you haven't played with the [homepage](https://maxleiter.com/) yet, some of the features are:\n\n- Draggable and resizable windows, including the blog posts\n- A web-friendly version of [KnightOS](https://knightos.org) in the Calculator app\n- A terminal app with some fun easter eggs\n- You can full-screen the windows, and some redirect to real pages (like the blog posts)\n\nGoing into this I had some constraints:\n\n- Remains snappy and is SSR'd at build-time\n- Must work without JavaScript enabled\n- Uses new web platform features\n\n![maxleiter.com screenshot](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/homepage.png?w=800)\n\n### Table of Contents\n\n## Preloading iframes\n\nIf you open a blog post, it opens in a windowed app. I originally rendered the SSR'd MDX, and that worked,\nbut it involved either:\n\n- Sending every post in the initial payload (not great for performa"},{"slug":"rewrite-your-prompts","type":"post","title":"You should be rewriting your prompts","description":"We talk about overfitting models but never overfitting prompts to models","date":"Sept 14, 2025","href":"/blog/rewrite-your-prompts","excerpt":"I've been \"lucky\" to work with a lot of different LLMs over the past few years (there is, in fact, a reason we made the [AI SDK](https://ai-sdk.dev/)).\nWhen a new model is publicly released there's a good chance we've already tried it and evaluated it for use with v0 within a few hours.\n\nOur results do not always improve as expected, even when we use newer and strictly better models[^1].\n\nAnother example of this is when gpt-5 was released in Cursor. People _hated_ it, but the zeitgeist has since shifted.\nYou can read about what OpenAI and Cursor fixed in [OpenAI's gpt-5 cookbook](https://cookbook.openai.com/examples/gpt-5/gpt-5_prompting_guide?utm_source=chatgpt.com#collaborative-coding-in-production-cursors-gpt-5-prompt-tuning).\n\nSo what should you do when a new model comes out? Rewrite your prompts. Otherwise it's an apples-to-oranges comparison.\n\nMy three and a half arguments for this are:\n\n- Prompt Format\n- Position Bias\n- Model Biases\n  - Work with the model biases, not against\n\n## Reason #1: Prompt Format\n\nAn early obvious example of where differences between models come into play is markdown vs XML.\n\nAnecdatally, OpenAI models (especially older ones) were _great_ with markdo"},{"slug":"seeing-the-future","type":"post","title":"I have seen the future through AR glasses","description":"My experience with the XReal One Pros","date":"Sept 7, 2025","href":"/blog/seeing-the-future","excerpt":"I like to try new technology. 75% of what I buy is something I use once or twice then sell or give away (or keep in a drawer and forget about. Sorry, remarkable).\nBut sometimes, on rare occasions, there's a product that is A) fucking awesome and B) I can't help but evangelize.\n\nOne of my more recent purchases was the [XReal One Pros](https://www.xreal.com/us/one-pro), and wow: I have seen the future, and it's through AR glasses.\n\nIf you&apos;re unfamiliar, the XReal One Pros are really just a display and (surprisingly good) speakers. They are augmented reality (AR) glasses,\nmeaning they aren't like _virtual reality_ headsets such as the Vision Pro or Meta Quest: they don't replace fully your view, they put an overlay on it\n\nI really think it's easier to show than tell in this case:\n\n\n  \n    \n      \n    \n  \n  \n    \n  \n\n\nTo get something out of the way: do I think XReal in particular will be the product that comes out on top? Not at all. I like their product, and I respect any newcomers to the hardware game, but it's an uphill battle for sure.\n\n## The Good\n\n- They are light. Because they're really just shells and they're powered by your devices, there's no need for a heavy battery\n- "},{"slug":"formatting","type":"post","title":"Formatting code should be unnecessary","description":"and we knew this back in the 80s","date":"Sep 6, 2025","href":"/blog/formatting","excerpt":"I had a (maybe slightly overqualified) computer science teacher back in highschool, Mr. Paige.\nHe worked on the [Ada]() compiler and\nhas been programming since the early 80s.\n\nOne day I complained about linter tooling that\nwas driving me nuts. I said something to the effect of, \"it's 2016, how are we still dealing with this sort of thing?\"\n\nTurns out, that problem was solved four decades ago (well, three at that point). Back when he was working on Ada,\nthey didn't store text sources at all &mdash; they used an IR called [DIANA](https://archive.org/details/dianaintermediat0000unse/page/n7/mode/2up).\nEveryone had their own pretty-printing settings for viewing it however they wanted.\n\nWe've been debating some linter settings at work recently and I keep thinking back to\nMr. Paige. It's 2025, how are we still dealing with this sort of thing?\n\n---\n\nWell, to answer that it would help to know what we're missing.\n\nI believe he was working with the [Rational R1000](https://en.wikipedia.org/wiki/Rational_R1000), of which there isn't a ton of info\n(like all things Ada, it was used by the DoD):\n\n![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/formatting/rational.jpg?w=400)\n\nThe"},{"slug":"vibecoding-minecraft-mods","type":"post","title":"Vibe-coding Minecraft mods","description":"and the lessons learned","date":"Jun 21, 2025","href":"/blog/vibecoding-minecraft-mods","excerpt":"{/* eslint-disable react/jsx-no-undef */}\n\nIf you aren't familiar with the extent of the Minecraft modding scene, it's _big_. There are mods with more thought put into them than many AAA games.\n\nThe best example is [Create](https://www.curseforge.com/minecraft/mc-mods/create):\n\n\n  \n  {\n    \n      Note that trains (and windmills and assembly lines) are not built into\n      Minecraft.\n    \n  }\n\n\nSo I was pretty lost when I started playing for the first time in a long time.\n\n### Table of Contents\n\n## The Problem\n\nAs some friends and I started playing the Divine Journey 2 modpack,\nI was overwhelmed by the number of modded blocks and items.\n\nTo give you a taste, there are 54 &quot;generators&quot; from 16 mods:\n\n{\n\n  \n    \n      I built this UI with v0 and extracted the images from a screenshot using\n      o4-mini with toolcalling.\n    \n}\n\nFinding them around our base was a pain. My friends knew where everything was,\nand would be telling me things like \"put coal in the hopper that feeds the Coke\nOven into the Blast Furnace by the biodiesel setup\"\n\nThere's one obvious solution:\n\n## The Solution: more mods\n\nI ended up creating two mods with a mix of [OpenAI Codex](https://github.com/opena"},{"slug":"sluggified-urls","type":"post","title":"Implementing Notion style URLs","description":"Create /some-title-here-{id} URLs for recognizable links in Next.js","date":"Jun 19, 2025","href":"/blog/sluggified-urls","excerpt":"I hate unrecognizable URLs. If I want to go back to a specific document or page, I should be able\nto type the name of it in the address bar and find it in my browser history. Notion is particularly good at this,\nand v0 was particularly bad at it (for a while), so this is what I did to fix v0.\n\nHere's what a notion URL looks like:\n\n\n  \n\n\nIt's recognizable, visually appealing, and easy to find in your browser history:\n\n\n\nI'm a fan.\n\n\n\nAt first I thought implementing it would be straight forward, but there are a few easy-to-hit gotcha's involved.\nThis post will be focused on Next.js, but the concepts are universal. Here are some of the things to keep in mind:\n\n- You need to ensure the [canonical URL](https://developers.google.com/search/docs/crawling-indexing/canonicalization) is up-to-date\n- The client needs to wind up on the most recent URL, otherwise crawlers like Google can index \"fake\" paths\n- Be mindful of your previous URLs and ensure they don't conflict with the logic for adding/parsing the slug\n\nTo get started, we need two functions: one to generate the URL, and one to parse it.\n\nIt's important we support URLs both with and without the title, and I recommend using a library t"},{"slug":"ship-every-day","type":"post","title":"Ship something every day","description":"","date":"Jun 10, 2024","href":"/blog/ship-every-day","excerpt":"**Edit**: A better title would've been \"_commit_ every day _that you work_\". I don't mean you should work on weekends or not take time off, and\nwhatever you work on doesn't need to \"ship to prod\". \n\n\n\nI don't feel particularly qualified to give advice (I blame imposter syndrome),\nbut I do have one tip to share that I think has been useful for me.\nIt applies both to professional software dev and personal projects.\n\nYou probably guessed it from the title: **ship something every day**.\n\nIt doesn't need to be a major feature or even a bug fix. It just needs to be something you can point to.\n\nWhy? A few reasons:\n\n- The dopamine rush of your code being shipped\n- Your team sees you're working\n  - There's more to this than just performance reviews; with remote work, it's easy for you and co-workers to feel isolated.\n- It encourages incremental work. Your future self and co-workers will thank you\n- Your git commit streak looks good\n  - Yes, in an ideal world this doesn't matter. But I'm sure people like recruiters look at GitHub profiles, and an empty page isn't a great look. This is a benefit of the habit, not necessarily a reason to start it.\n- The satisfaction and mental benefits of gett"},{"slug":"mobile-browsers-resizing-font","type":"post","title":"Why your website's fonts might be larger than intended","description":"A well-meaning mobile browser feature can be problematic","date":"Jun 9, 2023","href":"/blog/mobile-browsers-resizing-font","excerpt":"Someone recently reported that the font-size in some of my code blocks on my [build-your-own Next.js blog](/blog/build-a-blog-with-nextjs-13) post was too large. That's interesting because I use React and the code blocks are the same component. So why would the font-size be different between them?\n\nI was able to reproduce the issue and found that it only happened on iOS devices. Here it is in action:\n\n\n\nAfter adventuring down a small rabbit hole, I can share that mobile devices (mostly tablets/phones) support the [text-size-adjust](https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust) CSS property that automatically adjusts the font size of text to make it more readable.\nThis is a great feature for most websites, but it can be problematic for code blocks. It's worth noting that all browsers support this feature (although WebKit requires a prefix), but it seems like they use different heuristics to determine when to apply it.\n\nHere's a solution:\n\n\n\nThis disables the feature and makes the font size consistent across all browsers.\nBe careful though, because this will disable the feature for your entire site.\nYou may want to specifically opt certain elements out to let the"},{"slug":"nintype","type":"post","title":"Nintype is still the best iOS keyboard","description":"","date":"May 22, 2023","href":"/blog/nintype","excerpt":"Describing Nintype is a challenge. Here's a the demo video from it's launch back in 2014:\n\n\n  \n\n\n  \"the true touch typing experience\"\n\n\nEssentially, Nintype is a keyboard that enables you to _swipe and tap_ with both hands at the same time.\nIf you're typing \"there\", you'd swipe the \\`th\\` with your right hand, and tap or swipe the \\`ere\\` with your left.\nIt's such elegant and obvious next step for swipe keyboards it's incredible to me that no alternatives exist.\nIt's really does feel like magic; see how my friend texted me when we were first discovering it (apologies for the expletives):\n\n\n\nIt's genius lies in a few things:\n\n## Swipe and type\n\nNintype's true magic lies in it's ability to understand swiping and tapping with both fingers simultaneously.\nIf you need to double tap a word, like \"I'll\", you can swipe the first half of the word, and then double tap the \"l\" key to finish it.\nIt's a bit tricky to put into words, but it feels intuitive and unlocks a lot of speed. I can consistently reach 100 WPM with ~90-95% accuracy using Nintype.\n\n## Customization\n\nNintype has options for seemingly everything.\nYou can add custom shortcuts (such as auto filling your email or credit card num"},{"slug":"build-a-blog-with-nextjs-13","type":"post","title":"Building a blog with Next.js 15 and React Server Components","description":"Use MDX, RSC, and Bright to build a blog with Next.js 15.","date":"Apr 16, 2023","href":"/blog/build-a-blog-with-nextjs-13","excerpt":"I've been tinkering with this website and the [Next.js 13 App Router](https://beta.nextjs.org) for a while now,\nand it's been a great experience, especially in the last few months. But I've seen some confusion around\nhow to use the new features and React Server Components, so I wrote up an outline on building this website.\n\n\n  {' '}\n  This post has been updated for [Next.js\n  15.](https://nextjs.org/blog/next-15){' '}\n\n\nTo address the React-sized elephant in the room:\nyou do not need this fancy setup to build a blog.\nHTML and CSS may be a better choice for you, but I'd find little fun in that, and I'm a strong believer in having a website to experiment with.\n\nTo set a few expectations, here's what this post **won't** do:\n\n- Act as documentation for Next.js or React\n- Be a 100% code-complete tutorial. You'll need to fill in some gaps yourself.\n  - You can always reference [this website's source code](https://github.com/maxleiter/maxleiter.com).\n  - There are file trees included with links to the source code.\n\nAnd here's what it **will** do:\n\n- Show you real-world examples involving React Server Components and the App Router.\n- Guide you in spinning up your own blog with Next.js 13 a"},{"slug":"node-has-tooling-problems","type":"post","title":"The Node ecosystem (still) has tooling problems","description":"It shouldn't take this much work to publish a small library","date":"July 30, 2022","href":"/blog/node-has-tooling-problems","excerpt":"I recently published a [small npm package](https://github.com/maxleiter/sortablejs-vue3) containing a Vue library. The package is written in TypeScript powered by Vite, which I (wrongly) assumed would mediate most of my woes. \n\n![Obi Wan gif of him sarcastically saying \"Oh, this is going to be easy\"](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/node-tooling/obiwan.gif)\n\nFirst, I used Vite to build a small front-end site to demonstrate the library. This let me test the component and demonstrate usage in the same repository. Getting this working was fairly straight forward for someone with experience wrangling TypeScript configurations, but I imagine for a less experienced developer it could've been a daunting task. I ended up with two tsconfigs, \\`tsconfig.node.json\\` and \\`tsconfig.site.json\\`, had to figure out module resolution, realized I needed \\`vue-tsc\\`, and had a multitude of other minor roadblocks. The nicest thing about Vite is it is *fast*, which made working on this manageable.\n\nSecond, I had to figure out how to publish a library. After lots of research (AKA reading Reddit threads and blog posts), I figured out the proper incantation of \\`tsc\\` paramete"},{"slug":"supabase-next-analytics","type":"post","title":"Live updating page views with Supabase and Next.js","description":"A step-by-step guide to page views and server analytics","date":"May 15, 2022","href":"/blog/supabase-next-analytics","excerpt":"This post was written for the (now stable) beta Next.js middleware. If you\n  want your own analytics, I recommend looking at{' '}\n  Vercel's solution.\n\n\nThis post starts with a brief introduction. If you want to jump down to the tutorial, click [here](/blog/supabase-next-analytics#how). You can also see the live updating views in action in the top right of this page! The analytics events themselves require no JavaScript and occur completely on the server thanks to the [new (in beta) Next.js middleware](https://nextjs.org/docs/advanced-features/middleware). If you have JavaScript enabled, the view count should live update thanks to Supabase Realtime. You can try it by opening the page in a new tab and eyeing the view count.\n\n**Contents**\n\n- [Motivations](/blog/supabase-next-analytics#motivations)\n- [How to do it](/blog/supabase-next-analytics#how)\n  - [Supabase: Setting up the Database and Realtime](/blog/supabase-next-analytics#supabase-setting-up-the-database-and-realtime)\n  - [Next.js: Adding server-side analytics](/blog/supabase-next-analytics#nextjs-adding-server-side-analytics)\n  - [Next.js: Adding a live updating view counter](/blog/supabase-next-analytics#nextjs-adding-a-liv"},{"slug":"easy-site-improvements","type":"post","title":"Easy ways to improve your websites accessibility and performance","description":"A list of simple tips for developing a more accessible and user-friendly web.","date":"Apr 23, 2022","href":"/blog/easy-site-improvements","excerpt":"Below is a short list I wrote up for people who are comfortable building websites (with any technology) but want to improve their work, whether that be in terms of loading speeds, software quality, or accessibility.\n\n\nTL;DR:\n- [Use WAVE](/blog/easy-site-improvements#wave)\n- [Compress your images](/blog/easy-site-improvements#compress-your-images)\n- [Embrace semantic HTML](/blog/easy-site-improvements#embrace-semantic-html)\n- [Don’t use JavaScript to replace browser controls](/blog/easy-site-improvements#dont-use-javascript-to-replace-browser-controls)\n- [Invest in learning your developer tools](/blog/easy-site-improvements#invest-in-learning-your-developer-tools)\n\n## WAVE \n\n[WAVE](https://wave.webaim.org/) is a suite of tools for finding, diagnosing, and fixing accessibility problems. It's my first step for finding the lowest hanging improvements. It helps you not just fix your errors but understand them by guiding you through the relevant part of the HTML5 spec in plain language. Below you can see a screenshot of the tool being applied to https://webaim.org. \n![Screenshot of the WAVE tool being used on webaim.org](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/site-i"},{"slug":"hacker-sites","type":"post","title":"How hackers* run their sites","description":"An analysis based on 700 personal websites","date":"Apr 7, 2022","href":"/blog/hacker-sites","excerpt":"\\* hackers: users of hacker news\n\nYesterday, when I probably should have been doing something productive, I instead [asked hacker news users for links to their personal sites](https://news.ycombinator.com/item?id=30934529).\n\nIt got far more replies than I expected (over 1000 at the time of writing) so I had the idea to do some scraping and see how commenters build and host their sites.\n\nI wrote a quick-and-dirty typescript script (at the bottom of page) for scraping, pinging, and sorting the comments. I could've used a pre-existing library or service for determining tech used on the sites, but where's the fun in that? I’d have loved to add features like checking for git repository links and doing some API calls for a more in-depth analysis, but I’ll leave the complicated parts as exercises for the reader.\n\nIf I were to do this all again, I would absolutely not choose JavaScript. Just 0 real benefits; I spent more time than I care to admit bashing my head before remembering \\`Promise.allSettled\\` exists. I should've just used Python.\n\n## The stats:\n\nOf the 721 top level comments, 692 contained links and were analyzed at the time of writing. I only looked at the first link in a comme"},{"slug":"introducing-drift","type":"post","title":"Introducing Drift","description":"A self-hostable alternative to GitHub Gist and Pastebin","date":"Mar 26, 2022","href":"/blog/introducing-drift","excerpt":"_[View this post on Drift](https://paste.maxleiter.com/post/9d77d452-8ccf-4056-89dd-9bf9f96dfc3c)_\n\nI've wanted a Gist alternative for years, but it wasn't until I saw [this tweet](https://twitter.com/emilyst/status/1499858264346935297) I decided to sit down and build it:\n\n> \"What is the absolute closest thing to GitHub Gist that can be self-hosted? In terms of design and functionality. Hosts images and markdown, rendered. Creates links that can be private or public. Uses/requires registration. I have looked at dozens of pastebin-like things.\" - @emilyst\n\nIf your response to that is \"why?\", I recommend reading ['Why you should start self-hosting'](https://rohanrd.xyz/posts/why-you-should-start-self-hosting/) by Rohan Deshumkh. Also know that I have a habit of starting time consuming weekend projects to procrastinate school work, and this seemed like an especially fun one.\n\nThe primary goal of Drift is to capture the value proposition of GitHub. Syntax highlighting, markdown rendering, straight to the point. There are tons of self-hostable pastebins, and none target an experience like Gist. You can try a demo [here](https://drift.maxleiter.com).\n\nHere's a screenshot of the authentic"},{"slug":"contributing-to-oss","type":"post","title":"How to start contributing to open-source projects","description":"A small guide to finding projects and contributing changes","date":"Jan 25, 2022","href":"/blog/contributing-to-oss","excerpt":"One of the most common questions I'm asked by my computer science friends and students is how they can contribute to an open-source project. In order for me to organize and share my thoughts I thought I'd write something here.\n\nFirst off, it's a good idea! Contributing to projects is a fantastic way to build experience, connections, and improve a piece of software you use or rely on. I've grown immensely through maintaining my few projects and contributing to a hand full of others. I've gained experience in community management, team communication, code review, dependency management, and the list goes on. This post is focused on programming, but don't forget that issue management, documentation, user support, and bug reporting are all valuable ways you can contribute. \n\nThat point about using open-source software is important. The first thing I tell my friends is they should first ensure they're using some before they attempt to contribute. There are few things that are more satisfying than fixing a bug that's been bugging you in a program written by someone else, and the motivation that provides is not inconsequential[^1]. As a maintainer, contributor, and extensive procrastinator"},{"slug":"pin-dependencies","type":"post","title":"Pin your npm/yarn dependencies","description":"A guide on how to pin your dependencies and why you may want to","date":"Jan 9, 2022","href":"/blog/pin-dependencies","excerpt":"Today, the open-source maintainer [Marak](https://github.com/Marak) intentionally [bricked two popular JavaScript libraries](https://www.bleepingcomputer.com/news/security/dev-corrupts-npm-libs-colors-and-faker-breaking-thousands-of-apps/) (with ~25 total million weekly downloads) in such a way that they broke dependents software. There's nothing that npm or any other public registry could've done to have prevented this; the release was indistinguishable from a regular update, unless you looked at the code. This is not the first time an npm dependency has [gone rogue](https://qz.com/646467/how-one-programmer-broke-the-internet-by-deleting-a-tiny-piece-of-code/) and [caused havoc](https://github.com/dominictarr/event-stream/issues/115) due to supply chain problems, and it certainly won't be the last. And so the defensive role falls to you, the developer.\n\n### Pinning dependencies\n\nMy recommendation is to **pin your dependencies**. If you're unfamiliar with what this means, you should first be familiar with [semantic versioning](https://semver.org/). In short, pinning dependencies means the _exact_ version specified will be installed, rather than a dependency matching the range crite"},{"slug":"framework","type":"post","title":"Impressions of the Framework Laptop","description":"My thoughts on the Framework Laptop's hardware","date":"Nov 3, 2021","href":"/blog/framework","excerpt":"I received my [Framework Laptop DIY edition](https://frame.work) a few days ago and have been setting it up software-wise. I have it running Manjaro Linux with the Sway window manager. This is my first time using a Wayland desktop, and oh has it been a learning experience. This post will be largely about the hardware, but I plan to make one about the software once I'm more happy with my setup.\n\nHere's what I got:\n\n- Framework Laptop DIY Edition\n- 16GB (2 x 8GB) DDR4-3200\n- Intel® Wi-Fi 6E AX210 No vPro\n- 1TB - WD_BLACK™ SN850 NVMe™\n- USB-A Expansion Card\n- USB-C Expansion Card x2\n- HDMI Expansion Card\n\nI bought everything from the Framework store (at a slight markup of ~$80 for the RAM, SSD, and wifi card), but I'm happy to support them and for the convenience of knowing it would work properly was well worth it.\n\n## The Good\n\n- Well crafted body. I was not expecting a premium build quality from a startup trying to create an upgradeable laptop, but wow they excelled.\n- It's _really light_. It's just 2.8 pounds, compared to my 13\" Macbook Pro's 3.02. You wouldn't think that's a big difference, and maybe you wouldn't notice, but I sure did.\n- A solid keyboard. Most non-Mac laptops I'v"},{"slug":"MSHW0184","type":"post","title":"Adding ambient light support to Linux and GNOME","description":"A quick dive into Linux kernel drivers","date":"Dec 15, 2020","href":"/blog/MSHW0184","excerpt":"A couple of a weeks ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale. I love making devices run software they shouldn't, so I got to work dual-booting Linux on it. To my surprise, almost everything worked with the default Fedora 33 kernel, not including the touchscreen, the ambient light sensor, and the camera. After compiling and loading the great [linux-surface](https://github.com/linux-surface/linux-surface) kernel the touchscreen started to work but I found a [GitHub issue](https://github.com/linux-surface/linux-surface/issues/121) someone had made detailing that the ambient light sensor (a MSHW0184) isn't detected. This normally wouldn't matter a lot, but I'd discovered that GNOME supported adjusting the screen brightness based on the ambient light through [iio-sensor-proxy](https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/).\n\nI knew nothing (and still know very little) about the Linux kernel or drivers, but this seemed like a great place to start. Luckily, GitHub user archseer discovered that the MSHW0184 registers align with the APDS9960 device, which already has an upstream kernel driver, and he mentioned all that should be needed is a small change "},{"slug":"X11","type":"post","title":"X11 on iOS","description":"A guide on how to compile the X Window System for iOS","date":"Dec 15, 2019","href":"/blog/X11","excerpt":"This work has been picked back up recently, with KDE, GNOME, Wayland, and\n  more. Read about it here: https://maxleiter.com/blog/xios\n\n\nI'm excited to announce that X11 is coming soon to iOS. Most (see below) packages and dependencies for a fully functioning X11 desktop system have been compiled and are available on Cydia for iOS 11+. All packages have been compiled for arm64 and have been tested on iOS 12.4 and iOS 13.1. This requires a jailbroken device.\n\n\n[Image of programs running on\ndevice.](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/X11/onipad.jpg)\n\nThis site will serve largely as documentation for building yourself. ~You can add the Cydia repo below for the deb packages. Please let me know if you run across any issues with the debs; it's likely I messed up including a library or something like that. (These aren't done just yet.)~\n\n## How it works\n\nAt the moment, a virtual screen is accessed via a VNC client to an Xvnc instance running on the iDevice. If you're unfamiliar, Xvnc is an X server with a virtual screen that can be accessed via VNC. The best part of this is no drivers are required: it's all handled by Xvnc.\n\n## Why\n\nLargely just because I can. Als"}],"notes":[{"slug":"fish-directory-colors","type":"note","title":"Per-directory terminal colors in fish shell","description":"","date":"Apr 5, 2026","href":"/notes/fish-directory-colors","excerpt":"My terminal background color changes based on the current directory. \nIt's a small touch that makes it easy to tell which project I'm in at a glance, which is \nespecially useful when juggling AI agents.\n\nIt works via a custom fish function called `_color_for_dir`, which:\n\n1. Hashes the current `$PWD` \n2. Maps the hash to a hue (0-359)\n3. Converts it to a dark RGB color \n4. Sends an [OSC 11](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html) escape sequence to change the terminal background\n\n\n\nIt's deterministic, so each directory always gets the same color. \nThe function is triggered on startup and on every `cd` via a `--on-variable PWD` event listener.\n\nIt also skips VS Code's integrated terminal because I generally know what projects I have open \n\nFull code:\n\n\nClick to expand"},{"slug":"git-checkout-script","type":"note","title":"Never think about branch names again","description":"a bash script for generating branch names","date":"Aug 19, 2024","href":"/notes/git-checkout-script","excerpt":"I recommend swapping out \\`max\\` to basically anything else.\n\n\n\nTo use on macOS/linux, you can paste the above into a file in \\`/usr/local/bin\\` and make it executable with \\`chmod +x /usr/local/bin/gcb\\`.\n\nI also recommend setting your git settings to sort branches by \\`committerdate\\` so that you can easily find the branch you worked on most recently:\n\n\n\nThis does work with the default alphabetical sorting, but this works better if you work on features over long periods of time."},{"slug":"updating-jsonb-drizzle","type":"note","title":"Updating JSONB fields with Drizzle","description":"hint: just use `sql` and COALESCE.","date":"July 11, 2024","href":"/notes/updating-jsonb-drizzle","excerpt":"I recently made a jsonb column in a postgres database and it took me a bit\nto figure out how to update a single value without overwriting the entire\nfield. If you know a better way please let me know."},{"slug":"vscode-default-dir","type":"note","title":"Set your default directory in VS Code's open dialog","description":"","date":"Jun 6, 2024","href":"/notes/vscode-default-dir","excerpt":"This is my workflow for opening a project in VS Code:\n\n1. Open an empty window of VS Code\n2. Hit cmd+O\n3. Navigate to my \\`~/Documents/...\\` directory\n4. Hit enter\n\nIn my opinion, that's a few too many steps. I've made it a little better by\nchanging the \\`files.dialog.defaultPath\\` setting (added almost exactly [one year ago](https://code.visualstudio.com/updates/v1_80)).\n\n![VS Code settings](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/vscode-dir/screenshot.png)\n\nHope this helps."},{"slug":"gemini-script","type":"note","title":"gemini.sh script","description":"A script for concatenating files in a directory for copying to an LLM","date":"Apr 14, 2024","href":"/notes/gemini-script","excerpt":"As of late 2024/early 2025, I recommend using the great repomix tool: https://github.com/yamadashy/repomix\n\n\nI've been messing with gemini-1.5-pro with the 1 million token context window for a while now and found this script very useful\nfor grabbing entire repos. It ignores most binary files and concatenates the rest into a single file. \n\nYou'll need to have \\`parallel\\` installed for this to work (\\`brew install parallel\\` on macOS)."},{"slug":"slack-message-fetch","type":"note","title":"Sending a Slack message with fetch","description":"","date":"Mar 30, 2024","href":"/notes/slack-message-fetch","excerpt":"I like using Slack bots for things like alerts and notifications and\nhave needed this snippet enough to leave it here.\n\nI use [slack-block-builder](https://github.com/raycharius/slack-block-builder) to\nbuild the message; writing raw slack blocks is a pain."},{"slug":"swr-state","type":"note","title":"SWR for more than fetching","description":"SWR for state management","date":"Mar 30, 2024","href":"/notes/swr-state","excerpt":"[SWR](https://swr.vercel.app/) is a great library for data fetching in React.\nIt looks like this:\n\n\n\nBut my favorite use for it is local state management.\n\nHere's an example of how I use it for modals and dialogs:\n\n\n\nAny hook call with that same \\`state:modal\\` key will receive the same data and re-render when it changes.\nIt's a good replacement for other global state solutions or context."},{"slug":"wasm-edge-and-node","type":"note","title":"Loading wasm files on Vercel Edge and Node.js runtimes","description":"","date":"Mar 30, 2024","href":"/notes/wasm-edge-and-node","excerpt":"Loading wasm on the [Vercel Edge runtime](https://vercel.com/docs/functions/wasm) is easy. You need to do a little more work\nto do the same on Node.js."}],"projectsAndExternal":[{"title":"Max Leiter"},{"title":"How we made v0 an effective coding agent","description":"Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.","date":"Jan 7, 2026","href":"https://vercel.com/blog/how-we-made-v0-an-effective-coding-agent"},{"title":"Introducing the v0 composite model family","description":"Introducing the v0 composite model family.","date":"Jun 1, 2025","href":"https://vercel.com/blog/v0-composite-model-family"},{"title":"Introducing AI SDK 3.0 with Generative UI support","description":"Stream React Components from LLMs to deliver richer user experiences.","date":"Mar 1, 2024","href":"https://vercel.com/blog/ai-sdk-3-generative-ui"},{"title":"Introducing the Vercel AI SDK","description":"An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.","date":"Jun 15, 2023","href":"https://vercel.com/blog/introducing-the-vercel-ai-sdk"},{"title":"Improving the accessibility of our Next.js site","description":"We've made some improvements to the accessibility of our Next.js site. Here's how we did it.","date":"Sep 30, 2022","href":"https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site"},{"title":"New edge dev infrastructure","description":"New edge dev infrastructure.","date":"Jul 21, 2020","href":"https://vercel.com/blog/new-edge-dev-infrastructure"},{"title":"X11 on iOS","description":"Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.","href":"/blog/X11"},{"title":"Drift","description":"A self-hostable and open-source alternative to GitHub Gist and Pastebin.","href":"https://github.com/maxleiter/drift"},{"title":"The Lounge","description":"Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.","href":"https://github.com/thelounge/thelounge"},{"title":"SortableJS-vue3","description":"A TypeScript wrapper for SortableJS built for Vue 3.","href":"https://github.com/maxleiter/sortablejs-vue3/"},{"title":"KnightOS","description":"Open-source unix-like operating system for z80-based calculators written entirely in z80 asm. I wrote a significant portion of the libc and contribued to system libraries.","href":"https://github.com/knightos/knightos"},{"title":"MSHW0184 driver for Linux kernel","description":"I finally found an excuse to contribute to the Linux kernel","href":"blog/MSHW0184"},{"title":"jsonTree","description":"My first open-source project","href":"https://github.com/maxleiter/jsontree"},{"title":"easyarty.com","description":"A tiny tool I made for a video game I like but it now gets 250,000+ visitors a year","href":"https://easyarty.com"},{"title":"v0","description":"I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.","href":"https://v0.app"},{"title":"AI SDK","description":"I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK.","href":"https://github.com/vercel/ai"},{"title":"Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening","description":"I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimate vertical cup to disk ratios from retinal images.","href":"https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362"}]}</script>
+<script>
+'use strict';
+/* =====================================================================
+   CHANNELS — a procedural console-dashboard for maxleiter.com
+   Raw WebGL2, zero dependencies. CSS 3D fallback when WebGL2 is absent.
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const PI = Math.PI;
+function hash(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { let a = seed >>> 0 || 1; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const QS = new URLSearchParams(location.search);
+const RM = matchMedia('(prefers-reduced-motion: reduce)');
+let reduced = RM.matches || QS.has('still');
+RM.addEventListener?.('change', e => { reduced = e.matches; });
+
+/* ---------------------------------------------------------------------
+   Content -> channels
+   --------------------------------------------------------------------- */
+const RAW = JSON.parse($('#content').textContent);
+const SITE = RAW.site;
+const abs = h => !h ? SITE.url : /^https?:/.test(h) ? h : SITE.url + (h[0] === '/' ? h : '/' + h);
+const KW = {
+  'embedding-emoji-search': 'EMOJI', 'thank-u-next': 'NEXT', xios: 'WAYLAND', weights: 'WEIGHTS', sandcastle: 'SANDBOX',
+  'introducing-HFSViewer': 'HFS+', 'the-new-maxleiter-com': 'NEW', 'rewrite-your-prompts': 'PROMPTS', 'seeing-the-future': 'FUTURE',
+  formatting: 'FORMAT', 'vibecoding-minecraft-mods': 'MODS', 'sluggified-urls': 'SLUGS', 'ship-every-day': 'SHIP',
+  'mobile-browsers-resizing-font': 'FONTS', nintype: 'TYPE', 'build-a-blog-with-nextjs-13': 'RSC', 'node-has-tooling-problems': 'NODE',
+  'supabase-next-analytics': 'LIVE', 'easy-site-improvements': 'A11Y', 'hacker-sites': 'HACK', 'introducing-drift': 'DRIFT',
+  'contributing-to-oss': 'OSS', 'pin-dependencies': 'PIN', framework: 'LAPTOP', MSHW0184: 'LUX', X11: 'X11',
+  'fish-directory-colors': 'FISH', 'git-checkout-script': 'GIT', 'updating-jsonb-drizzle': 'JSONB', 'vscode-default-dir': 'DIR',
+  'gemini-script': '.SH', 'slack-message-fetch': 'FETCH', 'swr-state': 'SWR', 'wasm-edge-and-node': 'WASM',
+  'How we made v0 an effective coding agent': 'AGENT', 'Introducing the v0 composite model family': 'MODELS',
+  'Introducing AI SDK 3.0 with Generative UI support': 'GEN UI', 'Introducing the Vercel AI SDK': 'AI SDK',
+  'Improving the accessibility of our Next.js site': 'A11Y', 'New edge dev infrastructure': 'EDGE', 'X11 on iOS': 'X11', Drift: 'DRIFT',
+  'The Lounge': 'IRC', 'SortableJS-vue3': 'VUE 3', KnightOS: 'Z80', 'MSHW0184 driver for Linux kernel': 'KERNEL', jsonTree: '{ }',
+  'easyarty.com': 'ARTY', v0: 'v0', 'AI SDK': 'SDK', 'Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening': 'RETINA'
+};
+const host = h => { try { return new URL(abs(h)).host.replace(/^www\./, ''); } catch { return ''; } };
+function mkItem(o, kind, extra = {}) {
+  const id = o.slug || o.title;
+  return Object.assign({ id: kind + ':' + id, kind, title: o.title, desc: o.description || '', date: o.date || '', href: abs(o.href),
+    excerpt: o.excerpt || '', kw: KW[o.slug] || KW[o.title] || null, site: host(o.href) }, extra);
+}
+const posts = RAW.posts.map(p => mkItem(p, 'blog'));
+const notes = RAW.notes.map(p => mkItem(p, 'note'));
+const ext = RAW.projectsAndExternal.filter(p => p.href);
+const workNames = new Set(['v0', 'AI SDK']);
+const isWork = p => p.date || workNames.has(p.title) || /plos/.test(p.href);
+const work = ext.filter(isWork).map(p => mkItem(p, 'work'));
+work.sort((a, b) => (workNames.has(b.title) ? 1 : 0) - (workNames.has(a.title) ? 1 : 0));
+const projects = ext.filter(p => !isWork(p)).map(p => mkItem(p, 'project'));
+const about = mkItem({ title: SITE.name, description: SITE.blurb, href: '/', slug: 'about' }, 'profile', { kw: 'HELLO',
+  excerpt: SITE.blurb + '\n\nThis is a prototype of maxleiter.com rebuilt as a channel dashboard: every post, note and project is a tile, and every tile is drawn in code.\n\nFind me on [GitHub](' + SITE.github + ') or [X](' + SITE.x + '), or subscribe to the [RSS feed](https://maxleiter.com/feed.xml).' });
+const homeCopy = (it, chip) => Object.assign({}, it, { id: 'home:' + it.id, native: it, chip });
+const CH = [
+  { id: 'home', name: 'Home', hue: 205, items: [about, homeCopy(posts[0], 'LATEST POST'), homeCopy(notes[0], 'LATEST NOTE'), homeCopy(work.find(w => w.title === 'v0'), 'FEATURED'), homeCopy(posts.find(p => p.id === 'blog:sandcastle'), 'FEATURED'), homeCopy(posts.find(p => p.id === 'blog:ship-every-day'), 'CLASSIC')] },
+  { id: 'blog', name: 'Blog', hue: 28, items: posts },
+  { id: 'notes', name: 'Notes', hue: 168, items: notes },
+  { id: 'projects', name: 'Projects', hue: 268, items: projects },
+  { id: 'work', name: 'Work', hue: 350, items: work },
+  { id: 'about', name: 'About', hue: 215, items: [
+    Object.assign({}, about, { id: 'profile:about2' }),
+    mkItem({ title: 'GitHub', description: 'Open-source work, dotfiles, and experiments.', href: SITE.github }, 'link', { kw: '</>', excerpt: 'Code for most of what is on this site, plus KnightOS, The Lounge, Drift and a long tail of small tools.' }),
+    mkItem({ title: 'X', description: 'Short-form thoughts and links, mostly about the web and AI.', href: SITE.x }, 'link', { kw: '@', excerpt: 'Short-form thoughts and links. Mostly the web, Linux, tooling and AI.' }),
+    mkItem({ title: 'RSS feed', description: 'Every post and note, in your reader of choice.', href: '/feed.xml' }, 'link', { kw: 'RSS', excerpt: 'Every post and note on the site as an RSS feed.' })
+  ] }
+];
+CH.forEach((c, ci) => c.items.forEach((it, i) => { it.chan = ci; it.index = i; it.seed = it.native ? it.native.id : it.id; }));
+const KIND_LABEL = { blog: 'Blog', note: 'Note', project: 'Project', work: 'Work', profile: 'Profile', link: 'Link' };
+
+/* ---------------------------------------------------------------------
+   Tiny markdown -> HTML for excerpts (subset; images and JSX dropped)
+   --------------------------------------------------------------------- */
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function inline(s) {
+  const codes = [];
+  s = s.replace(/`([^`]+)`/g, (_, c) => { codes.push(c); return '\u0000' + (codes.length - 1) + '\u0000'; });
+  s = esc(s);
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, (_, t, u) => `<a href="${esc(abs(u.startsWith('http') || u.startsWith('/') ? u : '/' + u))}">${t}</a>`);
+  s = s.replace(/(^|[\s(])(https?:\/\/[^\s)<]+)/g, (_, p, u) => `${p}<a href="${u}">${u.replace(/^https?:\/\//, '')}</a>`);
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/(^|[^\w])_([^_]+)_(?=[^\w]|$)/g, '$1<em>$2</em>').replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>');
+  return s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${esc(codes[+i])}</code>`);
+}
+function md(src) {
+  src = src.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/<[^>\n]+\/>/g, '').replace(/<\/?[A-Za-z][^>\n]*>/g, '');
+  const lines = src.split('\n'); const out = []; let para = [], list = null, code = null;
+  const flush = () => { if (para.length) { out.push('<p>' + inline(para.join(' ')) + '</p>'); para = []; } if (list) { out.push(`<${list.t}>` + list.items.map(x => '<li>' + inline(x) + '</li>').join('') + `</${list.t}>`); list = null; } };
+  for (const raw of lines) {
+    const l = raw.replace(/\s+$/, '');
+    if (code) { if (/^```/.test(l)) { out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>'); code = null; } else code.push(raw); continue; }
+    if (/^```/.test(l)) { flush(); code = []; continue; }
+    if (!l.trim()) { flush(); continue; }
+    let m;
+    if ((m = l.match(/^(#{1,6})\s+(.*)/))) { flush(); out.push(`<h${m[1].length < 3 ? 3 : 4}>` + inline(m[2]) + `</h${m[1].length < 3 ? 3 : 4}>`); continue; }
+    if ((m = l.match(/^\s*([-*]|\d+\.)\s+(.*)/))) { if (para.length) flush(); const t = /\d/.test(m[1]) ? 'ol' : 'ul'; if (!list || list.t !== t) { flush(); list = { t, items: [] }; } list.items.push(m[2]); continue; }
+    if ((m = l.match(/^>\s?(.*)/))) { flush(); out.push('<blockquote>' + inline(m[1]) + '</blockquote>'); continue; }
+    if (list) { list.items[list.items.length - 1] += ' ' + l.trim(); continue; }
+    para.push(l.trim());
+  }
+  if (code) out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>');
+  flush();
+  return out.join('');
+}
+
+/* ---------------------------------------------------------------------
+   Procedural box-art covers (Canvas2D) — seeded per item
+   --------------------------------------------------------------------- */
+const FONT = '"Open Sans","Segoe UI",Inter,system-ui,sans-serif';
+const hsl = (h, s, l, a = 1) => `hsla(${((h % 360) + 360) % 360},${s}%,${l}%,${a})`;
+const STOP = new Set('a an the of on in to for and with your you is my why how i we our be it its are not still dont need good using via what from'.split(' '));
+function keyword(it) {
+  if (it.kw) return it.kw;
+  const w = it.title.replace(/[^\w\s.+-]/g, ' ').split(/\s+/).filter(x => x && !STOP.has(x.toLowerCase()));
+  let b = w[0] || it.title; for (const x of w) if (x.length > b.length && x.length <= 9) b = x; return b.toUpperCase();
+}
+let grainCanvas = null;
+function grain() {
+  if (grainCanvas) return grainCanvas;
+  const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const d = g.createImageData(128, 128); const R = rng(7);
+  for (let i = 0; i < d.data.length; i += 4) { const v = R() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+  g.putImageData(d, 0, 0); return grainCanvas = c;
+}
+function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function wrap(g, text, maxW, maxLines) {
+  const words = text.split(/\s+/); const lines = []; let cur = '';
+  for (const w of words) { const t = cur ? cur + ' ' + w : w; if (g.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+  if (cur) lines.push(cur);
+  if (lines.length > maxLines) { const l = lines.slice(0, maxLines); let last = l[maxLines - 1]; while (g.measureText(last + '…').width > maxW && last.length) last = last.slice(0, -1); l[maxLines - 1] = last.replace(/[\s,.:;]+$/, '') + '…'; return l; }
+  return lines;
+}
+const MOTIFS = ['shards', 'orb', 'ribbons', 'stripes', 'horizon', 'blocks', 'burst', 'contours', 'panels'];
+function motifFor(it) {
+  if (it.native) return motifFor(it.native);
+  const prevIt = CH[it.chan]?.items[it.index - 1];
+  let m = hash(it.seed + 'm') % MOTIFS.length;
+  if (prevIt && hash(prevIt.seed + 'm') % MOTIFS.length === m) m = (m + 4) % MOTIFS.length;
+  return MOTIFS[m];
+}
+function paletteFor(it, R) {
+  const hue = hash(it.seed + 'h') % 360;
+  const sch = Math.floor(R() * 4);
+  const h2 = hue + [32, 180, 120, -42][sch], h3 = hue + (R() < .5 ? -64 : 64);
+  return { hue, h2, h3, bg0: hsl(hue, 60, 8), bg1: hsl(h2, 62, 20), a: hsl(hue, 85, 56), b: hsl(h2, 90, 62), c: hsl(h3, 80, 70), hi: hsl(hue, 100, 90), dk: hsl(hue, 70, 14) };
+}
+function drawMotif(g, m, W, H, R, P) {
+  const lg = (x0, y0, x1, y1, stops) => { const gr = g.createLinearGradient(x0, y0, x1, y1); stops.forEach(([o, c]) => gr.addColorStop(o, c)); return gr; };
+  const rg = (x, y, r0, r1, stops, x1 = x, y1 = y) => { const gr = g.createRadialGradient(x, y, r0, x1, y1, r1); stops.forEach(([o, c]) => gr.addColorStop(o, c)); return gr; };
+  g.fillStyle = lg(0, 0, W, H, [[0, P.bg1], [1, P.bg0]]); g.fillRect(0, 0, W, H);
+  if (m === 'shards') {
+    const cols = 10, rows = 7, pts = [];
+    for (let j = 0; j <= rows; j++) for (let i = 0; i <= cols; i++) {
+      const edge = i === 0 || j === 0 || i === cols || j === rows;
+      pts.push([i / cols * W + (edge ? 0 : (R() - .5) * W / cols * .9), j / rows * H + (edge ? 0 : (R() - .5) * H / rows * .9), R() * 70]);
+    }
+    const Lx = -.45, Ly = -.6, Lz = .66;
+    const tri = (a, b, c) => {
+      const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2], vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
+      let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx; const nl = Math.hypot(nx, ny, nz) || 1; if (nz < 0) { nx = -nx; ny = -ny; nz = -nz; }
+      const sh = clamp((nx * Lx + ny * Ly + nz * Lz) / nl, 0, 1);
+      const cx = (a[0] + b[0] + c[0]) / 3, cy = (a[1] + b[1] + c[1]) / 3; const t = clamp(cx / W * .7 + cy / H * .3 + (R() - .5) * .12, 0, 1);
+      g.fillStyle = hsl(lerp(P.hue, P.h2, t), 72, 10 + sh * 46 * (1 - cy / H * .5));
+      g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(c[0], c[1]); g.closePath(); g.fill(); g.strokeStyle = g.fillStyle; g.lineWidth = 1; g.stroke();
+    };
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+      const p = (x, y) => pts[y * (cols + 1) + x];
+      if ((i + j) % 2) { tri(p(i, j), p(i + 1, j), p(i + 1, j + 1)); tri(p(i, j), p(i + 1, j + 1), p(i, j + 1)); }
+      else { tri(p(i, j), p(i + 1, j), p(i, j + 1)); tri(p(i + 1, j), p(i + 1, j + 1), p(i, j + 1)); }
+    }
+    g.globalCompositeOperation = 'lighter'; g.fillStyle = rg(W * .3, H * .1, 0, W * .7, [[0, hsl(P.h2, 90, 60, .35)], [1, 'rgba(0,0,0,0)']]); g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over';
+  } else if (m === 'orb') {
+    g.fillStyle = rg(W * .7, H * .4, 0, W * .8, [[0, hsl(P.h2, 60, 22)], [1, hsl(P.hue, 70, 4)]]); g.fillRect(0, 0, W, H);
+    for (let i = 0; i < 140; i++) { g.fillStyle = `rgba(255,255,255,${R() * .7})`; const s = R() < .08 ? 2.2 : 1.1; g.fillRect(R() * W, R() * H, s, s); }
+    const cx = W * (.58 + R() * .16), cy = H * (.36 + R() * .1), r = H * (.3 + R() * .08);
+    g.globalCompositeOperation = 'lighter'; g.fillStyle = rg(cx, cy, r * .8, r * 2.2, [[0, hsl(P.h2, 90, 55, .5)], [1, 'rgba(0,0,0,0)']]); g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over';
+    const tilt = -.35 + R() * .2;
+    const ring = (front) => { g.save(); g.translate(cx, cy); g.rotate(tilt); g.beginPath(); g.ellipse(0, 0, r * 1.75, r * .38, 0, front ? 0 : PI, front ? PI : 2 * PI); g.strokeStyle = lg(-r * 2, 0, r * 2, 0, [[0, hsl(P.h3, 80, 70, .1)], [.5, hsl(P.h3, 90, 80, .9)], [1, hsl(P.h3, 80, 70, .1)]]); g.lineWidth = r * .12; g.stroke(); g.lineWidth = r * .03; g.strokeStyle = hsl(P.h3, 100, 90, .6); g.beginPath(); g.ellipse(0, 0, r * 1.95, r * .43, 0, front ? 0 : PI, front ? PI : 2 * PI); g.stroke(); g.restore(); };
+    ring(false);
+    g.fillStyle = rg(cx - r * .4, cy - r * .45, r * .05, r * 1.05, [[0, P.hi], [.25, P.a], [.75, P.dk], [1, hsl(P.hue, 70, 5)]], cx, cy); g.beginPath(); g.arc(cx, cy, r, 0, 2 * PI); g.fill();
+    g.save(); g.clip(); for (let i = 0; i < 6; i++) { g.fillStyle = hsl(P.h2, 70, 60, .12); g.fillRect(cx - r, cy - r + (i * .33 + R() * .2) * r, r * 2, r * (.06 + R() * .12)); } g.restore();
+    g.strokeStyle = hsl(P.h2, 100, 80, .5); g.lineWidth = 3; g.beginPath(); g.arc(cx, cy, r - 1.5, PI * .1, PI * .9); g.stroke();
+    ring(true);
+  } else if (m === 'ribbons') {
+    g.fillStyle = lg(0, 0, 0, H, [[0, hsl(P.hue, 60, 6)], [1, hsl(P.h2, 60, 16)]]); g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 9; i++) {
+      const y0 = H * (.2 + R() * .6), y1 = H * (.1 + R() * .8), wdt = 6 + R() * 60, hueI = lerp(P.hue, P.h2, R());
+      g.strokeStyle = lg(0, 0, W, 0, [[0, hsl(hueI, 90, 60, 0)], [.4, hsl(hueI, 90, 62, .32)], [1, hsl(hueI, 90, 70, .05)]]);
+      g.lineWidth = wdt; g.lineCap = 'round'; g.shadowColor = hsl(hueI, 100, 60, .8); g.shadowBlur = 30;
+      g.beginPath(); g.moveTo(-40, y0); g.bezierCurveTo(W * .3, y0 - H * (R() - .2), W * .65, y1 + H * (R() - .5), W + 40, y1); g.stroke();
+      g.lineWidth = 1.5; g.strokeStyle = hsl(hueI, 100, 85, .7); g.stroke();
+    }
+    g.shadowBlur = 0; g.globalCompositeOperation = 'source-over';
+  } else if (m === 'stripes') {
+    g.fillStyle = P.a; g.fillRect(0, 0, W, H);
+    g.save(); g.translate(W / 2, H / 2); g.rotate(-.42 + R() * .2); let x = -W;
+    const cs = [P.dk, P.b, P.hi, P.bg0, P.c];
+    while (x < W) { const w = 14 + R() * 90; g.fillStyle = cs[Math.floor(R() * cs.length)]; g.fillRect(x, -H * 1.2, w, H * 2.4); x += w + R() * 30; }
+    g.globalAlpha = .7; for (let i = 0; i < 26; i++) { g.fillStyle = 'rgba(255,255,255,.7)'; g.fillRect(-W + R() * W * 2, -H + R() * H * 2, 40 + R() * 160, 2); } g.globalAlpha = 1; g.restore();
+    g.fillStyle = lg(0, 0, 0, H, [[0, 'rgba(0,0,0,.05)'], [1, 'rgba(0,0,0,.55)']]); g.fillRect(0, 0, W, H);
+    g.fillStyle = hsl(P.hue, 80, 8, .9); g.beginPath(); g.arc(W * .78, H * .38, H * .26, 0, 2 * PI); g.fill(); g.strokeStyle = P.hi; g.lineWidth = 6; g.stroke();
+  } else if (m === 'horizon') {
+    const hz = H * .6;
+    g.fillStyle = lg(0, 0, 0, hz, [[0, hsl(P.hue, 70, 8)], [.7, hsl(P.h2, 70, 30)], [1, hsl(P.h3, 90, 62)]]); g.fillRect(0, 0, W, hz);
+    const sx = W * (.6 + R() * .2), sr = H * .24;
+    g.save(); g.beginPath(); g.rect(0, 0, W, hz); g.clip();
+    g.fillStyle = lg(0, hz - sr * 2, 0, hz, [[0, hsl(P.h3, 100, 80)], [1, hsl(P.hue, 100, 55)]]); g.beginPath(); g.arc(sx, hz - sr * .25, sr, 0, 2 * PI); g.fill();
+    g.fillStyle = hsl(P.h2, 70, 22); for (let i = 0; i < 6; i++) g.fillRect(sx - sr, hz - sr * .25 - i * sr * .16 + sr * .1, sr * 2, 2 + i * 1.6);
+    g.fillStyle = hsl(P.hue, 50, 7); g.beginPath(); g.moveTo(0, hz); let mx = 0; while (mx <= W) { g.lineTo(mx, hz - 12 - R() * H * .14); mx += 30 + R() * 40; } g.lineTo(W, hz); g.fill();
+    g.restore();
+    g.fillStyle = lg(0, hz, 0, H, [[0, hsl(P.hue, 60, 10)], [1, '#020204']]); g.fillRect(0, hz, W, H - hz);
+    g.strokeStyle = hsl(P.h3, 100, 70, .75); g.lineWidth = 1.5; g.shadowColor = hsl(P.h3, 100, 60); g.shadowBlur = 10;
+    for (let i = -14; i <= 14; i++) { g.beginPath(); g.moveTo(W / 2 + i * 14, hz); g.lineTo(W / 2 + i * 150, H); g.stroke(); }
+    for (let j = 1; j < 10; j++) { const y = hz + Math.pow(j / 9, 2.2) * (H - hz); g.globalAlpha = j / 10 + .1; g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+    g.globalAlpha = 1; g.shadowBlur = 0;
+  } else if (m === 'blocks') {
+    g.fillStyle = lg(0, 0, 0, H, [[0, hsl(P.hue, 40, 12)], [1, hsl(P.hue, 50, 4)]]); g.fillRect(0, 0, W, H);
+    const s = 34, ox = W * .55, oy = H * .1;
+    for (let j = 0; j < 9; j++) for (let i = 0; i < 9; i++) {
+      const h = 10 + Math.pow(R(), 2) * 120, x = ox + (i - j) * s * .87, y = oy + (i + j) * s * .5;
+      const hu = lerp(P.hue, P.h2, (i + j) / 16);
+      const top = () => { g.beginPath(); g.moveTo(x, y - h); g.lineTo(x + s * .87, y - h + s * .5); g.lineTo(x, y - h + s); g.lineTo(x - s * .87, y - h + s * .5); g.closePath(); };
+      g.fillStyle = hsl(hu, 70, 28); g.beginPath(); g.moveTo(x - s * .87, y - h + s * .5); g.lineTo(x, y - h + s); g.lineTo(x, y + s); g.lineTo(x - s * .87, y + s * .5); g.fill();
+      g.fillStyle = hsl(hu, 70, 18); g.beginPath(); g.moveTo(x + s * .87, y - h + s * .5); g.lineTo(x, y - h + s); g.lineTo(x, y + s); g.lineTo(x + s * .87, y + s * .5); g.fill();
+      g.fillStyle = R() < .1 ? P.hi : hsl(hu, 80, 50); top(); g.fill();
+    }
+  } else if (m === 'burst') {
+    const cx = W * (.62 + R() * .2), cy = H * (.3 + R() * .2), n = 22;
+    g.fillStyle = P.dk; g.fillRect(0, 0, W, H);
+    for (let i = 0; i < n; i++) { g.fillStyle = i % 2 ? P.a : hsl(P.hue, 80, 40); g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, W * 1.5, i / n * 2 * PI, (i + 1) / n * 2 * PI); g.fill(); }
+    g.fillStyle = rg(cx, cy, 0, W * .8, [[0, 'rgba(255,255,255,.5)'], [.3, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,.7)']]); g.fillRect(0, 0, W, H);
+    g.fillStyle = hsl(P.h2, 90, 60, .55); for (let y = 0; y < H; y += 12) for (let x = 0; x < W; x += 12) { const r = 5 * clamp((x / W - .2) * 1.4, 0, 1) * (1 - y / H * .6); if (r > .3) { g.beginPath(); g.arc(x + (y / 12 % 2) * 6, y, r, 0, 2 * PI); g.fill(); } }
+    g.fillStyle = P.hi; g.beginPath(); g.arc(cx, cy, H * .1, 0, 2 * PI); g.fill();
+  } else if (m === 'contours') {
+    g.fillStyle = hsl(P.hue, 50, 7); g.fillRect(0, 0, W, H);
+    const cx = W * (.5 + R() * .3), cy = H * (.4 + R() * .2); const ph = [R() * 6, R() * 6, R() * 6];
+    for (let k = 22; k >= 1; k--) {
+      g.beginPath();
+      for (let a = 0; a <= 64; a++) { const t = a / 64 * 2 * PI; const r = k * 17 + Math.sin(t * 3 + ph[0] + k * .2) * 10 + Math.sin(t * 5 + ph[1]) * 6 + Math.sin(t * 2 + ph[2] - k * .1) * k * 1.4; const x = cx + Math.cos(t) * r * 1.3, y = cy + Math.sin(t) * r; a ? g.lineTo(x, y) : g.moveTo(x, y); }
+      g.closePath(); g.fillStyle = hsl(lerp(P.h2, P.hue, k / 22), 70, 10 + (22 - k) * 2.4); g.fill(); g.strokeStyle = hsl(P.h3, 90, 75, .35); g.lineWidth = 1.2; g.stroke();
+    }
+  } else if (m === 'panels') {
+    const cs = [P.a, P.b, P.c, P.dk, P.bg1, P.hi];
+    const split = (x, y, w, h, d) => {
+      if (d > 3 || (d > 1 && R() < .25) || w < 70 || h < 50) { g.fillStyle = cs[Math.floor(R() * cs.length)]; g.fillRect(x + 4, y + 4, w - 8, h - 8);
+        if (R() < .35) { g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.arc(x + w / 2, y + h / 2, Math.min(w, h) * .3, 0, 2 * PI); g.fill(); } return; }
+      if (w > h) { const s = w * (.3 + R() * .4); split(x, y, s, h, d + 1); split(x + s, y, w - s, h, d + 1); } else { const s = h * (.3 + R() * .4); split(x, y, w, s, d + 1); split(x, y + s, w, h - s, d + 1); }
+    };
+    g.fillStyle = '#0a0c10'; g.fillRect(0, 0, W, H); split(0, 0, W, H, 0);
+    g.fillStyle = lg(0, 0, W, H, [[0, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,.45)']]); g.fillRect(0, 0, W, H);
+  }
+}
+function makeCover(it, W = 640, H = 400) {
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const R = rng(hash(it.seed)); const P = paletteFor(it, R); const m = motifFor(it);
+  const sc = W / 640;
+  g.save(); g.scale(sc, sc); const w = 640, h = 400;
+  drawMotif(g, m, w, h, R, P);
+  // big type
+  const kw = keyword(it);
+  const layout = ['center', 'left', 'huge'][hash(it.seed + 'L') % 3];
+  let fs = layout === 'huge' ? 250 : layout === 'left' ? 150 : 170;
+  g.font = `800 ${fs}px ${FONT}`;
+  if ('letterSpacing' in g) g.letterSpacing = (layout === 'huge' ? -10 : -6) + 'px';
+  const maxW = layout === 'huge' ? w * 1.05 : w * .8;
+  let tw = g.measureText(kw).width; if (tw > maxW) { fs *= maxW / tw; g.font = `800 ${fs}px ${FONT}`; tw = g.measureText(kw).width; }
+  g.save();
+  let x, y;
+  if (layout === 'center') { x = (w - tw) / 2; y = h * .5 + fs * .3; }
+  else if (layout === 'left') { x = 30; y = 56 + fs * .78; }
+  else { x = -fs * .06; y = h * .73; }
+  g.translate(x, y); if (layout !== 'huge') g.transform(1, 0, -.1, 1, 0, 0);
+  g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 26; g.shadowOffsetY = 8;
+  const tg = g.createLinearGradient(0, -fs * .75, 0, 0); tg.addColorStop(0, '#fff'); tg.addColorStop(.55, '#fff'); tg.addColorStop(1, P.hi);
+  g.fillStyle = tg; g.globalAlpha = layout === 'huge' ? .92 : 1; g.fillText(kw, 0, 0);
+  g.shadowColor = 'transparent'; g.globalAlpha = 1; g.lineWidth = 2; g.strokeStyle = 'rgba(255,255,255,.35)'; g.strokeText(kw, 0, 0);
+  g.restore();
+  if ('letterSpacing' in g) g.letterSpacing = '0px';
+  // label band
+  const bandH = 128;
+  const bg = g.createLinearGradient(0, h - bandH - 30, 0, h); bg.addColorStop(0, 'rgba(3,5,8,0)'); bg.addColorStop(.35, 'rgba(3,5,8,.66)'); bg.addColorStop(1, 'rgba(3,5,8,.9)');
+  g.fillStyle = bg; g.fillRect(0, h - bandH - 30, w, bandH + 30);
+  g.font = `600 30px ${FONT}`; g.fillStyle = '#fff'; g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 6;
+  const lines = wrap(g, it.title, w - 64, 2);
+  const ty = h - 30 - (lines.length - 1) * 35 - 28;
+  lines.forEach((l, i) => g.fillText(l, 32, ty + i * 35));
+  g.shadowBlur = 0;
+  g.font = `700 14px ${FONT}`; if ('letterSpacing' in g) g.letterSpacing = '2.5px'; g.fillStyle = 'rgba(255,255,255,.62)';
+  const meta = [KIND_LABEL[it.kind], it.date || it.site].filter(Boolean).join('  ·  ').toUpperCase();
+  g.fillText(meta, 32, h - 24);
+  // chip
+  const chip = it.chip || KIND_LABEL[it.kind].toUpperCase();
+  g.font = `700 13px ${FONT}`; const cw = g.measureText(chip).width + 26;
+  rrect(g, 24, 22, cw, 30, 15); g.fillStyle = 'rgba(0,0,0,.5)'; g.fill(); g.strokeStyle = 'rgba(255,255,255,.3)'; g.lineWidth = 1.5; g.stroke();
+  g.fillStyle = '#fff'; g.fillText(chip, 37, 42);
+  if ('letterSpacing' in g) g.letterSpacing = '0px';
+  // gloss + grain + edge
+  g.save(); g.beginPath(); g.ellipse(w * .3, -h * .55, w * 1.1, h * .95, -.12, 0, 2 * PI); g.clip();
+  const gl2 = g.createLinearGradient(0, 0, 0, h * .42); gl2.addColorStop(0, 'rgba(255,255,255,.2)'); gl2.addColorStop(1, 'rgba(255,255,255,.02)'); g.fillStyle = gl2; g.fillRect(0, 0, w, h); g.restore();
+  g.globalCompositeOperation = 'overlay'; g.globalAlpha = .07; g.fillStyle = g.createPattern(grain(), 'repeat'); g.fillRect(0, 0, w, h);
+  g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  rrect(g, 2, 2, w - 4, h - 4, 26); g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 2.5; g.stroke();
+  g.restore();
+  return c;
+}
+function makeBack(it, W, H) {
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const R = rng(hash(it.seed)); const P = paletteFor(it, R);
+  const bgr = g.createLinearGradient(0, 0, 0, H); bgr.addColorStop(0, '#1c2530'); bgr.addColorStop(.25, '#0d1218'); bgr.addColorStop(1, '#07090c'); g.fillStyle = bgr; g.fillRect(0, 0, W, H);
+  const glow = g.createRadialGradient(W * .8, 0, 0, W * .8, 0, W * .7); glow.addColorStop(0, hsl(P.hue, 80, 50, .22)); glow.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = glow; g.fillRect(0, 0, W, H);
+  const s = W / 1000;
+  g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(0, 60 * s, W, 1);
+  g.font = `700 ${13 * s}px ${FONT}`; g.fillStyle = hsl(P.hue, 90, 70); g.fillText((KIND_LABEL[it.kind] + '   ' + (it.date || it.site)).toUpperCase(), 30 * s, 37 * s);
+  g.font = `300 ${40 * s}px ${FONT}`; g.fillStyle = '#fff'; wrap(g, it.title, W - 90 * s, 2).forEach((l, i) => g.fillText(l, 44 * s, 120 * s + i * 46 * s));
+  g.fillStyle = 'rgba(255,255,255,.08)'; for (let i = 0; i < 14; i++) g.fillRect(44 * s, 230 * s + i * 30 * s, (W - 90 * s) * (.6 + R() * .4), 9 * s);
+  rrect(g, 2, 2, W - 4, H - 4, 20 * s); g.strokeStyle = 'rgba(255,255,255,.2)'; g.lineWidth = 3; g.stroke();
+  return c;
+}
+function drawPfp(cv) {
+  const g = cv.getContext('2d'), W = cv.width;
+  const bg = g.createLinearGradient(0, 0, 0, W); bg.addColorStop(0, '#5aa7d8'); bg.addColorStop(1, '#173a57'); g.fillStyle = bg; g.fillRect(0, 0, W, W);
+  g.fillStyle = '#e0603a'; g.beginPath(); g.ellipse(W / 2, W * 1.05, W * .42, W * .32, 0, 0, 2 * PI); g.fill();
+  g.fillStyle = '#f0c4a0'; g.beginPath(); g.ellipse(W / 2, W * .5, W * .26, W * .29, 0, 0, 2 * PI); g.fill();
+  g.fillStyle = '#3a2a22'; g.beginPath(); g.ellipse(W / 2, W * .36, W * .29, W * .2, 0, PI, 2 * PI); g.fill(); g.beginPath(); g.ellipse(W * .43, W * .3, W * .2, W * .1, -.4, 0, 2 * PI); g.fill();
+  g.fillStyle = '#1a1a1a'; g.beginPath(); g.ellipse(W * .41, W * .52, W * .03, W * .045, 0, 0, 2 * PI); g.ellipse(W * .59, W * .52, W * .03, W * .045, 0, 0, 2 * PI); g.fill();
+  g.strokeStyle = '#8a4a3a'; g.lineWidth = W * .025; g.lineCap = 'round'; g.beginPath(); g.arc(W / 2, W * .6, W * .07, .3, PI - .3); g.stroke();
+  const gl = g.createLinearGradient(0, 0, 0, W * .5); gl.addColorStop(0, 'rgba(255,255,255,.35)'); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.beginPath(); g.ellipse(W / 2, W * .1, W * .6, W * .42, 0, 0, 2 * PI); g.fill();
+}
+
+/* ---------------------------------------------------------------------
+   Synthesized UI audio (WebAudio) — muted until the user opts in
+   --------------------------------------------------------------------- */
+const Sound = (() => {
+  let ac = null, master = null, on = false, noiseBuf = null, verb = null;
+  function init() {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    master = ac.createGain(); master.gain.value = .5; master.connect(ac.destination);
+    noiseBuf = ac.createBuffer(1, ac.sampleRate * 1.2, ac.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    // tiny feedback-delay "room"
+    const dl = ac.createDelay(); dl.delayTime.value = .11; const fb = ac.createGain(); fb.gain.value = .32; const lp = ac.createBiquadFilter(); lp.frequency.value = 2600;
+    verb = ac.createGain(); verb.gain.value = .35; verb.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(master);
+  }
+  const env = (node, t, a, peak, d) => { node.gain.setValueAtTime(0, t); node.gain.linearRampToValueAtTime(peak, t + a); node.gain.exponentialRampToValueAtTime(.0001, t + a + d); };
+  function tone(f0, f1, dur, type = 'sine', vol = .2, delay = 0, wet = true) {
+    const t = ac.currentTime + delay, o = ac.createOscillator(), gn = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    env(gn, t, .004, vol, dur); o.connect(gn); gn.connect(master); if (wet) gn.connect(verb); o.start(t); o.stop(t + dur + .05);
+  }
+  function noise(dur, f0, f1, q, vol, delay = 0, type = 'bandpass') {
+    const t = ac.currentTime + delay, s = ac.createBufferSource(), bf = ac.createBiquadFilter(), gn = ac.createGain();
+    s.buffer = noiseBuf; bf.type = type; bf.Q.value = q; bf.frequency.setValueAtTime(f0, t); bf.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(vol, t + dur * .35); gn.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    s.connect(bf); bf.connect(gn); gn.connect(master); gn.connect(verb); s.start(t); s.stop(t + dur + .05);
+  }
+  const fx = {
+    tick() { tone(2400, 1500, .045, 'triangle', .09, 0, false); noise(.03, 6000, 4000, 1.2, .05); },
+    bonk() { tone(220, 140, .12, 'sine', .14, 0, false); },
+    whoosh(dir) { noise(.42, dir > 0 ? 380 : 2600, dir > 0 ? 2600 : 380, .9, .22); tone(110, 70, .25, 'sine', .12); },
+    open() { tone(523, 784, .18, 'sine', .14); tone(784, 1046, .3, 'sine', .1, .07); noise(.35, 900, 5000, .7, .08); },
+    close() { tone(880, 523, .2, 'sine', .12); noise(.3, 4000, 600, .7, .06); },
+    hello() { [392, 494, 587, 740, 880].forEach((f, i) => tone(f, f * 1.001, 1.1, 'sine', .07, i * .07)); tone(196, 196, 1.6, 'triangle', .05); }
+  };
+  return {
+    get on() { return on; },
+    toggle() { if (!ac) init(); on = !on; if (on) { ac.resume(); fx.hello(); } return on; },
+    play(n, a) { if (on && ac && !document.hidden) try { fx[n](a); } catch { } }
+  };
+})();
+
+/* ---------------------------------------------------------------------
+   Math
+   --------------------------------------------------------------------- */
+const M4 = {
+  new() { const m = new Float32Array(16); m[0] = m[5] = m[10] = m[15] = 1; return m; },
+  mul(a, b, o = new Float32Array(16)) {
+    const r = new Float32Array(16);
+    for (let c = 0; c < 4; c++) for (let w = 0; w < 4; w++) r[c * 4 + w] = a[w] * b[c * 4] + a[4 + w] * b[c * 4 + 1] + a[8 + w] * b[c * 4 + 2] + a[12 + w] * b[c * 4 + 3];
+    o.set(r); return o;
+  },
+  persp(fy, asp, n, f) { const t = 1 / Math.tan(fy / 2), m = new Float32Array(16); m[0] = t / asp; m[5] = t; m[10] = (f + n) / (n - f); m[11] = -1; m[14] = 2 * f * n / (n - f); return m; },
+  look(e, c, u = [0, 1, 0]) {
+    let zx = e[0] - c[0], zy = e[1] - c[1], zz = e[2] - c[2]; let l = Math.hypot(zx, zy, zz); zx /= l; zy /= l; zz /= l;
+    let xx = u[1] * zz - u[2] * zy, xy = u[2] * zx - u[0] * zz, xz = u[0] * zy - u[1] * zx; l = Math.hypot(xx, xy, xz); xx /= l; xy /= l; xz /= l;
+    const yx = zy * xz - zz * xy, yy = zz * xx - zx * xz, yz = zx * xy - zy * xx;
+    return new Float32Array([xx, yx, zx, 0, xy, yy, zy, 0, xz, yz, zz, 0, -(xx * e[0] + xy * e[1] + xz * e[2]), -(yx * e[0] + yy * e[1] + yz * e[2]), -(zx * e[0] + zy * e[1] + zz * e[2]), 1]);
+  },
+  inv(m) {
+    const a = m, o = new Float32Array(16);
+    const b00 = a[0] * a[5] - a[1] * a[4], b01 = a[0] * a[6] - a[2] * a[4], b02 = a[0] * a[7] - a[3] * a[4], b03 = a[1] * a[6] - a[2] * a[5], b04 = a[1] * a[7] - a[3] * a[5], b05 = a[2] * a[7] - a[3] * a[6];
+    const b06 = a[8] * a[13] - a[9] * a[12], b07 = a[8] * a[14] - a[10] * a[12], b08 = a[8] * a[15] - a[11] * a[12], b09 = a[9] * a[14] - a[10] * a[13], b10 = a[9] * a[15] - a[11] * a[13], b11 = a[10] * a[15] - a[11] * a[14];
+    let d = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06; if (!d) return o; d = 1 / d;
+    o[0] = (a[5] * b11 - a[6] * b10 + a[7] * b09) * d; o[1] = (a[2] * b10 - a[1] * b11 - a[3] * b09) * d; o[2] = (a[13] * b05 - a[14] * b04 + a[15] * b03) * d; o[3] = (a[10] * b04 - a[9] * b05 - a[11] * b03) * d;
+    o[4] = (a[6] * b08 - a[4] * b11 - a[7] * b07) * d; o[5] = (a[0] * b11 - a[2] * b08 + a[3] * b07) * d; o[6] = (a[14] * b02 - a[12] * b05 - a[15] * b01) * d; o[7] = (a[8] * b05 - a[10] * b02 + a[11] * b01) * d;
+    o[8] = (a[4] * b10 - a[5] * b08 + a[7] * b06) * d; o[9] = (a[1] * b08 - a[0] * b10 - a[3] * b06) * d; o[10] = (a[12] * b04 - a[13] * b02 + a[15] * b00) * d; o[11] = (a[9] * b02 - a[8] * b04 - a[11] * b00) * d;
+    o[12] = (a[5] * b07 - a[4] * b09 - a[6] * b06) * d; o[13] = (a[0] * b09 - a[1] * b07 + a[2] * b06) * d; o[14] = (a[13] * b01 - a[12] * b03 - a[14] * b00) * d; o[15] = (a[8] * b03 - a[9] * b01 + a[10] * b00) * d;
+    return o;
+  },
+  // T * Ry * Rx * Rz * S
+  trs(tx, ty, tz, rx, ry, rz, sx, sy, sz, o = new Float32Array(16)) {
+    const cx = Math.cos(rx), snx = Math.sin(rx), cy = Math.cos(ry), sny = Math.sin(ry), cz = Math.cos(rz), snz = Math.sin(rz);
+    const a00 = cy, a01 = sny * snx, a02 = sny * cx, a11 = cx, a12 = -snx, a20 = -sny, a21 = cy * snx, a22 = cy * cx;
+    o[0] = (a00 * cz + a01 * snz) * sx; o[1] = (a11 * snz) * sx; o[2] = (a20 * cz + a21 * snz) * sx; o[3] = 0;
+    o[4] = (-a00 * snz + a01 * cz) * sy; o[5] = (a11 * cz) * sy; o[6] = (-a20 * snz + a21 * cz) * sy; o[7] = 0;
+    o[8] = a02 * sz; o[9] = a12 * sz; o[10] = a22 * sz; o[11] = 0; o[12] = tx; o[13] = ty; o[14] = tz; o[15] = 1; return o;
+  },
+  xf(m, x, y, z, w = 1) { return [m[0] * x + m[4] * y + m[8] * z + m[12] * w, m[1] * x + m[5] * y + m[9] * z + m[13] * w, m[2] * x + m[6] * y + m[10] * z + m[14] * w, m[3] * x + m[7] * y + m[11] * z + m[15] * w]; }
+};
+class Spring {
+  constructor(v, w = 9, z = .82) { this.v = v; this.t = v; this.vel = 0; this.w = w; this.z = z; }
+  step(dt) { const n = Math.max(1, Math.ceil(dt / .006)), h = dt / n; for (let i = 0; i < n; i++) { const a = -this.w * this.w * (this.v - this.t) - 2 * this.z * this.w * this.vel; this.vel += a * h; this.v += this.vel * h; } return this.v; }
+  snap(v) { this.v = this.t = v; this.vel = 0; }
+}
+class Spring3 { constructor(v, w, z) { this.s = v.map(x => new Spring(x, w, z)); } set t(v) { this.s.forEach((s, i) => s.t = v[i]); } get v() { return this.s.map(s => s.v); } step(dt) { this.s.forEach(s => s.step(dt)); } snap(v) { this.s.forEach((s, i) => s.snap(v[i])); } }
+
+/* ---------------------------------------------------------------------
+   State + layout (shared by both renderers)
+   --------------------------------------------------------------------- */
+const TILE_W = 3.2, TILE_H = 2.0, TILE_D = 0.11, TILE_R = 0.15, FLOOR_Y = -1.36;
+const S = {
+  chan: 0, idx: CH.map(() => 0), chanS: new Spring(0, 7.5, .86), rowS: CH.map(() => new Spring(0, 10, .8)),
+  open: null, openT: 0, openDir: 0, sweep: new Map(), hover: -1, t: 0, lastInput: 0, drag: 0, kbd: false,
+  mx: 0, my: 0, intro: 0
+};
+function tileLayout(k, portrait) {
+  const ak = Math.abs(k), n = Math.min(ak, 1), f = Math.max(ak - 1, 0);
+  if (k >= 0) {
+    return portrait
+      ? { x: n * 3.75 + f * 2.3, z: -(n * 2.2 + f * 1.4), ry: -n * .5, a: clamp(1 - f / 2.2, 0, 1) }
+      : { x: n * 3.5 + f * 1.75, z: -(n * 1.9 + f * 1.3), ry: -n * .56, a: clamp(1 - f / 5.2, 0, 1) };
+  }
+  return portrait
+    ? { x: -(n * 3.75 + f * 2.3), z: -(n * 2.2 + f * 1.4), ry: n * .5, a: clamp(1 - ak / 2.2, 0, 1) }
+    : { x: -(n * 3.4 + f * 1.8), z: -(n * 2.4 + f * 1.4), ry: n * .55, a: clamp(1 - ak * .62, 0, 1) * .8 };
+}
+function rowLayout(d) {
+  const ad = Math.abs(d);
+  return { y: d > 0 ? -d * 1.15 : -d * 2.3, z: -ad * 3.2, a: Math.pow(clamp(1 - ad, 0, 1), 1.4), s: 1 - ad * .12 };
+}
+function viewport() { const w = innerWidth, h = innerHeight; return { w, h, asp: w / h, portrait: w / h < .9 }; }
+function framing(vp) {
+  if (vp.portrait) {
+    const fov = 50 * PI / 180, t = Math.tan(fov / 2), D = (1.6 / .86) / (t * vp.asp), visH = 2 * D * t;
+    const ly = -.12 * visH;
+    return { fov, D, eye: [0, ly + 1.15, D], at: [0, ly, 0], avatar: [1.15, FLOOR_Y, 2.35] };
+  }
+  const fov = 34 * PI / 180, t = Math.tan(fov / 2);
+  const frac = vp.asp > 2 ? .34 : vp.asp > 1.5 ? .4 : .46;
+  const D = (1.6 / frac) / (t * vp.asp), visW = 2 * D * t * vp.asp, visH = 2 * D * t;
+  const lx = (vp.asp > 1.3 ? .1 : .06) * visW, ly = -.05 * visH;
+  return { fov, D, eye: [lx - .4, ly + 1.1, D], at: [lx, ly, 0], avatar: [3.05, FLOOR_Y, 2.1] };
+}
+function panelRect(vp) {
+  if (vp.portrait || vp.w < 700) { const w = vp.w - 20, h = vp.h - 96; return { w, h, x: (vp.w - w) / 2, y: (vp.h - h) / 2 + 22 }; }
+  const w = Math.min(980, vp.w * .78), h = Math.min(vp.h * .82, 820); return { w, h, x: (vp.w - w) / 2, y: (vp.h - h) / 2 + 10 };
+}
+const OPEN_Z = 2.5, OPEN_D = 5.0;
+function curItem() { return CH[S.chan].items[S.idx[S.chan]]; }
+
+/* ---------------------------------------------------------------------
+   Procedural avatar (scene graph + flat-shaded lathe meshes)
+   --------------------------------------------------------------------- */
+function srgb(hex) { const n = parseInt(hex.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => Math.pow(v / 255, 2.2)); }
+const AV_COL = { skin: srgb('#f0c09a'), skin2: srgb('#e3a882'), hair: srgb('#3b2a20'), hood: srgb('#e2643a'), hood2: srgb('#c24f2a'), pants: srgb('#2c3a52'), shoe: srgb('#eef0f2'), sole: srgb('#7d848c'), eye: srgb('#17191c'), white: srgb('#ffffff'), mouth: srgb('#7a3b33'), string: srgb('#f3efe8') };
+function makeAvatar() {
+  const B = {}; const bone = (name, parent, t) => (B[name] = { name, parent: parent && B[parent], t, r: [0, 0, 0], s: [1, 1, 1], m: new Float32Array(16) });
+  bone('root', null, [0, 0, 0]); bone('hips', 'root', [0, .64, 0]); bone('torso', 'hips', [0, .03, 0]); bone('neck', 'torso', [0, .47, 0]); bone('head', 'neck', [0, .05, 0]);
+  bone('shL', 'torso', [.205, .41, 0]); bone('elL', 'shL', [0, -.235, 0]); bone('haL', 'elL', [0, -.215, 0]);
+  bone('shR', 'torso', [-.205, .41, 0]); bone('elR', 'shR', [0, -.235, 0]); bone('haR', 'elR', [0, -.215, 0]);
+  bone('hipL', 'hips', [.092, -.02, 0]); bone('knL', 'hipL', [0, -.29, 0]); bone('anL', 'knL', [0, -.28, 0]);
+  bone('hipR', 'hips', [-.092, -.02, 0]); bone('knR', 'hipR', [0, -.29, 0]); bone('anR', 'knR', [0, -.28, 0]);
+  const parts = []; const P = (bn, mesh, col, t = [0, 0, 0], s = [1, 1, 1], r = [0, 0, 0]) => parts.push({ bone: B[bn], mesh, col, local: M4.trs(t[0], t[1], t[2], r[0], r[1], r[2], s[0], s[1], s[2]), m: new Float32Array(16), pm: new Float32Array(16) });
+  return { B, parts, P, yaw: new Spring(-.35, 6, .9), headY: new Spring(0, 7, .8), headX: new Spring(0, 7, .8), wave: -9, present: -9, blink: 2.5, hop: new Spring(0, 9, .4) };
+}
+function buildAvatarParts(av, mk) {
+  const { P } = av, C = AV_COL;
+  const sphere = mk.sphere, cap = mk.capsule;
+  P('hips', mk.pelvis, C.pants);
+  P('torso', mk.torso, C.hood); P('torso', mk.pocket, C.hood2, [0, .14, .118], [1, 1, 1], [-.12, 0, 0]);
+  P('torso', mk.hood, C.hood2, [0, .45, -.025], [1, 1, .95], [-.38, 0, 0]);
+  P('torso', mk.string, C.string, [.04, .42, .135], [1, 1, 1], [.12, 0, 0]); P('torso', mk.string, C.string, [-.04, .42, .135], [1, 1, 1], [.12, 0, 0]);
+  P('neck', mk.neck, C.skin);
+  P('head', sphere, C.skin, [0, .19, 0], [.2, .215, .195]);
+  P('head', mk.hairCap, C.hair, [0, .2, -.012], [.215, .23, .215]);
+  P('head', mk.tuft, C.hair, [.05, .38, .07], [1, 1, 1], [.75, .2, -.35]); P('head', mk.tuft, C.hair, [-.06, .385, .06], [1.1, 1, 1], [.7, -.3, .4]); P('head', mk.tuft, C.hair, [0, .405, -.02], [1.3, 1.1, 1.3], [.4, 0, 0]);
+  P('head', sphere, C.hair, [0, .315, .13], [.17, .06, .07], [-.3, 0, 0]);
+  P('head', sphere, C.skin, [.196, .19, 0], [.032, .048, .024]); P('head', sphere, C.skin, [-.196, .19, 0], [.032, .048, .024]);
+  for (const sx of [1, -1]) {
+    P('head', sphere, C.eye, [sx * .07, .2, .176], [.03, .042, .02], [0, sx * .25, 0]);
+    P('head', sphere, C.white, [sx * .07 + .01, .212, .193], [.009, .011, .006]);
+    P('head', sphere, C.hair, [sx * .075, .262, .178], [.042, .009, .012], [-.2, sx * .2, sx * -.12]);
+  }
+  P('head', sphere, C.skin2, [0, .15, .2], [.022, .026, .02]);
+  P('head', sphere, C.mouth, [0, .098, .183], [.036, .01, .012], [-.2, 0, 0]);
+  for (const s of ['L', 'R']) {
+    P('sh' + s, cap.upper, C.hood); P('el' + s, cap.fore, C.hood); P('ha' + s, sphere, C.skin, [0, -.035, 0], [.05, .062, .045]);
+    P('el' + s, mk.cuff, C.hood2, [0, -.22, 0]);
+    P('hip' + s, cap.thigh, C.pants); P('kn' + s, cap.shin, C.pants);
+    P('an' + s, sphere, C.shoe, [0, -.035, .045], [.072, .058, .13]); P('an' + s, sphere, C.sole, [0, -.075, .045], [.078, .022, .138]);
+  }
+  av.eyes = av.parts.filter(p => p.col === C.eye);
+}
+function updateAvatar(av, dt, t, ctx) {
+  const B = av.B;
+  // targets
+  const [ax, ay, az] = ctx.pos;
+  const toYaw = (tx, tz) => Math.atan2(tx - ax, tz - az);
+  const camYaw = toYaw(ctx.cam[0], ctx.cam[2]), tileYaw = toYaw(ctx.tile[0], ctx.tile[2]);
+  const busy = (t - ctx.lastInput) < 3.5;
+  const lookTile = busy || ctx.open > .01;
+  const angL = (a, b, k) => a + Math.atan2(Math.sin(b - a), Math.cos(b - a)) * k;
+  av.yaw.t = clamp(angL(camYaw, tileYaw, lookTile ? .3 : .12), camYaw - .75, camYaw + .75);
+  av.yaw.step(dt);
+  const tgt = lookTile ? ctx.tile : ctx.cam;
+  let ly = toYaw(tgt[0], tgt[2]) - av.yaw.v; ly = Math.atan2(Math.sin(ly), Math.cos(ly));
+  const hx = tgt[0] - ax, hz = tgt[2] - az, hy = tgt[1] - (ay + 1.55);
+  av.headY.t = clamp(ly + ctx.mx * .25, -.85, .85); av.headX.t = clamp(-Math.atan2(hy, Math.hypot(hx, hz)) * .8 + ctx.my * .1, -.4, .45);
+  av.headY.step(dt); av.headX.step(dt); av.hop.step(dt);
+  const br = Math.sin(t * 2.1), sw = Math.sin(t * 1.05);
+  B.root.t = [ax, ay + Math.max(0, av.hop.v) * .12, az]; B.root.r = [0, av.yaw.v, 0];
+  B.hips.r = [0, av.headY.v * .12, sw * .02]; B.hips.t = [0, .64 + sw * .004, 0];
+  B.torso.r = [-.02 + br * .012, av.headY.v * .22, -sw * .015]; B.torso.s = [1 + br * .008, 1, 1 + br * .01];
+  B.head.r = [av.headX.v, av.headY.v * .6, Math.sin(t * .7) * .04]; B.head.s = [1.32, 1.32, 1.32];
+  B.neck.r = [0, av.headY.v * .15, 0];
+  // arms idle
+  let shL = [sw * .04, 0, .1], shR = [-sw * .04, 0, -.1], elL = [-.2, 0, 0], elR = [-.2, 0, 0];
+  const wt = t - av.wave;
+  if (wt >= 0 && wt < 2.4) {
+    const up = sstep(0, .35, wt) * (1 - sstep(1.95, 2.4, wt));
+    const osc = Math.sin((wt - .3) * 11) * up;
+    shR = [lerp(shR[0], -.25, up), 0, lerp(shR[2], -2.6, up)];
+    elR = [lerp(-.2, -.1, up), 0, lerp(0, -.25, up) + osc * .45];
+    B.head.r[2] += up * .1;
+  }
+  const pt = t - av.present;
+  if (pt >= 0 && pt < 1.6) {
+    const up = sstep(0, .3, pt) * (1 - sstep(1.1, 1.6, pt));
+    const side = ctx.tileSide; // which arm points
+    if (side > 0) { shL = [lerp(shL[0], -.9, up), 0, lerp(shL[2], .55, up)]; elL = [lerp(-.2, -.25, up), 0, 0]; }
+    else { shR = [lerp(shR[0], -.9, up), 0, lerp(shR[2], -.55, up)]; elR = [lerp(-.2, -.25, up), 0, 0]; }
+  }
+  B.shL.r = shL; B.shR.r = shR; B.elL.r = elL; B.elR.r = elR;
+  B.hipL.r = [0, 0, -.02]; B.hipR.r = [0, 0, .02]; B.knL.r = [.02, 0, 0]; B.knR.r = [.02, 0, 0]; B.anL.r = [0, .12, 0]; B.anR.r = [0, -.12, 0];
+  // blink
+  av.blink -= dt; let eyeS = 1; if (av.blink < 0) { eyeS = .12; if (av.blink < -.12) av.blink = 2.5 + Math.random() * 3; }
+  av.eyes.forEach(p => p.blink = eyeS);
+  // world matrices
+  for (const k in B) { const b = B[k]; const l = M4.trs(b.t[0], b.t[1], b.t[2], b.r[0], b.r[1], b.r[2], b.s[0], b.s[1], b.s[2]); if (b.parent) M4.mul(b.parent.m, l, b.m); else b.m.set(l); }
+  for (const p of av.parts) { p.pm.set(p.m); let l = p.local; if (p.blink !== undefined && p.blink !== 1) { l = M4.mul(p.local, M4.trs(0, 0, 0, 0, 0, 0, 1, p.blink, 1)); } M4.mul(p.bone.m, l, p.m); }
+}
+
+/* ---------------------------------------------------------------------
+   WebGL2 renderer
+   --------------------------------------------------------------------- */
+function createGLRenderer(canvas) {
+  const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance' });
+  if (!gl) return null;
+  const extF = gl.getExtension('EXT_color_buffer_float');
+  const extA = gl.getExtension('EXT_texture_filter_anisotropic');
+  const HDR = !!extF;
+  const maxAniso = extA ? Math.min(8, gl.getParameter(extA.MAX_TEXTURE_MAX_ANISOTROPY_EXT)) : 0;
+  const SAMPLES = Math.min(4, gl.getParameter(gl.MAX_SAMPLES) || 0);
+
+  const HEAD = '#version 300 es\nprecision highp float;\n';
+  const COMMON = `
+  uniform vec3 uCam; uniform vec3 uSpotPos; uniform vec3 uSpotDir; uniform vec3 uSpotCol; uniform float uSpotCos;
+  uniform vec3 uAccent; uniform float uTime; uniform float uFloorY; uniform float uRefl;
+  float D_GGX(float nh,float a){float a2=a*a;float d=nh*nh*(a2-1.)+1.;return a2/(3.14159*d*d+1e-5);}
+  float spotAt(vec3 p,out vec3 L){vec3 v=uSpotPos-p;float d=length(v);L=v/d;float c=dot(-L,uSpotDir);return smoothstep(uSpotCos,mix(uSpotCos,1.,.55),c)*(30./(10.+d*d*.6));}
+  vec3 envMap(vec3 r){
+    float top=smoothstep(.45,.85,r.y)*smoothstep(1.,.2,abs(r.x));
+    float strip=exp(-pow((r.y-.16)/.045,2.))*smoothstep(1.,.15,abs(r.x+.15));
+    float side=exp(-pow((r.x-.78)/.14,2.))*smoothstep(-.3,.4,r.y);
+    float lowFloor=smoothstep(0.,-.4,r.y)*.04;
+    return vec3(.012,.015,.02)+top*vec3(2.2,2.25,2.35)+strip*vec3(1.1,1.12,1.2)+side*(uAccent*1.4+.15)+lowFloor;
+  }
+  `;
+  const VS_MESH = HEAD + `
+  layout(location=0) in vec3 aPos; layout(location=1) in vec3 aNor; layout(location=2) in vec3 aUV;
+  uniform mat4 uModel,uPrevModel,uVP,uPrevVP;
+  out vec3 vW; out vec3 vN; out vec3 vUV; out vec3 vL; out vec4 vCur; out vec4 vPrev;
+  void main(){vec4 w=uModel*vec4(aPos,1.);vW=w.xyz;vN=mat3(uModel)*aNor;vUV=aUV;vL=aPos;vCur=uVP*w;vPrev=uPrevVP*(uPrevModel*vec4(aPos,1.));gl_Position=vCur;}`;
+  const OUT = `layout(location=0) out vec4 oC; layout(location=1) out vec4 oV;
+  in vec4 vCur; in vec4 vPrev;
+  vec2 velo(){return (vCur.xy/vCur.w-vPrev.xy/vPrev.w)*.5;}
+  `;
+  const FS_TILE = HEAD + COMMON + OUT + `
+  in vec3 vW; in vec3 vN; in vec3 vUV; in vec3 vL;
+  uniform sampler2D uTex,uBack; uniform float uAlpha,uFocus,uSweep,uHover,uHasBack; uniform vec2 uHalf; uniform float uRad;
+  float rsd(vec2 p,vec2 h,float r){vec2 q=abs(p)-h+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
+  void main(){
+    if(uRefl>.5&&vW.y<uFloorY) discard;
+    if(uRefl<.5&&vW.y<uFloorY-.002) discard;
+    vec3 N=normalize(vN); vec3 V=normalize(uCam-vW);
+    if(dot(N,V)<0.&&vUV.z>1.5) N=-N;
+    vec3 L; float sp=spotAt(vW,L); float ndl=max(dot(N,L),0.); float ndv=max(dot(N,V),1e-3);
+    vec3 H=normalize(L+V); float nh=max(dot(N,H),0.); float lh=max(dot(L,H),0.);
+    float Fs=.04+.96*pow(1.-lh,5.); float Fe=.04+.96*pow(1.-ndv,5.);
+    vec3 col; float face=vUV.z;
+    vec3 R=reflect(-V,N);
+    if(face<.5){
+      vec3 alb=texture(uTex,vUV.xy).rgb;
+      float lum=dot(alb,vec3(.2126,.7152,.0722));
+      alb=mix(vec3(lum),alb,mix(.5,1.,uFocus));
+      col=alb*(.5+.42*ndl*sp)*mix(.42,1.08,uFocus)*(1.+uHover*.12);
+      col+=uSpotCol*D_GGX(nh,.09)*Fs*.25*ndl*sp*1.6;
+      col+=envMap(R)*Fe*1.1;
+      // chromatic sweep
+      if(uSweep>0.&&uSweep<1.){
+        float d=vUV.x*.85+(1.-vUV.y)*.5; float p=mix(-.5,1.9,uSweep); float w=.055;
+        vec3 band=vec3(exp(-pow((d-p+.035)/w,2.)),exp(-pow((d-p)/w,2.)),exp(-pow((d-p-.035)/w,2.)));
+        float wide=exp(-pow((d-p)/.22,2.));
+        col+=(band*1.6+wide*.22)*(1.-uSweep*.4);
+      }
+      float sd=rsd(vL.xy,uHalf,uRad);
+      col+=vec3(.8,.9,1.)*smoothstep(-.045,-.008,sd)*(.10+uFocus*.5);
+    } else if(face<1.5){
+      vec3 alb=uHasBack>.5?texture(uBack,vec2(1.-vUV.x,vUV.y)).rgb:vec3(.03,.035,.045);
+      col=alb*(.8+.25*ndl*sp)+envMap(R)*Fe*.8;
+    } else {
+      vec3 base=vec3(.03,.034,.04);
+      col=base*(.4+ndl*sp)+uSpotCol*D_GGX(nh,.2)*Fs*.25*ndl*sp*2.+envMap(R)*(.04+.96*pow(1.-ndv,3.))*.9;
+      col+=uAccent*pow(1.-ndv,2.)*.35*uFocus;
+    }
+    oC=vec4(col,uAlpha); oV=vec4(velo(),0.,uAlpha);
+    if(uRefl>.5) oC.a=clamp((vW.y-uFloorY)/2.6,0.,1.);
+  }`;
+  const FS_AV = HEAD + COMMON + OUT + `
+  in vec3 vW; in vec3 vN; in vec3 vUV; in vec3 vL;
+  uniform vec3 uColor; uniform float uAlpha;
+  void main(){
+    if(uRefl>.5&&vW.y<uFloorY) discard;
+    vec3 N=normalize(vN); vec3 V=normalize(uCam-vW); vec3 L; float sp=spotAt(vW,L);
+    float wrap=max((dot(N,L)+.35)/1.35,0.);
+    vec3 hemi=mix(vec3(.05,.05,.055),vec3(.34,.38,.46),N.y*.5+.5);
+    vec3 col=uColor*(hemi*.9+uSpotCol*wrap*sp*.62);
+    float ndv=max(dot(N,V),0.); float rim=pow(1.-ndv,3.);
+    col+=(uAccent*.6+.2)*rim*.28;
+    vec3 H=normalize(L+V); col+=uSpotCol*D_GGX(max(dot(N,H),0.),.35)*.03*sp*max(dot(N,L),0.);
+    oC=vec4(col,uAlpha); oV=vec4(velo(),0.,1.);
+    if(uRefl>.5) oC.a=clamp((vW.y-uFloorY)/2.6,0.,1.);
+  }`;
+  const FS_GLOW = HEAD + COMMON + OUT + `
+  in vec3 vW; in vec3 vN; in vec3 vUV; in vec3 vL;
+  uniform vec2 uHalf; uniform float uRad, uInt;
+  float rsd(vec2 p,vec2 h,float r){vec2 q=abs(p)-h+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
+  void main(){
+    if(vW.y<uFloorY) discard;
+    float sd=rsd(vL.xy,uHalf,uRad);
+    float g=exp(-max(sd,0.)*7.)*smoothstep(-.25,0.,sd);
+    oC=vec4((uAccent*1.3+.08)*g*uInt,0.); oV=vec4(0.);
+  }`;
+  const VS_FS = HEAD + `out vec2 vUV; void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));vUV=p;gl_Position=vec4(p*2.-1.,0.,1.);}`;
+  const FS_BG = HEAD + COMMON + `
+  in vec2 vUV; uniform mat4 uInvVP,uPrevVP; uniform vec3 uAccent2;
+  layout(location=0) out vec4 oC; layout(location=1) out vec4 oV;
+  float h1(float n){return fract(sin(n)*43758.5453);}
+  void main(){
+    vec4 w=uInvVP*vec4(vUV*2.-1.,1.,1.); vec3 d=normalize(w.xyz/w.w-uCam);
+    float y=d.y; float az=atan(d.x,-d.z);
+    vec3 col=mix(vec3(.0012,.0014,.002),vec3(.009,.011,.014),exp(-abs(y)*8.));
+    col+=vec3(.014,.016,.02)*exp(-pow(az*1.8,2.))*exp(-pow((y-.03)*5.,2.));
+    // ribbons
+    for(int i=0;i<4;i++){
+      float fi=float(i);
+      float c=y-(.2+.075*fi)-.09*sin(az*(1.3+fi*.3)+uTime*(.04+fi*.011)+fi*1.7)-.035*sin(az*2.7-uTime*.06+fi);
+      float band=exp(-c*c/(.00012+fi*.00008));
+      float soft=exp(-c*c/.004);
+      col+=mix(uAccent,uAccent2,fi/3.)*(band*.05+soft*.007)*smoothstep(1.6,.1,abs(az))*smoothstep(.0,.15,y);
+    }
+    // ceiling panels
+    if(y>.12){ float pz=1./max(y,.05); vec2 q=d.xz*pz; vec2 g=abs(fract(q*.25)-.5); col+=vec3(.03,.035,.04)*smoothstep(.47,.5,max(g.x,g.y))*smoothstep(.12,.3,y)*exp(-length(q)*.05); }
+    oC=vec4(col,1.);
+    vec4 pc=uPrevVP*vec4(uCam+d*100.,1.); vec4 cc=vec4(vUV*2.-1.,0.,1.);
+    oV=vec4((cc.xy-pc.xy/pc.w)*.5,0.,1.);
+    if(uRefl>.5) oC.a=1.;
+  }`;
+  const VS_FLOOR = HEAD + `layout(location=0) in vec3 aPos; uniform mat4 uVP,uPrevVP; out vec3 vW; out vec4 vCur; out vec4 vPrev;
+  void main(){vW=aPos;vCur=uVP*vec4(aPos,1.);vPrev=uPrevVP*vec4(aPos,1.);gl_Position=vCur;}`;
+  const FS_FLOOR = HEAD + COMMON + OUT + `
+  in vec3 vW; uniform sampler2D uReflT; uniform vec2 uRes; uniform vec4 uShadow[10]; uniform int uNShadow; uniform vec3 uAvatar;
+  float hash2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+  float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash2(i),hash2(i+vec2(1,0)),f.x),mix(hash2(i+vec2(0,1)),hash2(i+vec2(1,1)),f.x),f.y);}
+  void main(){
+    vec3 p=vW; vec3 V=normalize(uCam-p);
+    float n=vnoise(p.xz*1.7)*.6+vnoise(p.xz*6.)*.4;
+    vec2 suv=gl_FragCoord.xy/uRes;
+    vec2 off=(vec2(vnoise(p.xz*3.1),vnoise(p.xz*3.1+7.))-.5)*.006;
+    float h=texture(uReflT,suv).a;
+    float lod=clamp(h,0.,1.)*5.+n*.6;
+    vec3 refl=textureLod(uReflT,suv+off,lod).rgb;
+    float ndv=max(V.y,0.); float F=.035+.965*pow(1.-ndv,5.);
+    vec2 g=abs(fract(p.xz*.5)-.5); float seam=smoothstep(.488,.5,max(g.x,g.y));
+    vec3 base=vec3(.005,.006,.0075)*(1.-seam*.5)*(.85+n*.3);
+    vec3 L; float sp=spotAt(p,L);
+    float sh=1.;
+    for(int i=0;i<10;i++){ if(i>=uNShadow) break; vec4 s=uShadow[i]; vec2 q=abs(p.xz-s.xy)-vec2(s.z,.12); float dd=length(max(q,0.))+min(max(q.x,q.y),0.); sh*=1.-s.w*.55*(1.-smoothstep(-.2,.9,dd)); }
+    vec2 ad=(p.xz-uAvatar.xz)/vec2(.42,.34); sh*=1.-.7*exp(-dot(ad,ad)*1.6);
+    vec3 lit=base+uSpotCol*sp*max(L.y,0.)*.075*sh*(.8+n*.4)+uAccent*.012*exp(-length(p.xz-vec2(.5,-1.))*.25);
+    float rough=.75+n*.25;
+    vec3 col=lit+refl*mix(.42,1.,F)*rough*mix(1.,sh,.5);
+    col+=uSpotCol*D_GGX(max(dot(vec3(0,1,0),normalize(L+V)),0.),.18)*.02*sp*sh;
+    float dist=length(p.xz-uCam.xz); col=mix(col,vec3(.009,.011,.014),smoothstep(14.,90.,dist));
+    oC=vec4(col,1.); oV=vec4(velo(),0.,1.);
+  }`;
+  const VS_PT = HEAD + `layout(location=0) in vec4 aP; uniform mat4 uVP; uniform float uTime,uPx; out float vB; out vec3 vW;
+  void main(){vec3 p=aP.xyz; p.y=mod(p.y+uTime*.06*(.5+aP.w),5.6)-1.3; p.x+=sin(uTime*.2+aP.w*20.)*.3; p.z+=cos(uTime*.17+aP.w*13.)*.3; vW=p; vec4 c=uVP*vec4(p,1.); gl_Position=c; gl_PointSize=uPx*(.6+aP.w)/c.w; vB=.5+.5*sin(uTime*1.3+aP.w*40.);}`;
+  const FS_PT = HEAD + COMMON + `in float vB; in vec3 vW; layout(location=0) out vec4 oC; layout(location=1) out vec4 oV;
+  void main(){vec2 c=gl_PointCoord-.5; float a=exp(-dot(c,c)*18.); vec3 L; float sp=spotAt(vW,L); oC=vec4(uSpotCol*a*sp*.2*(.4+vB),0.); oV=vec4(0.);}`;
+  const FS_BRIGHT = HEAD + `in vec2 vUV; uniform sampler2D uT; uniform vec2 uTx; out vec4 o;
+  void main(){vec3 c=vec3(0);for(int i=0;i<4;i++){vec2 of=vec2(i&1,i>>1)*2.-1.;c+=texture(uT,vUV+of*uTx).rgb;}c*=.25;float l=max(c.r,max(c.g,c.b));float k=clamp(l-.75,0.,1.2);k=k*k/(1.2+1e-4)*.5+max(l-1.95,0.);o=vec4(c*k/max(l,1e-4),1.);}`;
+  const FS_BLUR = HEAD + `in vec2 vUV; uniform sampler2D uT; uniform vec2 uDir; out vec4 o;
+  void main(){vec3 c=texture(uT,vUV).rgb*.2270;c+=(texture(uT,vUV+uDir*1.3846).rgb+texture(uT,vUV-uDir*1.3846).rgb)*.3162;c+=(texture(uT,vUV+uDir*3.2308).rgb+texture(uT,vUV-uDir*3.2308).rgb)*.0703;o=vec4(c,1.);}`;
+  const FS_COMP = HEAD + COMMON + `in vec2 vUV; uniform sampler2D uScene,uVel,uDepth,uB0,uB1; uniform mat4 uInvVP; uniform float uMB,uFade,uFrame,uVolI,uBloomI; uniform vec2 uGVel; uniform vec2 uRes;
+  uniform vec3 uSpot2Pos,uSpot2Dir,uSpot2Col; out vec4 o;
+  float ign(vec2 p){return fract(52.9829189*fract(dot(p,vec2(.06711056,.00583715))));}
+  float h3(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+  float n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(h3(i),h3(i+vec3(1,0,0)),f.x),mix(h3(i+vec3(0,1,0)),h3(i+vec3(1,1,0)),f.x),f.y),mix(mix(h3(i+vec3(0,0,1)),h3(i+vec3(1,0,1)),f.x),mix(h3(i+vec3(0,1,1)),h3(i+vec3(1,1,1)),f.x),f.y),f.z);}
+  float cone(vec3 p,vec3 sp,vec3 sd,float cs){vec3 v=p-sp;float d=length(v);float c=dot(v/d,sd);return smoothstep(cs,mix(cs,1.,.5),c)/(1.+d*d*.012);}
+  vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
+  void main(){
+    vec2 v=texture(uVel,vUV).xy+uGVel; v*=uMB; float vl=length(v); if(vl>.07) v*=.07/vl;
+    float j=ign(gl_FragCoord.xy+uFrame*5.588);
+    vec3 c=vec3(0);
+    if(vl*uRes.x>1.5){ for(int i=0;i<10;i++){ float t=(float(i)+j)/10.-.5; c+=texture(uScene,vUV+v*t).rgb; } c/=10.; }
+    else c=texture(uScene,vUV).rgb;
+    // volumetric light
+    float dz=texture(uDepth,vUV).r;
+    vec4 wp=uInvVP*vec4(vUV*2.-1.,dz*2.-1.,1.); vec3 P=wp.xyz/wp.w; vec3 rd=P-uCam; float tm=min(length(rd),32.); rd/=max(length(rd),1e-4);
+    if(rd.y<0.) tm=min(tm,(uFloorY-uCam.y)/rd.y);
+    float acc=0.,acc2=0.; float st=tm/14.;
+    for(int i=0;i<14;i++){ vec3 p=uCam+rd*(float(i)+j)*st; float nn=.55+.45*n3(p*.7+vec3(0.,-uTime*.08,uTime*.03)); acc+=cone(p,uSpotPos,uSpotDir,.962)*nn; acc2+=cone(p,uSpot2Pos,uSpot2Dir,.975)*nn; }
+    float ph=1.+.6*pow(max(dot(rd,-uSpotDir),0.),3.);
+    c+=(uSpotCol*acc*ph*.02+uSpot2Col*acc2*.022)*st*uVolI;
+    c+=(texture(uB0,vUV).rgb*.55+texture(uB1,vUV).rgb*.7)*uBloomI;
+    c*=1.08;
+    c=aces(c);
+    vec2 q=vUV-.5; c*=1.-dot(q,q)*.9;
+    c=pow(c,vec3(1./2.2));
+    c+=(j-.5)/255.*1.5;
+    o=vec4(c*uFade,1.);
+  }`;
+
+  function sh(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { const log = gl.getShaderInfoLog(s); console.error(log, src.split('\n').map((l, i) => i + 1 + ': ' + l).join('\n')); throw new Error('shader: ' + log); } return s; }
+  function prog(vs, fs) {
+    const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    const u = {}; const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) { const info = gl.getActiveUniform(p, i); u[info.name.replace(/\[0\]$/, '')] = gl.getUniformLocation(p, info.name); }
+    return { p, u };
+  }
+  const P = {
+    tile: prog(VS_MESH, FS_TILE), av: prog(VS_MESH, FS_AV), glow: prog(VS_MESH, FS_GLOW), bg: prog(VS_FS, FS_BG), floor: prog(VS_FLOOR, FS_FLOOR),
+    pt: prog(VS_PT, FS_PT), bright: prog(VS_FS, FS_BRIGHT), blur: prog(VS_FS, FS_BLUR), comp: prog(VS_FS, FS_COMP)
+  };
+
+  // ---------- geometry ----------
+  function vao(data, stride = 9) {
+    const v = gl.createVertexArray(); gl.bindVertexArray(v); const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+    if (stride === 9) { gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 36, 0); gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 36, 12); gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 3, gl.FLOAT, false, 36, 24); }
+    else { gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, stride, gl.FLOAT, false, stride * 4, 0); }
+    gl.bindVertexArray(null); return { v, n: data.length / stride };
+  }
+  function roundedBox(w, h, d, r, seg = 8) {
+    const out = [], o = [];
+    const cs = [[w / 2 - r, h / 2 - r, 0], [-w / 2 + r, h / 2 - r, PI / 2], [-w / 2 + r, -h / 2 + r, PI], [w / 2 - r, -h / 2 + r, PI * 1.5]];
+    for (const [cx, cy, a0] of cs) for (let i = 0; i <= seg; i++) { const a = a0 + i / seg * PI / 2; o.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r, Math.cos(a), Math.sin(a)]); }
+    const V = (x, y, z, nx, ny, nz, f) => out.push(x, y, z, nx, ny, nz, x / w + .5, .5 - y / h, f);
+    const z1 = d / 2, z0 = -d / 2, M = o.length;
+    for (let i = 0; i < M; i++) { const a = o[i], b = o[(i + 1) % M]; V(0, 0, z1, 0, 0, 1, 0); V(a[0], a[1], z1, 0, 0, 1, 0); V(b[0], b[1], z1, 0, 0, 1, 0); }
+    for (let i = 0; i < M; i++) { const a = o[i], b = o[(i + 1) % M]; V(0, 0, z0, 0, 0, -1, 1); V(b[0], b[1], z0, 0, 0, -1, 1); V(a[0], a[1], z0, 0, 0, -1, 1); }
+    for (let i = 0; i < M; i++) { const a = o[i], b = o[(i + 1) % M];
+      V(a[0], a[1], z1, a[2], a[3], 0, 2); V(a[0], a[1], z0, a[2], a[3], 0, 2); V(b[0], b[1], z0, b[2], b[3], 0, 2);
+      V(a[0], a[1], z1, a[2], a[3], 0, 2); V(b[0], b[1], z0, b[2], b[3], 0, 2); V(b[0], b[1], z1, b[2], b[3], 0, 2); }
+    return out;
+  }
+  function lathe(prof, seg, smooth = true) {
+    const out = [];
+    if (smooth) {
+      const nrm = prof.map((p, i) => { const a = prof[Math.max(0, i - 1)], b = prof[Math.min(prof.length - 1, i + 1)]; let dr = b[0] - a[0], dy = b[1] - a[1]; const l = Math.hypot(dr, dy) || 1; return [dy / l, -dr / l]; });
+      const V = (i, a) => { const [r, y] = prof[i], [nr, ny] = nrm[i]; out.push(r * Math.sin(a), y, r * Math.cos(a), nr * Math.sin(a), ny, nr * Math.cos(a), 0, 0, 3); };
+      for (let i = 0; i < prof.length - 1; i++) for (let j = 0; j < seg; j++) { const a0 = j / seg * 2 * PI, a1 = (j + 1) / seg * 2 * PI;
+        if (prof[i][0] > 1e-6) { V(i, a0); V(i, a1); V(i + 1, a1); } if (prof[i + 1][0] > 1e-6) { V(i, a0); V(i + 1, a1); V(i + 1, a0); } }
+      return out;
+    }
+    const tri = (a, b, c) => { const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2], vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2]; let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx; const l = Math.hypot(nx, ny, nz); if (l < 1e-9) return; nx /= l; ny /= l; nz /= l; for (const p of [a, b, c]) out.push(p[0], p[1], p[2], nx, ny, nz, 0, 0, 3); };
+    for (let i = 0; i < prof.length - 1; i++) { const [r0, y0] = prof[i], [r1, y1] = prof[i + 1];
+      for (let j = 0; j < seg; j++) { const a0 = j / seg * 2 * PI, a1 = (j + 1) / seg * 2 * PI;
+        const p = (r, y, a) => [r * Math.sin(a), y, r * Math.cos(a)];
+        tri(p(r0, y0, a0), p(r0, y0, a1), p(r1, y1, a1)); tri(p(r0, y0, a0), p(r1, y1, a1), p(r1, y1, a0)); } }
+    return out;
+  }
+  const sphereProf = n => { const a = []; for (let i = 0; i <= n; i++) { const t = -PI / 2 + i / n * PI; a.push([Math.cos(t), Math.sin(t)]); } return a; };
+  const capProf = (r, L) => [[0, -L - r * .5], [r * .72, -L - r * .25], [r, -L + r * .2], [r, -r * .1], [r * .78, r * .35], [0, r * .5]];
+  const torusProf = (R0, r, n) => { const a = []; for (let i = 0; i <= n; i++) { const t = i / n * 2 * PI; a.push([R0 + Math.cos(t) * r, Math.sin(t) * r]); } return a; };
+  const G = {
+    tile: vao(roundedBox(TILE_W, TILE_H, TILE_D, TILE_R, 8)),
+    floor: vao([-300, FLOOR_Y, -300, 300, FLOOR_Y, 40, 300, FLOOR_Y, -300, -300, FLOOR_Y, -300, -300, FLOOR_Y, 40, 300, FLOOR_Y, 40], 3),
+  };
+  G.glow = vao([-2.4, -1.7, 0, 0, 0, 1, 0, 0, 0, 2.4, -1.7, 0, 0, 0, 1, 0, 0, 0, 2.4, 1.7, 0, 0, 0, 1, 0, 0, 0, -2.4, -1.7, 0, 0, 0, 1, 0, 0, 0, 2.4, 1.7, 0, 0, 0, 1, 0, 0, 0, -2.4, 1.7, 0, 0, 0, 1, 0, 0, 0]);
+  const AVM = {
+    sphere: vao(lathe(sphereProf(10), 14)),
+    hairCap: vao(lathe(sphereProf(10).filter(p => p[1] > -.2), 14)),
+    tuft: vao(lathe([[.075, 0], [.05, .06], [0, .12]], 6, false)),
+    torso: vao(lathe([[.125, -.02], [.15, .06], [.162, .2], [.178, .33], [.16, .42], [.1, .48], [0, .495]], 12).map((v, i) => (i % 9 === 2 ? v * .76 : v))),
+    pocket: vao(lathe([[.0, -.04], [.09, -.035], [.095, .035], [0, .04]], 4).map((v, i) => (i % 9 === 2 ? v * .25 : v))),
+    hood: vao(lathe(torusProf(.105, .042, 8), 12)),
+    string: vao(lathe([[.006, -.11], [.006, 0]], 4)),
+    neck: vao(lathe([[.058, -.02], [.055, .1]], 8)),
+    pelvis: vao(lathe([[.1, -.06], [.135, -.02], [.14, .06], [.128, .1]], 10).map((v, i) => (i % 9 === 2 ? v * .8 : v))),
+    cuff: vao(lathe(torusProf(.047, .014, 5), 8)),
+    capsule: { upper: vao(lathe(capProf(.054, .22), 10)), fore: vao(lathe(capProf(.048, .19), 10)), thigh: vao(lathe(capProf(.072, .27), 10)), shin: vao(lathe(capProf(.062, .25), 10)) }
+  };
+  // NB: scaling z of lathe positions (index%9==2) flattens torso; normals left as-is (flat-shaded look survives)
+  const avatar = makeAvatar(); buildAvatarParts(avatar, AVM);
+  const NPT = 90; const ptData = []; { const R = rng(99); for (let i = 0; i < NPT; i++) ptData.push(-3 + R() * 9, R() * 5.6, -3 + R() * 6.5, R()); }
+  G.pts = vao(ptData, 4);
+
+  // ---------- textures + targets ----------
+  function tex(w, h, ifmt, fmt, type, filter = gl.LINEAR, mip = false) {
+    const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, ifmt, w, h, 0, fmt, type, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mip ? gl.LINEAR_MIPMAP_LINEAR : filter); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    if (mip) gl.generateMipmap(gl.TEXTURE_2D); return t;
+  }
+  const CF = HDR ? [gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT] : [gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE];
+  let T = null, W = 0, H = 0;
+  function fbo(colors, depthRB) {
+    const f = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+    colors.forEach((c, i) => c.rb ? gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, c.rb) : gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, c, 0));
+    if (depthRB) depthRB.rb ? gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthRB.rb) : gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthRB, 0);
+    gl.drawBuffers(colors.map((_, i) => gl.COLOR_ATTACHMENT0 + i));
+    const st = gl.checkFramebufferStatus(gl.FRAMEBUFFER); if (st !== gl.FRAMEBUFFER_COMPLETE) console.warn('fbo incomplete', st);
+    return f;
+  }
+  function rb(fmt, w, h, s) { const r = gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER, r); if (s > 0) gl.renderbufferStorageMultisample(gl.RENDERBUFFER, s, fmt, w, h); else gl.renderbufferStorage(gl.RENDERBUFFER, fmt, w, h); return { rb: r }; }
+  function freeTargets() { if (!T) return; for (const k in T) { const o = T[k]; if (o instanceof WebGLTexture) gl.deleteTexture(o); else if (o instanceof WebGLFramebuffer) gl.deleteFramebuffer(o); else if (o && o.rb) gl.deleteRenderbuffer(o.rb); } }
+  let MRT = HDR;
+  function makeTargets(w, h) {
+    freeTargets(); T = {};
+    const s = SAMPLES;
+    T.msC = rb(CF[0], w, h, s); T.msD = rb(gl.DEPTH_COMPONENT24, w, h, s);
+    if (MRT) T.msV = rb(gl.RG16F, w, h, s);
+    T.ms = fbo(MRT ? [T.msC, T.msV] : [T.msC], T.msD);
+    T.scene = tex(w, h, ...CF); T.depth = tex(w, h, gl.DEPTH_COMPONENT24, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, gl.NEAREST);
+    T.res = fbo([T.scene], T.depth);
+    if (MRT) { T.vel = tex(w, h, gl.RG16F, gl.RG, gl.HALF_FLOAT); T.resV = fbo([T.vel]); }
+    else { T.vel = tex(1, 1, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE); }
+    const rw = Math.max(2, w >> 1), rh = Math.max(2, h >> 1);
+    T.rw = rw; T.rh = rh; T.refl = tex(rw, rh, ...CF, gl.LINEAR, true); T.reflD = rb(gl.DEPTH_COMPONENT16, rw, rh, 0); T.reflF = fbo([T.refl], T.reflD);
+    const bw = Math.max(1, w >> 2), bh = Math.max(1, h >> 2), cw = Math.max(1, w >> 3), ch = Math.max(1, h >> 3);
+    T.bw = bw; T.bh = bh; T.cw = cw; T.ch = ch;
+    T.b0 = tex(bw, bh, ...CF); T.b0t = tex(bw, bh, ...CF); T.b1 = tex(cw, ch, ...CF); T.b1t = tex(cw, ch, ...CF);
+    T.fb0 = fbo([T.b0]); T.fb0t = fbo([T.b0t]); T.fb1 = fbo([T.b1]); T.fb1t = fbo([T.b1t]);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  }
+  // cover textures (LRU)
+  const covers = new Map(); const queue = [];
+  const covW = innerWidth < 700 ? 512 : 640, covH = covW * 400 / 640;
+  const placeholder = (() => { const c = document.createElement('canvas'); c.width = 64; c.height = 40; const g = c.getContext('2d'); const gr = g.createLinearGradient(0, 0, 64, 40); gr.addColorStop(0, '#1d242c'); gr.addColorStop(1, '#0b0e12'); g.fillStyle = gr; g.fillRect(0, 0, 64, 40); return upload(c); })();
+  function upload(c, old) {
+    const t = old || gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.SRGB8_ALPHA8, gl.RGBA, gl.UNSIGNED_BYTE, c); gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    if (maxAniso) gl.texParameterf(gl.TEXTURE_2D, extA.TEXTURE_MAX_ANISOTROPY_EXT, maxAniso);
+    return t;
+  }
+  let frameNo = 0;
+  function coverTex(it) {
+    let e = covers.get(it.id);
+    if (e) { e.used = frameNo; return e.tex; }
+    if (!queue.includes(it)) queue.push(it); return placeholder;
+  }
+  function pumpCovers(budgetMs) {
+    const t0 = performance.now();
+    // nearest-first: queue is filled in draw order (focus-first)
+    while (queue.length && performance.now() - t0 < budgetMs) {
+      const it = queue.shift(); if (covers.has(it.id)) continue;
+      covers.set(it.id, { tex: upload(makeCover(it, covW, covH)), used: frameNo });
+      if (covers.size > 44) { let old = null; for (const [k, v] of covers) if (v.used < frameNo - 2 && (!old || v.used < old[1].used)) old = [k, v]; if (old) { gl.deleteTexture(old[1].tex); covers.delete(old[0]); } }
+    }
+  }
+  function flushCovers() { for (const [, v] of covers) gl.deleteTexture(v.tex); covers.clear(); }
+  let backTex = null, backFor = null;
+  function prepareBack(it, aspect) { const w = 1024, h = Math.round(1024 / aspect); const c = makeBack(it, w, Math.min(2048, h)); backTex = upload(c, backTex); backFor = it.id; }
+
+  // ---------- frame ----------
+  const cam = { eye: new Spring3([0, 4, 22], 4.2, .95), at: new Spring3([1, 0, 0], 4.6, .95), vp: M4.new(), pvp: M4.new(), view: M4.new(), proj: M4.new(), fov: .6 };
+  const prevModels = new Map();
+  let firstFrame = true;
+  const SPOT = { pos: [1.6, 7.2, 5.2], dir: null, col: [1.0, .94, .86], cos: Math.cos(25 * PI / 180) };
+  { const tgt = [.3, FLOOR_Y, -.2]; const d = [tgt[0] - SPOT.pos[0], tgt[1] - SPOT.pos[1], tgt[2] - SPOT.pos[2]]; const l = Math.hypot(...d); SPOT.dir = d.map(x => x / l); }
+  const SPOT2 = { pos: [-4, 9, -8], dir: (() => { const d = [3.8, -9.5, 4]; const l = Math.hypot(...d); return d.map(x => x / l); })() };
+  const accent = new Spring3(srgb('#4fb3ff'), 3, 1);
+  let lastVP = null;
+
+  function resize() {
+    const dpr = Math.min(devicePixelRatio || 1, QS.has('dpr') ? +QS.get('dpr') : 2);
+    const w = Math.max(2, Math.round(innerWidth * dpr)), h = Math.max(2, Math.round(innerHeight * dpr));
+    if (w === W && h === H) return; W = w; H = h; canvas.width = w; canvas.height = h; makeTargets(w, h);
+  }
+  function setCommon(p, refl, camPos, vp, pvp) {
+    const u = p.u; gl.useProgram(p.p);
+    gl.uniform3fv(u.uCam, camPos); gl.uniform3fv(u.uSpotPos, SPOT.pos); gl.uniform3fv(u.uSpotDir, SPOT.dir); gl.uniform3fv(u.uSpotCol, SPOT.col); gl.uniform1f(u.uSpotCos, SPOT.cos);
+    gl.uniform3fv(u.uAccent, accent.v); gl.uniform1f(u.uTime, S.t); gl.uniform1f(u.uFloorY, FLOOR_Y); gl.uniform1f(u.uRefl, refl ? 1 : 0);
+    if (u.uVP && vp) gl.uniformMatrix4fv(u.uVP, false, vp); if (u.uPrevVP && pvp) gl.uniformMatrix4fv(u.uPrevVP, false, pvp);
+  }
+  const REFLECT = M4.trs(0, 2 * FLOOR_Y, 0, 0, 0, 0, 1, -1, 1);
+
+  // the drawable list for this frame (computed once, drawn twice: reflection + main)
+  function buildDrawList(vp, fr) {
+    const list = [];
+    const chanPos = S.chanS.v; const o = S.openT, oe = easeIO(o);
+    for (let ci = 0; ci < CH.length; ci++) {
+      const d = ci - chanPos; if (Math.abs(d) >= 1) continue;
+      const row = rowLayout(d); const items = CH[ci].items; const fp = S.rowS[ci].v;
+      for (let i = 0; i < items.length; i++) {
+        const k = i - fp; if (k < -3.2 || k > 7.5) continue;
+        const L = tileLayout(k, fr.portrait);
+        const isOpen = S.open && ci === S.chan && i === S.idx[ci];
+        let x = L.x, y = row.y, z = L.z + row.z, ry = L.ry, sx = row.s, sy = row.s, a = L.a * row.a;
+        let focus = clamp(1 - Math.abs(k) * 1.4, 0, 1) * (ci === S.chan ? 1 : .4) * clamp(1 - Math.abs(d) * 2, 0, 1);
+        if (isOpen) {
+          x = lerp(x, 0, oe); y = lerp(y, 0, oe); z = lerp(z, OPEN_Z, oe); ry = lerp(ry, reduced ? 0 : PI, easeIO(clamp(o * 1.25 - .12, 0, 1)));
+          sx = lerp(sx, fr.openSX, oe); sy = lerp(sy, fr.openSY, oe);
+        } else if (S.openT > 0) { a *= 1 - oe * .9; z -= oe * 2; }
+        if (a < .01) continue;
+        const it = items[i];
+        const m = M4.trs(x, y, z, 0, ry, 0, sx, sy, 1);
+        const key = ci + ':' + i;
+        const pm = (!firstFrame && prevModels.get(key)) || m;
+        const sw = S.sweep.get(it.id); const sweep = sw === undefined ? -1 : (S.t - sw) / 1.05;
+        list.push({ it, m, pm, key, a, focus, sweep, isOpen, hover: S.hover === i && ci === S.chan ? 1 : 0, depth: M4.xf(vp, x, y, z)[3], x, y, z, ry, sx });
+      }
+    }
+    list.sort((p, q) => q.depth - p.depth);
+    return list;
+  }
+  function drawScene(list, refl, vp, pvp, camPos, fr) {
+    // background
+    gl.disable(gl.DEPTH_TEST); gl.depthMask(false); gl.disable(gl.BLEND);
+    setCommon(P.bg, refl, camPos, null, null);
+    gl.uniformMatrix4fv(P.bg.u.uInvVP, false, M4.inv(vp)); gl.uniformMatrix4fv(P.bg.u.uPrevVP, false, pvp);
+    gl.uniform3fv(P.bg.u.uAccent2, fr.accent2);
+    gl.bindVertexArray(null); gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.depthFunc(gl.LEQUAL);
+    // floor (main pass only)
+    if (!refl) {
+      setCommon(P.floor, false, camPos, vp, pvp);
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, T.refl); gl.uniform1i(P.floor.u.uReflT, 0);
+      gl.uniform2f(P.floor.u.uRes, W, H);
+      gl.uniform4fv(P.floor.u.uShadow, fr.shadows); gl.uniform1i(P.floor.u.uNShadow, fr.nShadow); gl.uniform3fv(P.floor.u.uAvatar, fr.avatar);
+      gl.bindVertexArray(G.floor.v); gl.drawArrays(gl.TRIANGLES, 0, G.floor.n);
+    }
+    // avatar
+    gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK); gl.frontFace(refl ? gl.CW : gl.CCW);
+    setCommon(P.av, refl, camPos, vp, pvp); gl.uniform1f(P.av.u.uAlpha, 1);
+    for (const p of avatar.parts) {
+      gl.uniformMatrix4fv(P.av.u.uModel, false, p.m); gl.uniformMatrix4fv(P.av.u.uPrevModel, false, firstFrame ? p.m : p.pm); gl.uniform3fv(P.av.u.uColor, p.col);
+      gl.bindVertexArray(p.mesh.v); gl.drawArrays(gl.TRIANGLES, 0, p.mesh.n);
+    }
+    // tiles back-to-front, glow behind the focused one
+    gl.enable(gl.BLEND);
+    for (const d of list) {
+      if (d.focus > .02 && !refl || (refl && d.focus > .2)) {
+        gl.disable(gl.CULL_FACE); gl.depthMask(false); gl.blendFunc(gl.ONE, gl.ONE);
+        setCommon(P.glow, refl, camPos, vp, pvp);
+        const gm = M4.mul(d.m, M4.trs(0, 0, -.09, 0, 0, 0, 1, 1, 1));
+        gl.uniformMatrix4fv(P.glow.u.uModel, false, gm); gl.uniformMatrix4fv(P.glow.u.uPrevModel, false, gm);
+        gl.uniform2f(P.glow.u.uHalf, TILE_W / 2, TILE_H / 2); gl.uniform1f(P.glow.u.uRad, TILE_R); gl.uniform1f(P.glow.u.uInt, d.focus * d.a * (1 - S.openT) * .2 * fr.glowPulse);
+        gl.bindVertexArray(G.glow.v); gl.drawArrays(gl.TRIANGLES, 0, G.glow.n);
+        gl.depthMask(true); gl.enable(gl.CULL_FACE);
+      }
+      gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+      if (refl) gl.disable(gl.BLEND); // reflection stores height in alpha
+      setCommon(P.tile, refl, camPos, vp, pvp);
+      const u = P.tile.u;
+      gl.uniformMatrix4fv(u.uModel, false, d.m); gl.uniformMatrix4fv(u.uPrevModel, false, d.pm);
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, coverTex(d.it)); gl.uniform1i(u.uTex, 0);
+      const hasBack = d.isOpen && backTex && backFor === d.it.id;
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, hasBack ? backTex : placeholder); gl.uniform1i(u.uBack, 1);
+      gl.uniform1f(u.uHasBack, hasBack ? 1 : 0);
+      gl.uniform1f(u.uAlpha, d.a); gl.uniform1f(u.uFocus, d.focus); gl.uniform1f(u.uSweep, reduced ? -1 : d.sweep); gl.uniform1f(u.uHover, d.hover);
+      gl.uniform2f(u.uHalf, TILE_W / 2, TILE_H / 2); gl.uniform1f(u.uRad, TILE_R);
+      gl.disable(gl.CULL_FACE);
+      gl.bindVertexArray(G.tile.v); gl.drawArrays(gl.TRIANGLES, 0, G.tile.n);
+      if (refl) gl.enable(gl.BLEND);
+    }
+    gl.disable(gl.CULL_FACE);
+    // dust motes
+    if (!refl) {
+      gl.depthMask(false); gl.blendFunc(gl.ONE, gl.ONE);
+      setCommon(P.pt, false, camPos, vp, pvp); gl.uniform1f(P.pt.u.uPx, H * .012);
+      gl.bindVertexArray(G.pts.v); gl.drawArrays(gl.POINTS, 0, G.pts.n);
+      gl.depthMask(true);
+    }
+    gl.disable(gl.BLEND);
+    gl.bindVertexArray(null);
+  }
+  function fsPass(p, target, w, h) { gl.bindFramebuffer(gl.FRAMEBUFFER, target); gl.viewport(0, 0, w, h); gl.useProgram(p.p); gl.drawArrays(gl.TRIANGLES, 0, 3); }
+  function bindT(p, name, t, unit) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(p.u[name], unit); }
+
+  let lastFocusRect = null, lastScreen = {};
+  function frame(dt, vpInfo) {
+    frameNo++;
+    resize();
+    const fr = Object.assign({}, framing(vpInfo));
+    const asp = W / H;
+    // camera targets
+    const oe = easeIO(S.openT);
+    const pr = panelRect(vpInfo);
+    const visH = 2 * OPEN_D * Math.tan(fr.fov / 2);
+    fr.openSY = (pr.h / vpInfo.h) * visH / TILE_H; fr.openSX = (pr.w / vpInfo.w) * visH * asp / TILE_W;
+    const pcy = (pr.y + pr.h / 2 - vpInfo.h / 2) / vpInfo.h * visH; // panel vertical offset in world units
+    const drift = reduced ? [0, 0] : [Math.sin(S.t * .21) * .07, Math.sin(S.t * .17) * .05];
+    const par = reduced ? [0, 0] : [S.mx * .35, -S.my * .18];
+    const be = [fr.eye[0] + drift[0] + par[0], fr.eye[1] + drift[1] + par[1], fr.eye[2]], ba = fr.at;
+    const oeye = [0, -pcy, OPEN_Z + OPEN_D], oat = [0, -pcy, OPEN_Z];
+    cam.eye.t = [lerp(be[0], oeye[0], oe), lerp(be[1], oeye[1], oe), lerp(be[2], oeye[2], oe)];
+    cam.at.t = [lerp(ba[0], oat[0], oe), lerp(ba[1], oat[1], oe), lerp(ba[2], oat[2], oe)];
+    if (reduced && S.intro === 0) { cam.eye.snap(cam.eye.v.map((_, i) => cam.eye.s[i].t)); cam.at.snap(cam.at.v.map((_, i) => cam.at.s[i].t)); }
+    S.intro = 1;
+    cam.eye.step(dt); cam.at.step(dt);
+    if (S.openT > .001 && S.openT < .999 || S.open) { // keep the panel exact once open
+      const k = sstep(.7, 1, S.openT); cam.eye.s.forEach((s, i) => s.v = lerp(s.v, cam.eye.s[i].t, k)); cam.at.s.forEach((s, i) => s.v = lerp(s.v, cam.at.s[i].t, k));
+    }
+    const ch = CH[S.chan];
+    accent.t = srgb(hsl2hex(ch.hue, .9, .6)); accent.step(dt);
+    fr.accent2 = srgb(hsl2hex(ch.hue + 40, .7, .5));
+    const eye = cam.eye.v, at = cam.at.v;
+    cam.view = M4.look(eye, at); cam.proj = M4.persp(fr.fov, asp, .1, 120);
+    const vp = M4.mul(cam.proj, cam.view);
+    const pvp = lastVP || vp;
+    // avatar
+    const ft = [0, 0, 0];
+    updateAvatar(avatar, dt, S.t, { pos: fr.avatar, cam: eye, tile: S.open ? [0, 0, OPEN_Z] : ft, lastInput: S.lastInput, open: S.openT, mx: S.mx, my: S.my, tileSide: fr.avatar[0] > 0 ? -1 : 1 });
+    fr.glowPulse = .85 + .15 * Math.sin(S.t * 2.4);
+    const list = buildDrawList(vp, fr);
+    // shadows from current-row tiles
+    const sh = new Float32Array(40); let ns = 0;
+    for (const d of list) { if (ns >= 10 || d.a < .1 || d.isOpen) continue; const ty = d.y; const t = (FLOOR_Y - ty) / SPOT.dir[1]; sh.set([d.x + SPOT.dir[0] * t * .35, d.z + SPOT.dir[2] * t * .35 - .2, TILE_W * .5 * Math.abs(Math.cos(d.ry)) * d.sx + .1, d.a * .9], ns * 4); ns++; }
+    fr.shadows = sh; fr.nShadow = ns;
+    // reflection pass
+    const rvp = M4.mul(vp, REFLECT), rpvp = M4.mul(pvp, REFLECT);
+    const reye = [eye[0], 2 * FLOOR_Y - eye[1], eye[2]];
+    gl.bindFramebuffer(gl.FRAMEBUFFER, T.reflF); gl.viewport(0, 0, T.rw, T.rh);
+    gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    drawScene(list, true, rvp, rpvp, reye, fr);
+    gl.bindTexture(gl.TEXTURE_2D, T.refl); gl.generateMipmap(gl.TEXTURE_2D);
+    // main pass (MSAA)
+    gl.bindFramebuffer(gl.FRAMEBUFFER, T.ms); gl.viewport(0, 0, W, H);
+    gl.clearBufferfv(gl.COLOR, 0, [0, 0, 0, 1]); if (MRT) gl.clearBufferfv(gl.COLOR, 1, [0, 0, 0, 0]); gl.clear(gl.DEPTH_BUFFER_BIT);
+    drawScene(list, false, vp, pvp, eye, fr);
+    // resolve
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, T.ms); gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, T.res);
+    gl.readBuffer(gl.COLOR_ATTACHMENT0); gl.blitFramebuffer(0, 0, W, H, 0, 0, W, H, gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT, gl.NEAREST);
+    if (MRT) { gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, T.resV); gl.readBuffer(gl.COLOR_ATTACHMENT1); gl.blitFramebuffer(0, 0, W, H, 0, 0, W, H, gl.COLOR_BUFFER_BIT, gl.NEAREST); gl.readBuffer(gl.COLOR_ATTACHMENT0); }
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null); gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+    // bloom
+    gl.disable(gl.DEPTH_TEST); gl.bindVertexArray(null);
+    gl.useProgram(P.bright.p); bindT(P.bright, 'uT', T.scene, 0); gl.uniform2f(P.bright.u.uTx, 1 / W, 1 / H); fsPass(P.bright, T.fb0, T.bw, T.bh);
+    gl.useProgram(P.blur.p); bindT(P.blur, 'uT', T.b0, 0); gl.uniform2f(P.blur.u.uDir, 1 / T.bw, 0); fsPass(P.blur, T.fb0t, T.bw, T.bh);
+    bindT(P.blur, 'uT', T.b0t, 0); gl.uniform2f(P.blur.u.uDir, 0, 1 / T.bh); fsPass(P.blur, T.fb0, T.bw, T.bh);
+    gl.useProgram(P.blur.p); bindT(P.blur, 'uT', T.b0, 0); gl.uniform2f(P.blur.u.uDir, 2 / T.bw, 0); fsPass(P.blur, T.fb1t, T.cw, T.ch);
+    bindT(P.blur, 'uT', T.b1t, 0); gl.uniform2f(P.blur.u.uDir, 0, 1.5 / T.ch); fsPass(P.blur, T.fb1, T.cw, T.ch);
+    bindT(P.blur, 'uT', T.b1, 0); gl.uniform2f(P.blur.u.uDir, 1.5 / T.cw, 0); fsPass(P.blur, T.fb1t, T.cw, T.ch);
+    bindT(P.blur, 'uT', T.b1t, 0); gl.uniform2f(P.blur.u.uDir, 0, 1.5 / T.ch); fsPass(P.blur, T.fb1, T.cw, T.ch);
+    // composite
+    const pc = P.comp; gl.useProgram(pc.p);
+    setCommon(pc, false, eye, null, null);
+    bindT(pc, 'uScene', T.scene, 0); bindT(pc, 'uVel', T.vel, 1); bindT(pc, 'uDepth', T.depth, 2); bindT(pc, 'uB0', T.b0, 3); bindT(pc, 'uB1', T.b1, 4);
+    gl.uniformMatrix4fv(pc.u.uInvVP, false, M4.inv(vp));
+    const mb = reduced || firstFrame ? 0 : clamp((1 / 40) / Math.max(dt, 1e-3), 0, 1.6);
+    gl.uniform1f(pc.u.uMB, mb); gl.uniform1f(pc.u.uFrame, frameNo % 64); gl.uniform1f(pc.u.uFade, clamp(S.t * 1.4, 0, 1)); gl.uniform1f(pc.u.uVolI, QS.has('novol') ? 0 : 1); gl.uniform1f(pc.u.uBloomI, QS.has('nobloom') ? 0 : 1);
+    gl.uniform2f(pc.u.uGVel, 0, 0); gl.uniform2f(pc.u.uRes, W, H);
+    gl.uniform3fv(pc.u.uSpot2Pos, SPOT2.pos); gl.uniform3fv(pc.u.uSpot2Dir, SPOT2.dir); gl.uniform3fv(pc.u.uSpot2Col, accent.v.map(x => x * .9 + .05));
+    fsPass(pc, null, W, H);
+    // bookkeeping
+    lastVP = vp; firstFrame = false;
+    prevModels.clear(); for (const d of list) prevModels.set(d.key, d.m);
+    pumpCovers(frameNo < 3 ? 400 : 7);
+    // screen info for HUD
+    const proj = (x, y, z) => { const c = M4.xf(vp, x, y, z); return [(c[0] / c[3] * .5 + .5) * vpInfo.w, (1 - (c[1] / c[3] * .5 + .5)) * vpInfo.h]; };
+    const foc = list.find(d => d.it === curItem() && !d.isOpen) || list.find(d => d.it === curItem());
+    let rect = null;
+    if (foc) { const cs = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sy]) => { const p = M4.xf(foc.m, sx * TILE_W / 2, sy * TILE_H / 2, TILE_D / 2); return proj(p[0], p[1], p[2]); }); const xs = cs.map(c => c[0]), ys = cs.map(c => c[1]); rect = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) }; }
+    lastFocusRect = rect;
+    lastScreen = { vp, list, proj };
+    return rect;
+  }
+  function pick(px, py, vpInfo) {
+    if (!lastScreen.vp) return -1;
+    const inv = M4.inv(lastScreen.vp); const nx = px / vpInfo.w * 2 - 1, ny = 1 - py / vpInfo.h * 2;
+    const a = M4.xf(inv, nx, ny, -1), b = M4.xf(inv, nx, ny, 1); const o = a.slice(0, 3).map(v => v / a[3]), e = b.slice(0, 3).map(v => v / b[3]);
+    let best = -1, bt = 1e9;
+    for (const d of lastScreen.list) {
+      if (d.a < .25) continue; const ci = +d.key.split(':')[0]; if (ci !== S.chan) continue;
+      const im = M4.inv(d.m); const lo = M4.xf(im, ...o), le = M4.xf(im, ...e);
+      const dz = le[2] - lo[2]; if (Math.abs(dz) < 1e-6) continue; const t = (TILE_D / 2 - lo[2]) / dz; if (t < 0 || t > 1) continue;
+      const x = lo[0] + (le[0] - lo[0]) * t, y = lo[1] + (le[1] - lo[1]) * t;
+      if (Math.abs(x) < TILE_W / 2 && Math.abs(y) < TILE_H / 2 && t < bt) { bt = t; best = +d.key.split(':')[1]; }
+    }
+    return best;
+  }
+  function project(x, y, z, vpInfo) { if (!lastScreen.proj) return [0, 0]; return lastScreen.proj(x, y, z); }
+  // first paint: prime covers for the home row and its neighbours
+  function prime() { for (const ci of [0, 1]) CH[ci].items.slice(0, 8).forEach(it => coverTex(it)); }
+  return { kind: 'webgl2', frame, pick, prepareBack, prime, flushCovers, project, avatar, info: { HDR, SAMPLES, MRT, maxAniso } };
+}
+function hsl2hex(h, s, l) { h = ((h % 360) + 360) % 360; const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1))); return '#' + [f(0), f(8), f(4)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join(''); }
+
+/* ---------------------------------------------------------------------
+   CSS 3D fallback renderer (no WebGL2)
+   --------------------------------------------------------------------- */
+function createCSSRenderer() {
+  const root = $('#css3d'); root.hidden = false; $('#gl').style.display = 'none';
+  const world = root.querySelector('.world'); const els = new Map(); let last = null;
+  const PX = 130;
+  function el(it, ci, i) {
+    let e = els.get(ci + ':' + i);
+    if (!e) { e = document.createElement('div'); e.className = 'tile'; e.style.width = TILE_W * PX + 'px'; e.style.height = TILE_H * PX + 'px'; e.style.marginLeft = -TILE_W * PX / 2 + 'px'; e.style.marginTop = -TILE_H * PX / 2 + 'px';
+      const c = makeCover(it, 512, 320); e.style.backgroundImage = `url(${c.toDataURL('image/jpeg', .86)})`; e.dataset.i = i; world.appendChild(e); els.set(ci + ':' + i, e); }
+    return e;
+  }
+  function frame(dt, vp) {
+    const fr = framing(vp); const out = [];
+    root.style.perspectiveOrigin = vp.portrait ? '50% 34%' : '40% 42%'; world.style.left = vp.portrait ? '50%' : '40%'; world.style.top = vp.portrait ? '34%' : '43%';
+    const scale = vp.portrait ? Math.min(1, vp.w / (TILE_W * PX * 1.16)) : Math.min(1.25, vp.w / 1280 * 1.15);
+    world.style.transform = `scale(${scale})`;
+    const seen = new Set();
+    for (let ci = 0; ci < CH.length; ci++) {
+      const d = ci - S.chanS.v; if (Math.abs(d) >= 1) continue; const row = rowLayout(d);
+      CH[ci].items.forEach((it, i) => {
+        const k = i - S.rowS[ci].v; if (k < -3 || k > 7) return; const L = tileLayout(k, vp.portrait);
+        const e = el(it, ci, i); seen.add(e);
+        const isOpen = S.open && ci === S.chan && i === S.idx[ci];
+        const a = L.a * row.a * (S.openT > 0 && !isOpen ? 1 - S.openT : 1);
+        e.style.transform = `translate3d(${L.x * PX}px,${-row.y * PX}px,${(L.z + row.z) * PX + (isOpen ? S.openT * 200 : 0)}px) rotateY(${-L.ry}rad) scale(${row.s})`;
+        e.style.opacity = a; e.style.zIndex = Math.round(100 - Math.abs(k) * 10); e.classList.toggle('f', ci === S.chan && i === S.idx[ci]); e.style.display = a < .01 ? 'none' : '';
+      });
+    }
+    for (const e of els.values()) if (!seen.has(e)) e.style.display = 'none';
+    const f = els.get(S.chan + ':' + S.idx[S.chan]); last = f && f.style.display !== 'none' ? f.getBoundingClientRect() : null;
+    return last && { x: last.left, y: last.top, w: last.width, h: last.height };
+  }
+  root.addEventListener('click', e => { const t = e.target.closest('.tile'); if (!t) return; const i = +t.dataset.i; if (i === S.idx[S.chan]) openItem(); else focusIndex(i); });
+  return { kind: 'css3d', frame, pick: () => -1, prepareBack() { }, prime() { }, flushCovers() { }, project: () => [0, 0], info: {} };
+}
+
+/* ---------------------------------------------------------------------
+   HUD, a11y mirror, input
+   --------------------------------------------------------------------- */
+const hud = $('#hud'), chansEl = $('.chans'), capEl = $('.cap'), pipsEl = $('.pips'), ring = $('.ring');
+const reader = $('#reader');
+drawPfp($('.pfp'));
+CH.forEach((c, ci) => { const d = document.createElement('div'); d.className = 'chan'; d.innerHTML = `${c.name}<small>${c.items.length}</small>`; d.addEventListener('click', () => setChannel(ci)); chansEl.appendChild(d); c.el = d; });
+// accessible mirror of the scene
+const nav = $('#a11y');
+nav.innerHTML = `<h1>${esc(SITE.name)}</h1><p>${esc(SITE.blurb)} Use the arrow keys to browse: left and right move between items, up and down switch channels, Enter opens an item, Escape closes it.</p>` +
+  CH.map((c, ci) => `<section aria-labelledby="ch-${c.id}"><h2 id="ch-${c.id}">${esc(c.name)}</h2><ul>${c.items.map((it, i) => `<li><a href="${esc(it.href)}" data-c="${ci}" data-i="${i}">${esc(it.title)}${it.date ? ', ' + esc(it.date) : ''}${it.desc ? ' — ' + esc(it.desc) : ''}</a></li>`).join('')}</ul></section>`).join('');
+const links = [...nav.querySelectorAll('a')];
+const linkFor = (ci, i) => links.find(a => +a.dataset.c === ci && +a.dataset.i === i);
+nav.addEventListener('focusin', e => { const a = e.target.closest('a'); if (!a) return; document.body.classList.add('kbd'); const ci = +a.dataset.c, i = +a.dataset.i; if (ci !== S.chan) setChannel(ci, true); if (i !== S.idx[ci]) focusIndex(i, true); });
+nav.addEventListener('focusout', () => document.body.classList.remove('kbd'));
+nav.addEventListener('click', e => { const a = e.target.closest('a'); if (a && e.detail === 0) { e.preventDefault(); openItem(); } });
+function syncA11y() { if (nav.contains(document.activeElement) || document.activeElement === document.body) { const l = linkFor(S.chan, S.idx[S.chan]); if (l && document.activeElement !== l && nav.contains(document.activeElement)) l.focus({ preventScroll: true }); } }
+
+function updateHUD(rect, vp) {
+  const ch = CH[S.chan], it = curItem();
+  document.documentElement.style.setProperty('--accent', hsl2hex(ch.hue, .95, .66));
+  // channel list
+  const cp = S.chanS.v; const big = vp.portrait ? 40 : 56;
+  const anchorY = rect ? rect.y + rect.h * (vp.portrait ? -0.0 : .5) : vp.h * .45;
+  const x0 = vp.portrait ? 16 : Math.max(28, Math.min(vp.w * .045, (rect ? rect.x : 200) - 260));
+  CH.forEach((c, ci) => {
+    const dd = ci - cp, ad = Math.abs(dd);
+    const sc = lerp(1, vp.portrait ? .5 : .43, Math.min(ad, 1));
+    const yy = Math.sign(dd) * (ad < 1 ? ad * big * .95 : big * .95 + (ad - 1) * big * .55);
+    const op = ad < 1 ? lerp(1, .42, ad) : Math.max(0, .42 - (ad - 1) * .12);
+    let y = anchorY + yy - big * .5;
+    if (vp.portrait) y = (rect ? rect.y : vp.h * .3) - big * 1.25 + yy;
+    c.el.style.transform = `translate3d(${x0}px,${y}px,0) scale(${sc})`;
+    c.el.style.opacity = vp.portrait && dd < -.5 ? 0 : (vp.portrait && dd > .5 ? op * .8 : op);
+    c.el.style.pointerEvents = ad < 2.5 ? 'auto' : 'none';
+  });
+  // caption under the focused tile
+  if (rect) {
+    capEl.style.transform = `translate3d(${vp.portrait ? 16 : rect.x + 4}px,${rect.y + rect.h + (vp.portrait ? 18 : 22)}px,0)`;
+    capEl.style.opacity = 1 - S.openT * 3;
+    capEl.style.width = vp.portrait ? (vp.w - 32) + 'px' : Math.min(560, Math.max(380, rect.w * 1.1)) + 'px';
+  }
+  if (capEl._for !== it) { capEl._for = it; capEl.querySelector('.k').textContent = [KIND_LABEL[it.kind], it.date || it.site].filter(Boolean).join('  ·  '); capEl.querySelector('.t').textContent = it.title; capEl.querySelector('.d').textContent = it.desc || plain(it.excerpt).slice(0, 160); }
+  // pips
+  if (pipsEl._for !== S.chan + ':' + S.idx[S.chan]) {
+    pipsEl._for = S.chan + ':' + S.idx[S.chan];
+    const n = ch.items.length, cur = S.idx[S.chan]; const lo = Math.max(0, Math.min(cur - 4, n - 9)), hi = Math.min(n, lo + 9);
+    pipsEl.innerHTML = Array.from({ length: hi - lo }, (_, k) => `<b class="${lo + k === cur ? 'on' : ''}"></b>`).join('') + `<span>${cur + 1} / ${n}</span>`;
+  }
+  if (rect) { pipsEl.style.transform = `translate3d(${vp.portrait ? 16 : rect.x + 4}px,${rect.y - 26}px,0)`; pipsEl.style.opacity = vp.portrait ? 0 : 1 - S.openT * 3; }
+  if (vp.portrait && rect) { pipsEl.style.opacity = 1 - S.openT * 3; pipsEl.style.transform = `translate3d(${vp.w - 16 - pipsEl.offsetWidth}px,${rect.y - 26}px,0)`; }
+  hud.querySelector('.chans').style.opacity = 1 - S.openT * 2;
+  hud.querySelector('.guide').style.opacity = 1 - S.openT * 2;
+  if (rect) { ring.style.transform = `translate3d(${rect.x - 6}px,${rect.y - 6}px,0)`; ring.style.width = rect.w + 12 + 'px'; ring.style.height = rect.h + 12 + 'px'; ring.classList.toggle('on', S.openT < .05); }
+  // reader placement
+  const pr = panelRect(vp);
+  reader.style.width = pr.w + 'px'; reader.style.height = pr.h + 'px'; reader.style.transform = `translate(${pr.x - vp.w / 2}px,${pr.y - vp.h / 2}px)`;
+  const ro = S.open ? sstep(.82, 1, S.openT) : sstep(.55, 1, S.openT);
+  reader.style.opacity = ro; reader.classList.toggle('show', ro > .5);
+}
+const plain = s => s.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[`*_#>]/g, '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+const clockEl = $('.clock');
+function tickClock() { const d = new Date(); clockEl.textContent = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+tickClock(); setInterval(tickClock, 15000);
+
+/* ---------- actions ---------- */
+let R = null; // renderer
+function touch() { S.lastInput = S.t; }
+function markSweep() { const it = curItem(); S.sweep.set(it.id, S.t + .05); }
+function focusIndex(i, fromA11y) {
+  const n = CH[S.chan].items.length; const ni = clamp(i, 0, n - 1);
+  if (ni === S.idx[S.chan]) { if (i !== ni) { Sound.play('bonk'); S.rowS[S.chan].vel += (i > ni ? 1 : -1) * 3; } return; }
+  S.idx[S.chan] = ni; S.rowS[S.chan].t = ni; Sound.play('tick'); markSweep(); touch();
+  if (av() && Math.random() < .3) av().present = S.t;
+  if (!fromA11y) syncA11y();
+}
+function move(d) { if (S.open) return; focusIndex(S.idx[S.chan] + d); }
+function setChannel(ci, fromA11y) {
+  if (S.open) return;
+  const n = clamp(ci, 0, CH.length - 1); if (n === S.chan) { if (ci !== n) { Sound.play('bonk'); S.chanS.vel += (ci > n ? 1 : -1) * 2; } return; }
+  const dir = n > S.chan ? 1 : -1; S.chan = n; S.chanS.t = n; Sound.play('whoosh', dir); markSweep(); touch();
+  if (av() && S.t - (av().wave || 0) > 5) { av().wave = S.t + .25; av().hop.vel = 4; }
+  if (!fromA11y) syncA11y();
+}
+const av = () => R && R.avatar;
+let returnFocus = null;
+function openItem() {
+  if (S.open) return; const it = curItem(); S.open = it; S.openDir = 1; touch();
+  returnFocus = document.activeElement;
+  const vp = viewport(); const pr = panelRect(vp); R.prepareBack(it, pr.w / pr.h);
+  reader.hidden = false;
+  reader.querySelector('.bar .k').innerHTML = `${esc(CH[S.chan].name)}<em>${esc([KIND_LABEL[it.kind], it.date].filter(Boolean).join(' · '))}</em>`;
+  $('#r-title').textContent = it.title;
+  const desc = reader.querySelector('.desc'); desc.textContent = it.desc; desc.hidden = !it.desc;
+  const body = it.excerpt ? md(it.excerpt.trim()) : `<p>${esc(it.desc)}</p>`;
+  reader.querySelector('.prose').innerHTML = body;
+  const internal = /maxleiter\.com/.test(it.href);
+  reader.querySelector('.more').textContent = it.excerpt && (it.kind === 'blog' || it.kind === 'note') ? 'This is the opening of the piece. The rest is on the site.' : '';
+  const go = reader.querySelector('.go'); go.href = it.href; go.querySelector('.gl').textContent = internal ? (it.kind === 'profile' ? 'Visit maxleiter.com' : 'Continue reading on maxleiter.com') : 'Visit ' + (it.site || 'link');
+  reader.querySelector('.body').scrollTop = 0;
+  Sound.play('open');
+  setTimeout(() => { if (S.open === it) $('#r-title').focus({ preventScroll: true }); }, reduced ? 50 : 700);
+}
+function closeItem() {
+  if (!S.open) return; S.open = null; S.openDir = -1; Sound.play('close'); touch();
+  const l = linkFor(S.chan, S.idx[S.chan]);
+  if (returnFocus && nav.contains(returnFocus) && l) l.focus({ preventScroll: true }); else if (document.activeElement && reader.contains(document.activeElement)) document.activeElement.blur();
+}
+reader.querySelector('.x-btn').addEventListener('click', closeItem);
+
+/* ---------- input ---------- */
+addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k === 'm' || k === 'M') { toggleSound(); return; }
+  if (S.open) {
+    if (k === 'Escape' || k === 'Backspace') { e.preventDefault(); closeItem(); }
+    if (k === 'Tab') { const f = [...reader.querySelectorAll('button,a[href],[tabindex="-1"]')].filter(x => x.offsetParent); const i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } }
+    return;
+  }
+  const onBtn = document.activeElement === $('#snd');
+  const map = { ArrowLeft: () => move(-1), ArrowRight: () => move(1), ArrowUp: () => setChannel(S.chan - 1), ArrowDown: () => setChannel(S.chan + 1), PageUp: () => setChannel(S.chan - 1), PageDown: () => setChannel(S.chan + 1), Home: () => focusIndex(0), End: () => focusIndex(1e9) };
+  if (map[k]) { e.preventDefault(); if (!nav.contains(document.activeElement) && !onBtn) document.body.classList.add('kbd'); map[k](); return; }
+  if ((k === 'Enter' || (k === ' ' && !onBtn)) && !onBtn) { e.preventDefault(); openItem(); }
+});
+addEventListener('mousedown', () => document.body.classList.remove('kbd'));
+let wheelAcc = 0, wheelX = 0, wheelLock = 0;
+addEventListener('wheel', e => {
+  if (S.open) return; e.preventDefault();
+  const now = performance.now(); wheelAcc += e.deltaY; wheelX += e.deltaX;
+  if (now < wheelLock) return;
+  if (Math.abs(wheelX) > 50 && Math.abs(wheelX) > Math.abs(wheelAcc)) { move(Math.sign(wheelX)); wheelX = 0; wheelAcc = 0; wheelLock = now + 140; }
+  else if (Math.abs(wheelAcc) > 60) { if (e.shiftKey) move(Math.sign(wheelAcc)); else setChannel(S.chan + Math.sign(wheelAcc)); wheelAcc = 0; wheelX = 0; wheelLock = now + 360; }
+}, { passive: false });
+const cv = $('#gl');
+let ptr = null;
+cv.addEventListener('pointerdown', e => { ptr = { x: e.clientX, y: e.clientY, t: performance.now(), id: e.pointerId, base: S.idx[S.chan], moved: false, axis: null }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => {
+  const vp = viewport(); S.mx = e.clientX / vp.w * 2 - 1; S.my = e.clientY / vp.h * 2 - 1;
+  if (!ptr) { if (R && R.kind === 'webgl2' && e.pointerType === 'mouse') { const i = R.pick(e.clientX, e.clientY, vp); S.hover = i; cv.style.cursor = i >= 0 ? 'pointer' : ''; } return; }
+  const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
+  if (!ptr.axis && Math.hypot(dx, dy) > 10) ptr.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+  if (ptr.axis === 'x' && !S.open) { ptr.moved = true; const per = vp.portrait ? vp.w * .55 : 220; S.rowS[S.chan].t = clamp(ptr.base - dx / per, -.4, CH[S.chan].items.length - .6); const ni = clamp(Math.round(S.rowS[S.chan].t), 0, CH[S.chan].items.length - 1); if (ni !== S.idx[S.chan]) { S.idx[S.chan] = ni; Sound.play('tick'); markSweep(); touch(); } }
+  if (ptr.axis === 'y') ptr.moved = true;
+});
+cv.addEventListener('pointerup', e => {
+  if (!ptr) return; const p = ptr; ptr = null; const dx = e.clientX - p.x, dy = e.clientY - p.y, dtm = performance.now() - p.t;
+  if (S.open) { if (!p.moved && !reader.contains(e.target)) closeItem(); return; }
+  if (p.axis === 'x') { const v = dx / Math.max(dtm, 1); let ni = Math.round(S.rowS[S.chan].t - (Math.abs(v) > .5 ? Math.sign(v) * .6 : 0)); ni = clamp(ni, 0, CH[S.chan].items.length - 1); S.idx[S.chan] = -1; focusIndex(ni); S.rowS[S.chan].t = ni; return; }
+  if (p.axis === 'y') { if (Math.abs(dy) > 40) setChannel(S.chan - Math.sign(dy)); return; }
+  // tap
+  const vp = viewport(); const i = R.kind === 'webgl2' ? R.pick(e.clientX, e.clientY, vp) : -1;
+  if (i < 0) return; if (i === S.idx[S.chan]) openItem(); else focusIndex(i);
+});
+cv.addEventListener('pointerleave', () => { if (!ptr) S.hover = -1; });
+cv.addEventListener('pointercancel', () => { ptr = null; S.rowS[S.chan].t = S.idx[S.chan]; });
+reader.addEventListener('pointerdown', e => e.stopPropagation());
+// gamepad
+const pad = { held: {}, next: {} };
+addEventListener('gamepadconnected', () => hud.querySelector('.pad').classList.add('on'));
+addEventListener('gamepaddisconnected', () => hud.querySelector('.pad').classList.remove('on'));
+function pollPad(now) {
+  const gps = navigator.getGamepads ? navigator.getGamepads() : []; const g = [...gps].find(x => x && x.connected); if (!g) return;
+  const ax = g.axes[0] || 0, ay = g.axes[1] || 0, b = i => !!(g.buttons[i] && g.buttons[i].pressed);
+  const dirs = { L: ax < -.5 || b(14), R: ax > .5 || b(15), U: ay < -.5 || b(12), D: ay > .5 || b(13), LB: b(4), RB: b(5), OK: b(0), BACK: b(1) };
+  const act = { L: () => move(-1), R: () => move(1), U: () => setChannel(S.chan - 1), D: () => setChannel(S.chan + 1), LB: () => setChannel(S.chan - 1), RB: () => setChannel(S.chan + 1), OK: () => S.open ? null : openItem(), BACK: () => closeItem() };
+  for (const k in dirs) {
+    if (dirs[k]) { const rep = k === 'OK' || k === 'BACK' ? 1e9 : 150; if (!pad.held[k]) { pad.held[k] = true; pad.next[k] = now + 380; act[k](); } else if (now > pad.next[k]) { pad.next[k] = now + rep; act[k](); } }
+    else pad.held[k] = false;
+  }
+  if (S.open && Math.abs(g.axes[3] || 0) > .2) reader.querySelector('.body').scrollTop += (g.axes[3]) * 14;
+}
+// sound toggle
+const sndBtn = $('#snd');
+function toggleSound() { const on = Sound.toggle(); sndBtn.setAttribute('aria-pressed', on); sndBtn.querySelector('.lbl').textContent = on ? 'Sound on' : 'Sound off'; }
+sndBtn.addEventListener('click', toggleSound);
+addEventListener('resize', () => { });
+
+/* ---------------------------------------------------------------------
+   Boot + loop
+   --------------------------------------------------------------------- */
+async function boot() {
+  const fontsReady = document.fonts ? Promise.all(['300', '600', '700', '800'].map(w => document.fonts.load(`${w} 40px "Open Sans"`))).catch(() => { }) : Promise.resolve();
+  await Promise.race([fontsReady, new Promise(r => setTimeout(r, 2200))]);
+  let booted = false; fontsReady.then(() => { if (booted && R) R.flushCovers(); });
+  const forceCSS = QS.has('css');
+  try { if (!forceCSS) R = createGLRenderer(cv); } catch (err) { console.warn('WebGL2 renderer failed, falling back to CSS 3D', err); R = null; }
+  if (!R) R = createCSSRenderer();
+  booted = true;
+  window.__ch = { S, R, CH, go(c, i) { S.chan = c; S.chanS.snap(c); S.idx[c] = i; S.rowS[c].snap(i); markSweep(); }, open: openItem, close: closeItem, setChannel, move };
+  R.prime && R.prime();
+  let last = performance.now(); S.t = 0;
+  setTimeout(() => { if (av()) av().wave = S.t; }, 900);
+  const loop = now => {
+    let dt = (now - last) / 1000; last = now; dt = clamp(dt, 0, QS.has('shot') ? .5 : .1);
+    S.t += dt;
+    pollPad(now);
+    S.chanS.step(dt); S.rowS.forEach(s => s.step(dt));
+    const target = S.open ? 1 : 0; const sp = reduced ? 6 : (S.open ? 1 / .85 : 1 / .65);
+    S.openT = clamp(S.openT + Math.sign(target - S.openT) * dt * sp, 0, 1);
+    if (!S.open && S.openT === 0 && !reader.hidden) reader.hidden = true;
+    const vp = viewport();
+    const rect = R.frame(dt, vp);
+    updateHUD(rect, vp);
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+}
+boot();
+</script>
+</body>
+</html>
