@@ -258,11 +258,9 @@ html.hand-on .hand { opacity: 1; }
 
 /* ------------------------------------------------ view transitions */
 ::view-transition-group(zoom) { animation-duration: 0.55s; animation-timing-function: cubic-bezier(0.22, 0.9, 0.24, 1); z-index: 5; }
-::view-transition-old(zoom), ::view-transition-new(zoom) { width: 100%; height: 100%; object-fit: fill; animation-duration: 0.55s; }
-html.vt-in::view-transition-old(zoom) { animation: vt-fade-out 0.35s ease both; }
-html.vt-in::view-transition-new(zoom) { animation: vt-fade-in 0.35s 0.08s ease both; }
-html.vt-back::view-transition-old(zoom) { animation: vt-fade-out 0.4s 0.1s ease both; }
-html.vt-back::view-transition-new(zoom) { animation: vt-fade-in 0.3s ease both; }
+::view-transition-old(zoom), ::view-transition-new(zoom) { width: 100%; height: 100%; object-fit: fill; mix-blend-mode: normal; animation: none; }
+html.vt-in::view-transition-new(zoom) { animation: vt-fade-in 0.3s 0.1s ease-out both; }
+html.vt-back::view-transition-old(zoom) { animation: vt-fade-out 0.3s 0.12s ease-in both; }
 ::view-transition-old(root) { animation: none; opacity: 0; }
 ::view-transition-new(root) { animation: none; }
 html.vt-in::view-transition-new(root) { animation: root-away 0.55s cubic-bezier(0.3, 0.6, 0.3, 1) both; }
