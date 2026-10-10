@@ -67,22 +67,24 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;outline:no
 .chan{position:absolute;left:0;top:0;white-space:nowrap;font:300 56px/1 var(--font);letter-spacing:-.5px;transform-origin:0 50%;background:none;border:0;padding:0 .12em;margin:0;display:flex;align-items:center;border-radius:12px;
   pointer-events:auto;cursor:pointer;color:var(--ink);text-shadow:0 2px 18px rgba(0,0,0,.55);will-change:transform,opacity}
 .chan:focus-visible{opacity:1!important;outline-width:calc(3px / var(--sc,1))!important;outline-offset:calc(3px / var(--sc,1))}
-.chan small{font-size:.32em;font-weight:600;letter-spacing:2px;color:var(--ink-3);margin-left:.6em;vertical-align:.9em}
+.chan small{font-size:.32em;font-weight:600;letter-spacing:2px;color:var(--ink-2);margin-left:.6em;vertical-align:.9em}
 .cap{position:absolute;left:0;top:0;width:520px;will-change:transform,opacity;text-shadow:0 1px 3px rgba(0,0,0,.95),0 2px 14px rgba(0,0,0,.85)}
-.cap::before{content:"";position:absolute;inset:-18px -40px -22px -30px;z-index:-1;border-radius:40px;background:radial-gradient(closest-side,rgba(3,5,8,.78),rgba(3,5,8,.55) 60%,rgba(3,5,8,0))}
+.cap,.pips,.guide{background:linear-gradient(180deg,rgba(30,38,48,.84),rgba(7,10,14,.88) 60%);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 30px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.cap{padding:12px 18px 14px;border-radius:16px}
 .cap .k{font-size:12px;font-weight:700;letter-spacing:2.6px;text-transform:uppercase;color:var(--accent)}
 .cap .t{font-size:24px;font-weight:600;margin-top:3px;line-height:1.2;letter-spacing:-.2px}
-.cap .d{font-size:14.5px;color:var(--ink-2);margin-top:5px;line-height:1.4;max-width:500px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.pips{position:absolute;left:0;top:0;display:flex;gap:6px;align-items:center}
+.cap .d{font-size:14.5px;color:rgba(240,245,250,.9);margin-top:5px;line-height:1.4;max-width:500px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pips{position:absolute;left:0;top:0;display:flex;gap:6px;align-items:center;padding:5px 12px;border-radius:20px}
 .pips b{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .25s,transform .25s}
 .pips b.on{background:#fff;transform:scale(1.35);box-shadow:0 0 10px var(--accent)}
-.pips span{font-size:12px;font-weight:600;letter-spacing:1.5px;color:var(--ink-3);margin-left:8px;font-variant-numeric:tabular-nums}
-.guide{position:absolute;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));display:flex;gap:26px;justify-content:center;font-size:13px;color:var(--ink-2);font-weight:600;letter-spacing:.3px}
+.pips span{font-size:12px;font-weight:600;letter-spacing:1.5px;color:var(--ink-2);margin-left:8px;font-variant-numeric:tabular-nums}
+.guide{position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);flex-wrap:wrap;padding:6px 20px;border-radius:30px;bottom:max(18px,env(safe-area-inset-bottom));display:flex;gap:26px;justify-content:center;font-size:13px;color:var(--ink-2);font-weight:600;letter-spacing:.3px}
 .guide span{display:flex;align-items:center;gap:8px;text-shadow:0 1px 6px rgba(0,0,0,.8)}
 .key{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 7px;border-radius:13px;font-size:11px;font-weight:700;color:#e9eef3;
   background:radial-gradient(circle at 50% 30%,#6b7682,#2a3139 70%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 4px rgba(0,0,0,.6);border:1px solid rgba(0,0,0,.5)}
-.pad{opacity:0;transition:opacity .4s}
-.pad.on{opacity:1}
+.guide .pad{display:none}
+@media (max-height:420px) and (min-aspect-ratio:1/1){.guide{display:none}}
+.guide .pad.on{display:flex}
 .ring{position:fixed;left:0;top:0;border-radius:18px;pointer-events:none;z-index:4;opacity:0;box-shadow:0 0 0 4px #fff,0 0 0 8px #000,0 0 34px 8px var(--accent);transition:opacity .2s}
 .kbd .ring.on{opacity:1}
 
@@ -91,6 +93,7 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;outline:no
   background:linear-gradient(180deg,rgba(28,36,46,.86),rgba(9,12,17,.9) 140px);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 0 1px rgba(255,255,255,.1),0 30px 80px rgba(0,0,0,.6)}
 #reader.show{pointer-events:auto}
+#r-title:focus{outline:none!important;box-shadow:none!important} /* programmatic focus target only, not interactive */
 #reader[hidden]{display:none}
 #reader .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 22px 14px 28px;border-bottom:1px solid rgba(255,255,255,.08);
   background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,0))}
@@ -186,7 +189,8 @@ canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block;outline:no
     <span class="kb"><span class="key">↑ ↓</span>Channels</span>
     <span class="kb"><span class="key">Enter</span>Open</span>
     <span class="kb"><span class="key">Esc</span>Back</span>
-    <span class="tp"><span class="key">⇆</span>Swipe</span>
+    <span class="tp"><span class="key">⇆</span>Items</span>
+    <span class="tp"><span class="key">⇅</span>Channels</span>
     <span class="tp"><span class="key">●</span>Tap to open</span>
     <span class="pad"><span class="key">◎</span>Controller connected</span>
   </div>
@@ -630,7 +634,7 @@ function tileLayout(k, portrait) {
   if (k >= 0) {
     return portrait
       ? { x: n * 3.75 + f * 2.3, z: -(n * 2.2 + f * 1.4), ry: -n * .5, a: clamp(1 - f / 2.2, 0, 1) }
-      : { x: n * 3.5 + f * 1.75, z: -(n * 1.9 + f * 1.3), ry: -n * .56, a: clamp(1 - f / 5.2, 0, 1) };
+      : { x: n * 3.95 + f * 1.75, z: -(n * 1.9 + f * 1.3), ry: -n * .56, a: clamp(1 - f / 5.2, 0, 1) };
   }
   return portrait
     ? { x: -(n * 3.75 + f * 2.3), z: -(n * 2.2 + f * 1.4), ry: n * .5, a: clamp(1 - ak / 2.2, 0, 1) }
@@ -651,7 +655,7 @@ function framing(vp) {
   const frac = vp.asp > 2 ? .34 : vp.asp > 1.5 ? .4 : .46;
   const D = (1.6 / frac) / (t * vp.asp), visW = 2 * D * t * vp.asp, visH = 2 * D * t;
   const lx = (vp.asp > 1.3 ? .1 : .06) * visW, ly = -.05 * visH;
-  return { fov, D, eye: [lx - .4, ly + 1.1, D], at: [lx, ly, 0], floorY: FLOOR_Y, avatar: [3.3, FLOOR_Y, 2.65] };
+  return { fov, D, eye: [lx - .4, ly + 1.1, D], at: [lx, ly, 0], floorY: FLOOR_Y, avatar: [2.12, FLOOR_Y, 1.35] };
 }
 function panelRect(vp) {
   if (vp.portrait || vp.w < 700) { const w = vp.w - 20, h = vp.h - 96; return { w, h, x: (vp.w - w) / 2, y: (vp.h - h) / 2 + 22 }; }
@@ -1391,19 +1395,19 @@ function updateHUD(rect, vp) {
   const ch = CH[S.chan], it = curItem();
   document.documentElement.style.setProperty('--accent', hsl2hex(ch.hue, .95, .66));
   // channel list
-  const cp = S.chanS.v; const big = vp.portrait ? 40 : 56;
+  const cp = S.chanS.v; const big = vp.portrait ? 40 : vp.h < 520 ? 36 : 56;
   const anchorY = rect ? rect.y + rect.h * (vp.portrait ? -0.0 : .5) : vp.h * .45;
   const x0 = vp.portrait ? 16 : Math.max(28, Math.min(vp.w * .045, (rect ? rect.x : 200) - 260));
   CH.forEach((c, ci) => {
     const dd = ci - cp, ad = Math.abs(dd);
     const sc = lerp(1, vp.portrait ? .5 : .43, Math.min(ad, 1));
     const yy = Math.sign(dd) * (ad < 1 ? ad * big * .98 : big * .98 + (ad - 1) * 46);
-    const op = ad < 1 ? lerp(1, .62, ad) : Math.max(.5, .62 - (ad - 1) * .04);
+    const op = ad < 1 ? lerp(1, .74, ad) : Math.max(.64, .74 - (ad - 1) * .04);
     // every label keeps a >= 44px hit area at its current scale
     const hpx = Math.max(big * 1.15, 44 / sc);
     let y = anchorY + yy - hpx / 2;
     if (vp.portrait) y = (rect ? rect.y : vp.h * .3) - big * 1.25 + yy - (hpx - big) / 2;
-    c.el.style.height = hpx + 'px'; c.el.style.setProperty('--sc', sc);
+    c.el.style.height = hpx + 'px'; c.el.style.fontSize = big + 'px'; c.el.style.setProperty('--sc', sc);
     c.el.style.transform = `translate3d(${x0}px,${y}px,0) scale(${sc})`;
     c.el.style.opacity = vp.portrait ? clamp(1 - ad * 1.6, 0, 1) : op;
     c.el.style.pointerEvents = (vp.portrait ? ad < .5 : ad < 2.5) ? 'auto' : 'none';
@@ -1422,8 +1426,8 @@ function updateHUD(rect, vp) {
     const n = ch.items.length, cur = S.idx[S.chan]; const lo = Math.max(0, Math.min(cur - 4, n - 9)), hi = Math.min(n, lo + 9);
     pipsEl.innerHTML = Array.from({ length: hi - lo }, (_, k) => `<b class="${lo + k === cur ? 'on' : ''}"></b>`).join('') + `<span>${cur + 1} / ${n}</span>`;
   }
-  if (rect) { pipsEl.style.transform = `translate3d(${vp.portrait ? 16 : rect.x + 4}px,${rect.y - 26}px,0)`; pipsEl.style.opacity = vp.portrait ? 0 : 1 - S.openT * 3; }
-  if (vp.portrait && rect) { pipsEl.style.opacity = 1 - S.openT * 3; pipsEl.style.transform = `translate3d(${vp.w - 16 - pipsEl.offsetWidth}px,${rect.y - 26}px,0)`; }
+  if (rect) { pipsEl.style.transform = `translate3d(${vp.portrait ? 16 : rect.x + 4}px,${rect.y - 44}px,0)`; pipsEl.style.opacity = vp.portrait ? 0 : 1 - S.openT * 3; }
+  if (vp.portrait && rect) { pipsEl.style.opacity = 1 - S.openT * 3; pipsEl.style.transform = `translate3d(${vp.w - 16 - pipsEl.offsetWidth}px,${rect.y - 44}px,0)`; }
   chansEl.style.opacity = 1 - S.openT * 2;
   hud.querySelector('.guide').style.opacity = 1 - S.openT * 2;
   if (rect) { ring.style.transform = `translate3d(${rect.x - 6}px,${rect.y - 6}px,0)`; ring.style.width = rect.w + 12 + 'px'; ring.style.height = rect.h + 12 + 'px'; ring.classList.toggle('on', S.openT < .05); }
@@ -1467,7 +1471,7 @@ function openItem() {
   reader.hidden = false; mainEl.inert = chansEl.inert = topEl.inert = true; setTitle();
   reader.querySelector('.bar .k').innerHTML = `${esc(CH[S.chan].name)}<em>${esc([KIND_LABEL[it.kind] !== CH[S.chan].name.replace(/s$/, '') ? KIND_LABEL[it.kind] : '', it.date || it.site].filter(Boolean).join(' · '))}</em>`;
   $('#r-title').textContent = it.title;
-  const desc = reader.querySelector('.desc'); desc.textContent = it.desc; desc.hidden = !it.desc;
+  const desc = reader.querySelector('.desc'); const showDesc = it.desc && !(it.excerpt || '').startsWith(it.desc); desc.textContent = showDesc ? it.desc : ''; desc.hidden = !showDesc;
   const body = it.excerpt ? md(it.excerpt.trim()) : `<p>${esc(it.desc)}</p>`;
   reader.querySelector('.prose').innerHTML = body;
   const internal = /maxleiter\.com/.test(it.href);
@@ -1500,7 +1504,9 @@ addEventListener('keydown', e => {
   const ae = document.activeElement; const onBtn = ae && ae.tagName === 'BUTTON';
   const map = { ArrowLeft: () => move(-1), ArrowRight: () => move(1), ArrowUp: () => setChannel(S.chan - 1), ArrowDown: () => setChannel(S.chan + 1), PageUp: () => setChannel(S.chan - 1), PageDown: () => setChannel(S.chan + 1), Home: () => focusIndex(0), End: () => focusIndex(1e9) };
   if (map[k]) { e.preventDefault(); map[k](); return; }
-  if ((k === 'Enter' || (k === ' ' && !onBtn)) && !onBtn) { e.preventDefault(); openItem(); }
+  // Enter/Space open the focused tile only from the scene itself or an item link; other links/buttons keep their default
+  const sceneTarget = !ae || ae === document.body || ae === cv || (ae.dataset && ae.dataset.c !== undefined);
+  if ((k === 'Enter' || k === ' ') && sceneTarget) { e.preventDefault(); openItem(); }
 });
 addEventListener('mousedown', () => document.body.classList.remove('kbd'));
 let wheelAcc = 0, wheelX = 0, wheelLock = 0;

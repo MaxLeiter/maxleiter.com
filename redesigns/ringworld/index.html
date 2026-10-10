@@ -75,8 +75,14 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
   position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; z-index: 20; transition: opacity 0.9s, filter 0.9s, transform 1.2s var(--ease);
 }
+.title-screen[hidden] { display: none; }
 .title-screen.out { opacity: 0; filter: blur(6px) brightness(2); transform: scale(1.06); pointer-events: none; }
+.title-screen::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 46% 40% at 50% 50%, rgba(1, 4, 10, 0.62), rgba(1, 4, 10, 0.25) 70%, rgba(1, 4, 10, 0) 100%), linear-gradient(180deg, rgba(1, 4, 10, 0) 80%, rgba(1, 4, 10, 0.7)); }
 .logo-wrap { position: relative; margin-top: -4vh; }
+.logo-sub, .logo-tag, .press-start { text-shadow: 0 1px 2px #000, 0 0 12px rgba(0, 0, 0, 0.8); }
+.logo-sub span, .logo-tag { display: inline-block; padding: 7px 4px 7px 14px; background: rgba(2, 6, 14, 0.78); box-shadow: 0 0 24px 10px rgba(2, 6, 14, 0.6); }
+.logo-tag { padding: 6px 4px 6px 12px; }
+.press-start { text-shadow: 0 1px 2px #000, 0 0 16px rgba(140, 210, 255, 0.9); }
 .logo {
   position: relative; margin: 0; font: 760 clamp(54px, 10.5vw, 132px)/0.9 var(--f-logo); font-stretch: 125%;
   letter-spacing: 0.1em; margin-right: -0.1em; text-transform: uppercase;
@@ -98,18 +104,20 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 }
 .logo-sub::before, .logo-sub::after { content: ''; width: clamp(40px, 9vw, 120px); height: 1px; background: linear-gradient(90deg, transparent, var(--line-hi)); }
 .logo-sub::after { background: linear-gradient(270deg, transparent, var(--line-hi)); }
-.logo-tag { margin-top: 30px; font: 500 13px/1 var(--f-ui); letter-spacing: 0.5em; margin-right: -0.5em; color: var(--ink-dim); text-transform: uppercase; }
+.logo-tag { margin-top: 30px; font: 600 13px/1 var(--f-ui); letter-spacing: 0.5em; margin-right: -0.5em; color: var(--ink-2); text-transform: uppercase; }
 .press-start:focus-visible { outline: none; box-shadow: none; }
 .press-start:focus-visible::before, .press-start:focus-visible::after { width: 80px; background: linear-gradient(90deg, transparent, #fff); height: 2px; }
 .press-start {
   margin-top: 11vh; position: relative; padding: 14px 40px; font: 500 20px/1 var(--f-menu); font-stretch: 112%;
   letter-spacing: 0.5em; margin-right: -0.5em; text-transform: uppercase; color: #fff;
-  text-shadow: 0 0 16px rgba(140, 210, 255, 0.9); animation: breathe 2.4s ease-in-out infinite;
+  text-shadow: 0 0 16px rgba(140, 210, 255, 0.9); animation: breathe-soft 2.4s ease-in-out infinite;
+  background: radial-gradient(ellipse at center, rgba(2, 6, 14, 0.8), rgba(2, 6, 14, 0.45) 70%, transparent);
 }
 .press-start::before, .press-start::after { content: ''; position: absolute; top: 50%; width: 46px; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan-hi)); }
 .press-start::before { right: 100%; }
 .press-start::after { left: 100%; transform: scaleX(-1); }
 @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.38; } }
+@keyframes breathe-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.72; } }
 .title-opts { margin-top: 26px; display: flex; gap: 14px; justify-content: center; }
 .title-foot { position: absolute; bottom: 26px; left: 16px; right: 16px; font: 500 11px/1.6 var(--f-ui); letter-spacing: 0.32em; color: var(--ink-dim); text-shadow: 0 1px 3px #000; text-transform: uppercase; }
 
@@ -184,7 +192,7 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 
 /* panels */
 .panel {
-  position: relative; background: linear-gradient(180deg, rgba(14, 28, 46, 0.86), rgba(5, 11, 20, 0.84));
+  position: relative; background: linear-gradient(180deg, rgba(13, 26, 43, 0.93), rgba(5, 11, 20, 0.92));
   border: 1px solid var(--line); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 18px 50px rgba(0, 0, 0, 0.35);
   -webkit-backdrop-filter: blur(8px) saturate(125%); backdrop-filter: blur(8px) saturate(125%);
 }
@@ -214,11 +222,11 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
   font: 400 25px/1 var(--f-menu); font-stretch: 110%; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim);
   transition: color 0.18s, text-shadow 0.18s, letter-spacing 0.3s var(--ease);
 }
-.mi .num { position: absolute; left: -26px; font: 400 9px/1 var(--f-head); letter-spacing: 0.1em; color: var(--ink-faint); transition: color 0.2s; }
+.mi .num { position: absolute; left: -32px; font: 400 9px/1 var(--f-head); letter-spacing: 0.1em; color: var(--ink-faint); transition: color 0.2s; }
 .mi .lbl { position: relative; z-index: 1; }
 .bar {
   position: absolute; left: 0; right: 0; top: 5px; bottom: 5px; opacity: 0; transform: scaleX(0.92); transform-origin: left center;
-  background: linear-gradient(90deg, rgba(160, 220, 255, 0.42) 0%, rgba(120, 195, 255, 0.2) 45%, rgba(120, 195, 255, 0.02) 100%);
+  background: linear-gradient(90deg, rgba(120, 190, 250, 0.36) 0%, rgba(100, 175, 245, 0.18) 45%, rgba(100, 175, 245, 0.03) 100%);
   box-shadow: 0 0 26px rgba(90, 170, 255, 0.18);
   transition: opacity 0.16s, transform 0.28s var(--ease);
 }
@@ -229,7 +237,7 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 .bar i:first-child { left: -9px; border-right: 0; }
 .bar i:last-child { right: 30px; border-left: 0; opacity: 0.5; }
 .bar b { position: absolute; inset: 0; overflow: hidden; }
-.bar b::after { content: ''; position: absolute; top: 0; bottom: 0; width: 34%; left: -40%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent); animation: glint 3.2s ease-in-out infinite; }
+.bar b::after { content: ''; position: absolute; top: 0; bottom: 0; width: 34%; left: -40%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent); animation: glint 3.2s ease-in-out infinite; }
 @keyframes glint { 0% { left: -40%; } 45%, 100% { left: 110%; } }
 .sel > .bar, .sel .bar { opacity: 1; transform: none; animation: barpulse 1.8s ease-in-out infinite; }
 @keyframes barpulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.35); } }
@@ -271,7 +279,7 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 .list { position: relative; flex: 1; margin: 0; padding: 8px 0; list-style: none; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(150, 205, 255, 0.35) transparent; overscroll-behavior: contain; }
 .li {
   position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; min-height: 40px; padding: 7px 18px 7px 16px; text-align: left;
-  font: 600 15px/1.15 var(--f-ui); letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-dim); text-decoration: none;
+  font: 600 15px/1.15 var(--f-ui); letter-spacing: 0.09em; text-transform: uppercase; color: #bccfe3; text-decoration: none;
 }
 .li .n { font: 400 9px/1 var(--f-head); color: var(--ink-faint); letter-spacing: 0.06em; }
 .li .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; position: relative; z-index: 1; }
@@ -284,7 +292,7 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 .li.thumb { grid-template-columns: 78px minmax(0, 1fr) auto; min-height: 58px; }
 .li.thumb canvas { width: 78px; height: 44px; display: block; border: 1px solid var(--line); position: relative; z-index: 1; }
 .li.thumb .t { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.cat { padding: 14px 18px 6px; font: 400 9px/1 var(--f-head); letter-spacing: 0.4em; color: var(--amber); display: flex; align-items: center; gap: 10px; }
+.cat { text-transform: uppercase; padding: 14px 18px 6px; font: 400 9px/1 var(--f-head); letter-spacing: 0.4em; color: var(--amber); display: flex; align-items: center; gap: 10px; }
 .cat::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255, 196, 107, 0.4), transparent); }
 .list-foot { display: flex; justify-content: space-between; padding: 10px 16px; border-top: 1px solid var(--line); font: 600 11px/1 var(--f-ui); letter-spacing: 0.22em; color: var(--ink-dim); text-transform: uppercase; }
 
@@ -323,6 +331,8 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 /* ---------------- Mission briefing (article) ---------------- */
 .brief-wrap { position: absolute; left: 0; right: 0; top: 76px; bottom: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 26px; }
 .article { display: flex; flex-direction: column; min-height: 0; }
+.prose-scroll:focus-visible { outline: 2px solid #eaf8ff; outline-offset: -4px; box-shadow: none; }
+.prose-scroll.sel:not(:focus-visible) { outline: none; }
 .prose-scroll { flex: 1; overflow-y: auto; padding: 26px 40px 40px; scrollbar-width: thin; scrollbar-color: rgba(150, 205, 255, 0.35) transparent; }
 .prose-scroll h3 { margin: 0 0 8px; font: 500 30px/1.1 var(--f-menu); font-stretch: 105%; letter-spacing: 0.04em; color: #fff; }
 .prose-meta { margin: 0 0 24px; font: 600 12px/1 var(--f-ui); letter-spacing: 0.26em; color: var(--ink-dim); text-transform: uppercase; }
@@ -357,7 +367,7 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 .film-hud .cam { position: absolute; left: 0; bottom: 0; color: var(--cyan-hi); }
 .film-hud .corner { position: absolute; width: 18px; height: 18px; border: 1px solid rgba(255, 255, 255, 0.5); }
 .transcript { padding: 22px 26px; overflow-y: auto; font: 300 16px/1.7 var(--f-body); color: var(--ink); scrollbar-width: thin; }
-.transcript .ghost { color: rgba(200, 220, 240, 0.12); }
+.transcript .ghost { color: rgba(200, 220, 240, 0.3); }
 .transcript .caret { display: inline-block; width: 8px; height: 1em; vertical-align: -2px; background: var(--cyan-hi); box-shadow: 0 0 8px var(--cyan); animation: breathe 0.8s steps(2) infinite; }
 .timeline { padding: 14px 18px 16px; border-top: 1px solid var(--line); display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 16px; align-items: center; }
 .tbtn { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--line-hi); background: rgba(120, 190, 255, 0.1); }
@@ -397,6 +407,10 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 .searching .mm-idle { display: none; }
 .spinner { width: 120px; height: 120px; }
 .spinner circle { fill: none; stroke-width: 2; }
+.spinner .sp1, .spinner .sp2 { transform-origin: 60px 60px; animation: spin 1.4s linear infinite; }
+.spinner .sp2 { animation-duration: 2.2s; animation-direction: reverse; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.found .spinner .sp1, .found .spinner .sp2 { animation-play-state: paused; }
 .s-status { font: 600 18px/1 var(--f-menu); font-stretch: 110%; letter-spacing: 0.3em; text-transform: uppercase; color: #fff; }
 .s-sub { font: 600 12px/1.4 var(--f-ui); letter-spacing: 0.24em; color: var(--ink-dim); text-transform: uppercase; min-height: 1.4em; }
 .s-log { list-style: none; margin: 0; padding: 0; font: 500 12px/1.9 var(--f-ui); letter-spacing: 0.2em; color: var(--ink-faint); text-transform: uppercase; }
@@ -447,7 +461,7 @@ html[data-screen]:not([data-screen='main']):not([data-screen='title']) #shade {
 .opt { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 210px; align-items: center; width: 100%; height: 50px; padding: 0 20px; text-align: left; font: 600 16px/1 var(--f-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-dim); }
 .opt .bar { left: 6px; right: 6px; }
 .opt .bar i:last-child { display: none; }
-.opt > span { position: relative; z-index: 1; }
+.opt > span:not(.bar) { position: relative; z-index: 1; }
 .opt.sel { color: #fff; }
 .val { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #fff; font-weight: 700; }
 .val .arr { color: var(--cyan-hi); opacity: 0.45; font-family: var(--f-head); font-size: 10px; padding: 6px; }
@@ -506,7 +520,7 @@ html.rm .screen.enter .holo { animation: fade-in 0.2s both !important; }
   .li { min-height: 46px; font-size: 14px; }
   .li.thumb { grid-template-columns: 64px minmax(0, 1fr); }
   .li.thumb .m { display: none; }
-  .brief-wrap { flex-direction: column-reverse; }
+  .brief-wrap { flex-direction: column; }
   .prose-scroll { padding: 18px 18px 28px; overflow: visible; }
   .prose-scroll h3 { font-size: 23px; }
   .prose { font-size: 16px; }
@@ -514,8 +528,12 @@ html.rm .screen.enter .holo { animation: fade-in 0.2s both !important; }
   .film-view { grid-template-columns: 1fr; }
   .film-frame { height: 200px; flex: none; border-right: 0; border-bottom: 1px solid var(--line); }
   .film { display: flex; }
-  .timeline { grid-template-columns: auto minmax(0, 1fr) auto; }
-  .timeline .speed { display: none; }
+  .timeline { grid-template-columns: auto auto minmax(0, 1fr); }
+  .timeline > div:last-child { grid-column: 1 / -1; justify-content: space-between; }
+  .track { height: 44px; }
+  .track .rail, .track .fill { top: 20px; }
+  .track .tick { top: 15px; }
+  .track .head { top: 11px; }
   .sr-right { display: flex; flex-direction: column; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat:nth-child(2n) { border-right: 0; }
@@ -527,6 +545,12 @@ html.rm .screen.enter .holo { animation: fade-in 0.2s both !important; }
   .dside { border-left: 0; border-top: 1px solid var(--line); }
   .mm-grid { grid-template-columns: 1fr 1fr; }
   .forge-view { height: 200px; }
+  .split > *, .brief-wrap > *, .sr-grid > *, .sr-right > *, .sr-lower > *, .film > * { flex: none; }
+  .sheet { max-height: calc(100% - 64px); overflow-y: auto; }
+}
+@media (max-width: 760px) and (max-height: 640px) {
+  [data-screen='main'] .lobby { display: none; }
+  .mi { height: 44px; }
 }
 @media (max-height: 640px) and (min-width: 761px) {
   .menu { top: 56px; }
@@ -2639,6 +2663,8 @@ const Art = (() => {
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
   const pad2 = (n) => String(n).padStart(2, '0')
   const DATA = JSON.parse(document.getElementById('content').textContent)
+  // some excerpts carry MDX-escaped backticks (\`); normalise before parsing
+  for (const x of [...DATA.posts, ...DATA.notes]) x.excerpt = x.excerpt.replace(/\\`/g, '`')
   const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 }
   const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
   const parseDate = (s) => { const m = String(s).match(/([A-Za-z]+)\.?\s+(\d+),\s*(\d{4})/); return m ? new Date(+m[3], MONTHS[m[1].slice(0, 3).toLowerCase()] ?? 0, +m[2]) : new Date(0) }
@@ -2662,7 +2688,7 @@ const Art = (() => {
   })
   const missions = posts.slice().reverse()
   const notes = DATA.notes.map((n) => {
-    const text = n.excerpt.replace(/```[\s\S]*?(```|$)/g, (m) => m.replace(/```\w*/g, '').trim()).replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*_~#>]/g, '').replace(/`/g, '').replace(/[ \t]+\n/g, '\n').replace(/([^\n])\n(?!\n)/g, '$1 ').trim()
+    const text = n.excerpt.replace(/```[\s\S]*?(```|$)/g, (m) => m.replace(/```\w*/g, '').trim()).replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*_~#>]/g, '').replace(/`/g, '').replace(/[ \t]+\n/g, '\n').replace(/([^\n])\n(?!\n|\d+\.\s|[-*]\s)/g, '$1 ').replace(/\n{3,}/g, '\n\n').trim()
     const secs = Math.max(12, Math.round(words(text) / 2.6))
     return { ...n, d: parseDate(n.date), text, secs }
   })
@@ -2716,7 +2742,7 @@ const Art = (() => {
     out = out.replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     out = out.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, (_, t, h) => `<a href="${fullUrl(h.replace(/&amp;/g, '&')).replace(/"/g, '&quot;')}" target="_blank" rel="noopener">${t}</a>`)
     out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    out = out.replace(/~([^~\s][^~]*)~/g, '<del>$1</del>')
+    out = out.replace(/(^|\s)~([^~\s][^~\n]{0,30}?)~(?=[\s.,!?:;]|$)/g, '$1<del>$2</del>')
     out = out.replace(/(^|[\s(])[_*]([^_*\n]+)[_*](?=[\s).,!?:;]|$)/g, '$1<em>$2</em>')
     return out
   }
@@ -2858,23 +2884,24 @@ const Art = (() => {
       <div class="scr-head holo"><h1 class="scr-title">Briefing</h1><p class="scr-sub">Mission ${pad2(p.num)} · Intel package decrypted</p></div>
       <div class="brief-wrap">
         <article class="panel article holo"><h2 class="ph">Transmission <small>${esc(p.date)}</small></h2>
-          <div class="prose-scroll" id="prose" tabindex="-1">
+          <div class="prose-scroll" id="prose" tabindex="0" data-nav role="region" aria-label="Article: ${esc(p.title)}">
             <h3>${esc(p.title)}</h3>
             <p class="prose-meta">${esc(p.date)} · <i>${TIERS[p.tier]}</i> · est. ${p.mins} min${p.description ? ' · ' + esc(p.description) : ''}</p>
             <div class="prose">${md(p.excerpt)}<p>…</p></div>
             <div class="trunc"><span>[ Transmission truncated ]</span><a class="cta" data-nav href="${esc(url)}" target="_blank" rel="noopener">Continue on maxleiter.com ›</a></div>
           </div></article>
-        <aside class="panel side-stack holo">
+        <div class="panel side-stack holo" role="group" aria-label="Mission summary">
           <div class="shot"><canvas aria-hidden="true"></canvas><div class="shot-cap"><small>Mission ${pad2(p.num)}</small></div></div>
           <div class="side-body">
             <div><span class="lab">Difficulty</span><div class="diff">${[0, 1, 2, 3].map((k) => Art.diffIcon(k <= p.tier, k)).join('')}</div><div class="kv">${TIERS[p.tier]}<small>Est. ${p.mins} min read</small></div></div>
             <div><span class="lab">Objective</span><p class="intel" style="margin:0;font-size:14px">${esc(p.intel)}</p></div>
             <a class="cta ghost" data-nav href="#campaign">‹ Mission select</a>
           </div>
-        </aside>
+        </div>
       </div>`
     },
     after() { const c = $('.screen.active .side-stack canvas'); const slug = decodeURIComponent(location.hash.split('/')[1] || ''); if (c) Art.drawPlate(c, slug || posts[posts.length - 1].slug, 'land') },
+    activate(el) { if (el.id === 'prose') return true },
     vertical(dir) { const el = $('#prose'); if (el) { el.scrollBy({ top: dir * 90, behavior: prefs.motion === 'reduced' ? 'auto' : 'smooth' }); return true } },
     hints: () => [['↑↓', 'Read'], ['←→', 'Choose'], ['↵', 'Open'], ['Esc', 'Back']],
     horizontalMoves: true,
@@ -2919,7 +2946,7 @@ const Art = (() => {
       <div class="film panel holo">
         <div class="film-view">
           <div class="film-frame"><canvas id="film-cv" aria-hidden="true"></canvas><div class="film-hud"><span class="rec"><i></i>Playback</span><span class="tc" id="film-tc">00:00</span><span class="cam">Camera: free · ${esc(n.title)}</span></div></div>
-          <div class="transcript" id="film-tx" aria-live="off"></div>
+          <div class="transcript" id="film-tx" tabindex="0" role="region" aria-label="Transcript"></div>
         </div>
         <div class="timeline">
           <button class="tbtn" data-nav data-act="play" aria-label="Play or pause"><svg viewBox="0 0 14 14" id="play-ico"></svg></button>
@@ -2951,7 +2978,7 @@ const Art = (() => {
     const n = film.n; if (!n) return
     const tx = $('#film-tx'); if (!tx) return
     const k = Math.floor(film.t * n.text.length)
-    tx.innerHTML = `<span style="white-space:pre-wrap">${esc(n.text.slice(0, k))}</span><span class="caret"></span><span class="ghost" style="white-space:pre-wrap">${esc(n.text.slice(k))}</span>`
+    tx.innerHTML = `<span class="sr">${esc(n.text)}</span><span aria-hidden="true"><span style="white-space:pre-wrap">${esc(n.text.slice(0, k))}</span><span class="caret"></span><span class="ghost" style="white-space:pre-wrap">${esc(n.text.slice(k))}</span></span>`
     const pct = (film.t * 100).toFixed(2) + '%'
     $('#film-fill').style.width = pct; $('#film-head').style.left = pct
     $('.track')?.setAttribute('aria-valuenow', Math.round(film.t * 100))
@@ -2995,7 +3022,7 @@ const Art = (() => {
       $('#forge-detail').innerHTML = `
         <h2 class="ph">Object properties <small>ID ${String(Art.hashStr(p.title) % 100000).padStart(5, '0')}</small></h2>
         <div class="forge-view"><canvas id="forge-cv" aria-hidden="true"></canvas><div class="forge-ov"><span>Edit mode · <b>Pivot</b></span><span>Snap 0.25 · Rot 15°</span></div></div>
-        <div class="dmain" style="overflow:auto"><table class="props">
+        <div class="dmain" style="overflow:auto" tabindex="0" role="region" aria-label="Object properties"><table class="props">
           <tr><th>Name</th><td style="font:600 18px/1.2 var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:#fff">${esc(p.title)}</td></tr>
           <tr><th>Category</th><td>${CAT_NAME[p.cat]}</td></tr>
           <tr><th>Description</th><td>${esc(p.description)}</td></tr>
@@ -3022,7 +3049,7 @@ const Art = (() => {
           <div class="list-foot"><span>Ranked: off</span><span>Region: worldwide</span></div></div>
         <div class="panel detail holo" id="mm-detail"></div>
       </div>`,
-    onSel(i) { cancelSearch(); renderPlaylist(i) },
+    onSel(i, el) { if (!el?.matches('.list .li')) return; cancelSearch(); renderPlaylist(i) },
     activate(el) { if (el.dataset.i != null) { startSearch(+el.dataset.i); return true } if (el.dataset.act === 'cancel') { cancelSearch(); renderPlaylist(S.matchmaking.sel); return true } },
     back() { if ($('#mm-detail.searching, #mm-detail.found')) { cancelSearch(); renderPlaylist(S.matchmaking.sel); Sound.blip('back'); return true } },
     leave() { cancelSearch() },
@@ -3042,7 +3069,7 @@ const Art = (() => {
           <div style="display:flex;gap:12px;align-items:center;margin-top:6px"><span class="key">↵</span><span class="lab" style="margin:0">Search for match</span></div>
         </div>
         <div class="search" aria-live="polite">
-          <svg class="spinner" viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" stroke="rgba(150,205,255,.15)"/><circle cx="60" cy="60" r="54" stroke="#c4ecff" stroke-dasharray="60 280" stroke-linecap="square"><animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="1.4s" repeatCount="indefinite"/></circle><circle cx="60" cy="60" r="42" stroke="#ffc46b" stroke-dasharray="20 244" opacity=".8"><animateTransform attributeName="transform" type="rotate" from="360 60 60" to="0 60 60" dur="2.2s" repeatCount="indefinite"/></circle><circle cx="60" cy="60" r="4" fill="#c4ecff" stroke="none"/></svg>
+          <svg class="spinner" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" stroke="rgba(150,205,255,.15)"/><circle class="sp1" cx="60" cy="60" r="54" stroke="#c4ecff" stroke-dasharray="60 280" stroke-linecap="square"/><circle class="sp2" cx="60" cy="60" r="42" stroke="#ffc46b" stroke-dasharray="20 244" opacity=".8"/><circle cx="60" cy="60" r="4" fill="#c4ecff" stroke="none"/></svg>
           <div class="s-status" id="s-status">Searching</div>
           <div class="s-sub" id="s-sub">${esc(w.title)}</div>
           <ul class="s-log" id="s-log"></ul>
@@ -3064,7 +3091,7 @@ const Art = (() => {
         d.classList.remove('searching'); d.classList.add('searching', 'found')
         $('#s-status').textContent = 'Match found'; sub(w.title)
         $('#s-act').innerHTML = `<a class="cta" data-nav href="${esc(w.href)}" target="_blank" rel="noopener">Join game ›</a><button class="cta ghost" data-nav data-act="cancel">Leave</button>`
-        Sound.blip('found'); Nav.refresh(0)
+        Sound.blip('found'); Nav.refresh(navItems().indexOf($('#s-act .cta')))
       }],
     ]
     const speed = prefs.motion === 'reduced' ? 0.3 : 1

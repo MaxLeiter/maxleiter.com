@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Max Leiter — Nightrun</title>
+<meta name="description" content="Max Leiter's site as the main menu of a 2004-era night street-racing game. Blog posts are races, notes are sprints, projects are parts.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#04060c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;1,400&family=Orbitron:wght@500;700;900&family=Russo+One&family=Saira+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>{{CSS}}</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div id="backdrop" aria-hidden="true">
+  <div class="bd-sky"></div><div class="bd-city"></div><div class="bd-neon"></div><div class="bd-floor"></div>
+  <svg class="bd-car" viewBox="0 0 600 200"><defs><linearGradient id="bdp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6b7a"/><stop offset=".45" stop-color="#b3051a"/><stop offset="1" stop-color="#3a0008"/></linearGradient></defs>
+    <ellipse cx="300" cy="182" rx="270" ry="14" fill="#19d9ff" opacity=".55" filter="blur(6px)"/>
+    <path d="M40 150 L60 112 L170 96 L250 58 L390 54 L470 92 L560 108 L572 150 Z" fill="url(#bdp)" stroke="#ffd0d6" stroke-width="2"/>
+    <path d="M262 64 L384 62 L440 94 L208 98 Z" fill="#05070c" stroke="#7f8da3"/>
+    <path d="M520 104 L572 116 L568 128 L520 120Z" fill="#e8f4ff"/><path d="M40 132 L70 128 L70 140 L40 142Z" fill="#ff2a3a"/>
+    <path d="M30 70 L120 66 L124 74 L34 78Z" fill="#14161c"/>
+    <circle cx="150" cy="152" r="34" fill="#0b0c10" stroke="#9aa6b8" stroke-width="5"/><circle cx="462" cy="152" r="34" fill="#0b0c10" stroke="#9aa6b8" stroke-width="5"/>
+    <path d="M100 124 L520 124" stroke="#05070c" stroke-width="6"/></svg>
+</div>
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <filter id="hb1" x="-20%" y="-10%" width="140%" height="120%"><feGaussianBlur stdDeviation="6 0"/></filter>
+  <filter id="hb2" x="-30%" y="-10%" width="160%" height="120%"><feGaussianBlur stdDeviation="16 0"/></filter>
+  <filter id="hb3" x="-40%" y="-10%" width="180%" height="120%"><feGaussianBlur stdDeviation="34 0"/></filter>
+</svg>
+
+<header id="hud" class="hud">
+  <h1 class="sr-only" id="h1">Max Leiter</h1>
+  <div class="plate tz" id="plate"><span class="plate-k" id="crumb-k">MAX LEITER · NIGHTRUN</span><span class="plate-t" id="crumb">Main Menu</span></div>
+  <div class="ring" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <defs><linearGradient id="rch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#8ea0b8"/><stop offset=".5" stop-color="#26303f"/><stop offset=".8" stop-color="#c9d4e4"/><stop offset="1" stop-color="#6d7a8e"/></linearGradient>
+      <radialGradient id="rfa" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#132238"/><stop offset="1" stop-color="#03060c"/></radialGradient></defs>
+      <path class="r-oct" d="M70 8 H130 L192 70 V130 L130 192 H70 L8 130 V70 Z" fill="url(#rfa)" stroke="url(#rch)" stroke-width="6"/>
+      <path class="r-oct2" d="M74 22 H126 L178 74 V126 L126 178 H74 L22 126 V74 Z" fill="none" stroke="#19d9ff" stroke-opacity=".35" stroke-width="1.5"/>
+      <g id="ticks"></g>
+      <path id="r-red" fill="none" stroke="#ff2f4a" stroke-width="7"/>
+      <path id="r-fill" fill="none" stroke="#c6ff1a" stroke-width="4" stroke-linecap="butt"/>
+      <g id="needle"><path d="M100 104 L97 100 L100 30 L103 100 Z" fill="#ff3b2f"/><circle cx="100" cy="100" r="9" fill="#0b0f18" stroke="url(#rch)" stroke-width="3"/></g>
+      <text x="100" y="140" class="r-num" id="r-num">000</text>
+      <text x="100" y="156" class="r-lab" id="r-lab">EVENTS</text>
+      <text x="100" y="74" class="r-x">x1000</text>
+      <rect x="146" y="146" width="26" height="26" class="r-gbox"/><text x="159" y="166" class="r-gear" id="r-gear">N</text>
+    </svg>
+  </div>
+  <button class="snd tz" id="snd" type="button" aria-pressed="false"><span class="snd-i" aria-hidden="true"></span><span>Sound: <b>Off</b></span></button>
+</header>
+
+<main id="content" tabindex="-1">
+  <section class="screen" id="s-title" data-s="title" aria-labelledby="t-h">
+    <h2 class="sr-only" id="t-h">Title screen</h2>
+    <div class="logo" role="img" aria-label="Max Leiter — Nightrun">
+      <svg viewBox="0 0 1000 330" class="logo-svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffffff"/><stop offset=".2" stop-color="#d9e6f7"/><stop offset=".44" stop-color="#7f97b8"/><stop offset=".5" stop-color="#1c2236"/>
+            <stop offset=".53" stop-color="#f2dcb0"/><stop offset=".66" stop-color="#9a7a52"/><stop offset=".82" stop-color="#e8eef8"/><stop offset="1" stop-color="#7c8aa3"/>
+          </linearGradient>
+          <linearGradient id="emb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0a1a33"/><stop offset=".5" stop-color="#0d2c55"/><stop offset="1" stop-color="#05101f"/></linearGradient>
+          <linearGradient id="glint" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+          <filter id="bevel" x="-5%" y="-10%" width="110%" height="130%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" result="b"/>
+            <feSpecularLighting in="b" surfaceScale="6" specularConstant="1.2" specularExponent="24" lighting-color="#ffffff" result="s"><feDistantLight azimuth="235" elevation="40"/></feSpecularLighting>
+            <feComposite in="s" in2="SourceAlpha" operator="in" result="s2"/>
+            <feComposite in="SourceGraphic" in2="s2" operator="arithmetic" k1="0" k2="1" k3=".85" k4="0"/>
+          </filter>
+          <filter id="neon" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <clipPath id="txtclip"><text x="500" y="196" text-anchor="middle" class="lg-txt" textLength="900" lengthAdjust="spacingAndGlyphs" transform="skewX(-12) translate(40 0)">MAX LEITER</text></clipPath>
+        </defs>
+        <g class="lg-emb">
+          <path class="emb-fill" d="M120 70 L900 52 L960 92 L860 236 L60 252 L20 214 Z" fill="url(#emb)"/>
+          <path class="emb-line" pathLength="1" d="M120 70 L900 52 L960 92 L860 236 L60 252 L20 214 Z" fill="none" stroke="#19d9ff" stroke-width="4" filter="url(#neon)"/>
+          <path class="emb-line2" pathLength="1" d="M70 232 L520 224 M560 223 L850 216" fill="none" stroke="#ff2f9a" stroke-width="5" filter="url(#neon)"/>
+          <path d="M40 120 L180 116 M20 150 L130 148 M880 140 L990 138" stroke="#9fdcff" stroke-opacity=".6" stroke-width="3"/>
+        </g>
+        <g class="lg-word">
+          <g transform="skewX(-12) translate(40 0)">
+            <g class="lg-ext">
+              <text x="500" y="196" text-anchor="middle" class="lg-txt" textLength="900" lengthAdjust="spacingAndGlyphs" transform="translate(8 9)" fill="#000">MAX LEITER</text>
+              <text x="500" y="196" text-anchor="middle" class="lg-txt" textLength="900" lengthAdjust="spacingAndGlyphs" transform="translate(6 7)" fill="#07142a">MAX LEITER</text>
+              <text x="500" y="196" text-anchor="middle" class="lg-txt" textLength="900" lengthAdjust="spacingAndGlyphs" transform="translate(4 5)" fill="#0c2246">MAX LEITER</text>
+              <text x="500" y="196" text-anchor="middle" class="lg-txt" textLength="900" lengthAdjust="spacingAndGlyphs" transform="translate(2 2.5)" fill="#143566">MAX LEITER</text>
+            </g>
+            <text x="500" y="196" text-anchor="middle" class="lg-txt lg-neon" textLength="900" lengthAdjust="spacingAndGlyphs" fill="none" stroke="#19d9ff" stroke-width="9" filter="url(#neon)">MAX LEITER</text>
+            <text x="500" y="196" text-anchor="middle" class="lg-txt" textLength="900" lengthAdjust="spacingAndGlyphs" fill="none" stroke="#02040a" stroke-width="5">MAX LEITER</text>
+            <text x="500" y="196" text-anchor="middle" class="lg-txt" textLength="900" lengthAdjust="spacingAndGlyphs" fill="url(#chrome)" filter="url(#bevel)" stroke="#ffffff" stroke-opacity=".5" stroke-width="1">MAX LEITER</text>
+          </g>
+          <g clip-path="url(#txtclip)"><rect class="lg-glint" x="-300" y="40" width="160" height="220" fill="url(#glint)" transform="skewX(-25)"/></g>
+        </g>
+        <g class="lg-sub">
+          <path d="M330 262 L700 262 L684 300 L314 300 Z" fill="#ff2f9a"/>
+          <path d="M330 262 L700 262 L697 269 L327 269 Z" fill="#fff" fill-opacity=".45"/>
+          <text x="507" y="291" text-anchor="middle" class="lg-subtxt">NIGHT · RUN</text>
+          <text x="742" y="292" class="lg-ed">STREET CODE EDITION</text>
+        </g>
+      </svg>
+    </div>
+    <button class="press" id="start" type="button"><span>Press Start</span></button>
+    <p class="t-hint" aria-hidden="true"><span class="k">Enter</span> · tap · <span class="k">Start</span></p>
+    <p class="t-copy">© 2026 Max Leiter. Original art, sound and code. All cars and places are fictional.</p>
+  </section>
+
+  <section class="screen" id="s-menu" data-s="menu" aria-labelledby="m-h">
+    <h2 class="sr-only" id="m-h">Main menu</h2>
+    <nav aria-label="Main menu" class="tz">
+      <ul class="bars">
+{{MENU}}
+      </ul>
+    </nav>
+    <aside class="mdesc tz" aria-live="off"><span class="mdesc-k">MODE INFO</span><p id="mdesc"></p></aside>
+  </section>
+
+  <section class="screen" id="s-career" data-s="career" aria-labelledby="c-h">
+    <h2 class="scr-h" id="c-h">Career <small>{{NPOSTS}} events · {{SPAN}}</small></h2>
+    <div class="col-list tz"><ul class="rows" aria-label="Events, newest first">
+{{CAREER}}
+    </ul></div>
+    <div class="map-wrap"><div class="map">{{MAP}}</div></div>
+    <article class="evcard tz" id="ev-card" aria-label="Event details">
+      <p class="ec-top"><span class="ec-type" id="ec-type">SPRINT</span><span class="ec-dist" id="ec-dist">DOWNTOWN</span></p>
+      <h3 class="ec-t" id="ec-t"></h3>
+      <p class="ec-meta"><span id="ec-date"></span> <span id="ec-stars"></span></p>
+      <p class="ec-intel"><span class="ec-k">INTEL</span> <span id="ec-intel"></span></p>
+      <button type="button" class="go" id="ec-go">Race <span aria-hidden="true">▶</span></button>
+    </article>
+  </section>
+
+  <section class="screen" id="s-quick" data-s="quick" aria-labelledby="q-h">
+    <h2 class="scr-h" id="q-h">Quick Race <small>{{NNOTES}} sprints · notes</small></h2>
+    <div class="col-list wide tz"><ul class="rows" aria-label="Notes, newest first">
+{{QUICK}}
+    </ul></div>
+    <article class="evcard qcard tz" id="qr-card" aria-label="Sprint details">
+      <p class="ec-top"><span class="ec-type">SPRINT</span><span class="ec-dist" id="qc-lap"></span></p>
+      <h3 class="ec-t" id="qc-t"></h3>
+      <p class="ec-meta" id="qc-date"></p>
+      <p class="ec-intel"><span class="ec-k">INTEL</span> <span id="qc-intel"></span></p>
+      <button type="button" class="go" id="qc-go">Go <span aria-hidden="true">▶</span></button>
+    </article>
+  </section>
+
+  <section class="screen" id="s-garage" data-s="garage" aria-labelledby="g-h">
+    <h2 class="scr-h" id="g-h">Garage <small>{{NPARTS}} parts installed</small></h2>
+    <div class="col-list tz"><ul class="rows" aria-label="Parts (projects)">
+{{GARAGE}}
+    </ul></div>
+    <article class="ptcard tz" id="pt-card" aria-label="Part details">
+      <p class="ec-top"><span class="ec-type" id="pc-type"></span><span class="ec-dist" id="pc-paint"></span></p>
+      <h3 class="ec-t" id="pc-t"></h3>
+      <p class="pc-desc" id="pc-desc"></p>
+      <dl class="pc-stats" id="pc-stats"></dl>
+      <p class="ec-meta"><span id="pc-stars"></span></p>
+    </article>
+  </section>
+
+  <section class="screen" id="s-crew" data-s="crew" aria-labelledby="cr-h">
+    <h2 class="scr-h" id="cr-h">Crew <small>Multiplayer · Vercel · {{NCREW}} jobs</small></h2>
+    <ul class="roster tz" aria-label="Crew jobs at Vercel">
+{{CREW}}
+    </ul>
+    <p class="crew-desc tz" id="crew-desc" aria-hidden="true"></p>
+  </section>
+
+  <section class="screen" id="s-profile" data-s="profile" aria-labelledby="p-h">
+    <h2 class="scr-h" id="p-h">Profile <small>Driver card</small></h2>
+    <div class="lic tz">
+      <div class="lic-holo" aria-hidden="true"></div>
+      <p class="lic-k">STREET CIRCUIT · DRIVER LICENSE</p>
+      <div class="lic-photo" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M8 38C8 20 20 8 34 8c13 0 22 10 22 24v8c0 6-4 10-10 10H20l-6-6H8z" fill="#c6ff1a" stroke="#fff" stroke-width="2"/><path d="M26 26h28v10c0 2-2 4-4 4H30c-3 0-4-2-4-4z" fill="#05070c"/><path d="M30 29h20" stroke="#19d9ff" stroke-width="2"/></svg></div>
+      <dl class="lic-f">
+        <div><dt>NAME</dt><dd>MAX LEITER</dd></div>
+        <div><dt>CLASS</dt><dd>S · ENGINEER</dd></div>
+        <div><dt>CREW</dt><dd>VERCEL — v0 · AI SDK</dd></div>
+        <div><dt>LIC NO.</dt><dd>{{LIC}}</dd></div>
+      </dl>
+      <p class="lic-bio">{{BLURB}}</p>
+      <svg class="lic-bar" viewBox="0 0 204 40" aria-hidden="true">{{BARCODE}}</svg>
+    </div>
+    <dl class="pstats tz">
+{{STATS}}
+    </dl>
+    <ul class="contact tz" aria-label="Contact">
+      <li><a class="cbtn" href="{{GITHUB}}" rel="noopener me" target="_blank">GitHub<span class="sr-only"> (opens in a new tab)</span></a></li>
+      <li><a class="cbtn" href="{{X}}" rel="noopener me" target="_blank">X / Twitter<span class="sr-only"> (opens in a new tab)</span></a></li>
+      <li><a class="cbtn" href="https://maxleiter.com">maxleiter.com</a></li>
+    </ul>
+  </section>
+
+  <section class="screen" id="s-options" data-s="options" aria-labelledby="o-h">
+    <h2 class="scr-h" id="o-h">Options <small>Audio · video · motion</small></h2>
+    <div class="opts tz">
+      <div class="opt"><span class="opt-l" id="ol-music">Music</span><button type="button" role="switch" class="sw" id="o-music" aria-checked="false" aria-labelledby="ol-music"><span class="sw-on">On</span><span class="sw-off">Off</span></button></div>
+      <div class="opt"><span class="opt-l" id="ol-sfx">Sound FX</span><button type="button" role="switch" class="sw" id="o-sfx" aria-checked="false" aria-labelledby="ol-sfx"><span class="sw-on">On</span><span class="sw-off">Off</span></button></div>
+      <div class="opt"><label class="opt-l" for="o-vol">Volume</label><input type="range" id="o-vol" min="0" max="10" step="1" value="7"><output for="o-vol" id="o-volv" class="opt-v">7</output></div>
+      <fieldset class="opt"><legend class="opt-l">Motion</legend><div class="seg">
+        <label><input type="radio" name="motion" value="full" checked><span>Full</span></label>
+        <label><input type="radio" name="motion" value="reduced"><span>Reduced</span></label></div></fieldset>
+      <fieldset class="opt"><legend class="opt-l">Quality</legend><div class="seg">
+        <label><input type="radio" name="quality" value="auto" checked><span>Auto</span></label>
+        <label><input type="radio" name="quality" value="low"><span>Low</span></label>
+        <label><input type="radio" name="quality" value="med"><span>Med</span></label>
+        <label><input type="radio" name="quality" value="high"><span>High</span></label></div></fieldset>
+      <p class="opt-info" id="o-info">Renderer: —</p>
+    </div>
+  </section>
+</main>
+
+<footer class="help" id="help">
+  <button type="button" class="hb" id="hb-back"><span class="glyph g-back" aria-hidden="true"></span><span class="key" aria-hidden="true">Esc</span> Back</button>
+  <span class="hb hb-s" aria-hidden="true"><span class="glyph g-ok"></span><span class="key">Enter</span> Select</span>
+  <span class="hb hb-s" aria-hidden="true"><span class="glyph g-dpad"></span><span class="key">↑↓</span> Navigate</span>
+  <span class="hb-pad" id="padstat" aria-hidden="true"></span>
+</footer>
+
+<div id="loading" class="loading" hidden>
+  <div class="ld-lines" aria-hidden="true"></div>
+  <p class="ld-ghost" aria-hidden="true" id="ld-ghost">CAREER</p>
+  <div class="ld-in" role="status">
+    <p class="ld-title"><span>Loading</span> <b id="ld-name">Career</b></p>
+    <div class="ld-bar" aria-hidden="true"><i id="ld-fill"></i></div>
+    <div class="ld-tip"><span class="ld-k">TIP</span><p id="ld-tip">{{TIP0}}</p></div>
+  </div>
+  <svg class="ld-wheel" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#0b0c10" stroke="#9aa6b8" stroke-width="4"/><g stroke="#dfe7f3" stroke-width="5" stroke-linecap="round"><path d="M32 32 L32 10"/><path d="M32 32 L53 25"/><path d="M32 32 L45 50"/><path d="M32 32 L19 50"/><path d="M32 32 L11 25"/></g><circle cx="32" cy="32" r="6" fill="#c6ff1a"/></svg>
+</div>
+
+<dialog id="reader" class="reader" aria-labelledby="rd-t">
+  <div class="rd-in">
+    <p class="rd-k"><span id="rd-kind">Event briefing</span> <span id="rd-meta"></span></p>
+    <h2 class="rd-t" id="rd-t" tabindex="-1"></h2>
+    <div class="rd-body" id="rd-body" tabindex="0" aria-label="Article excerpt"></div>
+    <div class="rd-foot">
+      <a class="go" id="rd-link" href="#">Continue on maxleiter.com <span aria-hidden="true">▶</span></a>
+      <button type="button" class="hb" id="rd-close"><span class="glyph g-back" aria-hidden="true"></span>Back</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="sr-only" aria-live="polite" id="live"></div>
+<div class="fx" aria-hidden="true"></div>
+{{TEMPLATES}}
+<script type="application/json" id="nr-data">{{DATA}}</script>
+<script>{{JS}}</script>
+</body>
+</html>

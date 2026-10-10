@@ -11,7 +11,7 @@ const hash = (s) => { let h = 2166136261; for (const ch of String(s)) { h ^= ch.
 const abs = (h) => (/^https?:/.test(h) ? h : SITE + '/' + String(h).replace(/^\//, ''))
 const year = (d) => +(String(d).match(/\d{4}/) || [0])[0]
 const pad = (n, w = 2) => String(n).padStart(w, '0')
-const plain = (md) => md.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*_`#>]/g, '').replace(/\s+/g, ' ').trim()
+const plain = (md) => md.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*_`#>]/g, '').replace(/\s+/g, ' ').trim()
 const firstSentence = (md) => { const t = plain(md); const m = t.match(/^(.{40,180}?[.!?])(\s|$)/); return m ? m[1] : t.slice(0, 150) + '…' }
 
 // --- tiny markdown -> HTML for excerpts (escape first, then a few inline rules)
@@ -22,7 +22,7 @@ function md(src) {
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/(^|[\s(])_([^_]+)_(?=[\s).,!?:;]|$)/g, '$1<em>$2</em>')
     .replace(/\\`/g, '`')
-  const blocks = src.replace(/\r/g, '').split(/\n{2,}/).map((b) => b.trim()).filter(Boolean)
+  const blocks = src.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\r/g, '').split(/\n{2,}/).map((b) => b.trim()).filter(Boolean)
   const out = blocks.map((b) => {
     if (/^#{1,6}\s/.test(b)) return `<h3>${inline(b.replace(/^#+\s*/, ''))}</h3>`
     const lines = b.split('\n')
@@ -226,7 +226,7 @@ const MENU = [
   ['profile', 'Profile', 'driver card', 'Driver card, career stats computed from the save file, and how to get in touch.'],
   ['options', 'Options', 'a/v · motion', 'Sound, music, motion and render quality.'],
 ]
-const menuList = MENU.map(([id, l, s, d], i) => `<li><a class="bar" href="#${id}" data-go="${id}" data-i="${i}" data-desc="${esc(d)}"><span class="bar-n" aria-hidden="true">${pad(i + 1)}</span><span class="bar-l">${l}</span><span class="bar-s"><span class="sr-only">, </span>${s}</span><span class="bar-chev" aria-hidden="true"></span></a></li>`).join('\n')
+const menuList = MENU.map(([id, l, s, d], i) => `<li><a class="bar" href="#s-${id}" data-go="${id}" data-i="${i}" data-desc="${esc(d)}"><span class="bar-n" aria-hidden="true">${pad(i + 1)}</span><span class="bar-l">${l}</span><span class="bar-s"><span class="sr-only">, </span>${s}</span><svg class="bar-chev" viewBox="0 0 36 20" aria-hidden="true"><path d="M0 0h6l8 10-8 10H0l8-10zM11 0h6l8 10-8 10h-6l8-10zM22 0h6l8 10-8 10h-6l8-10z"/></svg></a></li>`).join('\n')
 
 let html = readFileSync(here('src/index.html'), 'utf8')
 const R = {

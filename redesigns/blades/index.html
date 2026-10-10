@@ -319,7 +319,11 @@ body.pad .padchip { display: flex; }
 /* view transitions: the preview pane morphs into the reader glass */
 ::view-transition-group(glass) { animation-duration: .62s; animation-timing-function: var(--spring); }
 ::view-transition-old(glass), ::view-transition-new(glass) { height: 100%; width: 100%; object-fit: cover; animation-duration: .3s; }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: .35s; }
+/* Only the glass morphs: the root stays out of the transition, so the capture is one element (cheap, and no
+   whole-page crossfade); the backdrop fades on its own. */
+:root { view-transition-name: none; }
+.reader:not([hidden]) .reader-backdrop { animation: rfade .35s ease-out; }
+@keyframes rfade { from { opacity: 0; } }
 
 /* ---------- mobile tabs ---------- */
 .tabs { display: none; }

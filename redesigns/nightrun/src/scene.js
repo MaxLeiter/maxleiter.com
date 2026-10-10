@@ -257,7 +257,7 @@
       tube(G, [ox + 0.7, cy, cz], [ox, cy - 0.8, cz], 0.045, 10 + (i === 2 ? 1 : 0))
     }
     // backing wall for the sign
-    box(G, [-2.6, 3.4, -12.0], [7.0, 6.8, 0.4], 9)
+    box(G, [-2.6, 3.4, -12.0], [7.0, 6.8, 0.4], 6)
     tube(G, [-6.0, 6.6, -11.75], [0.8, 6.6, -11.75], 0.04, 12)
     // sodium lamp posts
     for (const x of [-12, 12, 20, -21]) {
@@ -284,11 +284,11 @@ float fbm(vec2 p){ float s=0., a=.5; for(int i=0;i<4;i++){ s+=a*vn(p); p=p*2.03+
 uniform vec3 uGlow;
 vec3 env(vec3 d){
   float el=d.y, az=atan(d.x,-d.z);
-  vec3 c=mix(vec3(.012,.01,.03), vec3(.16,.05,.22), exp(-abs(el)*5.));
+  vec3 c=mix(vec3(.006,.005,.015), vec3(.08,.025,.11), exp(-abs(el)*5.));
   c+=vec3(.35,.14,.05)*exp(-abs(el-.02)*22.);
   // distant city glow band with lit windows
   float band=step(-.01,el)*step(el,.06+.07*h21(vec2(floor(az*22.),3.)));
-  c+=band*(vec3(.05,.04,.07)+vec3(.9,.6,.3)*step(.72,h21(floor(vec2(az*260.,el*120.))))*.6);
+  c+=band*(vec3(.03,.025,.05)+vec3(.9,.6,.3)*step(.8,h21(floor(vec2(az*90.,el*50.))))*.18);
   if(el>0.){
     vec2 p=d.xz/max(d.y,.04)*4.2;
     float s1=smoothstep(.16,.07,abs(abs(p.x)-1.1))*smoothstep(3.2,2.7,abs(p.y));
@@ -297,8 +297,9 @@ vec3 env(vec3 d){
   }
   // wall softbox band + broken strip lights at eye level
   float seg=step(.25,fract(az*3.1831));
-  c+=vec3(.85,.9,1.)*2.2*smoothstep(.035,.0,abs(el-.17))*seg;
-  c+=vec3(.5,.6,.9)*.5*smoothstep(.12,.0,abs(el-.17));
+  float pan=smoothstep(.0,.04,el)*smoothstep(.26,.16,el)*step(.16,fract(az*1.9+.62));
+  c+=vec3(.8,.86,1.)*1.5*pan;
+  c+=vec3(.85,.9,1.)*2.4*smoothstep(.02,.0,abs(el-.075))*seg;
   c+=vec3(.9,.95,1.)*1.6*smoothstep(.02,.0,abs(el-.32))*step(.5,fract(az*1.2+.2));
   // neon pillars
   c+=vec3(1.,.12,.55)*6.*smoothstep(.025,.0,abs(az+.9))*step(-.03,el)*step(el,.7);
@@ -315,21 +316,22 @@ uniform mat4 uVP, uM; out vec3 vW, vN, vO; out float vM;
 void main(){ vO=aP; vec4 w=uM*vec4(aP,1.); vW=w.xyz; vN=mat3(uM)*aN; vM=aM; gl_Position=uVP*w; }`
   const MESH_FS = HDR + NOISE + ENV + `
 in vec3 vW, vN, vO; in float vM; out vec4 o;
-uniform vec3 uEye, uPaintA, uPaintB, uVinA, uVinB; uniform float uSweep, uFlip, uTime, uIsCar;
+uniform vec3 uEye, uPaintA, uPaintB, uVinA, uVinB; uniform float uSweep, uFlip, uTime, uIsCar, uDbg;
 vec3 Lp[4]; vec3 Lc[4];
 float aces1(float x){return x;}
 void main(){
   int m=int(vM+.5);
   vec3 N=normalize(vN);
-  vec3 fn=normalize(cross(dFdx(vW),dFdy(vW)))*uFlip;
-  bool back=dot(fn,N)<0.;
+  vec3 V0=normalize(uEye-vW);
+  vec3 fn=N;
+  bool back=dot(N,V0)<-.08;
   if(uIsCar>.5 && m==0){
     vec2 w1=vec2(vO.z-1.32,vO.y-.345), w2=vec2(vO.z+1.38,vO.y-.345);
     if(abs(vO.x)>.6 && (length(w1)<.405 || length(w2)<.405)) discard;
     if(back){ o=vec4(.004,.004,.006,1.); return; }
   }
-  if(back) N=-N;
-  vec3 V=normalize(uEye-vW);
+  vec3 V=V0;
+  if(dot(N,V)<0.) N=normalize(N-V*dot(N,V)*1.02);
   Lp[0]=vec3(0.,5.2,0.); Lc[0]=vec3(1.,1.,1.1)*2.2;
   Lp[1]=vec3(-6.,3.,-4.5); Lc[1]=vec3(1.,.15,.6)*3.2;
   Lp[2]=vec3(6.6,3.,-6.6); Lc[2]=vec3(.15,.7,1.)*3.2;
@@ -343,20 +345,21 @@ void main(){
     base=nw?uPaintB:uPaintA; vec3 vin=nw?uVinB:uVinA;
     // vinyl: twin hood/roof stripes + slashing side graphic
     float top=smoothstep(.45,.6,N.y);
-    float stripe=top*step(abs(abs(vO.x)-.2),.075)*step(abs(abs(vO.x)-.2),.075);
+    float sd0=abs(abs(vO.x)-.2)-.075; float aw=fwidth(vO.x)*1.2+1e-4; float stripe=top*(1.-smoothstep(-aw,aw,sd0));
     float side=smoothstep(.55,.75,abs(N.x));
     float zz=vO.z+.9;
     float sl=0.;
-    for(int i=0;i<3;i++){ float fi=float(i); float y0=.42+fi*.075+zz*.07;
-      float taper=smoothstep(-2.2,.6,vO.z-fi*.35)*smoothstep(1.9,.9,vO.z-fi*.2);
-      sl=max(sl,step(abs(vO.y-y0),.022*taper)); }
+    for(int i=0;i<3;i++){ float fi=float(i); float y0=.40+fi*.085+zz*.075;
+      float taper=smoothstep(-2.3,.2,vO.z-fi*.3)*smoothstep(1.7,.7,vO.z-fi*.25);
+      float dd=abs(vO.y-y0)-.028*taper; float aa=fwidth(vO.y)*1.2+1e-4;
+      sl=max(sl,(1.-smoothstep(-aa,aa,dd))*step(.05,taper)); }
     float vmask=max(stripe,side*sl);
     base=mix(base,vin,vmask);
     metal=.25; gloss=60.; coat=1.;
     if(uSweep<.999) E+=vec3(.9,.95,1.)*4.*smoothstep(.06,0.,abs(vO.z-zb));
     // flakes
     float fl=h21(floor(vO.xy*420.)+floor(vO.z*420.));
-    base*=.9+.2*fl;
+    base*=.95+.1*fl;
     // panel seams
     float seam=side*(smoothstep(.006,.0,abs(vO.z-.78))+smoothstep(.006,.0,abs(vO.z+.62)))*step(vO.y,.8);
     base*=1.-seam*.85;
@@ -377,7 +380,7 @@ void main(){
     // grille + side intake
     if(vO.z>2.1 && vO.y<.37 && ax<.62){ base=vec3(.008); coat=.4; float hx=step(.5,fract(vO.x*30.+step(.5,fract(vO.y*30.))*.5)); base+=hx*.01; }
     if(side>.5 && vO.z>-1.05 && vO.z<-.6 && vO.y>.42 && vO.y<.64 && vO.y-.42<(vO.z+1.05)*.6){ base=vec3(.006); coat=.3; }
-  } else if(m==1){ base=vec3(.004,.006,.01); coat=1.6; gloss=200.; col+=env(reflect(-V,N))*.06;
+  } else if(m==1){ base=vec3(.004,.006,.01); coat=.85; gloss=200.; col+=env(reflect(-V,N))*.06;
   } else if(m==2){ base=vec3(.025); gloss=12.; metal=0.; float lt=step(abs(length(vec2(vO.z-sign(vO.z)*1.35,vO.y-.345))-.29),.006)*step(.9,abs(N.x)); base+=lt*.15;
   } else if(m==3){ base=vec3(.75,.77,.8); metal=1.; gloss=120.;
   } else if(m==6){ base=vec3(.018); gloss=40.; coat=.25;
@@ -385,19 +388,20 @@ void main(){
   } else if(m==8){ base=vec3(.7,.06,.04); gloss=80.; coat=.6;
   } else if(m==9){ float n=fbm(vW.xy*1.3+vW.zx*.9); base=vec3(.045,.045,.05)*(.6+.8*n); gloss=8.;
     base*=1.-.5*smoothstep(1.2,0.,vW.y)*0.;
-  } else if(m==10){ E=vec3(1.,.1,.55)*9.;
-  } else if(m==11){ E=vec3(.1,.72,1.)*9.;
+  } else if(m==10){ E=vec3(1.,.1,.55)*6.5;
+  } else if(m==11){ E=vec3(.1,.72,1.)*6.5;
   } else if(m==12){ E=vec3(1.,.5,.12)*8.;
   } else if(m==13){ E=vec3(.95,.97,1.)*12.;
   }
+  vec3 dD=vec3(0.),dS=vec3(0.);
   if(m<7||m==8||m==9){
     for(int i=0;i<4;i++){
       vec3 L=Lp[i]-vW; float d2=dot(L,L); L=normalize(L);
       float att=1./(1.+d2*.03);
       float nl=max(dot(N,L),0.);
       vec3 Hh=normalize(L+V);
-      float sp=pow(max(dot(N,Hh),0.),gloss)*(gloss+8.)/25.;
-      col+=Lc[i]*att*(base*nl*(1.-metal)*(m==0?.32:1.)+sp*mix(vec3(.04),base,metal));
+      float sp=pow(max(dot(N,Hh),0.),gloss)*(gloss+8.)/25.*(uIsCar>.5?1.:.18);
+      col+=Lc[i]*att*(base*nl*(1.-metal)*(m==0?.32:1.)+sp*mix(vec3(.04),base,metal)); dD+=Lc[i]*att*base*nl; dS+=Lc[i]*att*sp*.04;
     }
     // underglow bounce from the floor
     float ug=max(-N.y,0.)*1.4+.35*(1.-smoothstep(.1,.6,vW.y));
@@ -411,6 +415,12 @@ void main(){
   }
   col+=E;
   if(uFlip<0.) col*=.75;
+  if(uDbg>.5&&uDbg<1.5) col=vec3(m==9?1.:0., m==6?1.:0., m>=10?1.:0.);
+  if(uDbg>1.5&&uDbg<2.5) col=vec3(NdV, back?1.:0., dot(fn,normalize(vN))*.5+.5);
+  if(uDbg>2.5&&uDbg<3.5) col=dD*10.;
+  if(uDbg>3.5&&uDbg<4.5) col=dS*10.;
+  if(uDbg>4.5&&uDbg<5.5) col=E+vec3(base);
+  if(uDbg>5.5) col=vec3(0.);
   o=vec4(col,1.);
 }`
   const FLOOR_VS = HDR + `
@@ -488,7 +498,7 @@ void main(){
   float rs=mix(.25,1.,puddle);
   col+=R*mix(.22,1.,F)*rs*1.25;
   col+=E;
-  col=mix(col,vec3(.03,.015,.05),1.-exp(-max(dist-12.,0.)*.03));
+  col=mix(col,vec3(.012,.006,.016),1.-exp(-max(dist-12.,0.)*.035));
   o=vec4(col,1.);
 }`
   const SKY_VS = HDR + `
@@ -503,7 +513,7 @@ vec4 city(float az, float y, float K, float hmin, float hmax, float seed, float 
   float hh=hmin+(hmax-hmin)*pow(h1,1.6);
   if(fx<wpad||fx>1.-wpad) hh=hmin*.6+(hmax-hmin)*.2*h21(vec2(id,seed+9.));
   if(y>hh) return vec4(0.);
-  vec3 c=vec3(.012,.012,.02);
+  vec3 c=vec3(.004,.004,.008);
   // windows
   vec2 wg=vec2((fx-wpad)/(1.-2.*wpad)*(6.+floor(h21(vec2(id,seed+4.))*6.)), y*1.6);
   vec2 wi=floor(wg), wf=fract(wg);
@@ -523,16 +533,16 @@ vec4 city(float az, float y, float K, float hmin, float hmax, float seed, float 
 void main(){
   vec3 d=normalize(vW-vec3(0.,1.5,0.));
   float az=atan(vW.x,-vW.z); float y=vW.y;
-  vec3 sky=mix(vec3(.07,.025,.09),vec3(.004,.004,.012),smoothstep(0.,22.,y));
-  sky+=vec3(.4,.12,.06)*exp(-max(y,0.)*.35)*.22;
+  vec3 sky=mix(vec3(.022,.009,.03),vec3(.0015,.0015,.005),smoothstep(0.,20.,y));
+  sky+=vec3(.3,.09,.05)*exp(-max(y,0.)*.4)*.09;
   float cl=fbm(vec2(az*3.,y*.12)+vec2(uTime*.004,0.));
-  sky+=vec3(.12,.04,.14)*smoothstep(.45,.85,cl)*smoothstep(4.,18.,y)*.7;
+  sky+=vec3(.05,.018,.06)*smoothstep(.45,.85,cl)*smoothstep(4.,18.,y)*.7;
   vec3 col=sky;
   vec4 far=city(az,y,90.,3.,14.,1.,.55);
   if(far.a>0.) col=mix(far.rgb,sky,.45);
   vec4 nr=city(az+.013,y,46.,1.,22.,7.,1.);
   if(nr.a>0.) col=mix(nr.rgb,sky*.6,.22);
-  col=mix(col,vec3(.07,.03,.06),exp(-max(y,0.)*.6)*.5);
+  col=mix(col,vec3(.03,.012,.03),exp(-max(y,0.)*.6)*.5);
   o=vec4(col,1.);
 }`
   const RAIN_VS = HDR + `
@@ -554,8 +564,8 @@ void main(){
   c.xy+=perp*aC.y*c.w*.9;
   gl_Position=c;
   float dcam=c0.w;
-  vA=(1.-aC.x)*(.09+.08*aS.w)*smoothstep(.5,2.5,dcam)*smoothstep(30.,8.,dcam);
-  vec3 lit=vec3(.35,.4,.55)+vec3(1.,.4,.8)*1.2*exp(-dot(p.xz-vec2(-6.,-4.6),p.xz-vec2(-6.,-4.6))/10.)
+  vA=(1.-aC.x)*(.05+.06*aS.w)*smoothstep(.5,2.5,dcam)*smoothstep(30.,8.,dcam);
+  vec3 lit=vec3(.22,.25,.35)+vec3(1.,.4,.8)*1.2*exp(-dot(p.xz-vec2(-6.,-4.6),p.xz-vec2(-6.,-4.6))/10.)
     +vec3(.3,.8,1.)*1.2*exp(-dot(p.xz-vec2(6.6,-6.7),p.xz-vec2(6.6,-6.7))/10.)
     +vec3(1.)*1.6*exp(-dot(p.xz,p.xz)/6.)*step(p.y,5.2);
   vCol=lit;
@@ -581,7 +591,7 @@ void main(){ vW=aP; vN=aN; gl_Position=uVP*vec4(aP,1.); }`
 void main(){ vec3 V=normalize(uEye-vW); float f=abs(dot(normalize(vN),V)); f=pow(f,3.);
   float h=smoothstep(0.,1.5,vW.y)*smoothstep(5.2,3.5,vW.y);
   float n=.75+.5*fbm(vec2(atan(vW.x,vW.z)*3.,vW.y*.5-uTime*.6));
-  o=vec4(vec3(.55,.62,.85)*f*h*n*.11,1.); }`
+  float top=smoothstep(0.,5.,vW.y); o=vec4(vec3(.55,.62,.85)*f*h*n*(.015+.05*top*top),1.); }`
   const FS_VS = HDR + `out vec2 vUV; void main(){ vec2 p=vec2((gl_VertexID<<1)&2, gl_VertexID&2); vUV=p; gl_Position=vec4(p*2.-1.,0.,1.); }`
   const DOWN_FS = HDR + `in vec2 vUV; out vec4 o; uniform sampler2D uT; uniform vec2 uTx; uniform float uThr;
 void main(){ vec3 c=vec3(0.);
@@ -612,13 +622,14 @@ void main(){
   vec3 st=vec3(0.);
   for(int i=-7;i<=7;i++){ float w=exp(-abs(float(i))*.35); st+=texture(uSmall,uv+vec2(float(i)*.018,0.)).rgb*w; }
   vec3 dirt=texture(uDirt,uv).rgb;
-  col+=b*.3+b*dirt*1.1+st*vec3(.35,.55,1.)*.04;
+  if(uDim<0.) b=vec3(0.);
+  col+=b*.2+b*dirt*.6+st*vec3(.35,.55,1.)*.03;
   col=aces(col*1.05);
   col=pow(col,vec3(1./2.2));
   col=mix(col,col*vec3(.92,1.,1.08),.5);
   float vg=smoothstep(1.05,.25,length(c*vec2(1.15,1.)));
   col*=mix(.45,1.,vg);
-  col*=1.-uDim;
+  col*=1.-max(uDim,0.);
   col+=(h(uv*uRes+fract(uTime*7.3)*91.)-.5)*uGrain;
   o=vec4(col,1.);
 }`
@@ -797,21 +808,22 @@ void main(){
 
   // ---------------------------------------------------------------- shots
   const SHOTS = {
-    title: { r: 7.6, h: 1.25, yaw: 0.55, ty: 0.5, fov: 34, sx: 0, sy: 0.42, tx: 0 },
+    title: { r: 9.6, h: 1.1, yaw: 0.95, ty: 0.75, fov: 34, sx: 0, sy: 0.17, tx: 0 },
     menu: { r: 8.4, h: 1.45, yaw: 0.42, ty: 0.55, fov: 33, sx: -0.3, sy: 0.02, tx: 0 },
-    garage: { r: 6.0, h: 1.3, yaw: 0.25, ty: 0.55, fov: 32, sx: -0.3, sy: 0.12, tx: 0 },
+    garage: { r: 9.4, h: 1.7, yaw: 0.3, ty: 0.45, fov: 32, sx: -0.32, sy: -0.3, tx: 0 },
     side: { r: 8.4, h: 2.4, yaw: 0.85, ty: 0.6, fov: 34, sx: -0.62, sy: 0.25, tx: 0 },
     reader: { r: 9.5, h: 1.2, yaw: 1.2, ty: 1.2, fov: 40, sx: 0, sy: 0, tx: 0 },
   }
   const SHOTS_M = {
     title: { r: 7.6, h: 1.4, yaw: 0.55, ty: 0.55, fov: 58, sx: 0, sy: 0.5, tx: 0 },
-    menu: { r: 7.2, h: 1.7, yaw: 0.42, ty: 0.5, fov: 54, sx: 0, sy: -0.48, tx: 0 },
-    garage: { r: 6.6, h: 1.6, yaw: 0.3, ty: 0.5, fov: 52, sx: 0, sy: -0.52, tx: 0 },
+    menu: { r: 9.6, h: 1.7, yaw: 0.42, ty: 0.5, fov: 54, sx: 0, sy: -0.5, tx: 0 },
+    garage: { r: 10.5, h: 2.0, yaw: 0.3, ty: 0.5, fov: 52, sx: 0, sy: -0.62, tx: 0 },
     side: { r: 8.2, h: 2.5, yaw: 0.85, ty: 0.6, fov: 56, sx: 0, sy: -0.55, tx: 0 },
     reader: { r: 9.5, h: 1.2, yaw: 1.2, ty: 1.2, fov: 60, sx: 0, sy: 0, tx: 0 },
   }
   S.custom = function (o) { SHOTS.custom = SHOTS_M.custom = o; st.shot = 'custom'; st.cam = Object.assign({}, o) }
   S.setAngle = function (a) { st.ang = a }
+  const dbg = {}; S.dbg = (o) => Object.assign(dbg, o)
   S.setShot = function (name, snap) {
     st.shot = name
     if (snap || !st.cam) st.cam = Object.assign({}, curShot())
@@ -843,7 +855,7 @@ void main(){
   S.info = () => ({ scale: st.scale, w: RW, h: RH, hdr: hdrOK, msaa: st.msaa })
 
   // ---------------------------------------------------------------- frame
-  S.frame = function (t, dt, realDt) {
+  S.frame = function (t, dt, realDt, draw) {
     if (!gl) return
     st.t = t
     // dynamic resolution
@@ -867,6 +879,7 @@ void main(){
     if (!st.reduced) st.ang += dt * st.spin
     if (st.sweep < 1) st.sweep = Math.min(1, st.sweep + dt / 0.85)
     for (let i = 0; i < 3; i++) st.glow[i] += (st.glowT[i] - st.glow[i]) * Math.min(1, dt * 3)
+    if (draw === false) return
     const c = st.cam, asp = RW / RH
     // handheld sway (off under reduced motion)
     const sw = st.reduced ? 0 : 1
@@ -909,9 +922,9 @@ void main(){
     // additive volumetrics
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE); gl.depthMask(false)
     gl.useProgram(P.cone.p); gl.uniformMatrix4fv(P.cone.u.uVP, false, VP); gl.uniform3fv(P.cone.u.uEye, eye); gl.uniform1f(P.cone.u.uTime, t)
-    gl.bindVertexArray(M.cone.vao); gl.drawArrays(gl.TRIANGLES, 0, M.cone.n)
+    if (!dbg.nocone) { gl.bindVertexArray(M.cone.vao); gl.drawArrays(gl.TRIANGLES, 0, M.cone.n) }
     drawStreaks(VP)
-    if (st.rainOn) {
+    if (st.rainOn && !dbg.norain) {
       gl.useProgram(P.rain.p); const ru = P.rain.u
       gl.uniformMatrix4fv(ru.uVP, false, VP); gl.uniform1f(ru.uTime, st.reduced ? 0 : t)
       gl.uniform2f(ru.uPx, 1.6 / RW, 1.6 / RH); gl.uniform3f(ru.uBox, 11, 6, 9)
@@ -937,7 +950,7 @@ void main(){
     for (let i = T.bloom.length - 1; i > 0; i--) {
       const s = T.bloom[i], d = T.bloom[i - 1]
       gl.bindFramebuffer(gl.FRAMEBUFFER, d.f); gl.viewport(0, 0, d.w, d.h)
-      gl.bindTexture(gl.TEXTURE_2D, s.t); gl.uniform1i(P.up.u.uT, 0); gl.uniform2f(P.up.u.uTx, 1 / s.w, 1 / s.h); gl.uniform1f(P.up.u.uK, 0.62)
+      gl.bindTexture(gl.TEXTURE_2D, s.t); gl.uniform1i(P.up.u.uT, 0); gl.uniform2f(P.up.u.uTx, 1 / s.w, 1 / s.h); gl.uniform1f(P.up.u.uK, i > 3 ? 0.3 : 0.5)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
     }
     gl.disable(gl.BLEND)
@@ -949,7 +962,7 @@ void main(){
     gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, T.bloom[3].t); gl.uniform1i(pu.uSmall, 2)
     gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, T.dirt); gl.uniform1i(pu.uDirt, 3)
     gl.uniform1f(pu.uTime, t); gl.uniform1f(pu.uCA, st.reduced ? 0 : 0.028); gl.uniform1f(pu.uGrain, st.reduced ? 0 : 0.045)
-    gl.uniform1f(pu.uDim, st.dim); gl.uniform2f(pu.uRes, W, H)
+    gl.uniform1f(pu.uDim, dbg.nobloom ? -1 : st.dim); gl.uniform2f(pu.uRes, W, H)
     gl.uniform4fv(pu.uRects, st.rects); gl.uniform1i(pu.uNR, st.nrect)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
     gl.activeTexture(gl.TEXTURE0)
@@ -968,9 +981,9 @@ void main(){
     gl.uniformMatrix4fv(u.uVP, false, VP); gl.uniform3fv(u.uEye, eye); gl.uniform1f(u.uFlip, flip); gl.uniform1f(u.uTime, st.t)
     gl.uniform3fv(u.uGlow, st.glow)
     gl.uniform3fv(u.uPaintA, st.paintA); gl.uniform3fv(u.uPaintB, st.paintB); gl.uniform3fv(u.uVinA, st.vinA); gl.uniform3fv(u.uVinB, st.vinB)
-    gl.uniform1f(u.uSweep, st.sweep)
+    gl.uniform1f(u.uSweep, st.sweep); gl.uniform1f(u.uDbg, dbg.mat || 0)
     gl.uniformMatrix4fv(u.uM, false, ID); gl.uniform1f(u.uIsCar, 0)
-    gl.bindVertexArray(M.props.vao); gl.drawArrays(gl.TRIANGLES, 0, M.props.n)
+    if (!dbg.noprops) { gl.bindVertexArray(M.props.vao); gl.drawArrays(gl.TRIANGLES, 0, M.props.n) }
     gl.uniformMatrix4fv(u.uM, false, carM); gl.uniform1f(u.uIsCar, 1)
     gl.bindVertexArray(M.car.vao); gl.drawArrays(gl.TRIANGLES, 0, M.car.n)
   }

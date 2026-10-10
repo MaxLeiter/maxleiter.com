@@ -87,7 +87,7 @@
     out = out.replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     out = out.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, (_, t, h) => `<a href="${fullUrl(h.replace(/&amp;/g, '&')).replace(/"/g, '&quot;')}" target="_blank" rel="noopener">${t}</a>`)
     out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    out = out.replace(/~([^~\s][^~]*)~/g, '<del>$1</del>')
+    out = out.replace(/(^|\s)~([^~\s][^~\n]{0,30}?)~(?=[\s.,!?:;]|$)/g, '$1<del>$2</del>')
     out = out.replace(/(^|[\s(])[_*]([^_*\n]+)[_*](?=[\s).,!?:;]|$)/g, '$1<em>$2</em>')
     return out
   }
@@ -229,23 +229,24 @@
       <div class="scr-head holo"><h1 class="scr-title">Briefing</h1><p class="scr-sub">Mission ${pad2(p.num)} · Intel package decrypted</p></div>
       <div class="brief-wrap">
         <article class="panel article holo"><h2 class="ph">Transmission <small>${esc(p.date)}</small></h2>
-          <div class="prose-scroll" id="prose" tabindex="-1">
+          <div class="prose-scroll" id="prose" tabindex="0" data-nav role="region" aria-label="Article: ${esc(p.title)}">
             <h3>${esc(p.title)}</h3>
             <p class="prose-meta">${esc(p.date)} · <i>${TIERS[p.tier]}</i> · est. ${p.mins} min${p.description ? ' · ' + esc(p.description) : ''}</p>
             <div class="prose">${md(p.excerpt)}<p>…</p></div>
             <div class="trunc"><span>[ Transmission truncated ]</span><a class="cta" data-nav href="${esc(url)}" target="_blank" rel="noopener">Continue on maxleiter.com ›</a></div>
           </div></article>
-        <aside class="panel side-stack holo">
+        <div class="panel side-stack holo" role="group" aria-label="Mission summary">
           <div class="shot"><canvas aria-hidden="true"></canvas><div class="shot-cap"><small>Mission ${pad2(p.num)}</small></div></div>
           <div class="side-body">
             <div><span class="lab">Difficulty</span><div class="diff">${[0, 1, 2, 3].map((k) => Art.diffIcon(k <= p.tier, k)).join('')}</div><div class="kv">${TIERS[p.tier]}<small>Est. ${p.mins} min read</small></div></div>
             <div><span class="lab">Objective</span><p class="intel" style="margin:0;font-size:14px">${esc(p.intel)}</p></div>
             <a class="cta ghost" data-nav href="#campaign">‹ Mission select</a>
           </div>
-        </aside>
+        </div>
       </div>`
     },
     after() { const c = $('.screen.active .side-stack canvas'); const slug = decodeURIComponent(location.hash.split('/')[1] || ''); if (c) Art.drawPlate(c, slug || posts[posts.length - 1].slug, 'land') },
+    activate(el) { if (el.id === 'prose') return true },
     vertical(dir) { const el = $('#prose'); if (el) { el.scrollBy({ top: dir * 90, behavior: prefs.motion === 'reduced' ? 'auto' : 'smooth' }); return true } },
     hints: () => [['↑↓', 'Read'], ['←→', 'Choose'], ['↵', 'Open'], ['Esc', 'Back']],
     horizontalMoves: true,
@@ -290,7 +291,7 @@
       <div class="film panel holo">
         <div class="film-view">
           <div class="film-frame"><canvas id="film-cv" aria-hidden="true"></canvas><div class="film-hud"><span class="rec"><i></i>Playback</span><span class="tc" id="film-tc">00:00</span><span class="cam">Camera: free · ${esc(n.title)}</span></div></div>
-          <div class="transcript" id="film-tx" aria-live="off"></div>
+          <div class="transcript" id="film-tx" tabindex="0" role="region" aria-label="Transcript"></div>
         </div>
         <div class="timeline">
           <button class="tbtn" data-nav data-act="play" aria-label="Play or pause"><svg viewBox="0 0 14 14" id="play-ico"></svg></button>
@@ -366,7 +367,7 @@
       $('#forge-detail').innerHTML = `
         <h2 class="ph">Object properties <small>ID ${String(Art.hashStr(p.title) % 100000).padStart(5, '0')}</small></h2>
         <div class="forge-view"><canvas id="forge-cv" aria-hidden="true"></canvas><div class="forge-ov"><span>Edit mode · <b>Pivot</b></span><span>Snap 0.25 · Rot 15°</span></div></div>
-        <div class="dmain" style="overflow:auto"><table class="props">
+        <div class="dmain" style="overflow:auto" tabindex="0" role="region" aria-label="Object properties"><table class="props">
           <tr><th>Name</th><td style="font:600 18px/1.2 var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:#fff">${esc(p.title)}</td></tr>
           <tr><th>Category</th><td>${CAT_NAME[p.cat]}</td></tr>
           <tr><th>Description</th><td>${esc(p.description)}</td></tr>
@@ -393,7 +394,7 @@
           <div class="list-foot"><span>Ranked: off</span><span>Region: worldwide</span></div></div>
         <div class="panel detail holo" id="mm-detail"></div>
       </div>`,
-    onSel(i) { cancelSearch(); renderPlaylist(i) },
+    onSel(i, el) { if (!el?.matches('.list .li')) return; cancelSearch(); renderPlaylist(i) },
     activate(el) { if (el.dataset.i != null) { startSearch(+el.dataset.i); return true } if (el.dataset.act === 'cancel') { cancelSearch(); renderPlaylist(S.matchmaking.sel); return true } },
     back() { if ($('#mm-detail.searching, #mm-detail.found')) { cancelSearch(); renderPlaylist(S.matchmaking.sel); Sound.blip('back'); return true } },
     leave() { cancelSearch() },
@@ -413,7 +414,7 @@
           <div style="display:flex;gap:12px;align-items:center;margin-top:6px"><span class="key">↵</span><span class="lab" style="margin:0">Search for match</span></div>
         </div>
         <div class="search" aria-live="polite">
-          <svg class="spinner" viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" stroke="rgba(150,205,255,.15)"/><circle cx="60" cy="60" r="54" stroke="#c4ecff" stroke-dasharray="60 280" stroke-linecap="square"><animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="1.4s" repeatCount="indefinite"/></circle><circle cx="60" cy="60" r="42" stroke="#ffc46b" stroke-dasharray="20 244" opacity=".8"><animateTransform attributeName="transform" type="rotate" from="360 60 60" to="0 60 60" dur="2.2s" repeatCount="indefinite"/></circle><circle cx="60" cy="60" r="4" fill="#c4ecff" stroke="none"/></svg>
+          <svg class="spinner" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" stroke="rgba(150,205,255,.15)"/><circle class="sp1" cx="60" cy="60" r="54" stroke="#c4ecff" stroke-dasharray="60 280" stroke-linecap="square"/><circle class="sp2" cx="60" cy="60" r="42" stroke="#ffc46b" stroke-dasharray="20 244" opacity=".8"/><circle cx="60" cy="60" r="4" fill="#c4ecff" stroke="none"/></svg>
           <div class="s-status" id="s-status">Searching</div>
           <div class="s-sub" id="s-sub">${esc(w.title)}</div>
           <ul class="s-log" id="s-log"></ul>
@@ -435,7 +436,7 @@
         d.classList.remove('searching'); d.classList.add('searching', 'found')
         $('#s-status').textContent = 'Match found'; sub(w.title)
         $('#s-act').innerHTML = `<a class="cta" data-nav href="${esc(w.href)}" target="_blank" rel="noopener">Join game ›</a><button class="cta ghost" data-nav data-act="cancel">Leave</button>`
-        Sound.blip('found'); Nav.refresh(0)
+        Sound.blip('found'); Nav.refresh(navItems().indexOf($('#s-act .cta')))
       }],
     ]
     const speed = prefs.motion === 'reduced' ? 0.3 : 1

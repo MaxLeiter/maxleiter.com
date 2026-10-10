@@ -16,7 +16,7 @@ const total = {}
 for (const flag of [true, false]) {
   const b = await chromium.launch({ args: flag ? [...GL, '--enable-blink-features=CanvasDrawElement'] : GL })
   for (const s of states) {
-    const p = await b.newPage({ viewport: { width: s.w || 1280, height: s.h || 720 } })
+    const p = await b.newPage({ viewport: { width: s.w || 1280, height: s.h || 720 } }); p.setDefaultTimeout(240000)
     await p.goto(base + s.q); await p.waitForTimeout(s.wait || 900)
     await p.addScriptTag(AXE ? { path: AXE } : { url: 'https://cdn.jsdelivr.net/npm/axe-core@4.10.2/axe.min.js' })
     const r = await p.evaluate(async () => {
