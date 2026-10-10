@@ -606,7 +606,7 @@ function tileLayout(k, portrait) {
   }
   return portrait
     ? { x: -(n * 3.75 + f * 2.3), z: -(n * 2.2 + f * 1.4), ry: n * .5, a: clamp(1 - ak / 2.2, 0, 1) }
-    : { x: -(n * 3.4 + f * 1.8), z: -(n * 2.4 + f * 1.4), ry: n * .55, a: clamp(1 - ak * .62, 0, 1) * .8 };
+    : { x: -(n * 3.6 + f * 1.8), z: -(n * 2.8 + f * 1.4), ry: n * .6, a: clamp(1 - ak * .7, 0, 1) * .5 };
 }
 function rowLayout(d) {
   const ad = Math.abs(d);
@@ -617,19 +617,20 @@ function framing(vp) {
   if (vp.portrait) {
     const fov = 50 * PI / 180, t = Math.tan(fov / 2), D = (1.6 / .86) / (t * vp.asp), visH = 2 * D * t;
     const ly = -.12 * visH;
-    return { fov, D, eye: [0, ly + 1.15, D], at: [0, ly, 0], avatar: [1.15, FLOOR_Y, 2.35] };
+    return { fov, D, eye: [0, ly + 1.6, D], at: [0, ly, 0], floorY: -2.5, avatar: [1.0, -2.5, 1.3] };
   }
   const fov = 34 * PI / 180, t = Math.tan(fov / 2);
   const frac = vp.asp > 2 ? .34 : vp.asp > 1.5 ? .4 : .46;
   const D = (1.6 / frac) / (t * vp.asp), visW = 2 * D * t * vp.asp, visH = 2 * D * t;
   const lx = (vp.asp > 1.3 ? .1 : .06) * visW, ly = -.05 * visH;
-  return { fov, D, eye: [lx - .4, ly + 1.1, D], at: [lx, ly, 0], avatar: [3.05, FLOOR_Y, 2.1] };
+  return { fov, D, eye: [lx - .4, ly + 1.1, D], at: [lx, ly, 0], floorY: FLOOR_Y, avatar: [3.75, FLOOR_Y, 2.5] };
 }
 function panelRect(vp) {
   if (vp.portrait || vp.w < 700) { const w = vp.w - 20, h = vp.h - 96; return { w, h, x: (vp.w - w) / 2, y: (vp.h - h) / 2 + 22 }; }
   const w = Math.min(980, vp.w * .78), h = Math.min(vp.h * .82, 820); return { w, h, x: (vp.w - w) / 2, y: (vp.h - h) / 2 + 10 };
 }
 const OPEN_Z = 2.5, OPEN_D = 5.0;
+let floorY = FLOOR_Y;
 function curItem() { return CH[S.chan].items[S.idx[S.chan]]; }
 
 /* ---------------------------------------------------------------------
@@ -782,10 +783,10 @@ function createGLRenderer(canvas) {
       col+=envMap(R)*Fe*1.1;
       // chromatic sweep
       if(uSweep>0.&&uSweep<1.){
-        float d=vUV.x*.85+(1.-vUV.y)*.5; float p=mix(-.5,1.9,uSweep); float w=.055;
+        float d=vUV.x*.85+(1.-vUV.y)*.5; float p=mix(-.5,1.9,uSweep); float w=.04;
         vec3 band=vec3(exp(-pow((d-p+.035)/w,2.)),exp(-pow((d-p)/w,2.)),exp(-pow((d-p-.035)/w,2.)));
         float wide=exp(-pow((d-p)/.22,2.));
-        col+=(band*1.6+wide*.22)*(1.-uSweep*.4);
+        col+=(band*.9+wide*.16)*(1.-uSweep*.4)*smoothstep(0.,.08,uSweep);
       }
       float sd=rsd(vL.xy,uHalf,uRad);
       col+=vec3(.8,.9,1.)*smoothstep(-.045,-.008,sd)*(.10+uFocus*.5);
@@ -850,8 +851,8 @@ function createGLRenderer(canvas) {
     oV=vec4((cc.xy-pc.xy/pc.w)*.5,0.,1.);
     if(uRefl>.5) oC.a=1.;
   }`;
-  const VS_FLOOR = HEAD + `layout(location=0) in vec3 aPos; uniform mat4 uVP,uPrevVP; out vec3 vW; out vec4 vCur; out vec4 vPrev;
-  void main(){vW=aPos;vCur=uVP*vec4(aPos,1.);vPrev=uPrevVP*vec4(aPos,1.);gl_Position=vCur;}`;
+  const VS_FLOOR = HEAD + `layout(location=0) in vec3 aPos; uniform mat4 uVP,uPrevVP; uniform float uFloorY; out vec3 vW; out vec4 vCur; out vec4 vPrev;
+  void main(){vec3 aP=aPos+vec3(0.,uFloorY,0.);vW=aP;vCur=uVP*vec4(aP,1.);vPrev=uPrevVP*vec4(aP,1.);gl_Position=vCur;}`;
   const FS_FLOOR = HEAD + COMMON + OUT + `
   in vec3 vW; uniform sampler2D uReflT; uniform vec2 uRes; uniform vec4 uShadow[10]; uniform int uNShadow; uniform vec3 uAvatar;
   float hash2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -970,7 +971,7 @@ function createGLRenderer(canvas) {
   const torusProf = (R0, r, n) => { const a = []; for (let i = 0; i <= n; i++) { const t = i / n * 2 * PI; a.push([R0 + Math.cos(t) * r, Math.sin(t) * r]); } return a; };
   const G = {
     tile: vao(roundedBox(TILE_W, TILE_H, TILE_D, TILE_R, 8)),
-    floor: vao([-300, FLOOR_Y, -300, 300, FLOOR_Y, 40, 300, FLOOR_Y, -300, -300, FLOOR_Y, -300, -300, FLOOR_Y, 40, 300, FLOOR_Y, 40], 3),
+    floor: vao([-300, 0, -300, 300, 0, 40, 300, 0, -300, -300, 0, -300, -300, 0, 40, 300, 0, 40], 3),
   };
   G.glow = vao([-2.4, -1.7, 0, 0, 0, 1, 0, 0, 0, 2.4, -1.7, 0, 0, 0, 1, 0, 0, 0, 2.4, 1.7, 0, 0, 0, 1, 0, 0, 0, -2.4, -1.7, 0, 0, 0, 1, 0, 0, 0, 2.4, 1.7, 0, 0, 0, 1, 0, 0, 0, -2.4, 1.7, 0, 0, 0, 1, 0, 0, 0]);
   const AVM = {
@@ -1079,10 +1080,9 @@ function createGLRenderer(canvas) {
   function setCommon(p, refl, camPos, vp, pvp) {
     const u = p.u; gl.useProgram(p.p);
     gl.uniform3fv(u.uCam, camPos); gl.uniform3fv(u.uSpotPos, SPOT.pos); gl.uniform3fv(u.uSpotDir, SPOT.dir); gl.uniform3fv(u.uSpotCol, SPOT.col); gl.uniform1f(u.uSpotCos, SPOT.cos);
-    gl.uniform3fv(u.uAccent, accent.v); gl.uniform1f(u.uTime, S.t); gl.uniform1f(u.uFloorY, FLOOR_Y); gl.uniform1f(u.uRefl, refl ? 1 : 0);
+    gl.uniform3fv(u.uAccent, accent.v); gl.uniform1f(u.uTime, S.t); gl.uniform1f(u.uFloorY, floorY); gl.uniform1f(u.uRefl, refl ? 1 : 0);
     if (u.uVP && vp) gl.uniformMatrix4fv(u.uVP, false, vp); if (u.uPrevVP && pvp) gl.uniformMatrix4fv(u.uPrevVP, false, pvp);
   }
-  const REFLECT = M4.trs(0, 2 * FLOOR_Y, 0, 0, 0, 0, 1, -1, 1);
 
   // the drawable list for this frame (computed once, drawn twice: reflection + main)
   function buildDrawList(vp, fr) {
@@ -1181,7 +1181,7 @@ function createGLRenderer(canvas) {
   function frame(dt, vpInfo) {
     frameNo++;
     resize();
-    const fr = Object.assign({}, framing(vpInfo));
+    const fr = Object.assign({}, framing(vpInfo)); floorY = fr.floorY;
     const asp = W / H;
     // camera targets
     const oe = easeIO(S.openT);
@@ -1192,7 +1192,7 @@ function createGLRenderer(canvas) {
     const drift = reduced ? [0, 0] : [Math.sin(S.t * .21) * .07, Math.sin(S.t * .17) * .05];
     const par = reduced ? [0, 0] : [S.mx * .35, -S.my * .18];
     const be = [fr.eye[0] + drift[0] + par[0], fr.eye[1] + drift[1] + par[1], fr.eye[2]], ba = fr.at;
-    const oeye = [0, -pcy, OPEN_Z + OPEN_D], oat = [0, -pcy, OPEN_Z];
+    const oeye = [0, pcy, OPEN_Z + OPEN_D], oat = [0, pcy, OPEN_Z];
     cam.eye.t = [lerp(be[0], oeye[0], oe), lerp(be[1], oeye[1], oe), lerp(be[2], oeye[2], oe)];
     cam.at.t = [lerp(ba[0], oat[0], oe), lerp(ba[1], oat[1], oe), lerp(ba[2], oat[2], oe)];
     if (reduced && S.intro === 0) { cam.eye.snap(cam.eye.v.map((_, i) => cam.eye.s[i].t)); cam.at.snap(cam.at.v.map((_, i) => cam.at.s[i].t)); }
@@ -1215,11 +1215,12 @@ function createGLRenderer(canvas) {
     const list = buildDrawList(vp, fr);
     // shadows from current-row tiles
     const sh = new Float32Array(40); let ns = 0;
-    for (const d of list) { if (ns >= 10 || d.a < .1 || d.isOpen) continue; const ty = d.y; const t = (FLOOR_Y - ty) / SPOT.dir[1]; sh.set([d.x + SPOT.dir[0] * t * .35, d.z + SPOT.dir[2] * t * .35 - .2, TILE_W * .5 * Math.abs(Math.cos(d.ry)) * d.sx + .1, d.a * .9], ns * 4); ns++; }
+    for (const d of list) { if (ns >= 10 || d.a < .1 || d.isOpen) continue; const ty = d.y; const t = (floorY - ty) / SPOT.dir[1]; sh.set([d.x + SPOT.dir[0] * t * .35, d.z + SPOT.dir[2] * t * .35 - .2, TILE_W * .5 * Math.abs(Math.cos(d.ry)) * d.sx + .1, d.a * .9], ns * 4); ns++; }
     fr.shadows = sh; fr.nShadow = ns;
     // reflection pass
+    const REFLECT = M4.trs(0, 2 * floorY, 0, 0, 0, 0, 1, -1, 1);
     const rvp = M4.mul(vp, REFLECT), rpvp = M4.mul(pvp, REFLECT);
-    const reye = [eye[0], 2 * FLOOR_Y - eye[1], eye[2]];
+    const reye = [eye[0], 2 * floorY - eye[1], eye[2]];
     gl.bindFramebuffer(gl.FRAMEBUFFER, T.reflF); gl.viewport(0, 0, T.rw, T.rh);
     gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     drawScene(list, true, rvp, rpvp, reye, fr);
@@ -1255,6 +1256,7 @@ function createGLRenderer(canvas) {
     // bookkeeping
     lastVP = vp; firstFrame = false;
     prevModels.clear(); for (const d of list) prevModels.set(d.key, d.m);
+    for (const ci of [S.chan + 1, S.chan - 1]) if (CH[ci]) CH[ci].items.slice(Math.max(0, S.idx[ci] - 1), S.idx[ci] + 5).forEach(it => { if (!covers.has(it.id) && !queue.includes(it)) queue.push(it); });
     pumpCovers(frameNo < 3 ? 400 : 7);
     // screen info for HUD
     const proj = (x, y, z) => { const c = M4.xf(vp, x, y, z); return [(c[0] / c[3] * .5 + .5) * vpInfo.w, (1 - (c[1] / c[3] * .5 + .5)) * vpInfo.h]; };
@@ -1357,14 +1359,14 @@ function updateHUD(rect, vp) {
     let y = anchorY + yy - big * .5;
     if (vp.portrait) y = (rect ? rect.y : vp.h * .3) - big * 1.25 + yy;
     c.el.style.transform = `translate3d(${x0}px,${y}px,0) scale(${sc})`;
-    c.el.style.opacity = vp.portrait && dd < -.5 ? 0 : (vp.portrait && dd > .5 ? op * .8 : op);
+    c.el.style.opacity = vp.portrait ? clamp(1 - ad * 1.6, 0, 1) : op;
     c.el.style.pointerEvents = ad < 2.5 ? 'auto' : 'none';
   });
   // caption under the focused tile
   if (rect) {
     capEl.style.transform = `translate3d(${vp.portrait ? 16 : rect.x + 4}px,${rect.y + rect.h + (vp.portrait ? 18 : 22)}px,0)`;
     capEl.style.opacity = 1 - S.openT * 3;
-    capEl.style.width = vp.portrait ? (vp.w - 32) + 'px' : Math.min(560, Math.max(380, rect.w * 1.1)) + 'px';
+    capEl.style.width = vp.portrait ? (vp.w * .6) + 'px' : Math.min(560, Math.max(380, rect.w * 1.1)) + 'px';
   }
   if (capEl._for !== it) { capEl._for = it; capEl.querySelector('.k').textContent = [KIND_LABEL[it.kind], it.date || it.site].filter(Boolean).join('  ·  '); capEl.querySelector('.t').textContent = it.title; capEl.querySelector('.d').textContent = it.desc || plain(it.excerpt).slice(0, 160); }
   // pips
@@ -1415,7 +1417,7 @@ function openItem() {
   returnFocus = document.activeElement;
   const vp = viewport(); const pr = panelRect(vp); R.prepareBack(it, pr.w / pr.h);
   reader.hidden = false;
-  reader.querySelector('.bar .k').innerHTML = `${esc(CH[S.chan].name)}<em>${esc([KIND_LABEL[it.kind], it.date].filter(Boolean).join(' · '))}</em>`;
+  reader.querySelector('.bar .k').innerHTML = `${esc(CH[S.chan].name)}<em>${esc([KIND_LABEL[it.kind] !== CH[S.chan].name.replace(/s$/, '') ? KIND_LABEL[it.kind] : '', it.date || it.site].filter(Boolean).join(' · '))}</em>`;
   $('#r-title').textContent = it.title;
   const desc = reader.querySelector('.desc'); desc.textContent = it.desc; desc.hidden = !it.desc;
   const body = it.excerpt ? md(it.excerpt.trim()) : `<p>${esc(it.desc)}</p>`;
@@ -1518,7 +1520,7 @@ async function boot() {
   let last = performance.now(); S.t = 0;
   setTimeout(() => { if (av()) av().wave = S.t; }, 900);
   const loop = now => {
-    let dt = (now - last) / 1000; last = now; dt = clamp(dt, 0, QS.has('shot') ? .5 : .1);
+    let dt = (now - last) / 1000; last = now; dt = clamp(dt, 0, QS.has('shot') ? .5 : .1); if (window.__ch.fixedDt) dt = window.__ch.fixedDt;
     S.t += dt;
     pollPad(now);
     S.chanS.step(dt); S.rowS.forEach(s => s.step(dt));
