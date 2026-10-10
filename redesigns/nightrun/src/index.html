@@ -36,7 +36,7 @@
 <header id="hud" class="hud">
   <h1 class="sr-only" id="h1">Max Leiter</h1>
   <div class="plate tz" id="plate"><span class="plate-k" id="crumb-k">MAX LEITER · NIGHTRUN</span><span class="plate-t" id="crumb">Main Menu</span></div>
-  <div class="ring" aria-hidden="true">
+  <div class="ring tz" aria-hidden="true">
     <svg viewBox="0 0 200 200">
       <defs><linearGradient id="rch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#8ea0b8"/><stop offset=".5" stop-color="#26303f"/><stop offset=".8" stop-color="#c9d4e4"/><stop offset="1" stop-color="#6d7a8e"/></linearGradient>
       <radialGradient id="rfa" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#132238"/><stop offset="1" stop-color="#03060c"/></radialGradient></defs>
@@ -58,7 +58,7 @@
 <main id="content" tabindex="-1">
   <section class="screen" id="s-title" data-s="title" aria-labelledby="t-h">
     <h2 class="sr-only" id="t-h">Title screen</h2>
-    <div class="logo" role="img" aria-label="Max Leiter — Nightrun">
+    <div class="logo tz" role="img" aria-label="Max Leiter — Nightrun">
       <svg viewBox="0 0 1000 330" class="logo-svg" aria-hidden="true">
         <defs>
           <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
@@ -104,9 +104,9 @@
         </g>
       </svg>
     </div>
-    <button class="press" id="start" type="button"><span>Press Start</span></button>
-    <p class="t-hint" aria-hidden="true"><span class="k">Enter</span> · tap · <span class="k">Start</span></p>
-    <p class="t-copy">© 2026 Max Leiter. Original art, sound and code. All cars and places are fictional.</p>
+    <button class="press tz" id="start" type="button"><span>Press Start</span></button>
+    <p class="t-hint tz" aria-hidden="true"><span class="k">Enter</span> · tap · <span class="k">Start</span></p>
+    <p class="t-copy tz">© 2026 Max Leiter. Original art, sound and code. All cars and places are fictional.</p>
   </section>
 
   <section class="screen" id="s-menu" data-s="menu" aria-labelledby="m-h">
@@ -116,15 +116,15 @@
 {{MENU}}
       </ul>
     </nav>
-    <aside class="mdesc tz" aria-live="off"><span class="mdesc-k">MODE INFO</span><p id="mdesc"></p></aside>
+    <div class="mdesc tz"><span class="mdesc-k">MODE INFO</span><p id="mdesc"></p></div>
   </section>
 
   <section class="screen" id="s-career" data-s="career" aria-labelledby="c-h">
-    <h2 class="scr-h" id="c-h">Career <small>{{NPOSTS}} events · {{SPAN}}</small></h2>
+    <h2 class="scr-h tz" id="c-h">Career <small>{{NPOSTS}} events · {{SPAN}}</small></h2>
     <div class="col-list tz"><ul class="rows" aria-label="Events, newest first">
 {{CAREER}}
     </ul></div>
-    <div class="map-wrap"><div class="map">{{MAP}}</div></div>
+    <div class="map-wrap tz"><div class="map">{{MAP}}</div></div>
     <article class="evcard tz" id="ev-card" aria-label="Event details">
       <p class="ec-top"><span class="ec-type" id="ec-type">SPRINT</span><span class="ec-dist" id="ec-dist">DOWNTOWN</span></p>
       <h3 class="ec-t" id="ec-t"></h3>
@@ -135,7 +135,7 @@
   </section>
 
   <section class="screen" id="s-quick" data-s="quick" aria-labelledby="q-h">
-    <h2 class="scr-h" id="q-h">Quick Race <small>{{NNOTES}} sprints · notes</small></h2>
+    <h2 class="scr-h tz" id="q-h">Quick Race <small>{{NNOTES}} sprints · notes</small></h2>
     <div class="col-list wide tz"><ul class="rows" aria-label="Notes, newest first">
 {{QUICK}}
     </ul></div>
@@ -149,7 +149,7 @@
   </section>
 
   <section class="screen" id="s-garage" data-s="garage" aria-labelledby="g-h">
-    <h2 class="scr-h" id="g-h">Garage <small>{{NPARTS}} parts installed</small></h2>
+    <h2 class="scr-h tz" id="g-h">Garage <small>{{NPARTS}} parts installed</small></h2>
     <div class="col-list tz"><ul class="rows" aria-label="Parts (projects)">
 {{GARAGE}}
     </ul></div>
@@ -163,7 +163,7 @@
   </section>
 
   <section class="screen" id="s-crew" data-s="crew" aria-labelledby="cr-h">
-    <h2 class="scr-h" id="cr-h">Crew <small>Multiplayer · Vercel · {{NCREW}} jobs</small></h2>
+    <h2 class="scr-h tz" id="cr-h">Crew <small>Multiplayer · Vercel · {{NCREW}} jobs</small></h2>
     <ul class="roster tz" aria-label="Crew jobs at Vercel">
 {{CREW}}
     </ul>
@@ -171,7 +171,7 @@
   </section>
 
   <section class="screen" id="s-profile" data-s="profile" aria-labelledby="p-h">
-    <h2 class="scr-h" id="p-h">Profile <small>Driver card</small></h2>
+    <h2 class="scr-h tz" id="p-h">Profile <small>Driver card</small></h2>
     <div class="lic tz">
       <div class="lic-holo" aria-hidden="true"></div>
       <p class="lic-k">STREET CIRCUIT · DRIVER LICENSE</p>
@@ -196,7 +196,7 @@
   </section>
 
   <section class="screen" id="s-options" data-s="options" aria-labelledby="o-h">
-    <h2 class="scr-h" id="o-h">Options <small>Audio · video · motion</small></h2>
+    <h2 class="scr-h tz" id="o-h">Options <small>Audio · video · motion</small></h2>
     <div class="opts tz">
       <div class="opt"><span class="opt-l" id="ol-music">Music</span><button type="button" role="switch" class="sw" id="o-music" aria-checked="false" aria-labelledby="ol-music"><span class="sw-on">On</span><span class="sw-off">Off</span></button></div>
       <div class="opt"><span class="opt-l" id="ol-sfx">Sound FX</span><button type="button" role="switch" class="sw" id="o-sfx" aria-checked="false" aria-labelledby="ol-sfx"><span class="sw-on">On</span><span class="sw-off">Off</span></button></div>
@@ -214,7 +214,7 @@
   </section>
 </main>
 
-<footer class="help" id="help">
+<footer class="help tz" id="help">
   <button type="button" class="hb" id="hb-back"><span class="glyph g-back" aria-hidden="true"></span><span class="key" aria-hidden="true">Esc</span> Back</button>
   <span class="hb hb-s" aria-hidden="true"><span class="glyph g-ok"></span><span class="key">Enter</span> Select</span>
   <span class="hb hb-s" aria-hidden="true"><span class="glyph g-dpad"></span><span class="key">↑↓</span> Navigate</span>

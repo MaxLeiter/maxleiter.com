@@ -810,12 +810,12 @@ void main(){
   const SHOTS = {
     title: { r: 9.6, h: 1.1, yaw: 0.95, ty: 0.75, fov: 34, sx: 0, sy: 0.17, tx: 0 },
     menu: { r: 8.4, h: 1.45, yaw: 0.42, ty: 0.55, fov: 33, sx: -0.3, sy: 0.02, tx: 0 },
-    garage: { r: 9.4, h: 1.7, yaw: 0.3, ty: 0.45, fov: 32, sx: -0.32, sy: -0.3, tx: 0 },
+    garage: { r: 10.8, h: 1.75, yaw: 0.3, ty: 0.45, fov: 32, sx: -0.4, sy: -0.4, tx: 0 },
     side: { r: 8.4, h: 2.4, yaw: 0.85, ty: 0.6, fov: 34, sx: -0.62, sy: 0.25, tx: 0 },
     reader: { r: 9.5, h: 1.2, yaw: 1.2, ty: 1.2, fov: 40, sx: 0, sy: 0, tx: 0 },
   }
   const SHOTS_M = {
-    title: { r: 7.6, h: 1.4, yaw: 0.55, ty: 0.55, fov: 58, sx: 0, sy: 0.5, tx: 0 },
+    title: { r: 10.5, h: 1.3, yaw: 0.95, ty: 0.7, fov: 56, sx: 0, sy: 0.02, tx: 0 },
     menu: { r: 9.6, h: 1.7, yaw: 0.42, ty: 0.5, fov: 54, sx: 0, sy: -0.5, tx: 0 },
     garage: { r: 10.5, h: 2.0, yaw: 0.3, ty: 0.5, fov: 52, sx: 0, sy: -0.62, tx: 0 },
     side: { r: 8.2, h: 2.5, yaw: 0.85, ty: 0.6, fov: 56, sx: 0, sy: -0.55, tx: 0 },

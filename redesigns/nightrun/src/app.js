@@ -332,6 +332,7 @@
     else if (k === 'ArrowLeft' && !inRange && !inRadio) { e.preventDefault(); move(-1, 'x') }
     else if (k === 'Escape' || (k === 'Backspace' && !inRange)) { e.preventDefault(); back() }
     else if (k === ' ' && t && t.matches('a')) { e.preventDefault(); activate() }
+    else if (k === 'Enter' && (!t || t === document.body || t.id === 'content')) { e.preventDefault(); activate() }
   })
 
   // ---------------------------------------------------------------- gamepad
@@ -391,12 +392,13 @@
   let frameN = 0, lastReal = performance.now()
   function tick(dt, realDt, draw) {
     clock.t += dt
+    const sdt = Math.min(dt, 0.05)
     runJobs()
     pollPad(dt)
-    gaugeStep(dt)
+    gaugeStep(sdt)
     if (glOK) {
       if (frameN % 10 === 0) textRects()
-      NRScene.frame(clock.t, dt, realDt, draw)
+      NRScene.frame(clock.t, sdt, realDt, draw)
       if (cur === 'options' && frameN % 30 === 0) { const i = NRScene.info(); $('#o-info').textContent = `Renderer: WebGL2 · ${i.hdr ? 'HDR 16F' : 'LDR'} · MSAA ${i.msaa}× · ${i.w}×${i.h} (${Math.round(i.scale * 100)}%)` }
     }
     frameN++
@@ -405,7 +407,7 @@
   addEventListener('resize', () => { if (glOK) { NRScene.resize(); NRScene.setShot(SCREENS[cur] ? SCREENS[cur].shot : 'title') } })
   function raf(now) {
     const realDt = now - lastReal; lastReal = now
-    tick(Math.min(0.05, realDt / 1000), realDt)
+    tick(Math.min(0.5, realDt / 1000), realDt)
     requestAnimationFrame(raf)
   }
   // deterministic capture hook: the page only advances when told to
@@ -428,6 +430,9 @@
   if (SCREENS[start]) { show(start, { sel: +(Q.get('i') || 0), silent: true }) } else show('title', { silent: true })
   if (Q.get('open') === '1' && (cur === 'career' || cur === 'quick')) { busy = false; openReader(cur === 'career' ? 'post' : 'note', SCREENS[cur].sel) }
   if (glOK) NRScene.setShot(SCREENS[cur].shot, true)
+  // focus can be refused while the font stylesheet still blocks rendering; retry once laid out
+  const refocus = () => { if (cur !== 'title' && !reader.open && (document.activeElement === document.body || !document.activeElement)) select(SCREENS[cur].sel, { focus: true, quiet: true }) }
+  addEventListener('load', refocus); later(50, refocus)
   if (!CAPTURE) requestAnimationFrame(raf)
   else tick(0, 0)
   window.NRApp = { show, select, go, openReader, back, move, clock, get cur() { return cur } }

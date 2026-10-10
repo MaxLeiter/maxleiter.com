@@ -283,7 +283,7 @@
     crumb: (a) => `Theater › <b>${esc((notes.find((n) => n.slug === a) || notes[0]).title)}</b>`,
     html: (slug) => {
       const n = notes.find((x) => x.slug === slug) || notes[0]
-      film.n = n; film.t = 0; film.playing = prefs.motion !== 'reduced'; film.speed = 1
+      film.n = n; film.t = prefs.motion === 'reduced' ? 1 : 0; film.playing = prefs.motion !== 'reduced'; film.speed = 1
       const paras = n.text.split(/\n\n+/); let acc = 0
       const ticks = paras.slice(0, -1).map((p) => { acc += p.length + 2; return acc / n.text.length })
       return `

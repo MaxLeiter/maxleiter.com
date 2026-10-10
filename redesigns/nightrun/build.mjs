@@ -125,7 +125,7 @@ const calls = []
 const crew = crewSrc.map((c, i) => {
   const w = c.title.split(/\s+/).filter((x) => !STOP.has(x.toLowerCase()))
   let cs = w[0].length > 8 ? w[0] : w.slice(0, 2).join(' ')
-  if (calls.includes(cs.toUpperCase())) cs = w.slice(0, 3).join(' ')
+  if (calls.includes(cs.toUpperCase())) cs += ` '${String(year(c.date)).slice(2)}`
   cs = cs.toUpperCase(); calls.push(cs)
   const h = hash(c.title)
   const y = year(c.date)
