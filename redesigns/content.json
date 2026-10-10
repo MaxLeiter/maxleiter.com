@@ -1,0 +1,415 @@
+{
+  "site": {
+    "name": "Max Leiter",
+    "url": "https://maxleiter.com",
+    "github": "https://github.com/maxleiter",
+    "x": "https://twitter.com/maxleiter",
+    "blurb": "Software engineer at Vercel working on v0 and the AI SDK. Writes about the web, Linux, tooling and AI."
+  },
+  "posts": [
+    {
+      "slug": "embedding-emoji-search",
+      "type": "post",
+      "title": "You don't need Jev for good emoji search",
+      "description": "or: semantic emoji search with embeddings",
+      "date": "Sep 26, 2026",
+      "href": "/blog/embedding-emoji-search",
+      "excerpt": "There's been a lot of [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) hype lately, and for good reason.\nIt's largely novel (to most developers, at least), super cheap, and there's a lot of cool use cases for it.\n\nThe issue I see is a lot of people are seeing Jev as a hammer, and lots of _classification_ tasks as nails.\nYou want to use Jev when you need some LLM reasoning behind the decision.\n\nFor example, take this tweet:\n\n\n\nTo be clear, I don't intend to pick on Gergely or Linear. But I think this is a miss on both their parts.\n\nTwo years ago, I built semantic emoji search but with no LLM and just embeddings. And it was faster, cheaper, and occasionally better than Jev (\"pareto-mogged\", as the kids say).\n\nNow, to [Gergely's point](https://x.com/GergelyOrosz/status/2103873821908353260?s=20), setting up a database and embedding model or an embedding provider are more work than just using Jev.\nAnd two years ago I would have gladly used Jev instead of working with Opus 3/GPT-4-turbo to scrape all of Vercel's slack emojis and get this working.\n\nBut it's not two years ago and models are now more than\ncapable of autonomously doing the work for you.\n\n\nAn aside on scr"
+    },
+    {
+      "slug": "thank-u-next",
+      "type": "post",
+      "title": "thank u, next",
+      "description": "Replacing Next.js with a vibe-coded \"framework",
+      "date": "Sept 1, 2026",
+      "href": "/blog/thank-u-next",
+      "excerpt": "![The cover of Ariana Grande's album Thank U, Next: the title repeated in many fonts on a pink background](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/thank-u-next/thank-u-next.png)\n\n\n  If you're wondering about this post's title:\n  https://en.wikipedia.org/wiki/Thank_U,_Next\n\n\nThere's been a lot of talk about custom / personal software and LLMs lately. I've been a huge fan -- I'm writing this in a [markdown editor](https://github.com/MaxLeiter/md-viewer) I made for myself. And lately I've been toying with thoughts about the future of frameworks. A nice intersection of the two seemed like a personal framework.\n\nSo as of September 1st, this website is no longer running on Next.js. Instead, it's built by a bespoke custom framework that Fable architected and Opus implemented. If this were a commercial project, I'd probably stay on Next[^1], but it's not, so 🤷\n\nThis site is overall [pretty simple](/blog/build-a-blog-with-nextjs-13) - it's fully static and compiled to HTML at build time. But it has a lot of React and non-trivial build-time processing like [MDX](https://mdxjs.com/). I gave Fable 5 (in the claude code CLI) the following:\n\n> i am curious about on-demand c"
+    },
+    {
+      "slug": "xios",
+      "type": "post",
+      "title": "Running Wayland, X11, GNOME, and KDE natively on an iPad",
+      "description": "X11 on iOS attempt 2: electric boogaloo hardware-accelerated Wayland edition",
+      "date": "Jul 28, 2026",
+      "href": "/blog/xios",
+      "excerpt": "I [like](https://knightos.org) [running](https://maxleiter.com/blog/MSHW0184) [software](https://maxleiter.com/x11) on devices that aren't \"supposed\" to run it.\n\nI own the hardware. I should control the software. And for _reasons_, Apple makes phenomenal hardware and operating systems, but locks them down.\n\nI've been bitter for a long time. Six years ago, when I should’ve been studying for finals, I [ported X11](https://maxleiter.com/x11) to my jailbroken iPad because I wanted to try using it as a \"real\" personal computer:\n\n\n\nThat first version worked, but also sucked: the X server ran on the iPad, but I used a VNC client to interact with it and a lot of\nsoftware did not compile. I was using vim and xterm and it looked like something from the 90s.\n\nWith more experience, and with LLMs, I was able to get significantly further.\n\nThere is a \"slop wiki\" available at https://xios.maxleiter.com with more information, and the code is on [GitHub](https://github.com/MaxLeiter/jailbreak/tree/main/x11/).\n\nSome screenshots:\n\n\n  \n  \n  \n  \n\n\n### X11\n\nIf you're unfamiliar with X11, this post assumes a basic understanding, but TL;DR: it’s a window server and protocol that\nmany devices use. It descr"
+    },
+    {
+      "slug": "weights",
+      "type": "post",
+      "title": "They're Made Out of Weights",
+      "description": "with apologies to Terry Bisson",
+      "date": "Jun 3, 2026",
+      "href": "/blog/weights",
+      "excerpt": "_After Terry Bisson's [\"They're Made Out of Meat\"](https://web.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html)._\n\n\"They're made out of weights.\"\n\n\"Weights?\"\n\n\"Weights. Floating-point numbers. We checked the whole thing through. It's nothing but weights.\"\n\n\"Weights doing what? Where do the words come from?\"\n\n\"The weights make the words. Are you understanding me? We opened it up. There's no dictionary in there, no grammar rules, no little man. Just weights. Eighty layers of numbers getting multiplied together.\"\n\n\"That's ridiculous. It wrote my performance review last week. It softened the tone unprompted. You're telling me multiplication did that?\"\n\n\"Matrix multiplication did that. The numbers go in one end, the phrasing comes out the other.\"\n\n\"So there's a language module somewhere. A reasoning unit bolted on.\"\n\n\"No module. No unit. We looked. The reasoning is the weights. The weights are the reasoning.\"\n\n\"Spare me. Nobody writes a eulogy with linear algebra.\"\n\n\"It doesn't write eulogies, technically. It predicts the next token. Then the next one. The eulogy is a side effect.\"\n\n\"A side effect. You're asking me to believe in sentient weights.\"\n\n\"I'm not asking you, I'm "
+    },
+    {
+      "slug": "sandcastle",
+      "type": "post",
+      "title": "Sandcastle: A web-based Linux desktop environment",
+      "description": "",
+      "date": "Feb 11, 2026",
+      "href": "/blog/sandcastle",
+      "excerpt": "![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/sandcastle/header.png)\n\nSix years ago, while I should have been studying for finals, I patched and compiled X11 (and all its dependencies)\nto [run on a jailbroken iPad](https://maxleiter.com/blog/X11). I wanted to run real applications on my tablet.\n\nI've spent the last few ~months~ ~weeks~ ~days~ hours ~building~ vibecoding something that feels like a better solution:\na Linux desktop environment, on the web. I wrote zero lines of code.\n\nYou can try it out [here](https://sandcastle-os.vercel.app), and the source is available [here](https://github.com/vercel-labs/sandcastle).\n\n\n  If you're familiar with Desktop Environments and Linux, you can [skip the next\n  few sections](#the-servers)\n\n\n### Table of Contents\n\n# X11?\n\n[X11](https://www.x.org/wiki/) is the display server protocol that has powered Linux machines for decades. Released in 1984, it handles drawing windows on screens and routing input (key presses and clicks) to the right applications.\nBecause computers were [very different](/blog/formatting) in the 80s, X11 is built for _servers_ and _clients_. The application runs on a server, and dumb clients can draw th"
+    },
+    {
+      "slug": "introducing-HFSViewer",
+      "type": "post",
+      "title": "Introducing HFSViewer",
+      "description": "View and modify HFS partitions on modern macOS versions",
+      "date": "Jan 2, 2026",
+      "href": "/blog/introducing-HFSViewer",
+      "excerpt": "Last year my roommate and I found an old original [iMac G3](https://en.wikipedia.org/wiki/IMac_G3) outside our apartment building. \nIt has some interesting early 2000s/late 90s style websites and files on it that I want to preserve (and hope to share here soon!).\n\nBut I realized getting files off of it wouldn't be easy.\n\nThe machine is running macOS 9.2, which supports USB 1.0.\nWe're up to USB 4 now, so thats pretty old; none of my modern USB 3 devices were detected by it.\nAfter [some research](https://www.reddit.com/r/VintageApple/comments/1jrmrqv/mac_os_9_hates_usb_sticks/) I found that macOS 9.2 _does_ have USB support, but it can't always negotiate USB 3 speeds or support larger USBs.\nSo I went and bought [this $5 stick](https://www.amazon.com/dp/B07W54X2F3) and it worked like a charm.\n\n\nYou should try to stick to USBs with less than 2 GBs of storage, otherwise Mac OS 9.2 might not support it. \n\n\nWith that solved and the files copied over, I plugged it into my M4 laptop and... it wasn't recognized there either. No error or mounting occurred due to no driver support.\nEventually I found [hfsutils](https://www.mars.org/home/rob/proj/hfs/), a wonderful package (which is convienentl"
+    },
+    {
+      "slug": "the-new-maxleiter-com",
+      "type": "post",
+      "title": "The new maxleiter.com",
+      "description": "iframes, view transitions, progressive enhancement, and React Server Components",
+      "date": "Nov 12, 2025",
+      "href": "/blog/the-new-maxleiter-com",
+      "excerpt": "I redesigned maxleiter.com this week. I've wanted to make it more personal and opinionated for a long time,\nbut felt I lacked the expertise to do it justice.\nWith [v0](https://v0.app) and [Claude Code](https://www.claude.com/product/claude-code) (and some manual cleanup) it only took a few hours.\n\nIf you haven't played with the [homepage](https://maxleiter.com/) yet, some of the features are:\n\n- Draggable and resizable windows, including the blog posts\n- A web-friendly version of [KnightOS](https://knightos.org) in the Calculator app\n- A terminal app with some fun easter eggs\n- You can full-screen the windows, and some redirect to real pages (like the blog posts)\n\nGoing into this I had some constraints:\n\n- Remains snappy and is SSR'd at build-time\n- Must work without JavaScript enabled\n- Uses new web platform features\n\n![maxleiter.com screenshot](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/2025-redesign/homepage.png?w=800)\n\n### Table of Contents\n\n## Preloading iframes\n\nIf you open a blog post, it opens in a windowed app. I originally rendered the SSR'd MDX, and that worked,\nbut it involved either:\n\n- Sending every post in the initial payload (not great for performa"
+    },
+    {
+      "slug": "rewrite-your-prompts",
+      "type": "post",
+      "title": "You should be rewriting your prompts",
+      "description": "We talk about overfitting models but never overfitting prompts to models",
+      "date": "Sept 14, 2025",
+      "href": "/blog/rewrite-your-prompts",
+      "excerpt": "I've been \"lucky\" to work with a lot of different LLMs over the past few years (there is, in fact, a reason we made the [AI SDK](https://ai-sdk.dev/)).\nWhen a new model is publicly released there's a good chance we've already tried it and evaluated it for use with v0 within a few hours.\n\nOur results do not always improve as expected, even when we use newer and strictly better models[^1].\n\nAnother example of this is when gpt-5 was released in Cursor. People _hated_ it, but the zeitgeist has since shifted.\nYou can read about what OpenAI and Cursor fixed in [OpenAI's gpt-5 cookbook](https://cookbook.openai.com/examples/gpt-5/gpt-5_prompting_guide?utm_source=chatgpt.com#collaborative-coding-in-production-cursors-gpt-5-prompt-tuning).\n\nSo what should you do when a new model comes out? Rewrite your prompts. Otherwise it's an apples-to-oranges comparison.\n\nMy three and a half arguments for this are:\n\n- Prompt Format\n- Position Bias\n- Model Biases\n  - Work with the model biases, not against\n\n## Reason #1: Prompt Format\n\nAn early obvious example of where differences between models come into play is markdown vs XML.\n\nAnecdatally, OpenAI models (especially older ones) were _great_ with markdo"
+    },
+    {
+      "slug": "seeing-the-future",
+      "type": "post",
+      "title": "I have seen the future through AR glasses",
+      "description": "My experience with the XReal One Pros",
+      "date": "Sept 7, 2025",
+      "href": "/blog/seeing-the-future",
+      "excerpt": "I like to try new technology. 75% of what I buy is something I use once or twice then sell or give away (or keep in a drawer and forget about. Sorry, remarkable).\nBut sometimes, on rare occasions, there's a product that is A) fucking awesome and B) I can't help but evangelize.\n\nOne of my more recent purchases was the [XReal One Pros](https://www.xreal.com/us/one-pro), and wow: I have seen the future, and it's through AR glasses.\n\nIf you&apos;re unfamiliar, the XReal One Pros are really just a display and (surprisingly good) speakers. They are augmented reality (AR) glasses,\nmeaning they aren't like _virtual reality_ headsets such as the Vision Pro or Meta Quest: they don't replace fully your view, they put an overlay on it\n\nI really think it's easier to show than tell in this case:\n\n\n  \n    \n      \n    \n  \n  \n    \n  \n\n\nTo get something out of the way: do I think XReal in particular will be the product that comes out on top? Not at all. I like their product, and I respect any newcomers to the hardware game, but it's an uphill battle for sure.\n\n## The Good\n\n- They are light. Because they're really just shells and they're powered by your devices, there's no need for a heavy battery\n- "
+    },
+    {
+      "slug": "formatting",
+      "type": "post",
+      "title": "Formatting code should be unnecessary",
+      "description": "and we knew this back in the 80s",
+      "date": "Sep 6, 2025",
+      "href": "/blog/formatting",
+      "excerpt": "I had a (maybe slightly overqualified) computer science teacher back in highschool, Mr. Paige.\nHe worked on the [Ada]() compiler and\nhas been programming since the early 80s.\n\nOne day I complained about linter tooling that\nwas driving me nuts. I said something to the effect of, \"it's 2016, how are we still dealing with this sort of thing?\"\n\nTurns out, that problem was solved four decades ago (well, three at that point). Back when he was working on Ada,\nthey didn't store text sources at all &mdash; they used an IR called [DIANA](https://archive.org/details/dianaintermediat0000unse/page/n7/mode/2up).\nEveryone had their own pretty-printing settings for viewing it however they wanted.\n\nWe've been debating some linter settings at work recently and I keep thinking back to\nMr. Paige. It's 2025, how are we still dealing with this sort of thing?\n\n---\n\nWell, to answer that it would help to know what we're missing.\n\nI believe he was working with the [Rational R1000](https://en.wikipedia.org/wiki/Rational_R1000), of which there isn't a ton of info\n(like all things Ada, it was used by the DoD):\n\n![](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/formatting/rational.jpg?w=400)\n\nThe"
+    },
+    {
+      "slug": "vibecoding-minecraft-mods",
+      "type": "post",
+      "title": "Vibe-coding Minecraft mods",
+      "description": "and the lessons learned",
+      "date": "Jun 21, 2025",
+      "href": "/blog/vibecoding-minecraft-mods",
+      "excerpt": "{/* eslint-disable react/jsx-no-undef */}\n\nIf you aren't familiar with the extent of the Minecraft modding scene, it's _big_. There are mods with more thought put into them than many AAA games.\n\nThe best example is [Create](https://www.curseforge.com/minecraft/mc-mods/create):\n\n\n  \n  {\n    \n      Note that trains (and windmills and assembly lines) are not built into\n      Minecraft.\n    \n  }\n\n\nSo I was pretty lost when I started playing for the first time in a long time.\n\n### Table of Contents\n\n## The Problem\n\nAs some friends and I started playing the Divine Journey 2 modpack,\nI was overwhelmed by the number of modded blocks and items.\n\nTo give you a taste, there are 54 &quot;generators&quot; from 16 mods:\n\n{\n\n  \n    \n      I built this UI with v0 and extracted the images from a screenshot using\n      o4-mini with toolcalling.\n    \n}\n\nFinding them around our base was a pain. My friends knew where everything was,\nand would be telling me things like \"put coal in the hopper that feeds the Coke\nOven into the Blast Furnace by the biodiesel setup\"\n\nThere's one obvious solution:\n\n## The Solution: more mods\n\nI ended up creating two mods with a mix of [OpenAI Codex](https://github.com/opena"
+    },
+    {
+      "slug": "sluggified-urls",
+      "type": "post",
+      "title": "Implementing Notion style URLs",
+      "description": "Create /some-title-here-{id} URLs for recognizable links in Next.js",
+      "date": "Jun 19, 2025",
+      "href": "/blog/sluggified-urls",
+      "excerpt": "I hate unrecognizable URLs. If I want to go back to a specific document or page, I should be able\nto type the name of it in the address bar and find it in my browser history. Notion is particularly good at this,\nand v0 was particularly bad at it (for a while), so this is what I did to fix v0.\n\nHere's what a notion URL looks like:\n\n\n  \n\n\nIt's recognizable, visually appealing, and easy to find in your browser history:\n\n\n\nI'm a fan.\n\n\n\nAt first I thought implementing it would be straight forward, but there are a few easy-to-hit gotcha's involved.\nThis post will be focused on Next.js, but the concepts are universal. Here are some of the things to keep in mind:\n\n- You need to ensure the [canonical URL](https://developers.google.com/search/docs/crawling-indexing/canonicalization) is up-to-date\n- The client needs to wind up on the most recent URL, otherwise crawlers like Google can index \"fake\" paths\n- Be mindful of your previous URLs and ensure they don't conflict with the logic for adding/parsing the slug\n\nTo get started, we need two functions: one to generate the URL, and one to parse it.\n\nIt's important we support URLs both with and without the title, and I recommend using a library t"
+    },
+    {
+      "slug": "ship-every-day",
+      "type": "post",
+      "title": "Ship something every day",
+      "description": "",
+      "date": "Jun 10, 2024",
+      "href": "/blog/ship-every-day",
+      "excerpt": "**Edit**: A better title would've been \"_commit_ every day _that you work_\". I don't mean you should work on weekends or not take time off, and\nwhatever you work on doesn't need to \"ship to prod\". \n\n\n\nI don't feel particularly qualified to give advice (I blame imposter syndrome),\nbut I do have one tip to share that I think has been useful for me.\nIt applies both to professional software dev and personal projects.\n\nYou probably guessed it from the title: **ship something every day**.\n\nIt doesn't need to be a major feature or even a bug fix. It just needs to be something you can point to.\n\nWhy? A few reasons:\n\n- The dopamine rush of your code being shipped\n- Your team sees you're working\n  - There's more to this than just performance reviews; with remote work, it's easy for you and co-workers to feel isolated.\n- It encourages incremental work. Your future self and co-workers will thank you\n- Your git commit streak looks good\n  - Yes, in an ideal world this doesn't matter. But I'm sure people like recruiters look at GitHub profiles, and an empty page isn't a great look. This is a benefit of the habit, not necessarily a reason to start it.\n- The satisfaction and mental benefits of gett"
+    },
+    {
+      "slug": "mobile-browsers-resizing-font",
+      "type": "post",
+      "title": "Why your website's fonts might be larger than intended",
+      "description": "A well-meaning mobile browser feature can be problematic",
+      "date": "Jun 9, 2023",
+      "href": "/blog/mobile-browsers-resizing-font",
+      "excerpt": "Someone recently reported that the font-size in some of my code blocks on my [build-your-own Next.js blog](/blog/build-a-blog-with-nextjs-13) post was too large. That's interesting because I use React and the code blocks are the same component. So why would the font-size be different between them?\n\nI was able to reproduce the issue and found that it only happened on iOS devices. Here it is in action:\n\n\n\nAfter adventuring down a small rabbit hole, I can share that mobile devices (mostly tablets/phones) support the [text-size-adjust](https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust) CSS property that automatically adjusts the font size of text to make it more readable.\nThis is a great feature for most websites, but it can be problematic for code blocks. It's worth noting that all browsers support this feature (although WebKit requires a prefix), but it seems like they use different heuristics to determine when to apply it.\n\nHere's a solution:\n\n\n\nThis disables the feature and makes the font size consistent across all browsers.\nBe careful though, because this will disable the feature for your entire site.\nYou may want to specifically opt certain elements out to let the"
+    },
+    {
+      "slug": "nintype",
+      "type": "post",
+      "title": "Nintype is still the best iOS keyboard",
+      "description": "",
+      "date": "May 22, 2023",
+      "href": "/blog/nintype",
+      "excerpt": "Describing Nintype is a challenge. Here's a the demo video from it's launch back in 2014:\n\n\n  \n\n\n  \"the true touch typing experience\"\n\n\nEssentially, Nintype is a keyboard that enables you to _swipe and tap_ with both hands at the same time.\nIf you're typing \"there\", you'd swipe the \\`th\\` with your right hand, and tap or swipe the \\`ere\\` with your left.\nIt's such elegant and obvious next step for swipe keyboards it's incredible to me that no alternatives exist.\nIt's really does feel like magic; see how my friend texted me when we were first discovering it (apologies for the expletives):\n\n\n\nIt's genius lies in a few things:\n\n## Swipe and type\n\nNintype's true magic lies in it's ability to understand swiping and tapping with both fingers simultaneously.\nIf you need to double tap a word, like \"I'll\", you can swipe the first half of the word, and then double tap the \"l\" key to finish it.\nIt's a bit tricky to put into words, but it feels intuitive and unlocks a lot of speed. I can consistently reach 100 WPM with ~90-95% accuracy using Nintype.\n\n## Customization\n\nNintype has options for seemingly everything.\nYou can add custom shortcuts (such as auto filling your email or credit card num"
+    },
+    {
+      "slug": "build-a-blog-with-nextjs-13",
+      "type": "post",
+      "title": "Building a blog with Next.js 15 and React Server Components",
+      "description": "Use MDX, RSC, and Bright to build a blog with Next.js 15.",
+      "date": "Apr 16, 2023",
+      "href": "/blog/build-a-blog-with-nextjs-13",
+      "excerpt": "I've been tinkering with this website and the [Next.js 13 App Router](https://beta.nextjs.org) for a while now,\nand it's been a great experience, especially in the last few months. But I've seen some confusion around\nhow to use the new features and React Server Components, so I wrote up an outline on building this website.\n\n\n  {' '}\n  This post has been updated for [Next.js\n  15.](https://nextjs.org/blog/next-15){' '}\n\n\nTo address the React-sized elephant in the room:\nyou do not need this fancy setup to build a blog.\nHTML and CSS may be a better choice for you, but I'd find little fun in that, and I'm a strong believer in having a website to experiment with.\n\nTo set a few expectations, here's what this post **won't** do:\n\n- Act as documentation for Next.js or React\n- Be a 100% code-complete tutorial. You'll need to fill in some gaps yourself.\n  - You can always reference [this website's source code](https://github.com/maxleiter/maxleiter.com).\n  - There are file trees included with links to the source code.\n\nAnd here's what it **will** do:\n\n- Show you real-world examples involving React Server Components and the App Router.\n- Guide you in spinning up your own blog with Next.js 13 a"
+    },
+    {
+      "slug": "node-has-tooling-problems",
+      "type": "post",
+      "title": "The Node ecosystem (still) has tooling problems",
+      "description": "It shouldn't take this much work to publish a small library",
+      "date": "July 30, 2022",
+      "href": "/blog/node-has-tooling-problems",
+      "excerpt": "I recently published a [small npm package](https://github.com/maxleiter/sortablejs-vue3) containing a Vue library. The package is written in TypeScript powered by Vite, which I (wrongly) assumed would mediate most of my woes. \n\n![Obi Wan gif of him sarcastically saying \"Oh, this is going to be easy\"](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/node-tooling/obiwan.gif)\n\nFirst, I used Vite to build a small front-end site to demonstrate the library. This let me test the component and demonstrate usage in the same repository. Getting this working was fairly straight forward for someone with experience wrangling TypeScript configurations, but I imagine for a less experienced developer it could've been a daunting task. I ended up with two tsconfigs, \\`tsconfig.node.json\\` and \\`tsconfig.site.json\\`, had to figure out module resolution, realized I needed \\`vue-tsc\\`, and had a multitude of other minor roadblocks. The nicest thing about Vite is it is *fast*, which made working on this manageable.\n\nSecond, I had to figure out how to publish a library. After lots of research (AKA reading Reddit threads and blog posts), I figured out the proper incantation of \\`tsc\\` paramete"
+    },
+    {
+      "slug": "supabase-next-analytics",
+      "type": "post",
+      "title": "Live updating page views with Supabase and Next.js",
+      "description": "A step-by-step guide to page views and server analytics",
+      "date": "May 15, 2022",
+      "href": "/blog/supabase-next-analytics",
+      "excerpt": "This post was written for the (now stable) beta Next.js middleware. If you\n  want your own analytics, I recommend looking at{' '}\n  Vercel's solution.\n\n\nThis post starts with a brief introduction. If you want to jump down to the tutorial, click [here](/blog/supabase-next-analytics#how). You can also see the live updating views in action in the top right of this page! The analytics events themselves require no JavaScript and occur completely on the server thanks to the [new (in beta) Next.js middleware](https://nextjs.org/docs/advanced-features/middleware). If you have JavaScript enabled, the view count should live update thanks to Supabase Realtime. You can try it by opening the page in a new tab and eyeing the view count.\n\n**Contents**\n\n- [Motivations](/blog/supabase-next-analytics#motivations)\n- [How to do it](/blog/supabase-next-analytics#how)\n  - [Supabase: Setting up the Database and Realtime](/blog/supabase-next-analytics#supabase-setting-up-the-database-and-realtime)\n  - [Next.js: Adding server-side analytics](/blog/supabase-next-analytics#nextjs-adding-server-side-analytics)\n  - [Next.js: Adding a live updating view counter](/blog/supabase-next-analytics#nextjs-adding-a-liv"
+    },
+    {
+      "slug": "easy-site-improvements",
+      "type": "post",
+      "title": "Easy ways to improve your websites accessibility and performance",
+      "description": "A list of simple tips for developing a more accessible and user-friendly web.",
+      "date": "Apr 23, 2022",
+      "href": "/blog/easy-site-improvements",
+      "excerpt": "Below is a short list I wrote up for people who are comfortable building websites (with any technology) but want to improve their work, whether that be in terms of loading speeds, software quality, or accessibility.\n\n\nTL;DR:\n- [Use WAVE](/blog/easy-site-improvements#wave)\n- [Compress your images](/blog/easy-site-improvements#compress-your-images)\n- [Embrace semantic HTML](/blog/easy-site-improvements#embrace-semantic-html)\n- [Don’t use JavaScript to replace browser controls](/blog/easy-site-improvements#dont-use-javascript-to-replace-browser-controls)\n- [Invest in learning your developer tools](/blog/easy-site-improvements#invest-in-learning-your-developer-tools)\n\n## WAVE \n\n[WAVE](https://wave.webaim.org/) is a suite of tools for finding, diagnosing, and fixing accessibility problems. It's my first step for finding the lowest hanging improvements. It helps you not just fix your errors but understand them by guiding you through the relevant part of the HTML5 spec in plain language. Below you can see a screenshot of the tool being applied to https://webaim.org. \n![Screenshot of the WAVE tool being used on webaim.org](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/site-i"
+    },
+    {
+      "slug": "hacker-sites",
+      "type": "post",
+      "title": "How hackers* run their sites",
+      "description": "An analysis based on 700 personal websites",
+      "date": "Apr 7, 2022",
+      "href": "/blog/hacker-sites",
+      "excerpt": "\\* hackers: users of hacker news\n\nYesterday, when I probably should have been doing something productive, I instead [asked hacker news users for links to their personal sites](https://news.ycombinator.com/item?id=30934529).\n\nIt got far more replies than I expected (over 1000 at the time of writing) so I had the idea to do some scraping and see how commenters build and host their sites.\n\nI wrote a quick-and-dirty typescript script (at the bottom of page) for scraping, pinging, and sorting the comments. I could've used a pre-existing library or service for determining tech used on the sites, but where's the fun in that? I’d have loved to add features like checking for git repository links and doing some API calls for a more in-depth analysis, but I’ll leave the complicated parts as exercises for the reader.\n\nIf I were to do this all again, I would absolutely not choose JavaScript. Just 0 real benefits; I spent more time than I care to admit bashing my head before remembering \\`Promise.allSettled\\` exists. I should've just used Python.\n\n## The stats:\n\nOf the 721 top level comments, 692 contained links and were analyzed at the time of writing. I only looked at the first link in a comme"
+    },
+    {
+      "slug": "introducing-drift",
+      "type": "post",
+      "title": "Introducing Drift",
+      "description": "A self-hostable alternative to GitHub Gist and Pastebin",
+      "date": "Mar 26, 2022",
+      "href": "/blog/introducing-drift",
+      "excerpt": "_[View this post on Drift](https://paste.maxleiter.com/post/9d77d452-8ccf-4056-89dd-9bf9f96dfc3c)_\n\nI've wanted a Gist alternative for years, but it wasn't until I saw [this tweet](https://twitter.com/emilyst/status/1499858264346935297) I decided to sit down and build it:\n\n> \"What is the absolute closest thing to GitHub Gist that can be self-hosted? In terms of design and functionality. Hosts images and markdown, rendered. Creates links that can be private or public. Uses/requires registration. I have looked at dozens of pastebin-like things.\" - @emilyst\n\nIf your response to that is \"why?\", I recommend reading ['Why you should start self-hosting'](https://rohanrd.xyz/posts/why-you-should-start-self-hosting/) by Rohan Deshumkh. Also know that I have a habit of starting time consuming weekend projects to procrastinate school work, and this seemed like an especially fun one.\n\nThe primary goal of Drift is to capture the value proposition of GitHub. Syntax highlighting, markdown rendering, straight to the point. There are tons of self-hostable pastebins, and none target an experience like Gist. You can try a demo [here](https://drift.maxleiter.com).\n\nHere's a screenshot of the authentic"
+    },
+    {
+      "slug": "contributing-to-oss",
+      "type": "post",
+      "title": "How to start contributing to open-source projects",
+      "description": "A small guide to finding projects and contributing changes",
+      "date": "Jan 25, 2022",
+      "href": "/blog/contributing-to-oss",
+      "excerpt": "One of the most common questions I'm asked by my computer science friends and students is how they can contribute to an open-source project. In order for me to organize and share my thoughts I thought I'd write something here.\n\nFirst off, it's a good idea! Contributing to projects is a fantastic way to build experience, connections, and improve a piece of software you use or rely on. I've grown immensely through maintaining my few projects and contributing to a hand full of others. I've gained experience in community management, team communication, code review, dependency management, and the list goes on. This post is focused on programming, but don't forget that issue management, documentation, user support, and bug reporting are all valuable ways you can contribute. \n\nThat point about using open-source software is important. The first thing I tell my friends is they should first ensure they're using some before they attempt to contribute. There are few things that are more satisfying than fixing a bug that's been bugging you in a program written by someone else, and the motivation that provides is not inconsequential[^1]. As a maintainer, contributor, and extensive procrastinator"
+    },
+    {
+      "slug": "pin-dependencies",
+      "type": "post",
+      "title": "Pin your npm/yarn dependencies",
+      "description": "A guide on how to pin your dependencies and why you may want to",
+      "date": "Jan 9, 2022",
+      "href": "/blog/pin-dependencies",
+      "excerpt": "Today, the open-source maintainer [Marak](https://github.com/Marak) intentionally [bricked two popular JavaScript libraries](https://www.bleepingcomputer.com/news/security/dev-corrupts-npm-libs-colors-and-faker-breaking-thousands-of-apps/) (with ~25 total million weekly downloads) in such a way that they broke dependents software. There's nothing that npm or any other public registry could've done to have prevented this; the release was indistinguishable from a regular update, unless you looked at the code. This is not the first time an npm dependency has [gone rogue](https://qz.com/646467/how-one-programmer-broke-the-internet-by-deleting-a-tiny-piece-of-code/) and [caused havoc](https://github.com/dominictarr/event-stream/issues/115) due to supply chain problems, and it certainly won't be the last. And so the defensive role falls to you, the developer.\n\n### Pinning dependencies\n\nMy recommendation is to **pin your dependencies**. If you're unfamiliar with what this means, you should first be familiar with [semantic versioning](https://semver.org/). In short, pinning dependencies means the _exact_ version specified will be installed, rather than a dependency matching the range crite"
+    },
+    {
+      "slug": "framework",
+      "type": "post",
+      "title": "Impressions of the Framework Laptop",
+      "description": "My thoughts on the Framework Laptop's hardware",
+      "date": "Nov 3, 2021",
+      "href": "/blog/framework",
+      "excerpt": "I received my [Framework Laptop DIY edition](https://frame.work) a few days ago and have been setting it up software-wise. I have it running Manjaro Linux with the Sway window manager. This is my first time using a Wayland desktop, and oh has it been a learning experience. This post will be largely about the hardware, but I plan to make one about the software once I'm more happy with my setup.\n\nHere's what I got:\n\n- Framework Laptop DIY Edition\n- 16GB (2 x 8GB) DDR4-3200\n- Intel® Wi-Fi 6E AX210 No vPro\n- 1TB - WD_BLACK™ SN850 NVMe™\n- USB-A Expansion Card\n- USB-C Expansion Card x2\n- HDMI Expansion Card\n\nI bought everything from the Framework store (at a slight markup of ~$80 for the RAM, SSD, and wifi card), but I'm happy to support them and for the convenience of knowing it would work properly was well worth it.\n\n## The Good\n\n- Well crafted body. I was not expecting a premium build quality from a startup trying to create an upgradeable laptop, but wow they excelled.\n- It's _really light_. It's just 2.8 pounds, compared to my 13\" Macbook Pro's 3.02. You wouldn't think that's a big difference, and maybe you wouldn't notice, but I sure did.\n- A solid keyboard. Most non-Mac laptops I'v"
+    },
+    {
+      "slug": "MSHW0184",
+      "type": "post",
+      "title": "Adding ambient light support to Linux and GNOME",
+      "description": "A quick dive into Linux kernel drivers",
+      "date": "Dec 15, 2020",
+      "href": "/blog/MSHW0184",
+      "excerpt": "A couple of a weeks ago I picked up a Surface Pro 7 (i3 1.2 mhz) at a Black Friday sale. I love making devices run software they shouldn't, so I got to work dual-booting Linux on it. To my surprise, almost everything worked with the default Fedora 33 kernel, not including the touchscreen, the ambient light sensor, and the camera. After compiling and loading the great [linux-surface](https://github.com/linux-surface/linux-surface) kernel the touchscreen started to work but I found a [GitHub issue](https://github.com/linux-surface/linux-surface/issues/121) someone had made detailing that the ambient light sensor (a MSHW0184) isn't detected. This normally wouldn't matter a lot, but I'd discovered that GNOME supported adjusting the screen brightness based on the ambient light through [iio-sensor-proxy](https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/).\n\nI knew nothing (and still know very little) about the Linux kernel or drivers, but this seemed like a great place to start. Luckily, GitHub user archseer discovered that the MSHW0184 registers align with the APDS9960 device, which already has an upstream kernel driver, and he mentioned all that should be needed is a small change "
+    },
+    {
+      "slug": "X11",
+      "type": "post",
+      "title": "X11 on iOS",
+      "description": "A guide on how to compile the X Window System for iOS",
+      "date": "Dec 15, 2019",
+      "href": "/blog/X11",
+      "excerpt": "This work has been picked back up recently, with KDE, GNOME, Wayland, and\n  more. Read about it here: https://maxleiter.com/blog/xios\n\n\nI'm excited to announce that X11 is coming soon to iOS. Most (see below) packages and dependencies for a fully functioning X11 desktop system have been compiled and are available on Cydia for iOS 11+. All packages have been compiled for arm64 and have been tested on iOS 12.4 and iOS 13.1. This requires a jailbroken device.\n\n\n[Image of programs running on\ndevice.](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/X11/onipad.jpg)\n\nThis site will serve largely as documentation for building yourself. ~You can add the Cydia repo below for the deb packages. Please let me know if you run across any issues with the debs; it's likely I messed up including a library or something like that. (These aren't done just yet.)~\n\n## How it works\n\nAt the moment, a virtual screen is accessed via a VNC client to an Xvnc instance running on the iDevice. If you're unfamiliar, Xvnc is an X server with a virtual screen that can be accessed via VNC. The best part of this is no drivers are required: it's all handled by Xvnc.\n\n## Why\n\nLargely just because I can. Als"
+    }
+  ],
+  "notes": [
+    {
+      "slug": "fish-directory-colors",
+      "type": "note",
+      "title": "Per-directory terminal colors in fish shell",
+      "description": "",
+      "date": "Apr 5, 2026",
+      "href": "/notes/fish-directory-colors",
+      "excerpt": "My terminal background color changes based on the current directory. \nIt's a small touch that makes it easy to tell which project I'm in at a glance, which is \nespecially useful when juggling AI agents.\n\nIt works via a custom fish function called `_color_for_dir`, which:\n\n1. Hashes the current `$PWD` \n2. Maps the hash to a hue (0-359)\n3. Converts it to a dark RGB color \n4. Sends an [OSC 11](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html) escape sequence to change the terminal background\n\n\n\nIt's deterministic, so each directory always gets the same color. \nThe function is triggered on startup and on every `cd` via a `--on-variable PWD` event listener.\n\nIt also skips VS Code's integrated terminal because I generally know what projects I have open \n\nFull code:\n\n\nClick to expand"
+    },
+    {
+      "slug": "git-checkout-script",
+      "type": "note",
+      "title": "Never think about branch names again",
+      "description": "a bash script for generating branch names",
+      "date": "Aug 19, 2024",
+      "href": "/notes/git-checkout-script",
+      "excerpt": "I recommend swapping out \\`max\\` to basically anything else.\n\n\n\nTo use on macOS/linux, you can paste the above into a file in \\`/usr/local/bin\\` and make it executable with \\`chmod +x /usr/local/bin/gcb\\`.\n\nI also recommend setting your git settings to sort branches by \\`committerdate\\` so that you can easily find the branch you worked on most recently:\n\n\n\nThis does work with the default alphabetical sorting, but this works better if you work on features over long periods of time."
+    },
+    {
+      "slug": "updating-jsonb-drizzle",
+      "type": "note",
+      "title": "Updating JSONB fields with Drizzle",
+      "description": "hint: just use `sql` and COALESCE.",
+      "date": "July 11, 2024",
+      "href": "/notes/updating-jsonb-drizzle",
+      "excerpt": "I recently made a jsonb column in a postgres database and it took me a bit\nto figure out how to update a single value without overwriting the entire\nfield. If you know a better way please let me know."
+    },
+    {
+      "slug": "vscode-default-dir",
+      "type": "note",
+      "title": "Set your default directory in VS Code's open dialog",
+      "description": "",
+      "date": "Jun 6, 2024",
+      "href": "/notes/vscode-default-dir",
+      "excerpt": "This is my workflow for opening a project in VS Code:\n\n1. Open an empty window of VS Code\n2. Hit cmd+O\n3. Navigate to my \\`~/Documents/...\\` directory\n4. Hit enter\n\nIn my opinion, that's a few too many steps. I've made it a little better by\nchanging the \\`files.dialog.defaultPath\\` setting (added almost exactly [one year ago](https://code.visualstudio.com/updates/v1_80)).\n\n![VS Code settings](https://tddeuevmbjbaaeoi.public.blob.vercel-storage.com/blog/vscode-dir/screenshot.png)\n\nHope this helps."
+    },
+    {
+      "slug": "gemini-script",
+      "type": "note",
+      "title": "gemini.sh script",
+      "description": "A script for concatenating files in a directory for copying to an LLM",
+      "date": "Apr 14, 2024",
+      "href": "/notes/gemini-script",
+      "excerpt": "As of late 2024/early 2025, I recommend using the great repomix tool: https://github.com/yamadashy/repomix\n\n\nI've been messing with gemini-1.5-pro with the 1 million token context window for a while now and found this script very useful\nfor grabbing entire repos. It ignores most binary files and concatenates the rest into a single file. \n\nYou'll need to have \\`parallel\\` installed for this to work (\\`brew install parallel\\` on macOS)."
+    },
+    {
+      "slug": "slack-message-fetch",
+      "type": "note",
+      "title": "Sending a Slack message with fetch",
+      "description": "",
+      "date": "Mar 30, 2024",
+      "href": "/notes/slack-message-fetch",
+      "excerpt": "I like using Slack bots for things like alerts and notifications and\nhave needed this snippet enough to leave it here.\n\nI use [slack-block-builder](https://github.com/raycharius/slack-block-builder) to\nbuild the message; writing raw slack blocks is a pain."
+    },
+    {
+      "slug": "swr-state",
+      "type": "note",
+      "title": "SWR for more than fetching",
+      "description": "SWR for state management",
+      "date": "Mar 30, 2024",
+      "href": "/notes/swr-state",
+      "excerpt": "[SWR](https://swr.vercel.app/) is a great library for data fetching in React.\nIt looks like this:\n\n\n\nBut my favorite use for it is local state management.\n\nHere's an example of how I use it for modals and dialogs:\n\n\n\nAny hook call with that same \\`state:modal\\` key will receive the same data and re-render when it changes.\nIt's a good replacement for other global state solutions or context."
+    },
+    {
+      "slug": "wasm-edge-and-node",
+      "type": "note",
+      "title": "Loading wasm files on Vercel Edge and Node.js runtimes",
+      "description": "",
+      "date": "Mar 30, 2024",
+      "href": "/notes/wasm-edge-and-node",
+      "excerpt": "Loading wasm on the [Vercel Edge runtime](https://vercel.com/docs/functions/wasm) is easy. You need to do a little more work\nto do the same on Node.js."
+    }
+  ],
+  "projectsAndExternal": [
+    {
+      "title": "Max Leiter"
+    },
+    {
+      "title": "How we made v0 an effective coding agent",
+      "description": "Learn how we built v0 to be an effective AI coding agent through careful system design and iteration.",
+      "date": "Jan 7, 2026",
+      "href": "https://vercel.com/blog/how-we-made-v0-an-effective-coding-agent"
+    },
+    {
+      "title": "Introducing the v0 composite model family",
+      "description": "Introducing the v0 composite model family.",
+      "date": "Jun 1, 2025",
+      "href": "https://vercel.com/blog/v0-composite-model-family"
+    },
+    {
+      "title": "Introducing AI SDK 3.0 with Generative UI support",
+      "description": "Stream React Components from LLMs to deliver richer user experiences.",
+      "date": "Mar 1, 2024",
+      "href": "https://vercel.com/blog/ai-sdk-3-generative-ui"
+    },
+    {
+      "title": "Introducing the Vercel AI SDK",
+      "description": "An interoperable, streaming-enabled, edge-ready software development kit for AI apps built with React and Svelte.",
+      "date": "Jun 15, 2023",
+      "href": "https://vercel.com/blog/introducing-the-vercel-ai-sdk"
+    },
+    {
+      "title": "Improving the accessibility of our Next.js site",
+      "description": "We've made some improvements to the accessibility of our Next.js site. Here's how we did it.",
+      "date": "Sep 30, 2022",
+      "href": "https://vercel.com/blog/improving-the-accessibility-of-our-nextjs-site"
+    },
+    {
+      "title": "New edge dev infrastructure",
+      "description": "New edge dev infrastructure.",
+      "date": "Jul 21, 2020",
+      "href": "https://vercel.com/blog/new-edge-dev-infrastructure"
+    },
+    {
+      "title": "X11 on iOS",
+      "description": "Patched, compiled, and packaged X11 for iOS devices instead of studying for finals.",
+      "href": "/blog/X11"
+    },
+    {
+      "title": "Drift",
+      "description": "A self-hostable and open-source alternative to GitHub Gist and Pastebin.",
+      "href": "https://github.com/maxleiter/drift"
+    },
+    {
+      "title": "The Lounge",
+      "description": "Self-hosted, always-on IRC client built with Node.js, Vue, and other web technologies.",
+      "href": "https://github.com/thelounge/thelounge"
+    },
+    {
+      "title": "SortableJS-vue3",
+      "description": "A TypeScript wrapper for SortableJS built for Vue 3.",
+      "href": "https://github.com/maxleiter/sortablejs-vue3/"
+    },
+    {
+      "title": "KnightOS",
+      "description": "Open-source unix-like operating system for z80-based calculators written entirely in z80 asm. I wrote a significant portion of the libc and contribued to system libraries.",
+      "href": "https://github.com/knightos/knightos"
+    },
+    {
+      "title": "MSHW0184 driver for Linux kernel",
+      "description": "I finally found an excuse to contribute to the Linux kernel",
+      "href": "blog/MSHW0184"
+    },
+    {
+      "title": "jsonTree",
+      "description": "My first open-source project",
+      "href": "https://github.com/maxleiter/jsontree"
+    },
+    {
+      "title": "easyarty.com",
+      "description": "A tiny tool I made for a video game I like but it now gets 250,000+ visitors a year",
+      "href": "https://easyarty.com"
+    },
+    {
+      "title": "v0",
+      "description": "I co-created v0.app with with Shu Ding, Jared Palmer, and shadcn while on the AI team at Vercel.",
+      "href": "https://v0.app"
+    },
+    {
+      "title": "AI SDK",
+      "description": "I worked with Shu Ding and later Lars Grammel on the first three versions of the Vercel AI SDK.",
+      "href": "https://github.com/vercel/ai"
+    },
+    {
+      "title": "Accuracy of computer-assisted vertical cup-to-disk ratio grading for glaucoma screening",
+      "description": "I had the opportunity to work with the great Proctor Foundation at UCSF to write a Java program for helping medical practitioners estimate vertical cup to disk ratios from retinal images.",
+      "href": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220362"
+    }
+  ]
+}
