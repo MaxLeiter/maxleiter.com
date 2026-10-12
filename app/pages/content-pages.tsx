@@ -7,62 +7,78 @@ import { NotesContent } from '@components/content/notes-content'
 import type { ListEntry, ProjectCard } from '@lib/types'
 import type { ComponentType } from 'react'
 import type { Note } from '@framework/shared/types'
-import { PageShell } from './shell'
+import { PageShell, type Section } from './shell'
 import { transitionName } from '@framework/shared/transitions'
 
 /**
- * The six list-and-prose routes.
- *
- * Each reuses the existing component under `app/components/content/`, so the
- * markup matches what the Next build produced. The one difference is where the
- * view-transition name lands: React's `<ViewTransition>` put it on the content
- * component's own root element, and these put it on `<main>`, because the
- * content components do not take a style prop.
+ * The six list-and-prose routes, each a section of the homepage's channels
+ * opened into the reader panel. Back returns to that section's row.
  *
  * All six take `toolbar` so the build can emit an `/embed` variant with no
- * chrome. The desktop's folder windows iframe those, which keeps the window
- * content byte-identical to the real page at zero client-JS cost.
+ * chrome.
  */
 
 export interface ContentPageProps {
   toolbar?: boolean
 }
 
+interface SectionSpec {
+  section: Section
+  name: string
+  path: string
+  /** The homepage row this page belongs to. */
+  row: string
+}
+
+function sectionShell(spec: SectionSpec, toolbar: boolean | undefined) {
+  return {
+    toolbar,
+    section: spec.section,
+    crumbs: [{ name: spec.name, href: spec.path, current: true }],
+    back: `/#ch-${spec.row}`,
+    vtName: transitionName('page', spec.path.slice(1)),
+  }
+}
+
 /**
- * `/about`, `/labs` and `/talks` are the same page three times: the section
- * name is the title, the only breadcrumb, the route and the transition name.
- * One function applied three times rather than three copies of eleven lines.
+ * `/about`, `/labs` and `/talks` take no data. One function applied three
+ * times rather than three copies of the same eleven lines.
  */
-function sectionPage(name: string, Content: ComponentType) {
+function sectionPage(spec: SectionSpec, Content: ComponentType) {
   return function SectionPage({ toolbar }: ContentPageProps) {
     return (
-      <PageShell
-        toolbar={toolbar}
-        title={name}
-        segments={[{ name, href: `/${name}` }]}
-        vtName={transitionName('page', name)}
-      >
+      <PageShell {...sectionShell(spec, toolbar)}>
         <Content />
       </PageShell>
     )
   }
 }
 
-export const AboutPage = sectionPage('about', AboutContent)
-export const LabsPage = sectionPage('labs', LabsContent)
-export const TalksPage = sectionPage('talks', TalksContent)
+export const AboutPage = sectionPage(
+  { section: 'about', name: 'About', path: '/about', row: 'about' },
+  AboutContent,
+)
+export const LabsPage = sectionPage(
+  { section: 'labs', name: 'Labs', path: '/labs', row: 'projects' },
+  LabsContent,
+)
+export const TalksPage = sectionPage(
+  { section: 'talks', name: 'Talks', path: '/talks', row: 'about' },
+  TalksContent,
+)
 
 export function ProjectsPage({
   projects,
   toolbar,
 }: ContentPageProps & { projects: ProjectCard[] }) {
+  const spec = {
+    section: 'projects',
+    name: 'Projects',
+    path: '/projects',
+    row: 'projects',
+  } as const
   return (
-    <PageShell
-      toolbar={toolbar}
-      title="projects"
-      segments={[{ name: 'projects', href: '/projects' }]}
-      vtName={transitionName('page', 'projects')}
-    >
+    <PageShell {...sectionShell(spec, toolbar)}>
       <ProjectsContent projects={projects} />
     </PageShell>
   )
@@ -72,13 +88,14 @@ export function BlogIndexPage({
   posts,
   toolbar,
 }: ContentPageProps & { posts: ListEntry[] }) {
+  const spec = {
+    section: 'blog',
+    name: 'Blog',
+    path: '/blog',
+    row: 'blog',
+  } as const
   return (
-    <PageShell
-      toolbar={toolbar}
-      title="blog"
-      segments={[{ name: 'blog', href: '/blog' }]}
-      vtName={transitionName('page', 'blog')}
-    >
+    <PageShell {...sectionShell(spec, toolbar)}>
       <BlogListContent posts={posts} />
     </PageShell>
   )
@@ -88,13 +105,14 @@ export function NotesIndexPage({
   notes,
   toolbar,
 }: ContentPageProps & { notes: Note[] }) {
+  const spec = {
+    section: 'notes',
+    name: 'Notes',
+    path: '/notes',
+    row: 'notes',
+  } as const
   return (
-    <PageShell
-      toolbar={toolbar}
-      title="notes"
-      segments={[{ name: 'notes', href: '/notes' }]}
-      vtName={transitionName('page', 'notes')}
-    >
+    <PageShell {...sectionShell(spec, toolbar)}>
       <NotesContent notes={notes} />
     </PageShell>
   )
@@ -102,22 +120,16 @@ export function NotesIndexPage({
 
 export function NotFoundPage() {
   return (
-    <PageShell title="404" vtName={transitionName('page', '404')}>
-      <div className="max-w-3xl">
-        <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
-          404
-        </h1>
-        <p className="text-[var(--gray)]">
-          That page does not exist.{' '}
-          <a
-            href="/"
-            className="text-[var(--link)] hover:opacity-80 underline transition-opacity"
-          >
-            Go home
-          </a>
-          .
-        </p>
-      </div>
+    <PageShell
+      section="home"
+      crumbs={[{ name: '404', href: '/404', current: true }]}
+      back="/"
+      vtName={transitionName('page', '404')}
+    >
+      <h1 className="ui-title">404</h1>
+      <p className="ui-lede">
+        That page does not exist. <a href="/">Go home</a>.
+      </p>
     </PageShell>
   )
 }

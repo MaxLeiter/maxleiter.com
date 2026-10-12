@@ -37,13 +37,12 @@ export const THEME_SCRIPT =
   `if(m)m.setAttribute('content',e=='light'?'#fff':'#000000')}catch(_){}`
 
 /**
- * Same-document view transitions: the router's page swap and the desktop's
- * window open/close. Reduced motion is honoured by the router, which skips
- * `startViewTransition` entirely rather than animating at zero duration.
+ * Same-document view transitions: the router's page swap. Reduced motion is
+ * honoured by the router, which skips `startViewTransition` entirely rather
+ * than animating at zero duration.
  */
 export const VIEW_TRANSITION_CSS = `
 ::view-transition-old(root),::view-transition-new(root){animation-duration:180ms}
-html.vt-local{view-transition-name:none}
 `.trim()
 
 export interface Fonts {
@@ -101,9 +100,9 @@ export interface ShellOptions {
    */
   runtimePreload?: string[]
   /**
-   * The document is the `/embed` variant, loaded in a desktop window's iframe.
-   * Every link in it must navigate the top page, not the frame: a post that
-   * links another post would otherwise open it nested inside the window.
+   * The document is the `/embed` variant, made to be framed. Every link in it
+   * must navigate the top page, not the frame: a post that links another post
+   * would otherwise open it nested inside the frame.
    */
   embed?: boolean
   /**

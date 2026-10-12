@@ -1,18 +1,30 @@
-const LINK = 'text-[var(--link)] hover:opacity-80 underline transition-opacity'
+import { Cover } from '@components/cover'
+
+const LINK = 'ui-link'
 
 export function AboutContent() {
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
-        ABOUT.md
-      </h1>
+    <div className="ui-col">
+      <header className="ui-head">
+        <div className="ui-head-art">
+          <Cover
+            seed="profile:max-leiter"
+            title="Max Leiter"
+            meta="PROFILE  ·  MAXLEITER.COM"
+            chip="Profile"
+            eager
+          />
+        </div>
+        <div className="ui-head-text">
+          <p className="ui-kicker">About</p>
+          <h1 className="ui-title">Max Leiter</h1>
+        </div>
+      </header>
 
-      <div className="space-y-6 text-[var(--gray)] leading-relaxed">
+      <div className="ui-copy">
         <section>
-          <h2 className="text-xl font-mono font-bold mb-3 text-[var(--fg)]">
-            Max Leiter
-          </h2>
-          <p className="mb-4">
+          <h2 className="ui-h2">Now</h2>
+          <p>
             I'm currently working on Claude Code at Anthropic. Previously, I
             helped start{' '}
             <a
@@ -38,9 +50,7 @@ export function AboutContent() {
         </section>
 
         <section>
-          <h2 className="text-xl font-mono font-bold mb-3 text-[var(--fg)]">
-            This site
-          </h2>
+          <h2 className="ui-h2">This site</h2>
           <p>
             This site was previously built with{' '}
             <a
@@ -78,15 +88,13 @@ export function AboutContent() {
         </section>
 
         <section>
-          <h2 className="text-xl font-mono font-bold mb-3 text-[var(--fg)]">
-            Contact
-          </h2>
-          <div className="flex gap-6">
+          <h2 className="ui-h2">Contact</h2>
+          <div className="ui-links">
             <a
               href="https://github.com/maxleiter"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[var(--link)] hover:opacity-80 transition-opacity"
+              className="ui-pill"
             >
               GitHub
             </a>
@@ -94,7 +102,7 @@ export function AboutContent() {
               href="https://twitter.com/maxleiter"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[var(--link)] hover:opacity-80 transition-opacity"
+              className="ui-pill"
             >
               Twitter
             </a>
@@ -102,7 +110,7 @@ export function AboutContent() {
               href="https://www.linkedin.com/in/MaxLeiter"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[var(--link)] hover:opacity-80 transition-opacity"
+              className="ui-pill"
             >
               LinkedIn
             </a>

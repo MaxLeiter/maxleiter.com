@@ -1,16 +1,15 @@
 /**
  * The single owner of the `view-transition-name` convention.
  *
- * The same `blog-post-<slug>` / `note-<slug>` / `page-<name>` rule used to be
- * written out three times: string templates in app/pages/article-pages.tsx, a
- * helper in app/islands/desktop/data.ts, and a regex over the destination URL
- * in framework/client/runtime.ts. A cross-document morph only happens when the
- * outgoing and incoming elements agree exactly, and a mismatch degrades to a
- * cross-fade with no error and no failing test. One module, three importers.
+ * The `blog-post-<slug>` / `note-<slug>` / `page-<name>` rule is needed by the
+ * pages that render the incoming element, the homepage and list pages whose
+ * links opt in to the morph, and the router, which works the name out from the
+ * destination URL. A morph only happens when the outgoing and incoming
+ * elements agree exactly, and a mismatch degrades to a cross-fade with no
+ * error and no failing test, so the rule is written down once, here.
  *
- * Deliberately dependency-free: framework/client/runtime.ts is bundled for the
- * browser by esbuild, and app/islands/desktop/data.ts ships inside the desktop
- * island chunk.
+ * Deliberately dependency-free: framework/client/router.ts is bundled for the
+ * browser by esbuild.
  *
  * In `shared/`: this file may import nothing but node builtins and React
  * types, because the build, the client bundle and `tools/` all reach it.
@@ -46,8 +45,9 @@ export function transitionNameForUrl(url: string): string | null {
  * True when some element already claims `name` as a live inline style.
  *
  * Browser-only. The router asks before handing a clicked card the outgoing
- * name, because the desktop's open post window may already hold it. Two
- * elements holding one `view-transition-name` cancels the transition outright.
+ * name, because an element on the page may already hold it as an inline
+ * style. Two elements holding one `view-transition-name` cancels the
+ * transition outright.
  */
 export function isNameLive(name: string): boolean {
   for (const el of document.querySelectorAll<HTMLElement>('[style]')) {

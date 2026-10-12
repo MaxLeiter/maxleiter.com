@@ -1,4 +1,11 @@
-import { bundledLanguages, createHighlighter, type Highlighter } from 'shiki'
+import {
+  bundledLanguages,
+  bundledThemes,
+  createHighlighter,
+  type Highlighter,
+  normalizeTheme,
+  type ThemeRegistrationResolved,
+} from 'shiki'
 import { transformerStyleToClass } from '@shikijs/transformers'
 
 /**
@@ -63,6 +70,71 @@ pre.shiki span {
 
 let highlighterPromise: Promise<Highlighter> | null = null
 
+/* ------------------------------------------------------------ contrast -- */
+
+const channel = (v: number) => {
+  const c = v / 255
+  return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+}
+
+function rgbOf(hex: string): [number, number, number] | null {
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})(?:[0-9a-f]{2})?$/i.exec(hex)
+  if (!m) return null
+  const h = m[1].length === 3 ? [...m[1]].map((c) => c + c).join('') : m[1]
+  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as [
+    number,
+    number,
+    number,
+  ]
+}
+
+const luminance = ([r, g, b]: [number, number, number]) =>
+  0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
+
+function ratio(a: [number, number, number], b: [number, number, number]) {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+/**
+ * A token colour moved toward white (on a dark block) or black until it reads
+ * at 4.5:1. Both bundled themes have tokens below that -- solarized-dark's
+ * blue is 4.07:1 on its own background -- and code is body text.
+ */
+function legible(colour: string, background: string): string {
+  const fg = rgbOf(colour)
+  const bg = rgbOf(background)
+  if (!fg || !bg || ratio(fg, bg) >= 4.5) return colour
+  const toward = luminance(bg) < 0.5 ? 255 : 0
+  let out = fg
+  for (let t = 0.05; t <= 1 && ratio(out, bg) < 4.5; t += 0.05) {
+    out = fg.map((v) => Math.round(v + (toward - v) * t)) as typeof fg
+  }
+  return `#${out.map((v) => v.toString(16).padStart(2, '0')).join('')}`
+}
+
+async function legibleTheme(
+  name: keyof typeof bundledThemes,
+): Promise<ThemeRegistrationResolved> {
+  const theme = normalizeTheme((await bundledThemes[name]()).default)
+  const fix = <T extends { settings?: { foreground?: string } }>(rule: T) =>
+    rule.settings?.foreground
+      ? {
+          ...rule,
+          settings: {
+            ...rule.settings,
+            foreground: legible(rule.settings.foreground, theme.bg),
+          },
+        }
+      : rule
+  return {
+    ...theme,
+    fg: legible(theme.fg, theme.bg),
+    settings: theme.settings.map(fix),
+    ...(theme.tokenColors ? { tokenColors: theme.tokenColors.map(fix) } : {}),
+  }
+}
+
 /**
  * One highlighter for the whole build. Loading every bundled grammar costs
  * seconds, so the caller passes the fence tags it actually saw.
@@ -71,7 +143,7 @@ export function getHighlighter(langs: string[]): Promise<Highlighter> {
   if (!highlighterPromise) {
     const known = langs.filter((lang) => lang in bundledLanguages)
     highlighterPromise = createHighlighter({
-      themes: [LIGHT_THEME, DARK_THEME],
+      themes: [legibleTheme(LIGHT_THEME), legibleTheme(DARK_THEME)],
       langs: [...new Set([...known, FALLBACK_LANG])],
     })
   }

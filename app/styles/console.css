@@ -1,0 +1,516 @@
+/*
+ * The console theme: the room every page stands in, the top bar, and the
+ * glass reader panel. In the base sheet because every route uses it; the
+ * homepage's own dashboard rules are app/styles/fragments/channels.css.
+ *
+ * `--ui-hue` is the page's accent, set inline on `.ui-room` from the section
+ * (SECTION_HUES in app/components/channels/data.ts).
+ */
+
+.ui-room {
+  --ui-hue: 205;
+  --ui-ink: #f4f7fa;
+  --ui-ink-2: rgba(236, 242, 248, 0.84);
+  --ui-ink-3: rgba(226, 234, 242, 0.7);
+  --ui-accent: hsl(var(--ui-hue) 95% 70%);
+  --ui-glow: hsl(var(--ui-hue) 95% 60%);
+  --ui-panel:
+    linear-gradient(180deg, rgba(30, 38, 49, 0.94), rgba(10, 13, 18, 0.96) 160px),
+    rgba(10, 13, 18, 0.96);
+  --ui-pill:
+    linear-gradient(
+      180deg,
+      rgba(80, 92, 106, 0.55),
+      rgba(20, 25, 32, 0.75) 55%,
+      rgba(10, 13, 18, 0.85)
+    );
+  --ui-line: rgba(255, 255, 255, 0.1);
+  --ui-hover: rgba(255, 255, 255, 0.06);
+  --ui-room-bg:
+    radial-gradient(42% 60% at 60% -6%, rgba(255, 240, 222, 0.13), transparent 72%),
+    radial-gradient(60% 18% at 32% 30%, hsl(var(--ui-hue) 90% 55% / 0.1), transparent 70%),
+    radial-gradient(70% 14% at 70% 22%, hsl(calc(var(--ui-hue) + 40) 80% 50% / 0.06), transparent 70%),
+    linear-gradient(180deg, transparent 0 64%, rgba(150, 175, 205, 0.07) 64.4%, transparent 76%),
+    radial-gradient(120% 90% at 45% 24%, #1c232c 0%, #0b0e12 55%, #050608 100%);
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: var(--ui-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-theme='light'] .ui-room:not(.ch-root) {
+  --ui-ink: #11161c;
+  --ui-ink-2: #2c3742;
+  --ui-ink-3: #4b5764;
+  --ui-accent: hsl(var(--ui-hue) 85% 27%);
+  --ui-glow: hsl(var(--ui-hue) 85% 45%);
+  --ui-panel:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(244, 247, 250, 0.98) 160px),
+    rgba(244, 247, 250, 0.98);
+  --ui-pill:
+    linear-gradient(180deg, #fff, #eef2f6 55%, #e1e7ed);
+  --ui-line: rgba(0, 0, 0, 0.1);
+  --ui-hover: rgba(0, 0, 0, 0.04);
+  --ui-room-bg:
+    radial-gradient(42% 60% at 60% -6%, rgba(255, 255, 255, 0.9), transparent 72%),
+    radial-gradient(60% 18% at 32% 30%, hsl(var(--ui-hue) 90% 60% / 0.14), transparent 70%),
+    linear-gradient(180deg, transparent 0 64%, rgba(255, 255, 255, 0.5) 64.4%, transparent 76%),
+    radial-gradient(120% 90% at 45% 24%, #eef2f6 0%, #d5dce4 55%, #bcc5cf 100%);
+}
+
+/* The room: fixed, so a long article scrolls over it like glass over a set. */
+.ui-room::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--ui-room-bg);
+  pointer-events: none;
+}
+
+/* Era-styled focus: a white core, a dark halo and the accent's glow. */
+.ui-room :focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 7px rgba(0, 0, 0, 0.9),
+    0 0 22px 4px var(--ui-glow);
+  border-radius: 6px;
+}
+
+.ui-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ui-skip {
+  position: fixed;
+  left: 16px;
+  top: -120px;
+  z-index: 30;
+  padding: 12px 18px;
+  border-radius: 24px;
+  background: #0b0f14;
+  color: #fff;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.ui-skip:focus {
+  top: 16px;
+}
+
+/* ------------------------------------------------------------- top bar -- */
+
+.ui-top {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(18px, env(safe-area-inset-top)) 34px 0;
+}
+
+.ui-card,
+.ui-pill {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--ui-pill);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='light'] .ui-room:not(.ch-root) :is(.ui-card, .ui-pill) {
+  border-color: rgba(0, 0, 0, 0.14);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 3px 12px rgba(30, 45, 60, 0.18);
+}
+
+.ui-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 18px 6px 6px;
+  border-radius: 40px;
+  color: inherit;
+  min-height: 44px;
+}
+
+.ui-pfp {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.22),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.ui-card-text b {
+  display: block;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.ui-card-text > span {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ui-ink-2);
+}
+
+.ui-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7be36f;
+  box-shadow: 0 0 8px #7be36f;
+  margin-right: 6px;
+}
+
+.ui-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 14px 8px 11px;
+  border-radius: 30px;
+  color: var(--ui-ink);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ui-pill:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.ui-pill svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --------------------------------------------------------------- panel -- */
+
+.ui-panel {
+  /* How far a breakout (the shot grid, the emoji search) may widen past the
+     article column: the panel's inside, not the 64rem they default to. */
+  --ui-wide: 940px;
+  position: relative;
+  z-index: 1;
+  width: min(980px, calc(100% - 48px));
+  margin: 16px auto 56px;
+  border-radius: 20px;
+  background: var(--ui-panel);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px var(--ui-line),
+    0 30px 80px rgba(0, 0, 0, 0.55);
+}
+
+.ui-room .ui-panel:focus {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px var(--ui-line),
+    0 30px 80px rgba(0, 0, 0, 0.55);
+}
+
+.ui-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 22px 12px 28px;
+  border-bottom: 1px solid var(--ui-line);
+  border-radius: 20px 20px 0 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent);
+}
+
+.ui-crumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+}
+
+.ui-crumbs ol {
+  display: flex;
+  align-items: center;
+}
+
+.ui-crumbs li + li::before {
+  content: '/';
+  margin: 0 10px;
+  color: var(--ui-ink-3);
+  font-weight: 400;
+}
+
+.ui-crumbs a {
+  display: inline-block;
+  padding: 12px 0;
+  color: var(--ui-accent);
+}
+
+.ui-crumbs a[aria-current] {
+  color: var(--ui-ink-3);
+}
+
+.ui-crumbs-meta {
+  color: var(--ui-ink-3);
+  letter-spacing: 1.5px;
+}
+
+.ui-back {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 16px 6px 8px;
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--ui-ink) 30%, transparent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.ui-back:hover {
+  background: var(--ui-hover);
+}
+
+.ui-key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 13px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #e9eef3;
+  background: radial-gradient(circle at 50% 30%, #6b7682, #2a3139 70%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.ui-body {
+  padding: 30px 44px 44px;
+}
+
+.ui-col {
+  max-width: 768px;
+  margin-inline: auto;
+}
+
+.ui-embed .ui-panel {
+  margin-top: 16px;
+}
+
+/* ---------------------------------------------------------------- type -- */
+
+.ui-title {
+  font-size: clamp(30px, 5vw, 42px);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--ui-ink);
+  overflow-wrap: break-word;
+}
+
+.ui-lede {
+  margin-top: 10px;
+  font-size: 17px;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--ui-ink-2);
+}
+
+.ui-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: var(--ui-accent);
+}
+
+.ui-kicker-tag {
+  color: var(--ui-ink-3);
+}
+
+.ui-h2 {
+  margin: 36px 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: var(--ui-accent);
+}
+
+.ui-lede a,
+.ui-copy a,
+.ui-foot a,
+.ui-link {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--link) 45%, transparent);
+  text-underline-offset: 3px;
+}
+
+.ui-copy {
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: var(--ui-ink-2);
+}
+
+.ui-copy p {
+  margin-top: 0.4em;
+}
+
+.ui-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+
+/* ------------------------------------------------------------- article -- */
+
+.ui-head {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  align-items: end;
+  gap: 28px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--ui-line);
+}
+
+.ui-head-art {
+  border-radius: 4.2%/6.7%;
+}
+
+.ui-prose {
+  margin-top: 8px;
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: var(--article-color);
+}
+
+.ui-prose a:not(.react-tweet-theme *) {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+  text-underline-offset: 3px;
+}
+
+.ui-foot {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ui-line);
+  font-size: 14px;
+  color: var(--ui-ink-3);
+}
+
+/* -------------------------------------------------------------- phones -- */
+
+@media (max-width: 700px) {
+  .ui-top {
+    padding: max(12px, env(safe-area-inset-top)) 12px 0;
+  }
+
+  .ui-card {
+    padding: 4px 14px 4px 4px;
+    gap: 9px;
+  }
+
+  .ui-pfp {
+    width: 36px;
+    height: 36px;
+  }
+
+  .ui-card-text b {
+    font-size: 14px;
+  }
+
+  .ui-card-text > span,
+  .ui-pill-label {
+    display: none;
+  }
+
+  .ui-pill {
+    padding: 8px 12px;
+  }
+
+  .ui-tools {
+    gap: 8px;
+  }
+
+  .ui-panel {
+    width: calc(100% - 16px);
+    margin: 10px auto 24px;
+    border-radius: 16px;
+  }
+
+  .ui-bar {
+    padding: 4px 8px 4px 18px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .ui-body {
+    padding: 22px 16px 32px;
+  }
+
+  .ui-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .ui-prose,
+  .ui-copy {
+    font-size: 16px;
+  }
+}

@@ -8,9 +8,9 @@
  * Islands are mounted through a generated wrapper that owns the `hydrate` call,
  * so preact lives in the island's shared chunk and never in this file.
  *
- * The menubar clock is NOT here. `#menubar-clock` only exists on the homepage,
- * where the desktop island hydrates over it and owns it; a second interval
- * writing `textContent` behind preact's back is one owner too many.
+ * The homepage's clock is NOT here. It exists only on the homepage, where the
+ * channels island owns it; a runtime interval writing to it as well would be
+ * one owner too many.
  */
 
 /** The generated island entry returns its own teardown. */
@@ -103,9 +103,9 @@ function schedule(el: HTMLElement): void {
   const on = el.dataset.on
   if (on === 'load') {
     // After first paint, not during it. This runtime is an inline module, so
-    // it runs before the browser has painted anything; starting the desktop's
-    // 48 KB import here put all of it on the homepage's critical path, for an
-    // island whose markup is already server-rendered and already reads as
+    // it runs before the browser has painted anything; starting a large
+    // island's import here put all of it on the homepage's critical path, for
+    // an island whose page is already server-rendered and already reads as
     // links. rAF fires before the paint, the `setTimeout` after it.
     requestAnimationFrame(() => setTimeout(() => void mount(el), 0))
   } else if (on === 'visible') {
@@ -128,9 +128,10 @@ function scheduleIslands(): void {
 /**
  * Unmounts every island before the router replaces the body.
  *
- * Islands register listeners on `window` and `document` -- the desktop's Ctrl+W
- * handler, its breakpoint and clock subscriptions -- which outlive their own
- * DOM. Without this they would accumulate one set per navigation.
+ * Islands register listeners on `window` and `document` -- the channels
+ * scene's keyboard, wheel and gamepad handlers, its animation frame -- which
+ * outlive their own DOM. Without this they would accumulate one set per
+ * navigation.
  */
 function unmountIslands(): void {
   generation++
@@ -208,16 +209,6 @@ document.addEventListener('click', (event) => {
     document
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', next === 'light' ? '#fff' : '#000000')
-    // Open windows iframe same-origin embeds, so their documents are ours to
-    // write. Each booted from localStorage before this click and would keep
-    // the old theme until reloaded.
-    for (const frame of document.querySelectorAll('iframe')) {
-      const doc = frame.contentDocument?.documentElement
-      if (doc) {
-        doc.dataset.theme = next
-        doc.style.colorScheme = next
-      }
-    }
     return
   }
 
@@ -253,10 +244,10 @@ document.addEventListener('click', (event) => {
  * Keep the import lazy: a static one would put the router in this inline
  * runtime on every page.
  */
-// A framed document is an `/embed` inside a desktop window. Its links carry
-// `<base target="_top">` and must reach the browser untouched; the router
-// reads the anchor's own `target`, which `<base>` does not set, and would
-// swap the new page into the frame.
+// A framed document is an `/embed` inside someone else's page. Its links
+// carry `<base target="_top">` and must reach the browser untouched; the
+// router reads the anchor's own `target`, which `<base>` does not set, and
+// would swap the new page into the frame.
 const framed = window.self !== window.top
 
 if (!framed) {

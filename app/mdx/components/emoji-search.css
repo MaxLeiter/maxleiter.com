@@ -283,7 +283,7 @@
    first pixel of overflow. */
 @media (min-width: 60rem) {
   .es-root {
-    --es-breakout: calc((min(64rem, 100vw - 5rem) - 100%) / 2);
+    --es-breakout: calc((min(var(--ui-wide, 64rem), 100vw - 5rem) - 100%) / 2);
     margin-inline: calc(-1 * var(--es-breakout));
   }
 }

@@ -388,7 +388,7 @@ export function toProjectCard(project: Project): ProjectCard {
 
 /**
  * One flat, date-sorted list of local posts, external posts and notes, which is
- * what /blog, the homepage and the desktop island render.
+ * what /blog, the search index and the feed render.
  */
 export function buildEntries(ctx: BuildContext): ListEntry[] {
   const posts: ListEntry[] = [...ctx.posts, ...ctx.externalPosts]

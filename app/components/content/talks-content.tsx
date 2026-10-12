@@ -1,4 +1,4 @@
-import { ListCard } from '@components/desktop/list-card'
+import { EntryList } from '@components/lists'
 
 export interface Talk {
   id: string
@@ -141,24 +141,19 @@ const TALKS: Talk[] = [
 
 export function TalksContent() {
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-2 text-[var(--fg)]">
-        talks/
-      </h1>
-      <p className="mb-8 text-[var(--gray)]">Talks I like.</p>
-
-      <ul className="space-y-2">
-        {TALKS.map((talk) => (
-          <ListCard
-            key={talk.id}
-            href={`https://www.youtube.com/watch?v=${talk.videoId}`}
-            title={talk.title}
-            description={`${talk.channel} · ${talk.duration}`}
-            external
-            icon={false}
-          />
-        ))}
-      </ul>
-    </div>
+    <>
+      <h1 className="ui-title">Talks</h1>
+      <p className="ui-lede">Talks I like.</p>
+      <EntryList
+        items={TALKS.map((talk) => ({
+          href: `https://www.youtube.com/watch?v=${talk.videoId}`,
+          title: talk.title,
+          seed: `talk:${talk.id}`,
+          meta: `${talk.channel}  ·  ${talk.duration}`.toUpperCase(),
+          chip: 'Talk',
+          external: true,
+        }))}
+      />
+    </>
   )
 }

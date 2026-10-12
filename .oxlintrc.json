@@ -58,7 +58,6 @@
         "framework/**",
         "app/pages/**",
         "app/islands/**",
-        "app/components/static/**",
         "app/mdx/static-components.tsx"
       ],
       "rules": {

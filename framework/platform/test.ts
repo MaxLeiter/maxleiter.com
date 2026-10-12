@@ -507,7 +507,7 @@ async function main(): Promise<void> {
     assert.equal(pruned.sheets.page, '.d{box-shadow:var(--tw-a)}')
     assert.deepEqual(pruned.dropped, { base: ['--dead', '--tw-b', 'b', 'c'] })
   })
-  // What the desktop fragment is made of: a grouped selector that kept one
+  // What the homepage fragment is made of: a grouped selector that kept one
   // member subtracts to exactly the other.
   check('subtractCss leaves exactly what the part lacks, in order', () => {
     assert.equal(

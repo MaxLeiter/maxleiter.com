@@ -1,0 +1,665 @@
+/*
+ * The homepage dashboard (app/pages/home.tsx) and the channels island's 3D
+ * mode on top of it.
+ *
+ * Without the scene this is a page of rows: a nav of channel names that jump
+ * to them, then one sideways-scrolling row of tiles per channel. With the
+ * scene, `.ch-3d` on the root pins the page to the viewport, hides the rows
+ * visually (they stay the focusable, accessible copy the scene follows), and
+ * the island positions the channel names and the HUD over the canvas.
+ */
+
+.ch-root {
+  color-scheme: dark;
+  /* Under the room's gradients, and the colour every contrast check sees:
+     `--bg` is white in the light theme, and this page stays dark. */
+  background-color: #07090c;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.ch-clock {
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+.ch-clock:empty {
+  display: none;
+}
+
+.ch-snd[aria-pressed='true'] .ch-snd-off,
+.ch-snd[aria-pressed='false'] .ch-snd-on {
+  display: none;
+}
+
+.ch-snd-body {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* ------------------------------------------------------- flat dashboard -- */
+
+.ch-chans {
+  position: fixed;
+  z-index: 4;
+  left: 34px;
+  top: 130px;
+  width: 210px;
+}
+
+.ch-chans ul {
+  display: grid;
+  gap: 2px;
+}
+
+.ch-chan {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.12em;
+  border-radius: 12px;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  color: var(--ui-ink-2);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+  transform-origin: 0 50%;
+}
+
+.ch-chan small {
+  align-self: flex-start;
+  margin: 0.45em 0 0 0.5em;
+  font-size: 0.34em;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--ui-ink-3);
+}
+
+.ch-chan:hover {
+  color: var(--ui-ink);
+}
+
+/* The channel in view is the big one: the target, or Home before any. */
+.ch-root:has(.ch-row:target) .ch-chan[aria-current],
+.ch-root:not(:has(.ch-row:target)) .ch-chan[href='#ch-home'],
+.ch-root:has(#ch-blog:target) .ch-chan[href='#ch-blog'],
+.ch-root:has(#ch-notes:target) .ch-chan[href='#ch-notes'],
+.ch-root:has(#ch-projects:target) .ch-chan[href='#ch-projects'],
+.ch-root:has(#ch-work:target) .ch-chan[href='#ch-work'],
+.ch-root:has(#ch-about:target) .ch-chan[href='#ch-about'] {
+  font-size: 48px;
+  color: var(--ui-ink);
+}
+
+.ch-main {
+  position: relative;
+  z-index: 1;
+  padding: 26px 0 60px 280px;
+}
+
+.ch-main:focus {
+  outline: none;
+}
+
+.ch-row {
+  scroll-margin-top: 20px;
+  padding-top: 14px;
+}
+
+.ch-row-head {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding-right: 34px;
+}
+
+.ch-row-h {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: var(--ui-accent);
+}
+
+.ch-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ui-ink-2);
+}
+
+.ch-more:hover {
+  color: var(--ui-ink);
+}
+
+.ch-tiles {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 6px;
+  padding: 10px 34px 64px 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.ch-item {
+  flex: 0 0 auto;
+  width: 250px;
+  scroll-snap-align: start;
+}
+
+.ch-item:first-child {
+  width: 420px;
+}
+
+.ch-tile {
+  display: block;
+  border-radius: 4.2%/6.7%;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* The mirror floor, where the browser can draw one. */
+  -webkit-box-reflect: below 12px
+    linear-gradient(transparent 62%, rgba(255, 255, 255, 0.16));
+}
+
+.ch-tile .cv-box {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 18px 30px rgba(0, 0, 0, 0.5);
+}
+
+.ch-tile:hover,
+.ch-tile:focus-visible {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.ch-root .ch-tile:focus-visible {
+  border-radius: 18px;
+  outline: 4px solid #fff;
+  outline-offset: 4px;
+  box-shadow:
+    0 0 0 9px #000,
+    0 0 34px 10px var(--ui-glow);
+}
+
+/* The sheen a tile catches when it gains focus. */
+.ch-tile .cv-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 120, 120, 0.22) 45%,
+    rgba(255, 255, 255, 0.4) 49%,
+    rgba(120, 180, 255, 0.22) 53%,
+    transparent 60%
+  );
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.ch-tile:hover .cv-box::before,
+.ch-tile:focus-visible .cv-box::before {
+  transform: translateX(120%);
+  transition: transform 0.9s ease;
+}
+
+@media (max-width: 900px) {
+  .ch-chans {
+    position: sticky;
+    top: 0;
+    left: auto;
+    width: auto;
+    margin-top: 8px;
+    padding: 6px 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: linear-gradient(180deg, rgba(5, 6, 8, 0.85), rgba(5, 6, 8, 0));
+  }
+
+  .ch-chans ul {
+    display: flex;
+    gap: 6px;
+  }
+
+  .ch-chan,
+  .ch-root:has(.ch-row:target) .ch-chan[aria-current],
+  .ch-root:not(:has(.ch-row:target)) .ch-chan[href='#ch-home'],
+  .ch-root:has(#ch-blog:target) .ch-chan[href='#ch-blog'],
+  .ch-root:has(#ch-notes:target) .ch-chan[href='#ch-notes'],
+  .ch-root:has(#ch-projects:target) .ch-chan[href='#ch-projects'],
+  .ch-root:has(#ch-work:target) .ch-chan[href='#ch-work'],
+  .ch-root:has(#ch-about:target) .ch-chan[href='#ch-about'] {
+    font-size: 22px;
+    padding: 0 10px;
+  }
+
+  .ch-main {
+    padding: 8px 0 40px;
+  }
+
+  .ch-row-head {
+    padding: 0 16px;
+  }
+
+  .ch-tiles {
+    padding: 8px 16px 48px;
+    scroll-padding-left: 16px;
+    gap: 16px;
+  }
+
+  .ch-item {
+    width: 62vw;
+    max-width: 260px;
+  }
+
+  .ch-item:first-child {
+    width: 82vw;
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 700px) {
+  .ch-clock {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------- 3D mode -- */
+
+/* While the scene starts, over the flat dashboard. */
+.ch-boot .ch-hud,
+.ch-boot .ch-ring,
+.ch-boot .ch-reader,
+.ch-boot .ch-chans {
+  visibility: hidden;
+}
+
+.ch-gl {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pinch-zoom;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.ch-gl.ch-on {
+  opacity: 1;
+}
+
+.ch-3d {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: pinch-zoom;
+}
+
+.ch-3d .ch-main {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ch-3d .ch-chans {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  overflow: visible;
+  animation: ch-in 0.5s ease both;
+}
+
+.ch-3d .ch-chans ul {
+  display: block;
+}
+
+.ch-3d .ch-chan {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-height: 0;
+  padding: 0 0.12em;
+  font-size: 56px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--ui-ink);
+  will-change: transform, opacity;
+}
+
+.ch-3d .ch-chan:focus-visible {
+  opacity: 1 !important;
+  outline-width: calc(3px / var(--sc, 1));
+  outline-offset: calc(3px / var(--sc, 1));
+}
+
+.ch-3d .ui-top {
+  z-index: 5;
+}
+
+@keyframes ch-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The HUD the island adds: caption, pips, guide, focus ring, reader. */
+
+.ch-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  animation: ch-in 0.5s ease both;
+}
+
+.ch-cap,
+.ch-pips,
+.ch-guide {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(
+    180deg,
+    rgba(30, 38, 48, 0.86),
+    rgba(7, 10, 14, 0.9) 60%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 10px 30px rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.ch-cap {
+  width: 520px;
+  padding: 12px 18px 14px;
+  border-radius: 16px;
+  will-change: transform, opacity;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+}
+
+.ch-cap-k {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: var(--ui-accent);
+}
+
+.ch-cap-t {
+  margin-top: 3px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.2px;
+}
+
+.ch-cap-d {
+  display: -webkit-box;
+  margin-top: 5px;
+  overflow: hidden;
+  font-size: 14.5px;
+  line-height: 1.4;
+  color: rgba(240, 245, 250, 0.9);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.ch-pips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+.ch-pip {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.24);
+  transition:
+    background 0.25s,
+    transform 0.25s;
+}
+
+.ch-pip.ch-pip-on {
+  background: #fff;
+  transform: scale(1.35);
+  box-shadow: 0 0 10px var(--ui-glow);
+}
+
+.ch-pips-n {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--ui-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.ch-guide {
+  left: 50%;
+  top: auto;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 26px;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  padding: 6px 20px;
+  border-radius: 30px;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--ui-ink-2);
+}
+
+.ch-guide > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ch-guide-pad {
+  display: none !important;
+}
+
+.ch-guide-pad.ch-on {
+  display: flex !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ch-guide-touch {
+    display: none !important;
+  }
+}
+
+@media (hover: none) {
+  .ch-guide-keys {
+    display: none !important;
+  }
+}
+
+@media (max-height: 420px) and (min-aspect-ratio: 1/1) {
+  .ch-guide {
+    display: none;
+  }
+}
+
+.ch-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  border-radius: 18px;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 4px #fff,
+    0 0 0 8px #000,
+    0 0 34px 8px var(--ui-glow);
+  transition: opacity 0.2s;
+}
+
+.ch-kbd .ch-ring.ch-on {
+  opacity: 1;
+}
+
+/* The reader: links that leave the site open here first. */
+
+.ch-reader {
+  position: fixed;
+  z-index: 6;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(28, 36, 46, 0.9),
+    rgba(9, 12, 17, 0.94) 140px
+  );
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+.ch-reader.ch-on {
+  pointer-events: auto;
+}
+
+.ch-reader .ui-bar {
+  padding: 14px 22px 12px 28px;
+}
+
+.ch-reader-body {
+  overflow: auto;
+  padding: 26px 44px 40px;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+}
+
+.ch-reader-art {
+  width: min(100%, 260px);
+  margin-bottom: 22px;
+}
+
+.ch-reader-title:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.ch-reader-text {
+  margin: 14px 0 26px;
+  max-width: 62ch;
+  font-size: 17px;
+  line-height: 1.65;
+  color: rgba(240, 244, 248, 0.92);
+}
+
+.ch-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 20px 10px 10px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.26),
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(0, 0, 0, 0.1)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.ch-go .ui-key {
+  background: radial-gradient(circle at 50% 30%, #8fd0ff, #2a76b8 70%);
+}
+
+@media (max-width: 700px) {
+  .ch-3d .ch-chan {
+    font-size: 40px;
+  }
+
+  .ch-cap {
+    width: calc(100vw - 32px);
+  }
+
+  .ch-cap-t {
+    font-size: 20px;
+  }
+
+  .ch-cap-d {
+    font-size: 13.5px;
+  }
+
+  .ch-guide {
+    gap: 14px;
+    font-size: 12px;
+  }
+
+  .ch-reader-body {
+    padding: 20px 20px 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ch-tile,
+  .ch-gl,
+  .ch-pip {
+    transition: none;
+  }
+
+  .ch-tile .cv-box::before {
+    display: none;
+  }
+
+  .ch-3d .ch-chans,
+  .ch-hud {
+    animation: none;
+  }
+}

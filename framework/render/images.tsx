@@ -30,12 +30,16 @@ export const IMAGE_QUALITY = 75
 const DEFAULT_WIDTH = 1536
 
 /**
- * The real column width. `max-w-3xl` is 48rem = 768px (article-pages.tsx)
- * inside `p-6`, so the breakpoint is 768 + 48 and the wide case is 768px flat.
- * The old `700px` understated the desktop column by 68px, which is how a page
- * ends up upscaling an image it had a bigger candidate for.
+ * The real column width: `.ui-col` is 768px inside the reader panel
+ * (app/styles/console.css). On a phone the panel sits 8px in from each edge
+ * with 16px of padding, so the column is the viewport less 48px. Wider, the
+ * panel is the viewport less 48px with 44px of padding a side, so the column
+ * is the viewport less 136px until that reaches 768px at 904px. The old
+ * `700px` understated the desktop column by 68px, which is how a page ends up
+ * upscaling an image it had a bigger candidate for.
  */
-const DEFAULT_SIZES = '(max-width: 816px) calc(100vw - 48px), 768px'
+const DEFAULT_SIZES =
+  '(max-width: 700px) calc(100vw - 48px), (max-width: 904px) calc(100vw - 136px), 768px'
 
 /** Formats /_vercel/image cannot optimize, or would reject outright. */
 const PASS_THROUGH = /\.(webm|mp4|m4v|mov|ogv|svg)(\?|$)/i

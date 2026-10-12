@@ -414,7 +414,7 @@ function filterRules(css: string, keep: Keep): string {
  * output never names.
  *
  * The sheets are pruned together because a variable crosses sheets: the
- * desktop fragment's shadow utilities read `@property` rules that live in the
+ * homepage fragment's utilities can read `@property` rules that live in the
  * base sheet, and dropping a registration changes the variable's initial
  * value and whether it inherits.
  */

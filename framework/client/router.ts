@@ -218,10 +218,10 @@ function resetLinkObserver(): void {
  * Hands the outgoing name to the element the reader actually clicked, so a
  * card morphs into the article it opens.
  *
- * It stands down when something already holds that name, which is how the
- * desktop's open post window wins over the card behind it: the window frame
- * renders `view-transition-name` itself, and two elements holding one name
- * cancels the transition outright.
+ * It stands down when something already holds that name as a live inline
+ * style -- an article's own cover, say, when a link on the article points at
+ * itself -- because two elements holding one name cancels the transition
+ * outright.
  */
 function claimTransitionName(source: Element | null, url: string): () => void {
   const noop = () => undefined

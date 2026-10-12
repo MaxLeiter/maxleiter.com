@@ -1,0 +1,97 @@
+/*
+ * Box art (app/components/cover). The motif is an <img>; the type is inline
+ * SVG in the same 640x400 units the channels island draws its textures in, so
+ * these sizes are cover units, not CSS pixels.
+ */
+
+.cv-box {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 4.2%/6.7%;
+  background: #0b0e12;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 18px 40px rgba(0, 0, 0, 0.45);
+  isolation: isolate;
+}
+
+.cv-art,
+.cv-type {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cv-art {
+  max-width: none;
+  object-fit: cover;
+}
+
+.cv-type {
+  font-family: var(--font-sans);
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+  user-select: none;
+}
+
+.cv-kw {
+  font-weight: 700;
+  fill: #fff;
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 2px;
+}
+
+.cv-kw-huge {
+  fill-opacity: 0.92;
+}
+
+.cv-t {
+  font-size: 30px;
+  font-weight: 600;
+  fill: #fff;
+}
+
+.cv-m,
+.cv-c {
+  font-weight: 700;
+  letter-spacing: 2.5px;
+}
+
+.cv-m {
+  font-size: 14px;
+  fill: rgba(255, 255, 255, 0.72);
+}
+
+.cv-c {
+  font-size: 13px;
+  fill: #fff;
+}
+
+.cv-chip {
+  fill: rgba(0, 0, 0, 0.5);
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1.5px;
+}
+
+/* The edge highlight the WebGL tile gets from its clearcoat. */
+.cv-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.22);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0) 38%
+  );
+  pointer-events: none;
+}
+
+.cv-mini {
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}

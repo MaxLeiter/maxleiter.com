@@ -1,4 +1,4 @@
-import { ListCard } from '@components/desktop/list-card'
+import { TileGrid } from '@components/lists'
 
 export interface Lab {
   id: string
@@ -62,23 +62,20 @@ const LABS: Lab[] = [
 
 export function LabsContent() {
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
-        labs/
-      </h1>
-
-      <ul className="space-y-2">
-        {LABS.map((lab) => (
-          <ListCard
-            key={lab.id}
-            href={lab.url}
-            title={lab.name}
-            description={lab.description}
-            external
-            icon={false}
-          />
-        ))}
-      </ul>
-    </div>
+    <>
+      <h1 className="ui-title">Labs</h1>
+      <p className="ui-lede">Experimental projects and playthings.</p>
+      <TileGrid
+        items={LABS.map((lab) => ({
+          href: lab.url,
+          title: lab.name,
+          seed: `lab:${lab.id}`,
+          meta: `Lab  ·  ${new URL(lab.url, 'https://maxleiter.com').host}`.toUpperCase(),
+          chip: 'Lab',
+          desc: lab.description,
+          external: /^https?:/.test(lab.url),
+        }))}
+      />
+    </>
   )
 }

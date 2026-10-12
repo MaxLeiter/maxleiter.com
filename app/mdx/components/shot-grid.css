@@ -14,7 +14,7 @@
    actually legible. `100%` is the article width, whatever it happens to be. */
 @media (min-width: 60rem) {
   .shot-grid {
-    --breakout: calc((min(64rem, 100vw - 3rem) - 100%) / 2);
+    --breakout: calc((min(var(--ui-wide, 64rem), 100vw - 3rem) - 100%) / 2);
     margin-left: calc(-1 * var(--breakout));
     margin-right: calc(-1 * var(--breakout));
   }

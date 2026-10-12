@@ -33,7 +33,7 @@ import {
  */
 
 /** Bump when the plugin stack changes so stale cache entries are ignored. */
-const CACHE_VERSION = 'v3'
+const CACHE_VERSION = 'v4'
 
 export type MdxComponents = Record<string, ComponentType<never> | unknown>
 

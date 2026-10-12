@@ -7,6 +7,7 @@ import type {
 } from '../shared/types'
 import { absoluteUrl } from '../content'
 import { collectLanguages, getHighlighter, highlightCss } from './highlight'
+import { takeEmittedAssets } from './assets'
 import { takeIslandManifest } from './islands'
 import { renderPostHtml } from './mdx'
 import { getPages } from './pages'
@@ -40,7 +41,7 @@ export interface RenderedPage extends RouteInfo {
 /**
  * The union across every page, which is what the client bundler needs. Each
  * page carries only its own names, so a content page's `__islands` JSON does
- * not advertise the desktop.
+ * not advertise the homepage's scene.
  */
 let allIslands = new Set<string>()
 
@@ -48,8 +49,16 @@ export function islandManifest(): string[] {
   return [...allIslands].sort()
 }
 
+/** Files the pages emitted while rendering, keyed by public URL. */
+let assets = new Map<string, string>()
+
+export function emittedAssets(): Map<string, string> {
+  return assets
+}
+
 export async function renderAll(ctx: BuildContext): Promise<RenderedPage[]> {
   takeIslandManifest()
+  takeEmittedAssets()
   allIslands = new Set<string>()
   const pages = await getPages(ctx)
   const rendered: RenderedPage[] = []
@@ -109,6 +118,7 @@ export async function renderAll(ctx: BuildContext): Promise<RenderedPage[]> {
     }
   }
 
+  assets = takeEmittedAssets()
   return rendered
 }
 

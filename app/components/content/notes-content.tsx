@@ -1,52 +1,25 @@
-'use client'
-
-import { ListCard } from '@components/desktop/list-card'
+import { EntryList } from '@components/lists'
 import type { Note } from '@framework/shared/types'
 
 interface NotesContentProps {
   notes: Note[]
-  onNoteClick?: (slug: string) => void
-  onNoteHover?: (slug: string) => void
-  onNoteHoverEnd?: () => void
 }
 
-export function NotesContent({
-  notes,
-  onNoteClick,
-  onNoteHover,
-  onNoteHoverEnd,
-}: NotesContentProps) {
+export function NotesContent({ notes }: NotesContentProps) {
   return (
-    <div className="max-w-3xl">
-      <h1
-        className="text-3xl font-mono font-bold mb-8"
-        style={{ color: 'var(--article-color)' }}
-      >
-        notes/
-      </h1>
-
-      <ul className="space-y-2">
-        {notes.map((note) => (
-          <ListCard
-            key={note.slug}
-            href={`/notes/${note.slug}`}
-            title={note.title}
-            description={note.description}
-            meta={`${note.date} • ${note.type}`}
-            icon
-            onClick={
-              onNoteClick
-                ? (e) => {
-                    e.preventDefault()
-                    onNoteClick(note.slug)
-                  }
-                : undefined
-            }
-            onMouseEnter={() => onNoteHover?.(note.slug)}
-            onMouseLeave={onNoteHoverEnd}
-          />
-        ))}
-      </ul>
-    </div>
+    <>
+      <h1 className="ui-title">Notes</h1>
+      <p className="ui-lede">Short-form thoughts, code snippets, and tips.</p>
+      <EntryList
+        items={notes.map((note) => ({
+          href: `/notes/${note.slug}`,
+          title: note.title,
+          seed: `note:${note.slug}`,
+          meta: `${note.type}  ·  ${note.date}`.toUpperCase(),
+          chip: 'Note',
+          desc: note.description,
+        }))}
+      />
+    </>
   )
 }

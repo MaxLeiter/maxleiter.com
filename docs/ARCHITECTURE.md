@@ -11,10 +11,11 @@ route is rendered to HTML at build time and served as a file. The output is a
 [Vercel Build Output API](https://vercel.com/docs/build-output-api/v3)
 directory: static files plus a routing table.
 
-78 routes, 4 islands, 12 platform routes, and it builds in about 350 ms. A
-content page ships roughly 1 KB of JavaScript. The homepage, which has a
-draggable window manager on it, ships about 17 KB brotli, and none of it before
-first paint.
+82 routes, 5 islands, 12 platform routes, and it builds in about 350 ms. A
+content page ships roughly 1 KB of JavaScript. The homepage is a channel
+dashboard that works as plain links; where WebGL2 runs well, a 3D room of the
+same channels takes it over after first paint, for about 26 KB brotli that
+nothing else downloads.
 
 `bun run build.ts` is the local path. `node scripts/build.mjs` is what Vercel
 runs, and the two produce byte-identical output. Nothing in the build uses a
@@ -44,6 +45,7 @@ framework/
                             requests": resolve once, commit, read from the repo
   render/                   everything that turns content into markup
     index.ts                the server bundle's entry: the render loop
+    assets.ts               files pages emit while rendering (the cover art)
     pages.ts                the page registry, every route as a PageDef
     shell.tsx               the HTML shell: head tags, inlined CSS, scripts
     islands.tsx             the build-time <Island> marker and its manifest
@@ -64,11 +66,12 @@ framework/
     router.ts               the same-document router, lazily imported
 app/
   pages/                    page components, plain React
-  islands/                  the interactive ones
+  islands/                  the interactive ones; channels/ is the 3D room
   components/               shared components, server-rendered
   mdx/                      the MDX component maps: static and island halves
   lib/                      the client-safe app layer (see Types)
-  styles/                   global.css, markdown.css, the CSS fragments
+  styles/                   global.css, markdown.css, console.css (the
+                            theme), the CSS fragments
 posts/ notes/               MDX content
 public/                     copied verbatim
 tools/snapshot.ts           the regression gate
@@ -114,12 +117,13 @@ per-step times in the report do not sum to the total.
 
 6. **css fragments** — each conditional slice of the stylesheet is read and
    minified, every sheet is pruned against the classes the build emits, the
-   rules only the desktop can use are subtracted from the base sheet into a
+   rules only the homepage can use are subtracted from the base sheet into a
    fragment of their own, and each fragment is given the markup marker that
    proves a page needs it.
 
 7. **write html** — each page gets the base sheet plus only the fragments its
-   markup references, wrapped in the shell. Written twice: `index.html` and
+   markup references, wrapped in the shell, and the files the pages emitted
+   while rendering (the cover art) are written under `/_assets/`. Written twice: `index.html` and
    `index.partial.html`. The route manifest goes to
    `.vercel/output/routes.json`, beside `static/` so it is never served.
 
@@ -164,32 +168,35 @@ seventeen variables in `global.css` nothing reads. The build log lists what
 each sheet lost, minus Tailwind's own `--tw-*` variables.
 
 The sheets are pruned together, not one at a time, because a variable crosses
-sheets: the desktop fragment's utilities read `@property` rules that live in
-the base sheet, and dropping a registration changes the variable's initial
+sheets: the homepage fragment's utilities can read `@property` rules that live
+in the base sheet, and dropping a registration changes the variable's initial
 value and whether it inherits. Classes inside `:not()`, `:is()` and `:where()`
 never count against a selector, which errs toward keeping.
 
-The base sheet is the pruned Tailwind build minus what only the desktop can
+The base sheet is the pruned Tailwind build minus what only the homepage can
 use, and that difference is decided from the output too (`assembleSheets` in
 `build.ts`). The sheet is pruned a second time against everything but the
-desktop: the bodies without its `data-island="desktop"` marker, and only the
+homepage: the bodies without its `data-island="channels"` marker, and only the
 client files some other entry can load, following static and lazy imports.
 That second view is the base sheet. What it lost, subtracted from the first by
-atom (`subtractCss`), is the `desktop` fragment, so only the homepage pays for
-it. Two details carry the weight. Reachability, not the entry file: most of
-the window chrome lives in a chunk esbuild split out for the desktop's own
-lazy imports, and esbuild's metafile lists every lazily imported chunk as an
-entry point, so only the entries the build declared count as roots. And atoms,
+atom (`subtractCss`), is the `home` fragment, so only the homepage pays for
+it. Today that is a few dozen bytes, because the dashboard's rules are a plain
+sheet of their own (`channels`), but the mechanism costs nothing to keep. Two
+details carry the weight. Reachability, not the entry file: the whole 3D scene
+lives in a chunk esbuild split out for the channels island's lazy import, and
+esbuild's metafile lists every lazily imported chunk as an entry point, so
+only the entries the build declared count as roots. And atoms,
 not blocks: a grouped selector can lose one member and a `:root` block one
 variable, so the subtraction compares one declaration plus the headers above
-it, which is why `.a,.b{d}` is split into `.a{d}.b{d}`. The desktop half keeps
+it, which is why `.a,.b{d}` is split into `.a{d}.b{d}`. The homepage half keeps
 the full sheet's order within itself, but it lands after the whole base sheet,
-so a homepage element carrying a desktop-only utility and a shared responsive
+so a homepage element carrying a homepage-only utility and a shared responsive
 variant of the same property resolves in the fragment's favour; the visual
 comparison over the homepage is what catches that.
 
 Every fragment is a plain stylesheet whose scoping is written into the class
-names — `.tree-`, `.shot-`, `.mc-`, `.mdx-note`, `.rt-` — and `PLAIN_SHEETS` in
+names — `.tree-`, `.shot-`, `.mc-`, `.mdx-note`, `.rt-`, `.cv-` (cover art),
+`.ch-` (the homepage), `.ui-list`/`.ui-grid` (section lists) — and `PLAIN_SHEETS` in
 `build.ts` pairs each with the marker that gates it. The markers are
 attribute-shaped (`class="shiki`, not `shiki`) because a bare word matches
 prose, and because `.react-tweet-theme` appears in the base sheet as a
@@ -222,6 +229,10 @@ and mounts it on Cmd/Ctrl+K or a `[data-open-palette]` click.
   must render markup identical to their fallback on first render.
 - The hydrate wrapper that owns the `hydrateRoot` call is a virtual esbuild
   entry (`island:<name>`), which is what keeps preact out of the runtime.
+- An island written as `app/islands/<name>.ts` is vanilla: no JSX, nothing to
+  hydrate, and its default export is the mount function itself, so the entry
+  re-exports it and no preact ships with it. The homepage's `channels` island
+  is the one: it drives server-rendered links and renders nothing.
 - A real fallback is preferred, because it is what makes the page work with
   JavaScript off. An empty fallback is correct only where the island adds a
   control surface rather than reproducing markup: the shot grid renders just a
@@ -237,13 +248,13 @@ and mounts it on Cmd/Ctrl+K or a `[data-open-palette]` click.
   attribute becomes a payload key, camelCased by the dataset API: write
   `data-section`, not `data-track-section`. `data-vt-name` is excluded from that
   payload because it is the transition opt-in.
-- The menubar clock is not the runtime's. `#menubar-clock` exists only on the
-  homepage, where the desktop island hydrates over it and owns it; a second
-  interval writing `textContent` behind preact's back is one owner too many.
+- The homepage clock is not the runtime's. It exists only on the homepage,
+  where the channels island fills it while the 3D room runs; a second
+  interval writing to it would be one owner too many.
 - View-transition names have a single owner: the router's click handler.
   Elements opt in with `data-vt-name`, it names the one that was clicked, and
   it stands down when something already holds that name as a live inline
-  style, which is how an open post window wins over the card behind it. Two
+  style. Two
   elements holding one name cancels the transition outright. The name comes
   from `transitionName(kind, slug)` in `framework/shared/transitions.ts`, never
   from a string spelled out at a call site.
@@ -352,6 +363,10 @@ a fast first click has to ride the `hold` fallback.
   page it varies, and it is always `noindex`. A `has: query embed` rewrite keeps
   old `?embed=true` links working, for `/blog/` and `/notes/` only.
 - Hashed assets under `static/_assets/<name>.<8-char-hash>.<ext>`, immutable.
+  That includes what pages emit while rendering through `render/assets.ts`:
+  every `cover.<hash>.svg` and the top bar's `avatar.<hash>.svg`. Identical
+  contents share one file, which is how a homepage tile and its article
+  header point at the same cover.
 - Unhashed root files: `search-index.json`, `feed.xml`, `sitemap.xml`,
   `robots.txt`, `opengraph-image.png`, `blog/<slug>/opengraph-image.png`.
 - `public/**` is copied verbatim. `public/feed.xml` is not; `feeds.ts` writes
@@ -362,7 +377,8 @@ a fast first click has to ride the `hold` fallback.
   `[data-theme='light']` is the light selector everywhere. The script also
   corrects `<meta name="theme-color">` (shipped dark, like the document), and
   the runtime's toggle keeps it in step; the pair of values must match `--bg`
-  in `global.css`.
+  in `global.css`. The homepage is dark in both themes (`color-scheme: dark`
+  on its root, and no toggle in its bar): it is a room, not a page.
 
 ## Types
 
@@ -373,9 +389,10 @@ Two files, one source of truth each.
   describe records loaded with `node:fs` and gray-matter, but the file itself
   imports nothing, which is the `shared/` rule.
 - `app/lib/types.ts` owns the client-safe view types plus `entryHref` and
-  `POPULAR_SLUGS`. It lives under `app/lib/` because the desktop island imports
-  it, and nothing the client bundle reaches may pull in `node:fs` or
-  gray-matter. `window-styles.ts` is there for the same reason.
+  `POPULAR_SLUGS`. It lives under `app/lib/` because components that islands
+  share import it, and nothing the client bundle reaches may pull in `node:fs`
+  or gray-matter. `cover-art.ts` is there for the same reason: the build writes
+  its SVGs and the channels island lays out the same type with it.
 
 Anything shared between the build and an island has to be a leaf module. That is
 what both `app/lib/` and `framework/shared/` are for; the difference is only
@@ -469,8 +486,46 @@ checked with real hashes instead of stated in prose.
 Still-true decisions, newest first. A decision that stops being true should be
 deleted from this list rather than annotated.
 
-**The desktop fragment is derived from the output, not from its sources.** A
-hand-kept list of the desktop's source files, fed to a second Tailwind run,
+**The homepage is a channel dashboard, and its 3D room is optional.** The
+draggable window manager was replaced in October 2026 by a late-2000s console
+dashboard: six channels of tiles (Home, Blog, Notes, Projects, Work, About)
+built from the real `BuildContext` by `app/components/channels/data.ts`. The
+server renders it as rows of real links that scroll sideways, with a nav that
+jumps between them and `:has(:target)` picking the big channel name, so it is
+complete with JavaScript off. The vanilla `channels` island then lazily imports
+a raw-WebGL2 scene (`app/islands/channels/`: MSAA HDR target, mirrored floor
+pass, volumetric spotlight, velocity-buffer motion blur, a rigged avatar) that
+takes the dashboard over. The links stay the source of truth: the scene follows
+DOM focus and arrow keys move it, so Tab order, screen readers and the scene
+always agree. The scene declines, leaving the flat dashboard, without WebGL2,
+with a software-only context (`failIfMajorPerformanceCaveat`), on Save-Data,
+and when frames stay slow after it has lowered its own resolution; `?scene=off`
+and `?scene=force` override that for testing. Opening a tile that is a page
+flips it into a glass panel at the exact rectangle the article's reader panel
+occupies -- `panelRect` in `app/islands/channels/layout.ts` and `.ui-panel` in
+`app/styles/console.css` must agree -- then clicks its link, so the router
+carries the move on. A tile that leaves the site opens the scene's own reader
+dialog instead. An article's Back goes to `/#t-<tile>`, where the scene starts
+open on that tile and flips it back into its row.
+
+**Cover art is generated, one picture per seed.** `app/lib/cover-art.ts` turns
+a seed (`blog:<slug>`, `note:<slug>`, `project:<id>`, ...) into two things: a
+motif SVG, written as a hashed asset, with no text in it because an SVG loaded
+as an image cannot use the page's fonts; and a type layout in cover units,
+which the server draws as inline SVG text in Geist and the island draws with
+Canvas2D into the tile's texture. The homepage tile, the scene and the article
+header therefore show the same art. Text widths come from a table of Geist's
+measured advances, so nothing is measured at runtime and the server and the
+canvas wrap titles identically.
+
+**Code blocks meet 4.5:1.** Both shiki themes load through `legibleTheme` in
+`render/highlight.ts`, which moves any token colour under 4.5:1 against its
+block's background toward white (or black on a light block): solarized-dark's
+blue measured 4.07:1, and code is body text. `CACHE_VERSION` in `mdx.ts` was
+bumped with it, because the cached class rules carry the colours.
+
+**The homepage fragment is derived from the output, not from its sources.** A
+hand-kept list of the old desktop homepage's source files, fed to a second Tailwind run,
 once left out the module holding the shared toolbar's classes and shipped
 every content page a toolbar with no height or padding. Reading the split off
 the output cannot misfile a file, and it took 3.4 KB raw off every document,
@@ -531,7 +586,7 @@ island — the command palette — which renders `hidden`, where a `pointerdown`
 
 **`load` islands mount after first paint,** through
 `requestAnimationFrame` then `setTimeout(0)`. The runtime is an inline module,
-so it runs before the browser has painted; starting the desktop's 48 KB import
+so it runs before the browser has painted; starting the old desktop's 48 KB import
 there put all of it on the homepage's critical path, for an island whose markup
 is already server-rendered and already reads as links.
 
@@ -568,11 +623,12 @@ date/time input pseudo-element, `optgroup`, `progress`, `textarea`, the Firefox
 `:invalid` fixes — is gone, for about 500 B brotli off every page. That block is
 the one file that has to be rechecked on a Tailwind major upgrade.
 
-**The image ladder is `[640, 828, 1536, 1920]` and `sizes` is
-`(max-width: 816px) calc(100vw - 48px), 768px`.** The article column is
-`max-w-3xl` = 768px inside `p-6`, so the old `700px` understated desktop by 68px
-and a DPR-2 desktop screen — the modal visitor — was served the 1920 candidate
-for a 1536-pixel need.
+**The image ladder is `[640, 828, 1536, 1920]` and `sizes` is the reader
+panel's column:** `calc(100vw - 48px)` on a phone, `calc(100vw - 136px)` up to
+904px, then 768px flat (`DEFAULT_SIZES` in `render/images.tsx` says why each
+number). An earlier `700px` understated desktop by 68px, and a DPR-2 desktop
+screen — the modal visitor — was served the 1920 candidate for a 1536-pixel
+need.
 
 **Canonical URLs are derived, not declared.** See Types.
 
@@ -605,8 +661,6 @@ targets.
 quality 5. It used to run after `total` was computed, so a quarter of the
 build's cost appeared in no table at all.
 
-**`--breakpoint-3xl: 120rem` is defined in an `@theme` block** in `global.css`.
-The ~21 surviving `3xl:` classes in the desktop chrome were no-ops without it.
 
 ### Open
 

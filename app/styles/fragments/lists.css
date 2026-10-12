@@ -1,0 +1,160 @@
+/*
+ * The two shapes a section page lists things in (app/components/lists.tsx):
+ * rows with a cover thumbnail, and a grid of tiles. A fragment, so an article
+ * page does not carry them.
+ */
+
+.ui-section {
+  margin-top: 8px;
+}
+
+.ui-lede + :is(.ui-grid, .ui-list) {
+  margin-top: 30px;
+}
+
+.ui-list {
+  display: grid;
+  gap: 4px;
+}
+
+.ui-row {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 14px;
+}
+
+.ui-row:hover,
+.ui-tile:hover .ui-tile-t {
+  background: var(--ui-hover);
+}
+
+.ui-row:hover {
+  box-shadow: inset 0 0 0 1px var(--ui-line);
+}
+
+.ui-row:focus-visible {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--ui-hue) 90% 60% / 0.2),
+    var(--ui-hover) 70%
+  );
+}
+
+.ui-thumb {
+  display: block;
+}
+
+.ui-row-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ui-row-m {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ui-accent);
+}
+
+.ui-row-t {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ui-ink);
+}
+
+.ui-row-d {
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: var(--ui-ink-2);
+}
+
+.ui-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 228px), 1fr));
+  gap: 26px 22px;
+}
+
+.ui-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 14px;
+}
+
+.ui-tile .cv-box {
+  margin-bottom: 8px;
+  transition: transform 0.2s ease;
+}
+
+.ui-tile:hover .cv-box,
+.ui-tile:focus-visible .cv-box {
+  transform: translateY(-3px);
+}
+
+.ui-tile-t {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  border-radius: 6px;
+}
+
+.ui-tile-d {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ui-ink-2);
+}
+
+.ui-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.ui-tag {
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--ui-ink-3);
+  box-shadow: inset 0 0 0 1px var(--ui-line);
+}
+
+.ui-ext {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  vertical-align: -1px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
+}
+
+@media (max-width: 700px) {
+  .ui-row {
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 12px;
+    padding: 8px;
+  }
+
+  .ui-row-t {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-tile .cv-box {
+    transition: none;
+  }
+}

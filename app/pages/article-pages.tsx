@@ -1,38 +1,21 @@
 import type { CSSProperties, ReactNode } from 'react'
+import { Cover } from '@components/cover'
 import { transitionName } from '@framework/shared/transitions'
 import { PageShell } from './shell'
 
 /**
- * Post and note pages.
+ * Post and note pages: the glass reader panel with the cover the homepage tile
+ * wears, then the full MDX body.
  *
- * `PostBody` is gone: MDX is compiled once at build and the resulting element
- * is passed in as `content`. The article carries the view-transition name that
- * React's `<ViewTransition>` used to apply, so a card on `/blog` can still morph
- * into the article across a cross-document navigation.
+ * MDX is compiled once at build and the resulting element is passed in as
+ * `content`. The cover carries the view-transition name, so a tile on the
+ * homepage or a card on `/blog` morphs into it across a navigation: they are
+ * the same picture at the same aspect ratio.
  */
 
-const PROSE_CLASS = `prose prose-sm max-w-none dark:prose-invert
-                        prose-headings:font-mono
-                        prose-p:leading-relaxed
-                        prose-a:no-underline
-                        prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-                        prose-pre:border
-                        prose-img:rounded-lg prose-img:border
-                        prose-strong:font-semibold`
-
-const PROSE_VARS = {
-  '--prose-headings': 'var(--article-color)',
-  '--prose-body': 'var(--article-color)',
-  '--prose-links': 'var(--link)',
-  '--prose-code': 'var(--article-color)',
-  '--prose-pre-bg': 'var(--lighter-gray)',
-  '--prose-pre-border': 'var(--border-color)',
-  '--prose-blockquote-border': 'var(--light-gray)',
-  '--prose-blockquote-text': 'var(--gray)',
-  '--prose-img-border': 'var(--border-color)',
-} as CSSProperties
-
 interface ArticleProps {
+  seed: string
+  section: 'Blog' | 'Note'
   title: string
   date: string
   dateISO: string
@@ -44,6 +27,8 @@ interface ArticleProps {
 }
 
 function Article({
+  seed,
+  section,
   title,
   date,
   dateISO,
@@ -53,73 +38,47 @@ function Article({
   vtName,
 }: ArticleProps) {
   return (
-    <article
-      className="max-w-3xl mx-auto"
-      style={{ viewTransitionName: vtName } as CSSProperties}
-    >
-      <div className="mb-1">
-        <time
-          className="font-mono text-sm"
-          style={{ color: 'var(--gray)' }}
-          dateTime={dateISO}
+    <div className="ui-col">
+      <header className="ui-head">
+        <div
+          className="ui-head-art"
+          style={{ viewTransitionName: vtName } as CSSProperties}
         >
-          {date}
-        </time>
-        {kind && (
-          <span
-            className="font-mono text-xs ml-4 capitalize"
-            style={{ color: 'var(--gray)' }}
-          >
-            {kind}
-          </span>
-        )}
-      </div>
+          <Cover
+            seed={seed}
+            title={title}
+            meta={`${section}  ·  ${date}`.toUpperCase()}
+            chip={section}
+            eager
+          />
+        </div>
+        <div className="ui-head-text">
+          <p className="ui-kicker">
+            <time dateTime={dateISO}>{date}</time>
+            {kind && <span className="ui-kicker-tag">{kind}</span>}
+          </p>
+          <h1 className="ui-title">{title}</h1>
+          {description && <p className="ui-lede">{description}</p>}
+        </div>
+      </header>
 
-      <h1
-        className="text-3xl font-mono font-bold mb-2! mt-2! leading-10"
-        style={{ color: 'var(--article-color)' }}
-      >
-        {title}
-      </h1>
-      {description && (
-        <p
-          className="font-mono text-base mb-4 mt-0!"
-          style={{ color: 'var(--article-color)' }}
-        >
-          {description}
-        </p>
-      )}
+      <article className="ui-prose">{content}</article>
 
-      <div className={PROSE_CLASS} style={PROSE_VARS}>
-        {content}
-      </div>
-
-      <footer
-        className="mt-8 pt-5 border-t text-sm"
-        style={{ borderColor: 'var(--border-color)', color: 'var(--gray)' }}
-      >
+      <footer className="ui-foot">
         <p>
           Thanks for reading! If you want to see future content, you can follow
           me{' '}
           <a
-            className="text-[var(--link)] hover:opacity-80 transition-opacity"
             href="https://twitter.com/maxleiter"
             target="_blank"
             rel="noopener noreferrer"
           >
             on X
           </a>{' '}
-          or subscribe to my{' '}
-          <a
-            className="text-[var(--link)] hover:opacity-80 transition-opacity"
-            href="/feed.xml"
-          >
-            RSS feed
-          </a>
-          .
+          or subscribe to my <a href="/feed.xml">RSS feed</a>.
         </p>
       </footer>
-    </article>
+    </div>
   )
 }
 
@@ -144,15 +103,14 @@ export function BlogPostPage({
 }: PostPageProps) {
   return (
     <PageShell
-      title={title}
-      segments={[
-        { name: 'blog', href: '/blog' },
-        { name: slug, href: `/blog/${slug}` },
-      ]}
-      minimizeHref={`/?openPost=${slug}`}
+      section="blog"
+      crumbs={[{ name: 'Blog', href: '/blog' }]}
+      back={`/#t-blog-${slug}`}
       toolbar={toolbar}
     >
       <Article
+        seed={`blog:${slug}`}
+        section="Blog"
         title={title}
         date={date}
         dateISO={dateISO}
@@ -180,15 +138,14 @@ export function NotePage({
 }: NotePageProps) {
   return (
     <PageShell
-      title={title}
-      segments={[
-        { name: 'notes', href: '/notes' },
-        { name: slug, href: `/notes/${slug}` },
-      ]}
-      minimizeHref={`/?openPost=${slug}`}
+      section="notes"
+      crumbs={[{ name: 'Notes', href: '/notes' }]}
+      back={`/#t-note-${slug}`}
       toolbar={toolbar}
     >
       <Article
+        seed={`note:${slug}`}
+        section="Note"
         title={title}
         date={date}
         dateISO={dateISO}

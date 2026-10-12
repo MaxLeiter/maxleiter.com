@@ -8,6 +8,7 @@ import { collectLanguages, getHighlighter } from './highlight'
 import { createMdxCompiler } from './mdx'
 import { createMdxComponents } from '../../app/mdx/static-components'
 import { HomePage } from '../../app/pages/home'
+import { buildChannels } from '../../app/components/channels/data'
 import {
   AboutPage,
   BlogIndexPage,
@@ -95,7 +96,14 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
         description: 'A website by Max Leiter.',
       },
       render: () =>
-        createElement(HomePage, { posts: entries, projects: projectCards }),
+        createElement(HomePage, {
+          channels: buildChannels({
+            posts: ctx.posts,
+            notes: ctx.notes,
+            externalPosts: ctx.externalPosts,
+            projects: ctx.projects,
+          }),
+        }),
     },
     {
       path: '/about',

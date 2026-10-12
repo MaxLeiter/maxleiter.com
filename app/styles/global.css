@@ -10,6 +10,7 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities) source(none);
 @import './markdown.css';
+@import './console.css';
 
 /*
  * Tailwind's preflight, minus the two thirds of it this site has no elements
@@ -123,7 +124,7 @@
     height: auto;
   }
 
-  /* The command palette's input, and every button in the desktop chrome. */
+  /* The command palette's input, and the console's pill buttons. */
   button,
   input {
     font: inherit;
@@ -151,15 +152,6 @@
   }
 }
 
-/*
- * `3xl:` is used throughout the desktop chrome to scale type and padding up on
- * very large displays. Tailwind 4 ships no 3xl breakpoint, so every one of
- * those classes was a no-op until this block existed.
- */
-@theme {
-  --breakpoint-3xl: 120rem;
-}
-
 :root {
   /* Spacing */
   --gap-quarter: 0.25rem;
@@ -180,33 +172,33 @@
   /* Transitions */
   --transition: 0.1s ease-in-out;
 
-  /* Dark Mode Colors */
+  /*
+   * Dark Mode Colors. `--bg` is the document behind the room and must match
+   * the theme-color pair in the theme script; everything a reader sees sits
+   * on the reader panel, which console.css paints.
+   */
   --bg: #000000;
-  --bg-window-alpha: rgba(0, 0, 0, 0.75);
-  --bg-widget: rgba(0, 0, 0, 0.3);
-  --fg: #e5e5e5;
-  --gray: #999;
-  --light-gray: #444;
-  --lighter-gray: #222;
-  --lightest-gray: #1a1a1a;
-  --article-color: #eaeaea;
-  --selection: rgba(255, 255, 255, 0.88);
-  --link: #579dff;
+  --fg: #eef3f8;
+  --gray: #a7b1bc;
+  --light-gray: #3a434d;
+  --lighter-gray: #1d242c;
+  --lightest-gray: #141a21;
+  --article-color: #e4eaf0;
+  --selection: rgba(159, 212, 255, 0.9);
+  --link: #9fd4ff;
   --border-color: rgba(255, 255, 255, 0.1);
 }
 
 [data-theme='light'] {
   --bg: #fff;
-  --bg-window-alpha: rgba(255, 255, 255, 0.75);
-  --bg-widget: rgba(255, 255, 255, 0.5);
-  --fg: #444;
-  --gray: rgb(100, 100, 100);
-  --light-gray: rgb(222, 222, 222);
-  --lighter-gray: rgb(240, 240, 240);
-  --lightest-gray: rgb(245, 245, 245);
-  --article-color: #212121;
-  --selection: rgba(0, 0, 0, 0.99);
-  --link: #6669ff;
+  --fg: #1b232c;
+  --gray: #536070;
+  --light-gray: #c9d1da;
+  --lighter-gray: #e3e8ee;
+  --lightest-gray: #edf1f5;
+  --article-color: #161c22;
+  --selection: rgba(11, 98, 196, 0.9);
+  --link: #0b5fbf;
   --border-color: rgba(0, 0, 0, 0.1);
 }
 
