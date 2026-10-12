@@ -10,7 +10,7 @@
       "noindex": false,
       "textHash": "10539b01ea6e03e7",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 87328
+      "partialBytes": 91815
     },
     {
       "path": "/404",
@@ -21,7 +21,7 @@
       "noindex": true,
       "textHash": "129a40777ad6a24b",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 5838
+      "partialBytes": 6068
     },
     {
       "path": "/about",
@@ -32,7 +32,7 @@
       "noindex": false,
       "textHash": "a97630c4423384b0",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 8989
+      "partialBytes": 9219
     },
     {
       "path": "/about/embed",
@@ -54,7 +54,7 @@
       "noindex": false,
       "textHash": "d3838580e1f42b83",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 39217
+      "partialBytes": 39447
     },
     {
       "path": "/blog/build-a-blog-with-nextjs-13",
@@ -65,7 +65,7 @@
       "noindex": false,
       "textHash": "f5dd69c62e99ffcf",
       "codeHash": "02a6e93a53e7b727",
-      "partialBytes": 101700
+      "partialBytes": 101930
     },
     {
       "path": "/blog/build-a-blog-with-nextjs-13/embed",
@@ -87,7 +87,7 @@
       "noindex": false,
       "textHash": "0d4900a7662071d2",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 20258
+      "partialBytes": 20488
     },
     {
       "path": "/blog/contributing-to-oss/embed",
@@ -109,7 +109,7 @@
       "noindex": false,
       "textHash": "86b1226599470734",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 18464
+      "partialBytes": 18694
     },
     {
       "path": "/blog/easy-site-improvements/embed",
@@ -142,7 +142,7 @@
       "noindex": false,
       "textHash": "5da8f24c257f2b0a",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 43258
+      "partialBytes": 43488
     },
     {
       "path": "/blog/embedding-emoji-search/embed",
@@ -164,7 +164,7 @@
       "noindex": false,
       "textHash": "d856b7fd45326bfd",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 18704
+      "partialBytes": 18934
     },
     {
       "path": "/blog/formatting/embed",
@@ -186,7 +186,7 @@
       "noindex": false,
       "textHash": "fd3d5ecc293ee1c6",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 16082
+      "partialBytes": 16312
     },
     {
       "path": "/blog/framework/embed",
@@ -208,7 +208,7 @@
       "noindex": false,
       "textHash": "50573661a44a402f",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 12863
+      "partialBytes": 13093
     },
     {
       "path": "/blog/hacker-sites/embed",
@@ -230,7 +230,7 @@
       "noindex": false,
       "textHash": "4cbd326b951eb9c8",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 14322
+      "partialBytes": 14552
     },
     {
       "path": "/blog/HFSViewer/embed",
@@ -252,7 +252,7 @@
       "noindex": false,
       "textHash": "9292b7aa967f8d17",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 15691
+      "partialBytes": 15921
     },
     {
       "path": "/blog/introducing-drift/embed",
@@ -274,7 +274,7 @@
       "noindex": false,
       "textHash": "a4fc7abc2c22eebe",
       "codeHash": "ab28b0bcce94c12d",
-      "partialBytes": 15308
+      "partialBytes": 15538
     },
     {
       "path": "/blog/mobile-browsers-resizing-font/embed",
@@ -296,7 +296,7 @@
       "noindex": false,
       "textHash": "648bdad15413100b",
       "codeHash": "21fe48e730e4baf5",
-      "partialBytes": 24011
+      "partialBytes": 24241
     },
     {
       "path": "/blog/MSHW0184/embed",
@@ -318,7 +318,7 @@
       "noindex": false,
       "textHash": "b9db338062f09173",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 16557
+      "partialBytes": 16787
     },
     {
       "path": "/blog/nintype/embed",
@@ -340,7 +340,7 @@
       "noindex": false,
       "textHash": "cde4bc83368d529e",
       "codeHash": "3f24a11511110725",
-      "partialBytes": 19670
+      "partialBytes": 19900
     },
     {
       "path": "/blog/node-has-tooling-problems/embed",
@@ -362,7 +362,7 @@
       "noindex": false,
       "textHash": "4cbec4d4be662199",
       "codeHash": "b875bc1dcab45df2",
-      "partialBytes": 17491
+      "partialBytes": 17721
     },
     {
       "path": "/blog/pin-dependencies/embed",
@@ -384,7 +384,7 @@
       "noindex": false,
       "textHash": "1910dd51cc6d88bf",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 19191
+      "partialBytes": 19421
     },
     {
       "path": "/blog/rewrite-your-prompts/embed",
@@ -406,7 +406,7 @@
       "noindex": false,
       "textHash": "1d60edaf89a6db1a",
       "codeHash": "51ad4f3a15cddfcc",
-      "partialBytes": 42852
+      "partialBytes": 43082
     },
     {
       "path": "/blog/sandcastle/embed",
@@ -428,7 +428,7 @@
       "noindex": false,
       "textHash": "ac46ccc2349deecd",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 31446
+      "partialBytes": 31676
     },
     {
       "path": "/blog/seeing-the-future/embed",
@@ -450,7 +450,7 @@
       "noindex": false,
       "textHash": "a9a460de9c3f51e3",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 10900
+      "partialBytes": 11130
     },
     {
       "path": "/blog/ship-every-day/embed",
@@ -472,7 +472,7 @@
       "noindex": false,
       "textHash": "feb2cdb09d18787b",
       "codeHash": "ad6dd6d618d84d53",
-      "partialBytes": 28248
+      "partialBytes": 28478
     },
     {
       "path": "/blog/sluggified-urls/embed",
@@ -494,7 +494,7 @@
       "noindex": false,
       "textHash": "7e6979e159682057",
       "codeHash": "cfd8a8bd5929e315",
-      "partialBytes": 55272
+      "partialBytes": 55502
     },
     {
       "path": "/blog/supabase-next-analytics/embed",
@@ -516,7 +516,7 @@
       "noindex": false,
       "textHash": "529f02acf4401c2b",
       "codeHash": "6e1d1614777e5aa9",
-      "partialBytes": 25526
+      "partialBytes": 25756
     },
     {
       "path": "/blog/thank-u-next/embed",
@@ -538,7 +538,7 @@
       "noindex": false,
       "textHash": "34ec6dd24fd5ae1c",
       "codeHash": "e4530c1c22646dc1",
-      "partialBytes": 32160
+      "partialBytes": 32390
     },
     {
       "path": "/blog/the-new-maxleiter-com/embed",
@@ -560,7 +560,7 @@
       "noindex": false,
       "textHash": "c3da577cb3139781",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 38322
+      "partialBytes": 38552
     },
     {
       "path": "/blog/vibecoding-minecraft-mods/embed",
@@ -582,7 +582,7 @@
       "noindex": false,
       "textHash": "667b0e42d9423b27",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 12385
+      "partialBytes": 12615
     },
     {
       "path": "/blog/weights/embed",
@@ -604,7 +604,7 @@
       "noindex": false,
       "textHash": "d7a01e863d29b0c5",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 21551
+      "partialBytes": 21781
     },
     {
       "path": "/blog/X11/embed",
@@ -626,7 +626,7 @@
       "noindex": false,
       "textHash": "c6fcf482174ef8e3",
       "codeHash": "ee6baf7ac96b6a76",
-      "partialBytes": 32308
+      "partialBytes": 32538
     },
     {
       "path": "/blog/xios/embed",
@@ -648,7 +648,7 @@
       "noindex": false,
       "textHash": "8aacb1e7fc17a9bd",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 16590
+      "partialBytes": 16820
     },
     {
       "path": "/labs/embed",
@@ -670,7 +670,7 @@
       "noindex": false,
       "textHash": "32f4a928b9159e2b",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 13715
+      "partialBytes": 13945
     },
     {
       "path": "/notes/embed",
@@ -692,7 +692,7 @@
       "noindex": false,
       "textHash": "eefb9278ad093f00",
       "codeHash": "86b6b2b5c9d67b14",
-      "partialBytes": 24743
+      "partialBytes": 24973
     },
     {
       "path": "/notes/fish-directory-colors/embed",
@@ -714,7 +714,7 @@
       "noindex": false,
       "textHash": "bc7d90f6ef749bf7",
       "codeHash": "23e7fdd7ebfe9984",
-      "partialBytes": 27592
+      "partialBytes": 27822
     },
     {
       "path": "/notes/gemini-script/embed",
@@ -736,7 +736,7 @@
       "noindex": false,
       "textHash": "838549a75a91ec50",
       "codeHash": "f61b7e38ecde7d51",
-      "partialBytes": 13549
+      "partialBytes": 13779
     },
     {
       "path": "/notes/git-checkout-script/embed",
@@ -758,7 +758,7 @@
       "noindex": false,
       "textHash": "62695a19f154be57",
       "codeHash": "07575870c059bb7f",
-      "partialBytes": 15182
+      "partialBytes": 15412
     },
     {
       "path": "/notes/slack-message-fetch/embed",
@@ -780,7 +780,7 @@
       "noindex": false,
       "textHash": "1c7039a2f503a055",
       "codeHash": "303e9eb9b11da209",
-      "partialBytes": 16682
+      "partialBytes": 16912
     },
     {
       "path": "/notes/swr-state/embed",
@@ -802,7 +802,7 @@
       "noindex": false,
       "textHash": "7791bfd3e653d838",
       "codeHash": "5958df93156120d0",
-      "partialBytes": 14337
+      "partialBytes": 14567
     },
     {
       "path": "/notes/updating-jsonb-drizzle/embed",
@@ -824,7 +824,7 @@
       "noindex": false,
       "textHash": "d91b53176ca460b5",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 11133
+      "partialBytes": 11363
     },
     {
       "path": "/notes/vscode-default-dir/embed",
@@ -846,7 +846,7 @@
       "noindex": false,
       "textHash": "ce63ce1138fea9a6",
       "codeHash": "15473062d2e7e712",
-      "partialBytes": 15934
+      "partialBytes": 16164
     },
     {
       "path": "/notes/wasm-edge-and-node/embed",
@@ -868,7 +868,7 @@
       "noindex": false,
       "textHash": "1b68c4cba653ec9e",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 20813
+      "partialBytes": 21043
     },
     {
       "path": "/projects/embed",
@@ -890,7 +890,7 @@
       "noindex": false,
       "textHash": "2aaa7ef349c400ad",
       "codeHash": "e3b0c44298fc1c14",
-      "partialBytes": 24276
+      "partialBytes": 24506
     },
     {
       "path": "/talks/embed",

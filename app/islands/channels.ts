@@ -17,17 +17,28 @@ export default function mount(): () => void {
   if (!root) return () => undefined
   let live = true
   let dispose: (() => void) | undefined
+  // The page may have started in the room's resting layout. If the scene
+  // does not arrive, give the reader the flat rows rather than a stage
+  // with nobody on it.
+  const flat = () => {
+    if (!root.classList.contains('ch-3d')) {
+      delete document.documentElement.dataset.scene
+    }
+  }
+  const fallback = window.setTimeout(() => {
+    if (!root.classList.contains('ch-boot')) flat()
+  }, 6000)
   import('./channels/engine')
     .then(({ boot }) => {
       if (live) dispose = boot(root)
     })
     .catch((error: unknown) => {
-      // The dashboard is already the page; a scene that fails to load
-      // leaves it alone.
+      flat()
       console.warn('channels: scene unavailable', error)
     })
   return () => {
     live = false
+    clearTimeout(fallback)
     dispose?.()
   }
 }

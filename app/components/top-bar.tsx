@@ -26,6 +26,20 @@ function ThemeIcon() {
   )
 }
 
+/**
+ * Runs before the homepage's markup paints: if the 3D room ran on this
+ * device before, the page starts in the room's resting layout rather than
+ * the flat rows, so the scene's arrival is a crossfade and not a change of
+ * layout (channels.css, `html[data-scene='room']`). On every page, because a
+ * soft navigation never runs scripts and the attribute has to be set before
+ * one reaches the homepage. The scene clears the flag when it cannot run.
+ */
+export const SCENE_SCRIPT =
+  `try{var q=new URLSearchParams(location.search).get('scene'),` +
+  `c=navigator.connection;if(q!=='off'&&!(c&&c.saveData)&&` +
+  `localStorage.getItem('ch-scene')==='room')` +
+  `document.documentElement.dataset.scene='room'}catch(e){}`
+
 export interface TopBarProps {
   /** False on the homepage, which stays dark: it is a room, not a page. */
   themeToggle?: boolean
@@ -35,6 +49,7 @@ export interface TopBarProps {
 export function TopBar({ themeToggle = true, children }: TopBarProps) {
   return (
     <header className="ui-top">
+      <script dangerouslySetInnerHTML={{ __html: SCENE_SCRIPT }} />
       <a className="ui-card" href="/" aria-label="Max Leiter, home">
         <Avatar className="ui-pfp" />
         <span className="ui-card-text">

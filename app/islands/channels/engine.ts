@@ -34,6 +34,16 @@ interface Connection {
 
 const MOTION_KEY = 'ch-motion'
 
+/** The label styles updateHUD writes, and teardown takes back. */
+const LABEL_PROPS = [
+  'height',
+  'font-size',
+  '--sc',
+  'transform',
+  'opacity',
+  'pointer-events',
+]
+
 /** How many times a scene has started in this page's life, for the tests. */
 let boots = 0
 
@@ -109,11 +119,49 @@ const READER_HTML =
   '<p class="ch-reader-text"></p>' +
   '<a class="ch-go" href="/"><span class="ui-key" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M12.5 3.5v4a2 2 0 0 1-2 2h-7M6.5 6.5l-3 3 3 3"/></svg></span><span class="ch-go-l"></span></a></div>'
 
+/**
+ * Whether the homepage should start in the room's resting layout: on <html>
+ * for this document, and in storage for the next hard load, where
+ * SCENE_SCRIPT (app/components/top-bar.tsx) reads it before first paint.
+ */
+function rememberScene(on: boolean, persist = true): void {
+  const html = document.documentElement
+  if (on) html.dataset.scene = 'room'
+  else delete html.dataset.scene
+  if (!persist) return
+  try {
+    if (on) localStorage.setItem('ch-scene', 'room')
+    else localStorage.removeItem('ch-scene')
+  } catch {
+    // Without storage the next visit simply starts flat.
+  }
+}
+
+/** Gives the page back to the flat dashboard before anything was taken. */
+function decline(persist = true): () => void {
+  rememberScene(false, persist)
+  return noop
+}
+
+/**
+ * Whether the scene is arriving after the page has been on screen for a
+ * while. Then nothing may play an entrance: the room fades in, matched to
+ * what is already there.
+ */
+function arrivingLate(): boolean {
+  if (document.documentElement.dataset.scene) return true
+  const nav = performance.getEntriesByType('navigation')[0]
+  if (!nav || new URL(nav.name).pathname !== location.pathname) return true
+  const paint = performance.getEntriesByName('first-contentful-paint')[0]
+  return !paint || performance.now() - paint.startTime > 300
+}
+
 export function boot(root: HTMLElement): () => void {
   const query = new URLSearchParams(location.search).get('scene')
-  if (query === 'off') return noop
+  if (query === 'off') return decline(false)
   const connection = (navigator as { connection?: Connection }).connection
-  if (connection?.saveData && query !== 'force') return noop
+  if (connection?.saveData && query !== 'force') return decline(false)
+  const late = arrivingLate()
 
   const canvas = document.createElement('canvas')
   canvas.className = 'ch-gl'
@@ -128,13 +176,13 @@ export function boot(root: HTMLElement): () => void {
     // and blocks the main thread doing it. The flat dashboard is better.
     failIfMajorPerformanceCaveat: query !== 'force',
   })
-  if (!context) return noop
+  if (!context) return decline()
   const gl: WebGL2RenderingContext = context
 
   boots++
   let introState: 'played' | 'skipped' = 'skipped'
   const channels = readModel(root)
-  if (channels.length === 0 || channels.some((c) => !c.label)) return noop
+  if (channels.length === 0 || channels.some((c) => !c.label)) return decline()
   const found = {
     main: root.querySelector<HTMLElement>('.ch-main'),
     nav: root.querySelector<HTMLElement>('.ch-chans'),
@@ -143,7 +191,7 @@ export function boot(root: HTMLElement): () => void {
     sound: root.querySelector<HTMLButtonElement>('.ch-snd'),
     clock: root.querySelector<HTMLElement>('.ch-clock'),
   }
-  if (Object.values(found).some((el) => !el)) return noop
+  if (Object.values(found).some((el) => !el)) return decline()
   // Re-bound as non-null: the checks above do not narrow inside the hoisted
   // function declarations below.
   const main = found.main as HTMLElement
@@ -184,7 +232,7 @@ export function boot(root: HTMLElement): () => void {
   } catch (error) {
     console.warn('channels: renderer failed', error)
     gl.getExtension('WEBGL_lose_context')?.loseContext()
-    return noop
+    return decline()
   }
 
   /* ------------------------------------------------------- take over -- */
@@ -849,6 +897,7 @@ export function boot(root: HTMLElement): () => void {
 
   /* ----------------------------------------------------------- HUD -- */
 
+  let labelsLive = false
   let capFor: Item | null = null
   let pipsFor = ''
   function updateHUD(rect: ScreenRect | null, vp: Viewport): void {
@@ -863,29 +912,32 @@ export function boot(root: HTMLElement): () => void {
     const x0 = vp.portrait
       ? 16
       : Math.max(28, Math.min(vp.w * 0.045, (rect ? rect.x : 200) - 260))
-    channels.forEach((c, ci) => {
-      const dd = ci - cp
-      const ad = Math.abs(dd)
-      const sc = lerp(1, vp.portrait ? 0.5 : 0.43, Math.min(ad, 1))
-      const yy =
-        Math.sign(dd) * (ad < 1 ? ad * big * 0.98 : big * 0.98 + (ad - 1) * 46)
-      const op =
-        ad < 1 ? lerp(1, 0.74, ad) : Math.max(0.64, 0.74 - (ad - 1) * 0.04)
-      // Every label keeps a 44px hit area at whatever scale it is drawn.
-      const hit = Math.max(big * 1.15, 45 / sc)
-      let y = anchorY + yy - hit / 2
-      if (vp.portrait)
-        y = (rect ? rect.y : vp.h * 0.3) - big * 1.25 + yy - (hit - big) / 2
-      const el = c.label
-      el.style.height = `${hit}px`
-      el.style.fontSize = `${big}px`
-      el.style.setProperty('--sc', String(sc))
-      el.style.transform = `translate3d(${x0}px,${y}px,0) scale(${sc})`
-      el.style.opacity = String(vp.portrait ? clamp(1 - ad * 1.6, 0, 1) : op)
-      el.style.pointerEvents = (vp.portrait ? ad < 0.5 : ad < 2.5)
-        ? 'auto'
-        : 'none'
-    })
+    // Until the handover the page's own layout places the labels.
+    if (labelsLive)
+      channels.forEach((c, ci) => {
+        const dd = ci - cp
+        const ad = Math.abs(dd)
+        const sc = lerp(1, vp.portrait ? 0.5 : 0.43, Math.min(ad, 1))
+        const yy =
+          Math.sign(dd) *
+          (ad < 1 ? ad * big * 0.98 : big * 0.98 + (ad - 1) * 46)
+        const op =
+          ad < 1 ? lerp(1, 0.74, ad) : Math.max(0.64, 0.74 - (ad - 1) * 0.04)
+        // Every label keeps a 44px hit area at whatever scale it is drawn.
+        const hit = Math.max(big * 1.15, 45 / sc)
+        let y = anchorY + yy - hit / 2
+        if (vp.portrait)
+          y = (rect ? rect.y : vp.h * 0.3) - big * 1.25 + yy - (hit - big) / 2
+        const el = c.label
+        el.style.height = `${hit}px`
+        el.style.fontSize = `${big}px`
+        el.style.setProperty('--sc', String(sc))
+        el.style.transform = `translate3d(${x0}px,${y}px,0) scale(${sc})`
+        el.style.opacity = String(vp.portrait ? clamp(1 - ad * 1.6, 0, 1) : op)
+        el.style.pointerEvents = (vp.portrait ? ad < 0.5 : ad < 2.5)
+          ? 'auto'
+          : 'none'
+      })
     if (rect) {
       cap.style.transform = `translate3d(${vp.portrait ? 16 : rect.x + 4}px,${rect.y + rect.h + (vp.portrait ? 18 : 22)}px,0)`
       cap.style.opacity = String(1 - S.openT * 3)
@@ -945,30 +997,49 @@ export function boot(root: HTMLElement): () => void {
 
   /* ------------------------------------------------------ entrance -- */
 
-  // Arriving from an article, or a section's Back: start on that tile, and
-  // when it was an article, flip it back into the row.
-  const hash = decodeURIComponent(location.hash.slice(1))
-  const entry = hash.startsWith('t-')
-    ? itemOf(document.getElementById(hash))
-    : null
-  const entryRow = hash.startsWith('ch-')
-    ? channels.findIndex((c) => c.id === hash.slice(3))
-    : -1
-  if (entry) {
-    S.chan = entry.chan
-    S.idx[entry.chan] = entry.index
-    S.rowS[entry.chan].snap(entry.index)
-    S.chanS.snap(entry.chan)
-    if (!entry.external) {
-      S.open = entry
-      openMode = 'page'
-      S.openT = 1
-      renderer.prepareBack(entry, viewport(), 'page')
+  /**
+   * Start where the dashboard already is, so the room fades in over the same
+   * picture: a hash target (an article's Back, a section's), else the link
+   * that has focus, else -- in the flat layout -- the row nearest the top of
+   * the screen and the first tile showing in it. No entrance replays: an
+   * article's tile is simply at rest in its row.
+   */
+  function startFromDom(): void {
+    const hash = decodeURIComponent(location.hash.slice(1))
+    let item = hash.startsWith('t-')
+      ? itemOf(document.getElementById(hash))
+      : null
+    let chan = hash.startsWith('ch-')
+      ? channels.findIndex((c) => c.id === hash.slice(3))
+      : -1
+    item ??= itemOf(document.activeElement)
+    if (!item && chan < 0 && !document.documentElement.dataset.scene) {
+      const rows = [...root.querySelectorAll<HTMLElement>('.ch-row')]
+      let nearest = Infinity
+      rows.forEach((row, i) => {
+        const d = Math.abs(row.getBoundingClientRect().top - 60)
+        if (d < nearest) {
+          nearest = d
+          chan = i
+        }
+      })
+      const strip = rows[chan]?.querySelector('.ch-tiles')
+      const left = strip?.getBoundingClientRect().left ?? 0
+      const shown = channels[chan]?.items.findIndex(
+        (it) => it.link.getBoundingClientRect().right > left + 40,
+      )
+      if (shown !== undefined && shown > 0) item = channels[chan].items[shown]
     }
-  } else if (entryRow > 0) {
-    S.chan = entryRow
-    S.chanS.snap(entryRow)
+    if (item) chan = item.chan
+    if (chan < 0) chan = 0
+    S.chan = chan
+    S.chanS.snap(chan)
+    if (item) {
+      S.idx[chan] = item.index
+      S.rowS[chan].snap(item.index)
+    }
   }
+  startFromDom()
   setTitle()
   markChannel()
   renderer.prime()
@@ -980,6 +1051,7 @@ export function boot(root: HTMLElement): () => void {
   let frames = 0
   let slow = 0
   let shownScene = false
+  let lastRect: ScreenRect | null = null
   let alive = true
   let waved = false
   let idleSince = 0
@@ -1016,13 +1088,12 @@ export function boot(root: HTMLElement): () => void {
     S.t += dt
     if (!waved && S.t > 0.9) {
       waved = true
-      if (!S.reduced) {
+      // The host's wave is an entrance; arriving late, there is none.
+      if (!S.reduced && !late) {
         renderer.avatar.wave = S.t
         introState = 'played'
       }
     }
-    if (entry && S.open === entry && S.t > 0.15 && openMode === 'page')
-      closeItem()
     S.chanS.step(dt)
     for (const s of S.rowS) s.step(dt)
     const target = S.open ? 1 : 0
@@ -1031,6 +1102,7 @@ export function boot(root: HTMLElement): () => void {
     if (!S.open && S.openT === 0 && !reader.hidden) reader.hidden = true
     const vp = viewport()
     const rect = renderer.frame(dt, vp, openMode)
+    lastRect = rect
     updateHUD(rect, vp)
     frames++
     if (!shownScene && frames > 2) {
@@ -1038,7 +1110,7 @@ export function boot(root: HTMLElement): () => void {
       canvas.classList.add('ch-on')
       window.setTimeout(
         () => {
-          if (alive) root.classList.replace('ch-boot', 'ch-3d')
+          if (alive) handover()
         },
         S.reduced ? 0 : 450,
       )
@@ -1050,7 +1122,7 @@ export function boot(root: HTMLElement): () => void {
       if (slow > 30) {
         slow = 0
         if (maxDpr > 0.75) maxDpr = maxDpr > 1 ? 1 : 0.75
-        else teardown()
+        else teardown('fail')
       }
     }
   }
@@ -1073,10 +1145,44 @@ export function boot(root: HTMLElement): () => void {
 
   on(canvas, 'webglcontextlost', (event: Event) => {
     event.preventDefault()
-    teardown()
+    teardown('fail')
   })
 
-  function teardown(): void {
+  /**
+   * The canvas is opaque now: hand the labels from wherever the page drew
+   * them to the HUD's places, moving rather than jumping, and remember that
+   * the room runs here.
+   */
+  function handover(): void {
+    const before = channels.map((c) => ({
+      rect: c.label.getBoundingClientRect(),
+      opacity: getComputedStyle(c.label).opacity,
+    }))
+    root.classList.replace('ch-boot', 'ch-3d')
+    labelsLive = true
+    updateHUD(lastRect, viewport())
+    rememberScene(true)
+    if (S.reduced) return
+    channels.forEach((c, i) => {
+      const from = before[i].rect
+      const to = c.label.getBoundingClientRect()
+      if (!from.height || !to.height) return
+      c.label.animate(
+        [
+          {
+            translate: `${from.left - to.left}px ${from.top - to.top}px`,
+            scale: `${from.height / to.height}`,
+            opacity: before[i].opacity,
+          },
+          { translate: '0 0', scale: '1' },
+        ],
+        { duration: 380, easing: 'cubic-bezier(.2,.8,.2,1)' },
+      )
+    })
+  }
+
+  /** `nav`: the router is leaving. `fail`: the room cannot run here. */
+  function teardown(reason: 'nav' | 'fail' = 'nav'): void {
     if (!alive) return
     alive = false
     cancelAnimationFrame(raf)
@@ -1086,9 +1192,12 @@ export function boot(root: HTMLElement): () => void {
     for (const [link, name] of vtNames) link.dataset.vtName = name
     for (const el of inertTargets) el.inert = false
     for (const c of channels) {
-      c.label.removeAttribute('style')
+      for (const prop of LABEL_PROPS) c.label.style.removeProperty(prop)
       c.label.removeAttribute('aria-current')
     }
+    // Leaving for another page keeps the room's layout for the way back;
+    // failing hands the homepage to the flat rows, now and next time.
+    if (reason === 'fail') rememberScene(false)
     nav.removeAttribute('style')
     root.classList.remove('ch-boot', 'ch-3d', 'ch-kbd')
     root.style.setProperty('--ui-hue', originalHue)
@@ -1104,5 +1213,5 @@ export function boot(root: HTMLElement): () => void {
     gl.getExtension('WEBGL_lose_context')?.loseContext()
   }
 
-  return teardown
+  return () => teardown('nav')
 }

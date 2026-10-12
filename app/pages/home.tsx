@@ -18,6 +18,12 @@ import { CommandPalette, roomStyle } from './shell'
  *
  * Every class here is spelled out for the CSS pruner, including the ones the
  * island only toggles: `hidden` buttons ship in the markup for that reason.
+ *
+ * `html[data-scene='room']` is decided before first paint (SCENE_SCRIPT in
+ * the top bar, or left set by the scene's last run in this document) and
+ * makes this same markup draw the room's resting frame -- the focused tile
+ * and the channel labels where the scene will put them -- so the scene
+ * crossfades in over its own layout instead of replacing a different one.
  */
 
 function MotionIcon() {
@@ -84,6 +90,7 @@ export function HomePage({ channels }: HomePageProps) {
                 className="ch-chan"
                 href={`#ch-${channel.id}`}
                 data-ch-chan={index}
+                style={{ '--i': index } as CSSProperties}
               >
                 {channel.name}
                 <small aria-hidden="true">{channel.items.length}</small>

@@ -506,7 +506,21 @@ occupies -- `panelRect` in `app/islands/channels/layout.ts` and `.ui-panel` in
 `app/styles/console.css` must agree -- then clicks its link, so the router
 carries the move on. A tile that leaves the site opens the scene's own reader
 dialog instead. An article's Back goes to `/#t-<tile>`, where the scene starts
-open on that tile and flips it back into its row.
+at rest on that tile.
+
+The scene never replays an entrance over a page that is already showing. It
+starts where the page is (a hash target, the focused link, the row in view),
+its camera starts at rest, and it crossfades in; the channel labels move from
+where the page drew them to where the HUD wants them. On a device where the
+room has run, `html[data-scene='room']` is set before first paint
+(`SCENE_SCRIPT` in the top bar on a hard load; on a soft navigation the
+attribute is simply still there from the scene's last run) and the server
+markup draws the room's resting frame in CSS instead of the flat rows -- the
+focused tile and the labels where the camera and HUD will put them -- so the
+canvas fades in over the same picture. `framing` in
+`app/islands/channels/layout.ts` and the stage rules in `channels.css` must
+agree. When the scene cannot run, it clears the flag and the page is flat
+again.
 
 **Cover art is generated, one picture per seed.** `app/lib/cover-art.ts` turns
 a seed (`blog:<slug>`, `note:<slug>`, `project:<id>`, ...) into two things: a

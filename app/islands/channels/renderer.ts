@@ -1300,7 +1300,9 @@ export function createRenderer(
       lerp(base.at[1], oat[1], oe),
       lerp(base.at[2], oat[2], oe),
     ]
-    if (S.reduced && frameNo === 1) {
+    // The first frame is the resting frame: no fly-in, because the page
+    // under the canvas is already showing this view.
+    if (frameNo === 1) {
       cam.eye.snap(cam.eye.s.map((s) => s.t) as Vec3)
       cam.at.snap(cam.at.s.map((s) => s.t) as Vec3)
     }

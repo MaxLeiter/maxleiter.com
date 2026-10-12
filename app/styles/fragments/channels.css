@@ -85,13 +85,13 @@
 }
 
 /* The channel in view is the big one: the target, or Home before any. */
-.ch-root:has(.ch-row:target) .ch-chan[aria-current],
-.ch-root:not(:has(.ch-row:target)) .ch-chan[href='#ch-home'],
-.ch-root:has(#ch-blog:target) .ch-chan[href='#ch-blog'],
-.ch-root:has(#ch-notes:target) .ch-chan[href='#ch-notes'],
-.ch-root:has(#ch-projects:target) .ch-chan[href='#ch-projects'],
-.ch-root:has(#ch-work:target) .ch-chan[href='#ch-work'],
-.ch-root:has(#ch-about:target) .ch-chan[href='#ch-about'] {
+html:not([data-scene='room']) .ch-root:has(.ch-row:target) .ch-chan[aria-current],
+html:not([data-scene='room']) .ch-root:not(:has(.ch-row:target)) .ch-chan[href='#ch-home'],
+html:not([data-scene='room']) .ch-root:has(#ch-blog:target) .ch-chan[href='#ch-blog'],
+html:not([data-scene='room']) .ch-root:has(#ch-notes:target) .ch-chan[href='#ch-notes'],
+html:not([data-scene='room']) .ch-root:has(#ch-projects:target) .ch-chan[href='#ch-projects'],
+html:not([data-scene='room']) .ch-root:has(#ch-work:target) .ch-chan[href='#ch-work'],
+html:not([data-scene='room']) .ch-root:has(#ch-about:target) .ch-chan[href='#ch-about'] {
   font-size: 48px;
   color: var(--ui-ink);
 }
@@ -233,12 +233,12 @@
   }
 
   .ch-chan,
-  .ch-root:has(.ch-row:target) .ch-chan[aria-current],
-  .ch-root:not(:has(.ch-row:target)) .ch-chan[href='#ch-home'],
-  .ch-root:has(#ch-blog:target) .ch-chan[href='#ch-blog'],
-  .ch-root:has(#ch-notes:target) .ch-chan[href='#ch-notes'],
-  .ch-root:has(#ch-projects:target) .ch-chan[href='#ch-projects'],
-  .ch-root:has(#ch-work:target) .ch-chan[href='#ch-work'],
+  html:not([data-scene='room']) .ch-root:has(.ch-row:target) .ch-chan[aria-current],
+  html:not([data-scene='room']) .ch-root:not(:has(.ch-row:target)) .ch-chan[href='#ch-home'],
+  html:not([data-scene='room']) .ch-root:has(#ch-blog:target) .ch-chan[href='#ch-blog'],
+  html:not([data-scene='room']) .ch-root:has(#ch-notes:target) .ch-chan[href='#ch-notes'],
+  html:not([data-scene='room']) .ch-root:has(#ch-projects:target) .ch-chan[href='#ch-projects'],
+  html:not([data-scene='room']) .ch-root:has(#ch-work:target) .ch-chan[href='#ch-work'],
   .ch-root:has(#ch-about:target) .ch-chan[href='#ch-about'] {
     font-size: 22px;
     padding: 0 10px;
@@ -277,11 +277,20 @@
 
 /* ------------------------------------------------------------- 3D mode -- */
 
-/* While the scene starts, over the flat dashboard. */
+/*
+ * The room has two states that must look alike. `.ch-3d` is the scene
+ * running. `[data-scene='room']` (set on <html> before first paint, see
+ * SCENE_SCRIPT in app/components/top-bar.tsx) is the same layout drawn by
+ * CSS alone while the scene loads: the focused tile where the camera will
+ * frame it and the channel labels where the HUD will put them, so the
+ * canvas fades in over its own picture. The numbers below are the scene's:
+ * `framing` in app/islands/channels/layout.ts and `updateHUD` in engine.ts.
+ */
+
+/* While the scene starts: the HUD it is about to add stays out of sight. */
 .ch-boot .ch-hud,
 .ch-boot .ch-ring,
-.ch-boot .ch-reader,
-.ch-boot .ch-chans {
+.ch-boot .ch-reader {
   visibility: hidden;
 }
 
@@ -301,7 +310,8 @@
   opacity: 1;
 }
 
-.ch-3d {
+.ch-3d,
+[data-scene='room'] .ch-root {
   position: fixed;
   inset: 0;
   overflow: hidden;
@@ -320,7 +330,8 @@
   white-space: nowrap;
 }
 
-.ch-3d .ch-chans {
+.ch-3d .ch-chans,
+[data-scene='room'] .ch-root .ch-chans {
   position: fixed;
   inset: 0 auto auto 0;
   width: 0;
@@ -329,14 +340,15 @@
   padding: 0;
   background: none;
   overflow: visible;
-  animation: ch-in 0.5s ease both;
 }
 
-.ch-3d .ch-chans ul {
+.ch-3d .ch-chans ul,
+[data-scene='room'] .ch-root .ch-chans ul {
   display: block;
 }
 
-.ch-3d .ch-chan {
+.ch-3d .ch-chan,
+[data-scene='room'] .ch-root .ch-chan {
   position: absolute;
   left: 0;
   top: 0;
@@ -346,7 +358,157 @@
   font-weight: 400;
   line-height: 1;
   color: var(--ui-ink);
+  transform-origin: 0 50%;
   will-change: transform, opacity;
+}
+
+/* -- the resting frame in CSS -- */
+
+/* Which channel is current: the one a hash points into, else Home. */
+.ch-root {
+  --c: 0;
+}
+.ch-root:has(#ch-blog:target, #ch-blog .ch-tile:target) {
+  --c: 1;
+}
+.ch-root:has(#ch-notes:target, #ch-notes .ch-tile:target) {
+  --c: 2;
+}
+.ch-root:has(#ch-projects:target, #ch-projects .ch-tile:target) {
+  --c: 3;
+}
+.ch-root:has(#ch-work:target, #ch-work .ch-tile:target) {
+  --c: 4;
+}
+.ch-root:has(#ch-about:target, #ch-about .ch-tile:target) {
+  --c: 5;
+}
+
+/* The focused tile's rectangle as the camera frames it, per aspect band. */
+[data-scene='room'] .ch-root {
+  --vw: 1vw;
+  --vh: 1vh;
+  --vw: 1dvw;
+  --vh: 1dvh;
+  --frac: 0.46;
+  --lx: 0.06;
+  --tile-w: calc(var(--frac) * 100 * var(--vw));
+  --tile-h: calc(var(--tile-w) / 1.6);
+  --tile-x: calc((50 - var(--lx) * 100) * var(--vw) - var(--tile-w) / 2);
+  --tile-y: calc(45 * var(--vh) - var(--tile-h) / 2);
+  --big: 56px;
+}
+
+@media (min-aspect-ratio: 13/10) {
+  [data-scene='room'] .ch-root {
+    --lx: 0.1;
+  }
+}
+
+@media (min-aspect-ratio: 3/2) {
+  [data-scene='room'] .ch-root {
+    --frac: 0.4;
+  }
+}
+
+@media (min-aspect-ratio: 2/1) {
+  [data-scene='room'] .ch-root {
+    --frac: 0.34;
+  }
+}
+
+@media (max-height: 519px) {
+  [data-scene='room'] .ch-root {
+    --big: 36px;
+  }
+}
+
+@media (max-aspect-ratio: 9/10) {
+  [data-scene='room'] .ch-root {
+    --tile-w: calc(86 * var(--vw));
+    --tile-x: calc(7 * var(--vw));
+    --tile-y: calc(37.9 * var(--vh) - var(--tile-h) / 2);
+    --big: 40px;
+  }
+}
+
+[data-scene='room'] .ch-root:not(.ch-3d) .ch-chan {
+  --d: calc(var(--i) - var(--c));
+  --ad: max(var(--d), -1 * var(--d));
+  --sgn: clamp(-1, var(--d) * 1000, 1);
+  --near: min(var(--ad), 1);
+  --sc: calc(1 - var(--near) * 0.57);
+  --hit: max(calc(var(--big) * 1.15), calc(45px / var(--sc)));
+  --yy: calc(
+    var(--sgn) *
+      (var(--near) * var(--big) * 0.98 + max(var(--ad) - 1, 0) * 46px)
+  );
+  height: var(--hit);
+  font-size: var(--big);
+  opacity: max(
+    0.64,
+    calc(1 - var(--near) * 0.26 - max(var(--ad) - 1, 0) * 0.04)
+  );
+  transform: translate(
+      max(28px, min(4.5 * var(--vw), var(--tile-x) - 260px)),
+      calc(var(--tile-y) + var(--tile-h) / 2 + var(--yy) - var(--hit) / 2)
+    )
+    scale(var(--sc));
+}
+
+@media (max-aspect-ratio: 9/10) {
+  [data-scene='room'] .ch-root:not(.ch-3d) .ch-chan {
+    --sc: calc(1 - var(--near) * 0.5);
+    opacity: max(0, calc(1 - var(--ad) * 1.6));
+    transform: translate(
+        16px,
+        calc(
+          var(--tile-y) - var(--big) * 1.25 + var(--yy) -
+            (var(--hit) - var(--big)) / 2
+        )
+      )
+      scale(var(--sc));
+  }
+}
+
+/* Everything in the rows but the focused tile is there, focusable and
+   read, just not drawn: the scene draws it. */
+[data-scene='room'] .ch-root:not(.ch-3d) :is(.ch-row-head, .ch-tile) {
+  opacity: 0;
+}
+
+[data-scene='room']
+  .ch-root:not(.ch-3d):not(:has(.ch-row:target, .ch-tile:target))
+  #ch-home
+  .ch-item:first-child
+  .ch-tile,
+[data-scene='room'] .ch-root:not(.ch-3d) .ch-row:target .ch-item:first-child .ch-tile,
+[data-scene='room'] .ch-root:not(.ch-3d) .ch-tile:target {
+  position: fixed;
+  z-index: 1;
+  left: var(--tile-x);
+  top: var(--tile-y);
+  width: var(--tile-w);
+  opacity: 1;
+  transform: none;
+  transition: none;
+  -webkit-box-reflect: unset;
+  animation: ch-rest 0.6s ease both;
+}
+
+/* The one entrance left, and it is CSS: it plays from first paint, never
+   after the page is already showing. */
+@keyframes ch-rest {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scene='room'] .ch-root .ch-tile {
+    animation: none;
+  }
 }
 
 .ch-3d .ch-chan:focus-visible {
@@ -355,7 +517,8 @@
   outline-offset: calc(3px / var(--sc, 1));
 }
 
-.ch-3d .ui-top {
+.ch-3d .ui-top,
+[data-scene='room'] .ch-root .ui-top {
   z-index: 5;
 }
 
