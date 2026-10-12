@@ -16,6 +16,12 @@ importers:
       '@fec/remark-a11y-emoji':
         specifier: 4.0.2
         version: 4.0.2
+      '@fontsource-variable/exo-2':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource-variable/saira':
+        specifier: 5.3.0
+        version: 5.3.0
       '@mdx-js/mdx':
         specifier: ^3.1.1
         version: 3.1.1
@@ -274,6 +280,12 @@ packages:
   '@fec/remark-a11y-emoji@4.0.2':
     resolution: {integrity: sha512-Au3jSkt66PRwTKTCYm7KzTGfMzUmn1LYPK+cyrytfzjfOPkHpohrLcGYPLsgxV8nzc4vXxt3Ay7MlBrmeIfFLg==}
     engines: {node: '>=16.0'}
+
+  '@fontsource-variable/exo-2@5.3.0':
+    resolution: {integrity: sha512-KgmRT6/E6y/ZwFcGnlFrFoKkizPcWtpDh1q1KlxLNA7NJWaSP4Y+nWGRlnRBiGZ8yybF8DhEWNldmDhOZkzMAQ==}
+
+  '@fontsource-variable/saira@5.3.0':
+    resolution: {integrity: sha512-C1rm7n1OuEx4Se/SAB/5EeUuCviGFFnYTr5vxuQQm2YIOfgbQWx/P6qqhdXlVCBRm/1UzNWCtDK5jNbVmO6W2w==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -2222,6 +2234,10 @@ snapshots:
       gemoji: 6.1.0
       mdast-util-find-and-replace: 1.1.1
       unist-util-visit: 2.0.3
+
+  '@fontsource-variable/exo-2@5.3.0': {}
+
+  '@fontsource-variable/saira@5.3.0': {}
 
   '@img/colour@1.1.0':
     optional: true

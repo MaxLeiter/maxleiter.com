@@ -365,8 +365,10 @@ async function main(): Promise<void> {
       assert.ok(font.after < font.before, `${font.name} did not shrink`)
       assert.ok(ctx.assets[`${font.name}.woff2`], `${font.name} not in assets`)
     }
+    // The interface and body cores; Geist Mono loads where code renders.
     assert.equal(result.fonts.preload.length, 2)
-    assert.match(result.fonts.css, /--font-geist-sans/)
+    assert.match(result.fonts.css, /--font-saira/)
+    assert.match(result.fonts.css, /--font-exo/)
     assert.match(result.fonts.css, /--font-geist-mono/)
   })
 
@@ -507,7 +509,7 @@ async function main(): Promise<void> {
     assert.equal(pruned.sheets.page, '.d{box-shadow:var(--tw-a)}')
     assert.deepEqual(pruned.dropped, { base: ['--dead', '--tw-b', 'b', 'c'] })
   })
-  // What the desktop fragment is made of: a grouped selector that kept one
+  // What the homepage fragment is made of: a grouped selector that kept one
   // member subtracts to exactly the other.
   check('subtractCss leaves exactly what the part lacks, in order', () => {
     assert.equal(

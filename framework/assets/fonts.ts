@@ -7,13 +7,15 @@ import type { BuildContext } from '../shared/types'
 /**
  * Font subsetting.
  *
- * `geist@1.5.1` ships two variable woff2 files covering the full Latin
- * Extended + Greek + Cyrillic range across a 100-900 weight axis, ~58 KB each.
- * Three things are cut: every codepoint the site does not render, the weight
- * axis outside the range its CSS asks for, and every OpenType feature no rule
- * turns on. Each face is two files (see SLICES), and the core one is preloaded
- * on every page, so this is the largest item on a first visit and it is on
- * the critical path.
+ * Three variable faces: Saira (the MERIDIAN interface face, weight and width
+ * axes), Exo 2 (body text) and Geist Mono (code). The sources are packages --
+ * `@fontsource-variable/saira`, `@fontsource-variable/exo-2`, `geist` -- and
+ * three things are cut from each: every codepoint the site does not render,
+ * each axis outside the range its CSS asks for, and every OpenType feature no
+ * rule turns on. Each face is two files (see `slices`). The interface and body
+ * cores are preloaded on every page, so they are the largest item on a first
+ * visit and they are on the critical path; Geist Mono only renders where a
+ * page has code, so it is left to load on demand.
  *
  * The subsets are committed to `app/fonts/` so a clean build does no work.
  * A change to SUBSET_SPEC bumps the manifest hash and regenerates them.
@@ -62,13 +64,20 @@ const SUBSET_EXTRAS: readonly number[] = [
 ]
 
 /**
- * The weight range to keep on the variable axis.
+ * The interface glyphs above Latin-1 the MERIDIAN chrome renders: ‹ › for
+ * crumbs and back links, ′ on the per-year chart, ↵ on key hints. Only the
+ * Saira and Exo 2 cores carry them; Geist Mono's core stays exactly what
+ * `scripts/box-drawing.py` cut its corners from.
+ */
+const INTERFACE_EXTRAS: readonly number[] = [0x2032, 0x2039, 0x203a, 0x21b5]
+
+/**
+ * Geist Mono's weight range.
  *
- * The site asks for exactly three weights: 400 (`--font-weight-normal`), 600
- * (`font-semibold`, and `markdown.css`'s headings) and 700 (`font-bold`).
- * Preflight's `b, strong { font-weight: bolder }` resolves to 700 from a normal
- * parent and would ask for 900 inside an already-bold one, where clamping to
- * 700 is the correct rendering rather than a degraded one.
+ * Code asks for 400, and bold spans inside it for 600 and 700. Preflight's
+ * `b, strong { font-weight: bolder }` resolves to 700 from a normal parent and
+ * would ask for 900 inside an already-bold one, where clamping to 700 is the
+ * correct rendering rather than a degraded one.
  */
 const WEIGHT_AXIS = { min: 400, max: 700 } as const
 
@@ -98,13 +107,26 @@ export const LAYOUT_FEATURES: readonly string[] = [
 /** Bumped whenever the subset definition changes, to invalidate the artifacts. */
 const SUBSET_SPEC = 3
 
+interface Axis {
+  min: number
+  max: number
+}
+
 interface FontSource {
-  /** Filename stem: `GeistSans` becomes `GeistSans-subset.woff2`. */
+  /** Filename stem: `Saira` becomes `Saira-subset.woff2`. */
   stem: string
-  /** Path under node_modules/geist/dist/fonts. */
-  source: string
+  /** Resolves the source woff2 from the repo root. */
+  source: (root: string) => string
   /** CSS `font-family` the site's tokens point at. */
   family: string
+  /** The custom property `global.css` reads the family through. */
+  token: string
+  /** The variation axes kept, each clamped to the range the CSS asks for. */
+  axes: { wght: Axis; wdth?: Axis }
+  /** Codepoints above Latin-1 the core slice carries. */
+  extras: readonly number[]
+  /** Preload the core slice on every page. */
+  preload: boolean
   /**
    * Has a committed face of diagram glyphs the source lacks, drawn by
    * scripts/box-drawing.py: `<stem>-box.woff2`, and `<stem>-box.json` naming
@@ -113,16 +135,55 @@ interface FontSource {
   drawn?: boolean
 }
 
+/**
+ * Resolve a package's files without relying on a hoisted node_modules.
+ * Both fontsource packages export `./files/*`.
+ */
+function packageFile(root: string, spec: string): string {
+  return createRequire(path.join(root, 'package.json')).resolve(spec)
+}
+
 const FONTS: readonly FontSource[] = [
   {
-    stem: 'GeistSans',
-    source: 'geist-sans/Geist-Variable.woff2',
-    family: 'Geist Variable',
+    // The whole interface: logo, menu, labels and crumbs. Widths 100-125 are
+    // the axis range the chrome uses (`font-stretch` 100% for labels, 112%
+    // for the menu, 125% for the logo); 300-700 is every weight it asks for.
+    stem: 'Saira',
+    source: (root) =>
+      packageFile(
+        root,
+        '@fontsource-variable/saira/files/saira-latin-wdth-normal.woff2',
+      ),
+    family: 'Saira Variable',
+    token: '--font-saira',
+    axes: { wght: { min: 300, max: 700 }, wdth: { min: 100, max: 125 } },
+    extras: [...SUBSET_EXTRAS, ...INTERFACE_EXTRAS],
+    preload: true,
+  },
+  {
+    // Body text. Emphasis is synthesised from the upright rather than paying
+    // for the italic file, which would be another 22 KB.
+    stem: 'Exo2',
+    source: (root) =>
+      packageFile(
+        root,
+        '@fontsource-variable/exo-2/files/exo-2-latin-wght-normal.woff2',
+      ),
+    family: 'Exo 2 Variable',
+    token: '--font-exo',
+    axes: { wght: { min: 300, max: 700 } },
+    extras: [...SUBSET_EXTRAS, ...INTERFACE_EXTRAS],
+    preload: true,
   },
   {
     stem: 'GeistMono',
-    source: 'geist-mono/GeistMono-Variable.woff2',
+    source: (root) =>
+      path.join(geistFontDir(root), 'geist-mono/GeistMono-Variable.woff2'),
     family: 'Geist Mono Variable',
+    token: '--font-geist-mono',
+    axes: { wght: WEIGHT_AXIS },
+    extras: SUBSET_EXTRAS,
+    preload: false,
     drawn: true,
   },
 ]
@@ -142,9 +203,9 @@ const LATIN1_REST = range(LATIN1_SUPPLEMENT).filter(
 )
 
 /**
- * The first slice is the core: preloaded on every page, and claiming every
- * codepoint no other face of its family claims. Every other face is fetched
- * only where its characters render, and claims exactly its own codepoints.
+ * The first slice is the core: claiming every codepoint no other face of its
+ * family claims. Every other face is fetched only where its characters
+ * render, and claims exactly its own codepoints.
  *
  * Where two faces of one family overlap, the browser takes the last one
  * declared that covers the character, so the ranges are kept disjoint by
@@ -154,16 +215,37 @@ const LATIN1_REST = range(LATIN1_SUPPLEMENT).filter(
  * chooses partly from the primary file's cmap, which is why diagram glyphs
  * are drawn rather than left to fallback.
  */
-const SLICES: readonly Slice[] = [
-  {
-    suffix: 'subset',
-    codepoints: [...range(ASCII), ...LATIN1_RENDERED, ...SUBSET_EXTRAS],
-  },
-  { suffix: 'latin1', codepoints: LATIN1_REST },
-]
+function slices(font: FontSource): readonly Slice[] {
+  return [
+    {
+      suffix: 'subset',
+      codepoints: [...range(ASCII), ...LATIN1_RENDERED, ...font.extras],
+    },
+    { suffix: 'latin1', codepoints: LATIN1_REST },
+  ]
+}
+
+/**
+ * What a subset is cut to, as the string its manifest hash is taken over.
+ * A weight-only face hashes exactly as it did before the width axis existed,
+ * so Geist Mono's committed subsets -- and the drawn corners cut from its
+ * core -- are not regenerated by a change that does not touch them.
+ */
+function axesKey(axes: FontSource['axes']): string {
+  const weight = `${axes.wght.min}-${axes.wght.max}`
+  return axes.wdth ? `${weight}/wdth:${axes.wdth.min}-${axes.wdth.max}` : weight
+}
+
+/** The `@font-face` range descriptors matching the instanced axes. */
+function axisDescriptors(axes: FontSource['axes']): string {
+  const weight = `font-weight:${axes.wght.min} ${axes.wght.max};`
+  return axes.wdth
+    ? `${weight}font-stretch:${axes.wdth.min}% ${axes.wdth.max}%;`
+    : weight
+}
 
 export interface FontResult {
-  /** `@font-face` blocks plus the `--font-geist-*` custom properties. */
+  /** `@font-face` blocks plus the `--font-*` family custom properties. */
   css: string
   /** Absolute paths (site-relative URLs) to preload in `<head>`. */
   preload: string[]
@@ -174,7 +256,7 @@ export interface FontResult {
 interface SubsetOptions {
   targetFormat: 'woff2' | 'woff' | 'sfnt'
   /** Partial instancing: keep the axis, narrow its range. */
-  variationAxes?: Record<string, { min: number; max: number }>
+  variationAxes?: Record<string, Axis>
   /** Allowlist of layout features. Omitted, subset-font keeps all of them. */
   keepFeatures?: readonly string[]
 }
@@ -277,8 +359,8 @@ async function readDrawn(
 }
 
 /**
- * Subset both Geist faces (writing the committed artifacts if absent), copy
- * them into `${ctx.staticDir}/_assets` under a content hash, register them in
+ * Subset every face (writing the committed artifacts if absent), copy them
+ * into `${ctx.staticDir}/_assets` under a content hash, register them in
  * `ctx.assets` and return the CSS the shell needs.
  */
 export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
@@ -304,20 +386,19 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
   const preload: string[] = []
 
   for (const font of FONTS) {
-    const sourcePath = path.join(geistFontDir(ctx.root), font.source)
-    const original = await fs.readFile(sourcePath)
+    const original = await fs.readFile(font.source(ctx.root))
     const family: {
       name: string
       codepoints: readonly number[]
       data: Buffer
     }[] = []
 
-    for (const slice of SLICES) {
+    for (const slice of slices(font)) {
       const name = `${font.stem}-${slice.suffix}`
       const subsetPath = path.join(fontDir, `${name}.woff2`)
       const text = String.fromCodePoint(...slice.codepoints)
       const specKey = hash(
-        `${SUBSET_SPEC}:${WEIGHT_AXIS.min}-${WEIGHT_AXIS.max}:` +
+        `${SUBSET_SPEC}:${axesKey(font.axes)}:` +
           `${LAYOUT_FEATURES.join(',')}:${text}`,
       )
 
@@ -329,7 +410,9 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
         }
         const subset = await subsetFont(original, text, {
           targetFormat: 'woff2',
-          variationAxes: { wght: WEIGHT_AXIS },
+          variationAxes: font.axes.wdth
+            ? { wght: font.axes.wght, wdth: font.axes.wdth }
+            : { wght: font.axes.wght },
           keepFeatures: LAYOUT_FEATURES,
         })
         await fs.writeFile(subsetPath, subset)
@@ -356,16 +439,16 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
         before: original.byteLength,
         after: face.data.byteLength,
       })
-      if (face === core) preload.push(url)
+      if (face === core && font.preload) preload.push(url)
       const claims =
         face === core
           ? unicodeRange(claimed, { invert: true })
           : unicodeRange(face.codepoints)
       faces.push(
-        // The descriptor has to match the instanced axis, or the browser asks
-        // for a weight the file cannot render and synthesises one.
+        // The descriptors have to match the instanced axes, or the browser
+        // asks for a weight the file cannot render and synthesises one.
         `@font-face{font-family:'${font.family}';font-style:normal;` +
-          `font-weight:${WEIGHT_AXIS.min} ${WEIGHT_AXIS.max};font-display:swap;` +
+          `${axisDescriptors(font.axes)}font-display:swap;` +
           `src:url('${url}') format('woff2');unicode-range:${claims}}`,
       )
     }
@@ -377,9 +460,8 @@ export async function prepareFonts(ctx: BuildContext): Promise<FontResult> {
   const previous = await fs.readFile(manifestPath, 'utf8').catch(() => '')
   if (previous !== manifestText) await fs.writeFile(manifestPath, manifestText)
 
-  const css = `${faces.join('')}:root{--font-geist-sans:'${
-    FONTS[0].family
-  }';--font-geist-mono:'${FONTS[1].family}'}`
+  const tokens = FONTS.map((font) => `${font.token}:'${font.family}'`)
+  const css = `${faces.join('')}:root{${tokens.join(';')}}`
 
   return { css, preload, sizes }
 }
