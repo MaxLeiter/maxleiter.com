@@ -9,7 +9,7 @@ import {
 } from './layout'
 import { clamp, lerp, sstep, Spring } from './math'
 import { createRenderer, type Renderer } from './renderer'
-import { Sound } from './sound'
+import { sound } from './sound'
 
 /**
  * The channel room: takes over the server-rendered dashboard with a WebGL2
@@ -261,7 +261,6 @@ export function boot(root: HTMLElement): () => void {
   soundBtn.hidden = false
   const originalTitle = document.title
   const originalHue = root.style.getPropertyValue('--ui-hue')
-  const sound = new Sound()
 
   /* ---------------------------------------------------------- a11y -- */
 
@@ -358,12 +357,19 @@ export function boot(root: HTMLElement): () => void {
     status.textContent = S.reduced ? 'Reduced motion on' : 'Full motion on'
   })
 
-  function toggleSound(): void {
-    const playing = sound.toggle()
-    soundBtn.setAttribute('aria-pressed', String(playing))
+  function showSound(): void {
+    soundBtn.setAttribute('aria-pressed', String(sound.on))
     const label = soundBtn.querySelector('.ui-pill-label')
-    if (label) label.textContent = playing ? 'Sound on' : 'Sound off'
-    status.textContent = playing
+    if (label) label.textContent = sound.on ? 'Sound on' : 'Sound off'
+  }
+  // The setting outlives the scene: a soft navigation back keeps it.
+  showSound()
+
+  /** Synchronous all the way to `resume()`: iOS needs the gesture. */
+  function toggleSound(): void {
+    sound.toggle()
+    showSound()
+    status.textContent = sound.on
       ? 'Interface sounds on'
       : 'Interface sounds off'
   }
@@ -1059,7 +1065,6 @@ export function boot(root: HTMLElement): () => void {
     soundBtn.hidden = true
     for (const el of added) el.remove()
     document.title = originalTitle
-    sound.dispose()
     try {
       renderer.dispose()
     } catch {
