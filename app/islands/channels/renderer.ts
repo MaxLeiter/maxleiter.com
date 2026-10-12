@@ -45,6 +45,8 @@ export interface Renderer {
   pick(px: number, py: number, vp: Viewport): number
   prepareBack(item: Item, vp: Viewport, mode: 'page' | 'reader'): void
   prime(): void
+  /** Where the camera is headed, for tests that check nothing moved it. */
+  cameraTarget(): Vec3
   avatar: Avatar
   dispose(): void
 }
@@ -1564,5 +1566,7 @@ export function createRenderer(
     for (const s of shaders) gl.deleteShader(s)
   }
 
-  return { frame, pick, prepareBack, prime, avatar, dispose }
+  const cameraTarget = (): Vec3 => cam.at.s.map((spring) => spring.t) as Vec3
+
+  return { frame, pick, prepareBack, prime, cameraTarget, avatar, dispose }
 }

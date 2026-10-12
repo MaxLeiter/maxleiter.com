@@ -34,6 +34,9 @@ interface Connection {
 
 const MOTION_KEY = 'ch-motion'
 
+/** How many times a scene has started in this page's life, for the tests. */
+let boots = 0
+
 function readMotionPref(): string | null {
   try {
     return localStorage.getItem(MOTION_KEY)
@@ -128,6 +131,8 @@ export function boot(root: HTMLElement): () => void {
   if (!context) return noop
   const gl: WebGL2RenderingContext = context
 
+  boots++
+  let introState: 'played' | 'skipped' = 'skipped'
   const channels = readModel(root)
   if (channels.length === 0 || channels.some((c) => !c.label)) return noop
   const found = {
@@ -991,6 +996,14 @@ export function boot(root: HTMLElement): () => void {
   const tick = (now: number) => {
     if (!alive) return
     raf = requestAnimationFrame(tick)
+    // Behind the open palette the room holds still: drawing it under a
+    // full-screen blur is all cost, and on a phone the slow frames that
+    // costs used to trip the fallback below and take the scene away.
+    if (shownScene && paletteOpen()) {
+      last = now
+      slow = 0
+      return
+    }
     const raw = (now - last) / 1000
     last = now
     const dt = clamp(raw, 0, 0.1)
@@ -1003,7 +1016,10 @@ export function boot(root: HTMLElement): () => void {
     S.t += dt
     if (!waved && S.t > 0.9) {
       waved = true
-      if (!S.reduced) renderer.avatar.wave = S.t
+      if (!S.reduced) {
+        renderer.avatar.wave = S.t
+        introState = 'played'
+      }
     }
     if (entry && S.open === entry && S.t > 0.15 && openMode === 'page')
       closeItem()
@@ -1039,6 +1055,21 @@ export function boot(root: HTMLElement): () => void {
     }
   }
   raf = requestAnimationFrame(tick)
+
+  // A read-only window for the Playwright checks, only under ?scene=force.
+  if (query === 'force') {
+    ;(window as { __channels?: unknown }).__channels = {
+      state: () => ({
+        chan: S.chan,
+        idx: [...S.idx],
+        open: Boolean(S.open),
+        camera: renderer.cameraTarget(),
+        intro: introState,
+        boots,
+        scrollY,
+      }),
+    }
+  }
 
   on(canvas, 'webglcontextlost', (event: Event) => {
     event.preventDefault()

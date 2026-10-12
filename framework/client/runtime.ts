@@ -156,12 +156,25 @@ scheduleIslands()
 
 /* ------------------------------------------------------------- palette -- */
 
+/**
+ * What had focus before the palette opened. The palette hands it back on
+ * close; leaving focus on `<body>` lost the reader's place, and on the
+ * homepage the next arrow key re-derived it.
+ */
+export interface PaletteHost extends HTMLElement {
+  returnFocus?: Element | null
+}
+
 function openPalette(): void {
-  const el = document.querySelector<HTMLElement>('[data-island="palette"]')
+  const el = document.querySelector<PaletteHost>('[data-island="palette"]')
   if (!el) return
+  if (el.hidden) el.returnFocus = document.activeElement
   el.hidden = false
-  // Focus first so typing is never swallowed while the module loads.
-  el.querySelector<HTMLInputElement>('[data-palette-input]')?.focus()
+  // Focus first so typing is never swallowed while the module loads. No
+  // scroll: the overlay is fixed, and a scroll would lose the reader's place.
+  el.querySelector<HTMLInputElement>('[data-palette-input]')?.focus({
+    preventScroll: true,
+  })
   void mount(el)
 }
 

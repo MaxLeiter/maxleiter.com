@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState, useSyncExternalStore } from 'react'
+import type { PaletteHost } from '@framework/client/runtime'
 import type {
   CSSProperties,
   KeyboardEvent as ReactKeyboardEvent,
@@ -124,12 +125,29 @@ export default function Palette() {
     ? items.filter((item) => item.title.toLowerCase().includes(query))
     : items
 
+  /**
+   * Hides the palette and gives focus back to exactly what had it, without
+   * scrolling. Nothing else on the page should notice it was open.
+   */
   const close = () => {
-    const wrapper = overlayRef.current?.closest<HTMLElement>('[data-island]')
-    if (wrapper) wrapper.hidden = true
+    const wrapper =
+      overlayRef.current?.closest<PaletteHost>('[data-island]') ?? null
+    const back = wrapper?.returnFocus
+    if (wrapper) {
+      wrapper.hidden = true
+      wrapper.returnFocus = null
+    }
     setSearch('')
     setSelectedIndex(0)
-    inputRef.current?.blur()
+    if (
+      back instanceof HTMLElement &&
+      back !== document.body &&
+      document.contains(back)
+    ) {
+      back.focus({ preventScroll: true })
+    } else {
+      inputRef.current?.blur()
+    }
   }
 
   const navigate = (item: PaletteItem) => {
@@ -191,6 +209,9 @@ export default function Palette() {
    */
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.target === overlayRef.current) {
+      // Without this the mousedown that follows moves focus to <body>,
+      // straight after close() handed it back.
+      event.preventDefault()
       close()
       return
     }
