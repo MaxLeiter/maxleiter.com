@@ -84,6 +84,7 @@ export function TileGrid({ items }: { items: ListItem[] }) {
               title={item.title}
               meta={item.meta}
               chip={item.chip ?? ''}
+              sizes="(max-width: 700px) calc(100vw - 48px), 250px"
             />
             <span className="ui-tile-t">
               {item.title}

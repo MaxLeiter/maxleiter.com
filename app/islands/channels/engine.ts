@@ -77,6 +77,10 @@ function readModel(root: HTMLElement): Channel[] {
           // The meta line and the chip are already in the cover's own type.
           const text = (selector: string) =>
             link.querySelector(selector)?.textContent ?? ''
+          const img = link.querySelector('img')
+          // A bespoke piece names the size the scene samples; one the page
+          // already loaded is reused as is, so the texture costs no fetch.
+          const tex = img?.dataset.tex
           return {
             chan,
             index,
@@ -88,7 +92,9 @@ function readModel(root: HTMLElement): Channel[] {
             meta: text('.cv-m'),
             href: link.href,
             external: d.ext !== undefined,
-            art: link.querySelector('img')?.src ?? '',
+            art:
+              (tex !== undefined && img?.currentSrc) || tex || img?.src || '',
+            bespoke: tex !== undefined,
             link,
           }
         },

@@ -45,7 +45,7 @@ framework/
                             requests": resolve once, commit, read from the repo
   render/                   everything that turns content into markup
     index.ts                the server bundle's entry: the render loop
-    assets.ts               files pages emit while rendering (the cover art)
+    assets.ts               files pages emit while rendering (cover and card art)
     pages.ts                the page registry, every route as a PageDef
     shell.tsx               the HTML shell: head tags, inlined CSS, scripts
     islands.tsx             the build-time <Island> marker and its manifest
@@ -364,9 +364,11 @@ a fast first click has to ride the `hold` fallback.
   old `?embed=true` links working, for `/blog/` and `/notes/` only.
 - Hashed assets under `static/_assets/<name>.<8-char-hash>.<ext>`, immutable.
   That includes what pages emit while rendering through `render/assets.ts`:
-  every `cover.<hash>.svg` and the top bar's `avatar.<hash>.svg`. Identical
-  contents share one file, which is how a homepage tile and its article
-  header point at the same cover.
+  every `cover.<hash>.svg`, every `art.<hash>.webp` and the top bar's
+  `avatar.<hash>.svg`. Identical contents share one file, which is how a
+  homepage tile and its article header point at the same cover. The WebP art
+  is only ever linked through `/_vercel/image` (`_assets` is in
+  `localPatterns`), so a phone gets an AVIF sized to its tile.
 - Unhashed root files: `search-index.json`, `feed.xml`, `sitemap.xml`,
   `robots.txt`, `opengraph-image.png`, `blog/<slug>/opengraph-image.png`.
 - `public/**` is copied verbatim. `public/feed.xml` is not; `feeds.ts` writes
@@ -521,6 +523,25 @@ canvas fades in over the same picture. `framing` in
 `app/islands/channels/layout.ts` and the stage rules in `channels.css` must
 agree. When the scene cannot run, it clears the flag and the page is flat
 again.
+
+**Card art is drawn per piece, baked once, and checked by the build.** Every
+post, note, project, lab, talk, work entry, link and section index has its own
+illustration in `app/art/pieces/`: SVG source drawn with one style kit
+(`app/art/kit.ts`), a lit stage with a glossy floor and one hero subject, in
+the 2008 console box-art direction. A piece names the seeds it serves (a post
+and the project that links to it share one). The SVG is rasterized by
+`pnpm bake-art` (`scripts/bake-art.ts`, sharp from `@vercel/og`'s
+dependencies) to a committed 1536x960 WebP in `app/art/baked/`, with a
+`.hash` stamp of the source beside it. The build does not rasterize: resvg
+cost about a second and a megabyte of PNG per card. It copies the WebP as a
+hashed asset and fails, naming the command, when a piece's source no longer
+matches its stamp (`app/art/registry.ts`). The SVG text rounds every number
+to two decimals, because the bake runs under Bun and the build may run under
+Node, and `Math.sin` can differ in its last bit between them. A cover with
+bespoke art drops the generated keyword and gets a shade under its title
+(`.cv-b`), and its `<img>` carries `data-tex`, the size the scene samples;
+the island reuses the tile's already-loaded image when there is one. A seed
+with no piece falls back to the generated cover below.
 
 **Cover art is generated, one picture per seed.** `app/lib/cover-art.ts` turns
 a seed (`blog:<slug>`, `note:<slug>`, `project:<id>`, ...) into two things: a

@@ -5,6 +5,10 @@ import { TopBar } from '@components/top-bar'
 import { Island } from '@framework/render/islands'
 import { CommandPalette, roomStyle } from './shell'
 
+/** `.ch-item` widths in channels.css: the first tile of a row is wider. */
+const FIRST_TILE = '(max-width: 700px) 82vw, 420px'
+const TILE = '(max-width: 700px) 62vw, 250px'
+
 /**
  * The homepage: a channel dashboard.
  *
@@ -145,6 +149,7 @@ export function HomePage({ channels }: HomePageProps) {
                       meta={item.meta}
                       chip={item.chip}
                       eager={ci === 0 && i < 3}
+                      sizes={i === 0 ? FIRST_TILE : TILE}
                     />
                     <span className="ui-sr">
                       {item.title}

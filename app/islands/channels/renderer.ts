@@ -755,7 +755,16 @@ export function createRenderer(
       title: item.title,
       meta: item.meta,
       chip: item.chip,
+      bespoke: item.bespoke,
     })
+    if (item.bespoke) {
+      // The same shade as .cv-b::before, so the title reads over any art.
+      const shade = g.createLinearGradient(0, COVER_H * 0.5, 0, COVER_H)
+      shade.addColorStop(0, 'rgba(0,0,0,0)')
+      shade.addColorStop(1, 'rgba(0,0,0,.55)')
+      g.fillStyle = shade
+      g.fillRect(0, COVER_H * 0.5, COVER_W, COVER_H * 0.5)
+    }
     const spacing = (px: number) => {
       if ('letterSpacing' in g) g.letterSpacing = `${px}px`
     }

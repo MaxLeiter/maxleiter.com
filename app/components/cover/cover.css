@@ -74,6 +74,20 @@
   stroke-width: 1.5px;
 }
 
+/* Bespoke art: a shade under the title band, as the scene's canvas draws it. */
+.cv-b::before {
+  content: '';
+  position: absolute;
+  inset: 50% 0 0;
+  z-index: 1;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+}
+
+.cv-b .cv-type {
+  z-index: 2;
+}
+
 /* The edge highlight the WebGL tile gets from its clearcoat. */
 .cv-box::after {
   content: '';

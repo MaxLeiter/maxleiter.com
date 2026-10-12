@@ -7,12 +7,13 @@ import type {
 } from '../shared/types'
 import { absoluteUrl } from '../content'
 import { collectLanguages, getHighlighter, highlightCss } from './highlight'
-import { takeEmittedAssets } from './assets'
+import { type AssetContents, takeEmittedAssets } from './assets'
 import { takeIslandManifest } from './islands'
 import { renderPostHtml } from './mdx'
 import { getPages } from './pages'
 import { renderBody, renderPartial, renderShell, type Fonts } from './shell'
 import { resetArticleImages } from '../../app/mdx/static-components'
+import { loadArt } from '../../app/art/registry'
 
 /**
  * The server bundle's entry point.
@@ -50,15 +51,16 @@ export function islandManifest(): string[] {
 }
 
 /** Files the pages emitted while rendering, keyed by public URL. */
-let assets = new Map<string, string>()
+let assets = new Map<string, AssetContents>()
 
-export function emittedAssets(): Map<string, string> {
+export function emittedAssets(): Map<string, AssetContents> {
   return assets
 }
 
 export async function renderAll(ctx: BuildContext): Promise<RenderedPage[]> {
   takeIslandManifest()
   takeEmittedAssets()
+  loadArt(ctx.root)
   allIslands = new Set<string>()
   const pages = await getPages(ctx)
   const rendered: RenderedPage[] = []

@@ -799,7 +799,7 @@ const KEYWORDS: Record<string, string> = {
   'blog:xios': 'WAYLAND',
   'blog:weights': 'WEIGHTS',
   'blog:sandcastle': 'SANDBOX',
-  'blog:introducing-HFSViewer': 'HFS+',
+  'blog:HFSViewer': 'HFS+',
   'blog:the-new-maxleiter-com': 'NEW',
   'blog:rewrite-your-prompts': 'PROMPTS',
   'blog:seeing-the-future': 'FUTURE',
@@ -888,6 +888,8 @@ export interface CoverText {
   meta: string
   /** `LATEST POST`, `NOTE`. */
   chip: string
+  /** Bespoke art is its own subject: no keyword is drawn over it. */
+  bespoke?: boolean
 }
 
 export interface CoverLayout {
@@ -931,7 +933,7 @@ function wrap(text: string, maxW: number, maxLines: number): string[] {
 
 export function coverLayout(text: CoverText): CoverLayout {
   const kind = (['center', 'left', 'huge'] as const)[hash(`${text.seed}L`) % 3]
-  const keyword = keywordFor(text.seed, text.title)
+  const keyword = text.bespoke ? '' : keywordFor(text.seed, text.title)
   const spacing = kind === 'huge' ? -10 : -6
   let size = kind === 'huge' ? 250 : kind === 'left' ? 150 : 170
   const maxW = kind === 'huge' ? W * 1.05 : W * 0.8

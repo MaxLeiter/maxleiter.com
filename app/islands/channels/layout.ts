@@ -28,8 +28,10 @@ export interface Item {
   href: string
   /** Leaves the site, so it opens in the scene's own reader first. */
   external: boolean
-  /** The motif's URL, from the tile's `<img>`. */
+  /** The art's URL, from the tile's `<img>`. */
   art: string
+  /** Bespoke art: no keyword over it, a shade under the title. */
+  bespoke: boolean
   link: HTMLAnchorElement
 }
 

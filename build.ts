@@ -642,7 +642,7 @@ async function main(): Promise<void> {
     ) => string
     wrapPartial: (page: RenderedPage, options: WrapOptions) => string
     islandManifest: () => string[]
-    emittedAssets: () => Map<string, string>
+    emittedAssets: () => Map<string, string | Uint8Array>
     highlightCss: () => string
     renderFeedHtml: (
       ctx: BuildContext,
@@ -780,7 +780,7 @@ async function main(): Promise<void> {
       }
     }
 
-    // Generated files the pages point at: the cover art. Hashed names, so
+    // Generated files the pages point at: the cover and card art. Hashed names, so
     // they land beside the client bundles under the same cache rules.
     for (const [url, contents] of server.emittedAssets()) {
       await fs.writeFile(path.join(ctx.staticDir, url), contents)
