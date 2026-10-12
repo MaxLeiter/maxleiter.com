@@ -104,7 +104,7 @@ const READER_HTML =
   '<span class="ui-key" aria-hidden="true">Esc</span><span aria-hidden="true">Back</span></button></div>' +
   '<div class="ch-reader-body"><div class="ch-reader-art"></div><h2 id="ch-reader-title" class="ui-title ch-reader-title" tabindex="-1"></h2>' +
   '<p class="ch-reader-text"></p>' +
-  '<a class="ch-go" href="/"><span class="ui-key" aria-hidden="true">↵</span><span class="ch-go-l"></span></a></div>'
+  '<a class="ch-go" href="/"><span class="ui-key" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M12.5 3.5v4a2 2 0 0 1-2 2h-7M6.5 6.5l-3 3 3 3"/></svg></span><span class="ch-go-l"></span></a></div>'
 
 export function boot(root: HTMLElement): () => void {
   const query = new URLSearchParams(location.search).get('scene')

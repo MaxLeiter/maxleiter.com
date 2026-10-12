@@ -14,9 +14,27 @@
   --ui-ink-3: rgba(226, 234, 242, 0.7);
   --ui-accent: hsl(var(--ui-hue) 95% 70%);
   --ui-glow: hsl(var(--ui-hue) 95% 60%);
-  --ui-panel:
-    linear-gradient(180deg, rgba(30, 38, 49, 0.94), rgba(10, 13, 18, 0.96) 160px),
-    rgba(10, 13, 18, 0.96);
+  --ui-panel: linear-gradient(
+    180deg,
+    rgba(30, 38, 49, 0.94),
+    rgba(10, 13, 18, 0.96) 160px
+  );
+  /*
+   * Every bezel is one edge: a 1px border painted with this gradient, bright
+   * at the top where the light catches it. An inset highlight on top of a
+   * border reads as a second line, worst at DPR 3.
+   */
+  --ui-edge: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.1) 60%,
+    rgba(255, 255, 255, 0.08)
+  );
+  --ui-panel-edge: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.24),
+    rgba(255, 255, 255, 0.09) 140px
+  );
   --ui-pill:
     linear-gradient(
       180deg,
@@ -49,9 +67,17 @@
   --ui-ink-3: #4b5764;
   --ui-accent: hsl(var(--ui-hue) 85% 27%);
   --ui-glow: hsl(var(--ui-hue) 85% 45%);
-  --ui-panel:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(244, 247, 250, 0.98) 160px),
-    rgba(244, 247, 250, 0.98);
+  --ui-panel: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.97),
+    rgba(244, 247, 250, 0.98) 160px
+  );
+  --ui-edge: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+  --ui-panel-edge: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.08),
+    rgba(0, 0, 0, 0.13) 140px
+  );
   --ui-pill:
     linear-gradient(180deg, #fff, #eef2f6 55%, #e1e7ed);
   --ui-line: rgba(0, 0, 0, 0.1);
@@ -126,18 +152,15 @@
 
 .ui-card,
 .ui-pill {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: var(--ui-pill);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 4px 16px rgba(0, 0, 0, 0.35);
+  border: 1px solid transparent;
+  background:
+    var(--ui-pill) padding-box,
+    var(--ui-edge) border-box;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 [data-theme='light'] .ui-room:not(.ch-root) :is(.ui-card, .ui-pill) {
-  border-color: rgba(0, 0, 0, 0.14);
-  box-shadow:
-    inset 0 1px 0 #fff,
-    0 3px 12px rgba(30, 45, 60, 0.18);
+  box-shadow: 0 3px 12px rgba(30, 45, 60, 0.18);
 }
 
 .ui-card {
@@ -154,9 +177,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.22),
-    0 2px 6px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
 }
 
@@ -233,19 +254,16 @@
   width: min(980px, calc(100% - 48px));
   margin: 16px auto 56px;
   border-radius: 20px;
-  background: var(--ui-panel);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 0 0 1px var(--ui-line),
-    0 30px 80px rgba(0, 0, 0, 0.55);
+  border: 1px solid transparent;
+  background:
+    var(--ui-panel) padding-box,
+    var(--ui-panel-edge) border-box;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
 }
 
 .ui-room .ui-panel:focus {
   outline: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 0 0 1px var(--ui-line),
-    0 30px 80px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
 }
 
 .ui-bar {
@@ -255,8 +273,8 @@
   gap: 16px;
   padding: 14px 22px 12px 28px;
   border-bottom: 1px solid var(--ui-line);
-  border-radius: 20px 20px 0 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent);
+  border-radius: 19px 19px 0 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
 }
 
 .ui-crumbs {
@@ -328,10 +346,18 @@
   font-weight: 700;
   color: #e9eef3;
   background: radial-gradient(circle at 50% 30%, #6b7682, #2a3139 70%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 2px 4px rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* An icon in a key is centred on its own box, not on a glyph's line box. */
+.ui-key svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .ui-body {

@@ -105,7 +105,9 @@ export function PageShell({
             </nav>
             <a className="ui-back" href={back}>
               <span className="ui-key" aria-hidden="true">
-                ←
+                <svg viewBox="0 0 16 16">
+                  <path d="M13 8H3.5M7.5 4 3.5 8l4 4" />
+                </svg>
               </span>
               Back
             </a>
