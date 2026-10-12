@@ -5,6 +5,7 @@
     "dev": "bun run framework/dev.ts",
     "build": "node scripts/build.mjs",
     "build:bun": "bun run build.ts",
+    "bake-art": "bun run scripts/bake-art.ts",
     "check": "tsc --noEmit",
     "lint": "oxlint . && oxfmt --write '**/*.{js,ts,tsx}'",
     "lint:check": "oxlint . && oxfmt --check '**/*.{js,ts,tsx}'",

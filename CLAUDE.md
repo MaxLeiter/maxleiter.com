@@ -23,6 +23,11 @@ file is only the parts specific to working here.
 - `pnpm snapshot` — build and rewrite `docs/snapshot.json`. Only when you mean
   to change the output; review the diff and say why in the commit.
 
+- `pnpm bake-art` — rasterize the card art in `app/art/pieces/` to the
+  committed WebPs in `app/art/baked/` (`--check` to only verify, `--sheet
+  out.png` for a contact sheet). The build fails on a stale piece; run this
+  after editing one and commit both files.
+
 Package manager is pnpm 9.15.9. Node 24 (`engines`) or Bun both work.
 
 Run `pnpm check`, `pnpm lint`, `pnpm test` and `pnpm gate` before reporting a
