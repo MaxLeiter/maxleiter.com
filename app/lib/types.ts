@@ -4,15 +4,15 @@
  * `framework/shared/types.ts` owns the build-side record types -- `Post`, `Note`,
  * `Project`, `BuildContext` -- which are loaded with gray-matter and `node:fs`.
  * These are the flattened shapes that reach a component, and they live here
- * because the desktop island imports them and nothing the client bundle reaches
- * may pull in `node:fs`. Anything shared between the build and an island has to
- * be a leaf module.
+ * because nothing the client bundle reaches may pull in `node:fs`, and the
+ * pages and the feed share them. Anything shared between the build and an
+ * island has to be a leaf module.
  */
 
 /**
  * One row in a list of content: local posts, external posts and notes, flat and
- * date-sorted. `framework/content` builds these with `buildEntries`; /blog,
- * the homepage and the desktop island all render them.
+ * date-sorted. `framework/content` builds these with `buildEntries`; the feed
+ * and the search index read them.
  */
 export interface ListEntry {
   /** A third-party post has no slug, so its href doubles as the identifier. */
@@ -28,7 +28,7 @@ export interface ListEntry {
   type: 'post' | 'note'
 }
 
-/** The display shape the projects page and the desktop widget consume. */
+/** The flattened project the MERIDIAN model (`app/lib/meridian.ts`) reads. */
 export interface ProjectCard {
   id: string
   name: string
@@ -52,8 +52,8 @@ export interface HrefEntry {
 
 /**
  * Where a piece of content lives. The one implementation of the rule, shared
- * by the feed, the search index, the list pages and the desktop island; pass
- * `base` for an absolute URL.
+ * by the feed, the sitemap and the search index; pass `base` for an absolute
+ * URL.
  */
 export function entryHref(entry: HrefEntry, base = ''): string {
   if (entry.isThirdParty && entry.href) return entry.href
@@ -62,7 +62,7 @@ export function entryHref(entry: HrefEntry, base = ''): string {
 }
 
 /**
- * The posts pinned above the recent list on /blog and on the desktop widget.
- * One declaration: there used to be three.
+ * The posts pinned as priority targets on /blog. One declaration: there used
+ * to be three.
  */
 export const POPULAR_SLUGS = ['weights', 'xios', 'formatting']

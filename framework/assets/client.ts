@@ -143,7 +143,7 @@ export async function buildClient(options: {
     // `island.palette.3f9a.js` -> `island.palette`. Only the entries declared
     // above count: esbuild also marks every chunk a lazy import() targets as
     // an entry point, and treating those as roots makes a chunk only the
-    // desktop loads look loadable by anything.
+    // homepage's scene loads look loadable by anything.
     const logical = base.replace(/\.[A-Z0-9]+\.js$/i, '')
     const entry = Object.hasOwn(entryPoints, logical) ? logical : undefined
     outputs.push({

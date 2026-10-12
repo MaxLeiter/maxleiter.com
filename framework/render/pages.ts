@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import type { BuildContext, Head, PageDef } from '../shared/types'
-import { buildEntries, toProjectCard } from '../content'
+import { toProjectCard } from '../content'
 import { collectImageUrls, loadImageDimensions } from '../content/dimensions'
 import { collectTweetIds, loadTweets } from '../content/tweets'
 import { ogImageUrl } from '../platform/og'
@@ -18,6 +18,7 @@ import {
   TalksPage,
 } from '../../app/pages/content-pages'
 import { BlogPostPage, NotePage } from '../../app/pages/article-pages'
+import { buildCampaign } from '../../app/lib/meridian'
 
 /**
  * The page registry: every route in the site as a `PageDef`.
@@ -85,8 +86,28 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
     dimensions,
   })
 
-  const entries = buildEntries(ctx)
-  const projectCards = ctx.projects.map(toProjectCard)
+  // Every route renders from one model of the content: missions with read
+  // times counted from their full bodies, films, forge objects, playlists
+  // and the service record computed from the real dates.
+  const campaign = buildCampaign({
+    posts: ctx.posts.flatMap((post) =>
+      post.slug ? [{ ...post, slug: post.slug }] : [],
+    ),
+    notes: ctx.notes,
+    projects: ctx.projects.map(toProjectCard),
+    external: ctx.externalPosts,
+  })
+  const counts = {
+    missions: campaign.missions.length,
+    films: campaign.films.length,
+    objects: campaign.objects.length,
+    playlists: campaign.playlists.length,
+  }
+  const section = { campaign, counts }
+  // Mission numbers run oldest first; `campaign.missions` is newest first.
+  const missionAt = new Map(
+    campaign.missions.map((mission) => [mission.num, mission]),
+  )
 
   const pages: PageDef[] = [
     {
@@ -94,8 +115,7 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
       head: {
         description: 'A website by Max Leiter.',
       },
-      render: () =>
-        createElement(HomePage, { posts: entries, projects: projectCards }),
+      render: () => createElement(HomePage, section),
     },
     {
       path: '/about',
@@ -104,7 +124,8 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
         description: 'About this website.',
       },
       variants: { embed: true },
-      render: ({ toolbar }) => createElement(AboutPage, { toolbar }),
+      render: ({ toolbar }) =>
+        createElement(AboutPage, { ...section, toolbar }),
     },
     {
       path: '/blog',
@@ -114,7 +135,7 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
       },
       variants: { embed: true },
       render: ({ toolbar }) =>
-        createElement(BlogIndexPage, { posts: entries, toolbar }),
+        createElement(BlogIndexPage, { ...section, toolbar }),
     },
     {
       path: '/notes',
@@ -124,7 +145,7 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
       },
       variants: { embed: true },
       render: ({ toolbar }) =>
-        createElement(NotesIndexPage, { notes: ctx.notes, toolbar }),
+        createElement(NotesIndexPage, { ...section, toolbar }),
     },
     {
       path: '/labs',
@@ -133,7 +154,7 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
         description: 'Experimental projects and playthings',
       },
       variants: { embed: true },
-      render: ({ toolbar }) => createElement(LabsPage, { toolbar }),
+      render: ({ toolbar }) => createElement(LabsPage, { ...section, toolbar }),
     },
     {
       path: '/projects',
@@ -143,7 +164,7 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
       },
       variants: { embed: true },
       render: ({ toolbar }) =>
-        createElement(ProjectsPage, { projects: projectCards, toolbar }),
+        createElement(ProjectsPage, { ...section, toolbar }),
     },
     {
       path: '/talks',
@@ -152,7 +173,8 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
         description: 'Tech talks I enjoy from around the web',
       },
       variants: { embed: true },
-      render: ({ toolbar }) => createElement(TalksPage, { toolbar }),
+      render: ({ toolbar }) =>
+        createElement(TalksPage, { ...section, toolbar }),
     },
     {
       path: '/404',
@@ -164,13 +186,15 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
       // Vercel's static builder injects an error-phase route to `/404.html`
       // ahead of ours, so the body has to exist under that name too.
       aliases: ['/404.html'],
-      render: () => createElement(NotFoundPage),
+      render: () => createElement(NotFoundPage, { counts }),
     },
   ]
 
   for (const post of ctx.posts) {
     const slug = post.slug
     if (!slug) continue
+    const mission = campaign.missions.find((entry) => entry.slug === slug)
+    if (!mission) continue
     pages.push({
       path: `/blog/${slug}`,
       head: articleHead({
@@ -183,18 +207,19 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
       variants: { embed: true },
       render: async ({ toolbar }) =>
         createElement(BlogPostPage, {
-          slug,
-          title: post.title,
-          date: post.date,
-          dateISO: post.dateISO,
-          description: post.description,
+          mission,
+          previous: missionAt.get(mission.num - 1),
+          next: missionAt.get(mission.num + 1),
           content: await mdx.render(post.body, components, post.file),
+          counts,
           toolbar,
         }),
     })
   }
 
   for (const note of ctx.notes) {
+    const film = campaign.films.find((entry) => entry.slug === note.slug)
+    if (!film) continue
     pages.push({
       path: `/notes/${note.slug}`,
       head: articleHead({
@@ -206,13 +231,9 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
       variants: { embed: true },
       render: async ({ toolbar }) =>
         createElement(NotePage, {
-          slug: note.slug,
-          title: note.title,
-          date: note.date,
-          dateISO: note.dateISO,
-          description: note.description,
-          kind: note.type,
+          film,
           content: await mdx.render(note.body, components, note.file),
+          counts,
           toolbar,
         }),
     })

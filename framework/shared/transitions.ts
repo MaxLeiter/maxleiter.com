@@ -1,27 +1,26 @@
 /**
  * The single owner of the `view-transition-name` convention.
  *
- * The same `blog-post-<slug>` / `note-<slug>` / `page-<name>` rule used to be
- * written out three times: string templates in app/pages/article-pages.tsx, a
- * helper in app/islands/desktop/data.ts, and a regex over the destination URL
- * in framework/client/runtime.ts. A cross-document morph only happens when the
- * outgoing and incoming elements agree exactly, and a mismatch degrades to a
- * cross-fade with no error and no failing test. One module, three importers.
+ * The `blog-post-<slug>` / `note-<slug>` rule is used by the article pages,
+ * which name their `<article>`, by the mission and film rows on `/blog` and
+ * `/notes`, which offer the same name through `data-vt-name`, and by the
+ * router, which works out from a destination URL what the clicked element
+ * should hand over to. A morph only happens when the outgoing and incoming
+ * elements agree exactly, and a mismatch degrades to a cross-fade with no
+ * error and no failing test, which is why there is one module.
  *
- * Deliberately dependency-free: framework/client/runtime.ts is bundled for the
- * browser by esbuild, and app/islands/desktop/data.ts ships inside the desktop
- * island chunk.
+ * Deliberately dependency-free: framework/client/router.ts is bundled for the
+ * browser by esbuild.
  *
  * In `shared/`: this file may import nothing but node builtins and React
  * types, because the build, the client bundle and `tools/` all reach it.
  */
 
-export type TransitionKind = 'blog' | 'note' | 'page'
+export type TransitionKind = 'blog' | 'note'
 
 const PREFIXES: Record<TransitionKind, string> = {
   blog: 'blog-post-',
   note: 'note-',
-  page: 'page-',
 }
 
 export function transitionName(kind: TransitionKind, slug: string): string {
@@ -46,8 +45,8 @@ export function transitionNameForUrl(url: string): string | null {
  * True when some element already claims `name` as a live inline style.
  *
  * Browser-only. The router asks before handing a clicked card the outgoing
- * name, because the desktop's open post window may already hold it. Two
- * elements holding one `view-transition-name` cancels the transition outright.
+ * name, because an article on the page may already hold it. Two elements
+ * holding one `view-transition-name` cancels the transition outright.
  */
 export function isNameLive(name: string): boolean {
   for (const el of document.querySelectorAll<HTMLElement>('[style]')) {

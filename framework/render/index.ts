@@ -40,7 +40,7 @@ export interface RenderedPage extends RouteInfo {
 /**
  * The union across every page, which is what the client bundler needs. Each
  * page carries only its own names, so a content page's `__islands` JSON does
- * not advertise the desktop.
+ * not advertise the homepage's islands.
  */
 let allIslands = new Set<string>()
 

@@ -1,11 +1,20 @@
-import type { CSSProperties, ReactNode } from 'react'
-import { WindowToolbar } from '@components/static/window-toolbar'
+import type { ReactNode } from 'react'
 import Palette from '@islands/palette'
 import { Island } from '@framework/render/islands'
+import {
+  Counts,
+  Key,
+  Sky,
+  TopBar,
+  TopChips,
+  type Crumb,
+  type MeridianCounts,
+} from '@components/meridian/chrome'
 
 /**
- * The frame every non-homepage route renders inside: toolbar, main region and
- * the command-palette shell.
+ * The frame every non-homepage route renders inside: the painted sky, the
+ * MERIDIAN top bar, the main region, the hint bar and the command-palette
+ * shell.
  *
  * The palette's overlay, input and empty list are server-rendered into every
  * page inside a `hidden` div. The runtime unhides it and focuses the input on
@@ -14,19 +23,13 @@ import { Island } from '@framework/render/islands'
  * first keystroke can land.
  */
 
-interface BreadcrumbSegment {
-  name: string
-  href: string
-}
-
 export interface PageShellProps {
-  title: string
-  segments?: BreadcrumbSegment[]
-  /** `/?openPost=<slug>` on post and note pages. */
-  minimizeHref?: string
-  /** Emitted as `view-transition-name` on `<main>`. */
-  vtName?: string
-  /** False for the `/embed` variants, which drop the toolbar entirely. */
+  /** Breadcrumb trail after the brand; the last entry is this page. */
+  crumbs: Crumb[]
+  /** Where the hint bar's Back goes: the screen this one was entered from. */
+  back: { href: string; label: string }
+  counts: MeridianCounts
+  /** False for the `/embed` variants, which drop the chrome entirely. */
   toolbar?: boolean
   children: ReactNode
 }
@@ -46,30 +49,54 @@ export function CommandPalette() {
 }
 
 export function PageShell({
-  title,
-  segments = [],
-  minimizeHref,
-  vtName,
+  crumbs,
+  back,
+  counts,
   toolbar = true,
   children,
 }: PageShellProps) {
-  const style: CSSProperties | undefined = vtName
-    ? ({ viewTransitionName: vtName } as CSSProperties)
-    : undefined
-
+  if (!toolbar) {
+    return (
+      <>
+        <Sky />
+        <main className="mx-wrap mx-main mx-embed">{children}</main>
+      </>
+    )
+  }
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex flex-col">
-      {toolbar && (
-        <WindowToolbar
-          title={title}
-          segments={segments}
-          minimizeHref={minimizeHref}
-        />
-      )}
-      <main className="flex-1 overflow-auto p-6" style={style}>
-        {children}
-      </main>
-      {toolbar && <CommandPalette />}
-    </div>
+    <>
+      <Sky />
+      <a className="mx-skip" href="#main">
+        Skip to content
+      </a>
+      <div className="mx-page">
+        <TopBar crumbs={crumbs}>
+          <TopChips />
+        </TopBar>
+        <main id="main" className="mx-wrap mx-main" tabIndex={-1}>
+          {children}
+        </main>
+        <footer className="mx-hints">
+          <div className="mx-wrap mx-hints-in">
+            <div className="mx-hints-l">
+              <a className="mx-hint" href={back.href}>
+                <Key>‹</Key>
+                {back.label}
+              </a>
+              <button type="button" className="mx-hint" data-open-palette>
+                <Key>⌘K</Key>
+                Search
+              </button>
+              <a className="mx-hint" href="/feed.xml">
+                <Key>RSS</Key>
+                Subscribe
+              </a>
+            </div>
+            <Counts counts={counts} />
+          </div>
+        </footer>
+      </div>
+      <CommandPalette />
+    </>
   )
 }

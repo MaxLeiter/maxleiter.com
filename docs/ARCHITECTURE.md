@@ -11,10 +11,11 @@ route is rendered to HTML at build time and served as a file. The output is a
 [Vercel Build Output API](https://vercel.com/docs/build-output-api/v3)
 directory: static files plus a routing table.
 
-78 routes, 4 islands, 12 platform routes, and it builds in about 350 ms. A
-content page ships roughly 1 KB of JavaScript. The homepage, which has a
-draggable window manager on it, ships about 17 KB brotli, and none of it before
-first paint.
+82 routes, 6 islands, 13 platform routes, and it builds in about 350 ms. A
+content page ships roughly 1 KB of JavaScript. The homepage is the main menu of
+MERIDIAN, an invented 2007 sci-fi shooter the whole site is dressed as: its
+menu island ships about 15 KB brotli, none of it before first paint, and the
+WebGPU scene behind it another 17 KB that loads only after the menu mounts.
 
 `bun run build.ts` is the local path. `node scripts/build.mjs` is what Vercel
 runs, and the two produce byte-identical output. Nothing in the build uses a
@@ -53,7 +54,7 @@ framework/
   assets/                   the three producers of bytes the shell needs
     css.ts                  the Tailwind CLI over app/styles/
     client.ts               esbuild: the runtime and one bundle per island
-    fonts.ts                the Geist subsets
+    fonts.ts                the Saira, Exo 2 and Geist Mono subsets
     node-bundle.json        the node/ESM esbuild options, as data
   platform/                 the three writers that run in one Promise.all
     index.ts                runPlatformSteps
@@ -67,8 +68,10 @@ app/
   islands/                  the interactive ones
   components/               shared components, server-rendered
   mdx/                      the MDX component maps: static and island halves
-  lib/                      the client-safe app layer (see Types)
-  styles/                   global.css, markdown.css, the CSS fragments
+  lib/                      the client-safe app layer (see Types), including
+                            meridian.ts, the content model every page renders
+  styles/                   global.css, markdown.css, meridian.css, the CSS
+                            fragments
 posts/ notes/               MDX content
 public/                     copied verbatim
 tools/snapshot.ts           the regression gate
@@ -114,7 +117,7 @@ per-step times in the report do not sum to the total.
 
 6. **css fragments** — each conditional slice of the stylesheet is read and
    minified, every sheet is pruned against the classes the build emits, the
-   rules only the desktop can use are subtracted from the base sheet into a
+   rules only the homepage can use are subtracted from the base sheet into a
    fragment of their own, and each fragment is given the markup marker that
    proves a page needs it.
 
@@ -164,32 +167,40 @@ seventeen variables in `global.css` nothing reads. The build log lists what
 each sheet lost, minus Tailwind's own `--tw-*` variables.
 
 The sheets are pruned together, not one at a time, because a variable crosses
-sheets: the desktop fragment's utilities read `@property` rules that live in
-the base sheet, and dropping a registration changes the variable's initial
-value and whether it inherits. Classes inside `:not()`, `:is()` and `:where()`
+sheets: a fragment's utilities can read `@property` rules that live in the
+base sheet, the MERIDIAN fragments read its `--mx-*` tokens, and dropping a
+registration changes the variable's initial value and whether it inherits. Classes inside `:not()`, `:is()` and `:where()`
 never count against a selector, which errs toward keeping.
 
-The base sheet is the pruned Tailwind build minus what only the desktop can
-use, and that difference is decided from the output too (`assembleSheets` in
-`build.ts`). The sheet is pruned a second time against everything but the
-desktop: the bodies without its `data-island="desktop"` marker, and only the
-client files some other entry can load, following static and lazy imports.
-That second view is the base sheet. What it lost, subtracted from the first by
-atom (`subtractCss`), is the `desktop` fragment, so only the homepage pays for
-it. Two details carry the weight. Reachability, not the entry file: most of
-the window chrome lives in a chunk esbuild split out for the desktop's own
-lazy imports, and esbuild's metafile lists every lazily imported chunk as an
-entry point, so only the entries the build declared count as roots. And atoms,
-not blocks: a grouped selector can lose one member and a `:root` block one
-variable, so the subtraction compares one declaration plus the headers above
-it, which is why `.a,.b{d}` is split into `.a{d}.b{d}`. The desktop half keeps
-the full sheet's order within itself, but it lands after the whole base sheet,
-so a homepage element carrying a desktop-only utility and a shared responsive
-variant of the same property resolves in the fragment's favour; the visual
-comparison over the homepage is what catches that.
+The base sheet is the pruned Tailwind build -- which `@import`s
+`app/styles/meridian.css`, the shared skin -- minus what only the homepage
+can use, and that difference is decided from the output too
+(`assembleSheets` in `build.ts`). The sheet is pruned a second time against
+everything but the homepage: the bodies without its `data-island="home"`
+marker, and only the client files some entry other than `island.home` and
+`island.scene` can load, following static and lazy imports. That second view
+is the base sheet. What it lost, subtracted from the first by atom
+(`subtractCss`), is the `home` fragment -- the title screen, the menu, the
+lobby, the scene host -- so only the homepage pays for it. Two details carry
+the weight. Reachability, not the entry file: the scene's renderer is a chunk
+esbuild split out for the scene's own lazy import, and esbuild's metafile
+lists every lazily imported chunk as an entry point, so only the entries the
+build declared count as roots. And atoms, not blocks: a grouped selector can
+lose one member and a `:root` block one variable, so the subtraction compares
+one declaration plus the headers above it, which is why `.a,.b{d}` is split
+into `.a{d}.b{d}`. The homepage half keeps the full sheet's order within
+itself, but it lands after the whole base sheet, so a homepage element
+carrying a homepage-only rule and a shared responsive variant of the same
+property resolves in the fragment's favour; the visual comparison over the
+homepage is what catches that.
+
+State the build cannot see as a class -- the title screen being up, the
+reduced-motion setting -- is written as an attribute (`data-title`,
+`data-reduced-motion`, `data-out`), because attribute selectors are never
+pruned and a class minted only inside an inline script would be.
 
 Every fragment is a plain stylesheet whose scoping is written into the class
-names — `.tree-`, `.shot-`, `.mc-`, `.mdx-note`, `.rt-` — and `PLAIN_SHEETS` in
+names — `.tree-`, `.shot-`, `.mc-`, `.mdx-note`, `.rt-`, `.mx-` — and `PLAIN_SHEETS` in
 `build.ts` pairs each with the marker that gates it. The markers are
 attribute-shaped (`class="shiki`, not `shiki`) because a bare word matches
 prose, and because `.react-tweet-theme` appears in the base sheet as a
@@ -237,16 +248,36 @@ and mounts it on Cmd/Ctrl+K or a `[data-open-palette]` click.
   attribute becomes a payload key, camelCased by the dataset API: write
   `data-section`, not `data-track-section`. `data-vt-name` is excluded from that
   payload because it is the transition opt-in.
-- The menubar clock is not the runtime's. `#menubar-clock` exists only on the
-  homepage, where the desktop island hydrates over it and owns it; a second
-  interval writing `textContent` behind preact's back is one owner too many.
 - View-transition names have a single owner: the router's click handler.
-  Elements opt in with `data-vt-name`, it names the one that was clicked, and
-  it stands down when something already holds that name as a live inline
-  style, which is how an open post window wins over the card behind it. Two
-  elements holding one name cancels the transition outright. The name comes
-  from `transitionName(kind, slug)` in `framework/shared/transitions.ts`, never
-  from a string spelled out at a call site.
+  Elements opt in with `data-vt-name` -- the mission and film rows on `/blog`
+  and `/notes` -- it names the one that was clicked, and it stands down when
+  something already holds that name as a live inline style, which is what an
+  article page's own `<article>` does. Two elements holding one name cancels
+  the transition outright. The name comes from `transitionName(kind, slug)` in
+  `framework/shared/transitions.ts`, never from a string spelled out at a call
+  site. The sky, the top bar and the hint bar carry fixed names of their own
+  (`mx-sky`, `mx-top`, `mx-hints`), so a swap holds them still and only the
+  screen in between makes the hologram cut `meridian.css` gives the root.
+
+The homepage is three layers. The painted sky (`Sky` in
+`app/components/meridian/chrome.tsx`, CSS gradients only) is plain markup on
+every page, so every page is complete at rest. The `scene` island draws the
+ring and the gas giant over it -- WebGPU, then WebGL2, then a Canvas 2D plate
+-- from a renderer it imports lazily after mounting; it fades in on its first
+frame, stops when the tab is hidden or a link is followed, drops to a third
+of the frame rate after a minute without input, starts at Low on small
+screens and does not start when `saveData` is set. The `home` island is the
+menu: real links, so the page is a page of links with JavaScript off, plus
+arrow-key and gamepad selection (selection is DOM focus), Settings and
+synthesised sound that is off by default. The two talk through window events
+(`mx:prefs`, `mx:stats`, `mx:start` in `app/lib/meridian-prefs.ts`).
+
+The title screen is neither island. It renders `hidden`, and the inline script
+after it shows it before first paint only on a first visit to `/` with no
+fragment; any key or click dismisses it for good (`localStorage`). A crawler,
+a deep link and a visitor with JavaScript off never see it, and a soft
+navigation back to `/` cannot show it, because the router strips executable
+scripts from the documents it adopts.
 
 ## Navigation
 
@@ -373,9 +404,12 @@ Two files, one source of truth each.
   describe records loaded with `node:fs` and gray-matter, but the file itself
   imports nothing, which is the `shared/` rule.
 - `app/lib/types.ts` owns the client-safe view types plus `entryHref` and
-  `POPULAR_SLUGS`. It lives under `app/lib/` because the desktop island imports
-  it, and nothing the client bundle reaches may pull in `node:fs` or
-  gray-matter. `window-styles.ts` is there for the same reason.
+  `POPULAR_SLUGS`. It lives under `app/lib/` because nothing the client bundle
+  reaches may pull in `node:fs` or gray-matter. `meridian.ts`, the content
+  model the pages render (mission numbers, read time and difficulty counted
+  from each post's full MDX body, the service record), and
+  `meridian-prefs.ts`, which the two homepage islands share, are there for the
+  same reason.
 
 Anything shared between the build and an island has to be a leaf module. That is
 what both `app/lib/` and `framework/shared/` are for; the difference is only
@@ -469,9 +503,22 @@ checked with real hashes instead of stated in prose.
 Still-true decisions, newest first. A decision that stops being true should be
 deleted from this list rather than annotated.
 
-**The desktop fragment is derived from the output, not from its sources.** A
-hand-kept list of the desktop's source files, fed to a second Tailwind run,
-once left out the module holding the shared toolbar's classes and shipped
+**The site is dressed as MERIDIAN, a 2007 sci-fi shooter's main menu.** The
+homepage desktop window manager was replaced in October 2026 by the menu:
+Campaign is `/blog` (posts as missions), Theater is `/notes` (saved films),
+Forge is `/projects`, Matchmaking is `/blog#matchmaking` (the external posts,
+which the blog index was already the route to list), and Service Record is
+`/about`; `/labs` and `/talks` are Custom Games and Broadcasts, reached from
+the lobby. Every route, title, description, canonical and OG tag is
+unchanged. The GPU scene is the homepage's alone; every other page gets the
+painted sky. It costs content pages weight -- a post went from 9.3 KB to about
+15 KB brotli, mostly the skin's stylesheet and the briefing chrome -- which is
+why the section, reader and service-record rules are gated sheets rather than
+base.
+
+**The homepage fragment is derived from the output, not from its sources.** A
+hand-kept list of the homepage's source files, fed to a second Tailwind run,
+once left out the module holding a shared toolbar's classes and shipped
 every content page a toolbar with no height or padding. Reading the split off
 the output cannot misfile a file, and it took 3.4 KB raw off every document,
 because homepage-only classes outside the listed files used to stay in base.
@@ -531,23 +578,27 @@ island — the command palette — which renders `hidden`, where a `pointerdown`
 
 **`load` islands mount after first paint,** through
 `requestAnimationFrame` then `setTimeout(0)`. The runtime is an inline module,
-so it runs before the browser has painted; starting the desktop's 48 KB import
-there put all of it on the homepage's critical path, for an island whose markup
+so it runs before the browser has painted; starting the homepage's island
+imports there put all of them on its critical path, for an island whose markup
 is already server-rendered and already reads as links.
 
-**Fonts are subset to what the site renders and instanced to 400-700.** The
-subset used to name eight whole Unicode blocks, 1,208 codepoints, of which Geist
-covers 262; it is now Latin-1 plus 24 explicit codepoints Geist has glyphs for,
-out of everything above U+00FF in the built output and in the sources that mint
-text at runtime. The weight axis is clamped to the three weights the CSS asks
-for, and the OpenType features to the ones browsers apply by default plus
-`tnum`; Geist's stylistic sets, fractions and superscripts were ~140 unused
-glyphs per face. Each face is split into files with disjoint `unicode-range`s:
-a preloaded core (ASCII, the four Latin-1 characters the output uses, the
-extras) and the other 92 Latin-1 characters, which a browser fetches only for
-a page that renders one, at the cost of kerning across that boundary. The
-preload is the largest single item on a first visit: 64.3 KB, then 40.4 KB,
-now 25.5 KB.
+**Fonts are subset to what the site renders and instanced to the axes it
+uses.** Three faces: Saira for the MERIDIAN interface (width 100-125%, weight
+300-700), Exo 2 for text (weight 300-700; emphasis is synthesised rather than
+paying for the italic file) and Geist Mono for code (400-700). The subset used
+to name eight whole Unicode blocks, 1,208 codepoints; it is now Latin-1 plus a
+short explicit list of codepoints above U+00FF that the built output and the
+sources that mint text at runtime use, and each axis is clamped to the range
+the CSS asks for. The OpenType features are cut to the ones browsers apply by
+default plus `tnum`. Each face is split into files with disjoint
+`unicode-range`s: a core (ASCII, the four Latin-1 characters the output uses,
+the extras) and the other 92 Latin-1 characters, which a browser fetches only
+for a page that renders one, at the cost of kerning across that boundary. The
+Saira and Exo 2 cores are preloaded on every page and are the largest single
+item on a first visit, 50.3 KB together (the Geist pair was 25.5 KB); Geist
+Mono is not preloaded, because only pages with code render it. Geist Mono's
+committed subsets hash exactly as they did before the width axis existed, so
+the drawn box glyphs below were not cut again.
 
 **Geist Mono's missing diagram glyphs are drawn, not left to fallback.** It has
 ─ │ ┌ └ ├ ▲ ▼ and no ┐ ┘ ┤ ┬ ┴ ┼ ► ◄, so every diagram in a post took those
@@ -569,10 +620,11 @@ date/time input pseudo-element, `optgroup`, `progress`, `textarea`, the Firefox
 the one file that has to be rechecked on a Tailwind major upgrade.
 
 **The image ladder is `[640, 828, 1536, 1920]` and `sizes` is
-`(max-width: 816px) calc(100vw - 48px), 768px`.** The article column is
-`max-w-3xl` = 768px inside `p-6`, so the old `700px` understated desktop by 68px
-and a DPR-2 desktop screen — the modal visitor — was served the 1920 candidate
-for a 1536-pixel need.
+`(max-width: 760px) calc(100vw - 70px), 738px`.** The reader's prose column is
+72ch of 17px Exo 2, measured at 738px, so a DPR-2 desktop screen — the modal
+visitor — needs 1476 pixels and is served the 1536 candidate rather than the
+1920 one. An old `700px` once understated the column, which is how a page ends
+up upscaling an image it had a bigger candidate for.
 
 **Canonical URLs are derived, not declared.** See Types.
 
@@ -604,9 +656,6 @@ targets.
 **The build-time size report is inside a timed step** and compresses at brotli
 quality 5. It used to run after `total` was computed, so a quarter of the
 build's cost appeared in no table at all.
-
-**`--breakpoint-3xl: 120rem` is defined in an `@theme` block** in `global.css`.
-The ~21 surviving `3xl:` classes in the desktop chrome were no-ops without it.
 
 ### Open
 

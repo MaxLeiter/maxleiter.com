@@ -1,0 +1,437 @@
+/*
+ * MERIDIAN's reader chrome: the mission briefing and the theater's film
+ * player around every post and note. Gated on `class="mx-reader` in
+ * build.ts, so only article pages carry it. The tokens it reads live in
+ * app/styles/meridian.css.
+ */
+
+html[data-reduced-motion] .mx-rec i {
+  animation: none;
+}
+
+.mx-prose :is(h1, h2, h3, h4) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mx-dossier-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 20px 20px;
+}
+
+.mx-adj-t {
+  display: block;
+  font: 400 14px/1.4 var(--mx-f-body);
+  color: var(--mx-ink-2);
+}
+
+.mx-adj-next {
+  text-align: right;
+}
+
+.mx-diff {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.mx-shield {
+  width: 30px;
+  height: 34px;
+}
+
+.mx-shield path:first-child {
+  fill: rgba(150, 205, 255, 0.06);
+  stroke: var(--mx-line-hi);
+}
+
+.mx-shield.mx-on path:first-child {
+  fill: #ffc46b;
+  stroke: #ffe2a8;
+}
+
+.mx-briefing {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 26px;
+  align-items: start;
+}
+
+article.mx-article {
+  line-height: inherit;
+  margin: 0;
+}
+
+article.mx-article > * + * {
+  margin-top: 0;
+}
+
+.mx-reader {
+  padding: 30px 44px 40px;
+}
+
+.mx-art-head {
+  margin-bottom: 26px;
+  padding-bottom: 22px;
+  border-bottom: 1px dashed var(--mx-line);
+}
+
+article .mx-art-title {
+  padding: 0;
+  font: 500 34px/1.12 var(--mx-f-ui);
+  font-stretch: 105%;
+  letter-spacing: 0.02em;
+  color: var(--mx-hi);
+  overflow-wrap: anywhere;
+}
+
+article .mx-art-meta {
+  margin: 12px 0 0;
+  font: 600 12px/1.4 var(--mx-f-ui);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--mx-ink-dim);
+}
+
+.mx-art-meta i {
+  font-style: normal;
+  color: var(--mx-amber);
+}
+
+article .mx-art-desc {
+  margin: 14px 0 0;
+  font: 400 18px/1.5 var(--mx-f-body);
+  color: var(--mx-ink-2);
+}
+
+.mx-prose {
+  max-width: 72ch;
+  font: 400 17px/1.72 var(--mx-f-body);
+  color: var(--article-color);
+}
+
+.mx-prose h1,
+.mx-prose h2,
+.mx-prose h3,
+.mx-prose h4 {
+  font-family: var(--mx-f-ui);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  color: var(--mx-hi);
+}
+
+.mx-prose h2 {
+  font-size: 1.5rem;
+}
+
+.mx-prose h2::before {
+  content: '// ';
+  color: var(--mx-cyan);
+  font-weight: 400;
+}
+
+.mx-prose h3 {
+  font-size: 1.2rem;
+  color: var(--mx-cyan-hi);
+}
+
+.mx-prose h4 {
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mx-cyan-hi);
+}
+
+.mx-prose a {
+  color: var(--mx-cyan-hi);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--mx-cyan-hi) 40%, transparent);
+  text-underline-offset: 3px;
+}
+
+.mx-prose a:hover {
+  color: var(--mx-hi);
+  text-decoration-color: currentColor;
+}
+
+.mx-prose pre {
+  border-left: 2px solid var(--mx-cyan-deep);
+  border-radius: 0;
+}
+
+.mx-prose blockquote {
+  border-left-color: var(--mx-amber-deep);
+  color: var(--mx-ink-2);
+}
+
+.mx-prose li::marker {
+  color: var(--mx-cyan);
+}
+
+.mx-prose img,
+.mx-prose video {
+  border: 1px solid var(--mx-line);
+}
+
+.mx-art-foot {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--mx-line);
+  font: 400 14px/1.6 var(--mx-f-body);
+  color: var(--mx-ink-dim);
+}
+
+.mx-art-foot a {
+  color: var(--mx-cyan-hi);
+}
+
+.mx-dossier {
+  position: sticky;
+  top: calc(var(--mx-top-h) + 16px);
+}
+
+.mx-adj {
+  display: block;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+}
+
+.mx-adj:hover,
+.mx-adj:focus-visible {
+  border-color: var(--mx-line-hi);
+  background: rgba(120, 190, 255, 0.08);
+}
+
+.mx-adj .mx-lab {
+  margin-bottom: 4px;
+}
+
+.mx-film {
+  max-width: 1040px;
+}
+
+.mx-film-frame {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--mx-line);
+  background: #000;
+}
+
+.mx-film-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.18) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+.mx-film-hud {
+  position: absolute;
+  inset: 14px 18px;
+  z-index: 1;
+  font: 700 11px/1 var(--mx-f-ui);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.mx-rec {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.mx-rec i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff7a66;
+  box-shadow: 0 0 8px #ff7a66;
+  animation: mx-breathe 1.6s steps(2) infinite;
+}
+
+.mx-tc {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-weight: 400;
+  font-stretch: 125%;
+  letter-spacing: 0.12em;
+}
+
+.mx-cam {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #c4ecff;
+}
+
+.mx-timeline {
+  position: sticky;
+  top: var(--mx-top-h);
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--mx-line);
+  background: linear-gradient(180deg, var(--mx-panel-a), var(--mx-panel-b));
+}
+
+.mx-tl-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--mx-line-hi);
+  background: rgba(120, 190, 255, 0.1);
+}
+
+.mx-tl-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--mx-hi);
+}
+
+.mx-track {
+  position: relative;
+  display: block;
+  height: 22px;
+}
+
+.mx-rail,
+.mx-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 9px;
+  height: 4px;
+  background: var(--mx-line-soft);
+}
+
+.mx-fill {
+  background: linear-gradient(90deg, var(--mx-cyan-deep), var(--mx-cyan-hi));
+  box-shadow: 0 0 10px var(--mx-cyan);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.mx-tick {
+  position: absolute;
+  top: 4px;
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 196, 107, 0.7);
+}
+
+.mx-head-mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 22px;
+  margin-left: -6px;
+  background: var(--mx-hi);
+  box-shadow: 0 0 12px var(--mx-cyan);
+  clip-path: polygon(50% 0, 100% 22%, 100% 100%, 0 100%, 0 22%);
+}
+
+.mx-tread {
+  font: 400 11px/1 var(--mx-f-ui);
+  font-stretch: 125%;
+  letter-spacing: 0.1em;
+  color: var(--mx-ink-2);
+}
+
+@keyframes mx-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes mx-scrub {
+  from {
+    left: 0;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .mx-fill {
+    animation: mx-progress linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  .mx-head-mark {
+    animation: mx-scrub linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mx-rec i {
+    animation: none;
+  }
+}
+
+/* Below this the dossier would squeeze the column under 60 characters, so it
+   moves under the article instead. */
+@media (max-width: 1100px) {
+  .mx-briefing {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mx-dossier {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .mx-reader {
+    padding: 20px 18px 28px;
+  }
+
+  article .mx-art-title {
+    font-size: 26px;
+  }
+
+  .mx-prose {
+    font-size: 16px;
+  }
+
+  .mx-film-frame {
+    height: 180px;
+  }
+
+  .mx-timeline {
+    top: var(--mx-top-h);
+  }
+}
+
+/* The shot grid and the emoji search break out past an article column that
+   is centred in the viewport. The reader's column sits left of the dossier,
+   so a symmetric breakout would run off the screen; they keep to the column. */
+.mx-prose .shot-grid,
+.mx-prose .es-root {
+  margin-inline: 0;
+}

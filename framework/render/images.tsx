@@ -16,9 +16,9 @@ import type { ImgHTMLAttributes, ReactElement } from 'react'
  * (url, w, q, format) tuple is a separate billable transformation.
  *
  * Retargeted to the ladder `sizes` below can actually select. The article
- * column is 768px, so above the breakpoint a DPR-1 screen wants 768 and a
- * DPR-2 screen wants 1536 -- which used to round up to the 1920 candidate,
- * 1.56x the pixels required. 1200 was unreachable above the breakpoint and
+ * column is 738px, so above the breakpoint a DPR-1 screen wants 738 and a
+ * DPR-2 screen wants 1476 -- which the 1536 candidate covers rather than
+ * rounding up to the 1920 one, 1.56x the pixels required. 1200 was unreachable above the breakpoint and
  * 640 unreachable below it at any DPR above 1.
  */
 export const IMAGE_WIDTHS = [640, 828, 1536, 1920] as const
@@ -30,12 +30,13 @@ export const IMAGE_QUALITY = 75
 const DEFAULT_WIDTH = 1536
 
 /**
- * The real column width. `max-w-3xl` is 48rem = 768px (article-pages.tsx)
- * inside `p-6`, so the breakpoint is 768 + 48 and the wide case is 768px flat.
- * The old `700px` understated the desktop column by 68px, which is how a page
- * ends up upscaling an image it had a bigger candidate for.
+ * The real column width: the reader's prose is capped at 72ch of 17px Exo 2,
+ * 738px, inside the briefing panel (meridian-reader.css). On a phone it is
+ * the viewport less 70px of gutters, borders and panel padding. Measure it
+ * again after changing any of those: a `sizes` that understates the column
+ * is how a page ends up upscaling an image it had a bigger candidate for.
  */
-const DEFAULT_SIZES = '(max-width: 816px) calc(100vw - 48px), 768px'
+const DEFAULT_SIZES = '(max-width: 760px) calc(100vw - 70px), 738px'
 
 /** Formats /_vercel/image cannot optimize, or would reject outright. */
 const PASS_THROUGH = /\.(webm|mp4|m4v|mov|ogv|svg)(\?|$)/i

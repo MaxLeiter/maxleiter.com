@@ -413,10 +413,11 @@ function filterRules(css: string, keep: Keep): string {
  * custom property that no remaining rule in ANY of the sheets reads and the
  * output never names.
  *
- * The sheets are pruned together because a variable crosses sheets: the
- * desktop fragment's shadow utilities read `@property` rules that live in the
- * base sheet, and dropping a registration changes the variable's initial
- * value and whether it inherits.
+ * The sheets are pruned together because a variable crosses sheets: a
+ * fragment's utilities can read `@property` rules that live in the base
+ * sheet, and the MERIDIAN fragments read the base sheet's `--mx-*` tokens;
+ * dropping a registration changes the variable's initial value and whether
+ * it inherits.
  */
 export function pruneCss(
   sheets: Record<string, string>,

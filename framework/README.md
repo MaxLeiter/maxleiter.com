@@ -4,9 +4,9 @@ This isn't a framework. It's a build script with opinions.
 
 [`build.ts`](../build.ts) reads my posts, renders every page with React on the
 server, writes HTML files, and exits. No server. No code runs when you request
-a page. A blog post ships about 1 KB of JavaScript. The homepage, which has a
-draggable window manager on it, ships about 17 KB, none of it before first
-paint. The whole site builds in
+a page. A blog post ships about 1 KB of JavaScript. The homepage, the main
+menu of a sci-fi shooter that never existed, ships about 15 KB for the menu,
+none of it before first paint, and a WebGPU scene after that. The whole site builds in
 about half a second. Output is a
 [Vercel Build Output](https://vercel.com/docs/build-output-api/v3) directory,
 which is just static files plus a routing table.
@@ -92,8 +92,9 @@ the stuff that doesn't need an island: the theme toggle, Cmd/Ctrl+K,
 click-delegated analytics, and view-transition names. It's plain DOM code, no
 library, which is how it stays around a kilobyte.
 
-The island components live in `app/islands/`: the desktop, the command palette,
-the MDX file tree, and the screenshot lightbox. They're written as normal React
+The island components live in `app/islands/`: the homepage menu and its 3D
+scene, the command palette, the MDX file tree, the emoji search and the
+screenshot lightbox. They're written as normal React
 and bundled as Preact, so the types and hooks are unchanged. Only the shipped
 bytes are smaller.
 

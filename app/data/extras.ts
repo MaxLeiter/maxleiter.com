@@ -1,4 +1,67 @@
-import { ListCard } from '@components/desktop/list-card'
+/**
+ * The two hand-kept lists that are not content files: the labs (`/labs`,
+ * shown as Custom Games) and the talks (`/talks`, shown as Broadcasts).
+ */
+
+export interface Lab {
+  id: string
+  name: string
+  description: string
+  url: string
+}
+
+export const LABS: Lab[] = [
+  {
+    id: 'md-viewer',
+    name: 'md-viewer',
+    description:
+      'A minimal, native-feeling markdown editor and viewer for macOS',
+    url: 'https://github.com/MaxLeiter/md-viewer',
+  },
+  {
+    id: 'vcup',
+    name: 'vcup',
+    description: 'A dead-simple CLI for uploading files to Vercel Blob',
+    url: 'https://github.com/MaxLeiter/vcup',
+  },
+  {
+    id: 'HFSViewer',
+    name: 'HFS Viewer',
+    description: 'A Swift UI app for opening HFS disk images',
+    url: '/blog/HFSViewer',
+  },
+  {
+    id: 'rsc-llm-edge',
+    name: 'RSC LLM on the Edge',
+    description:
+      'Streaming LLM responses with React Server Components at the edge',
+    url: 'https://rsc-llm-on-the-edge.vercel.app/',
+  },
+  {
+    id: 'pip-playground',
+    name: 'v0 PIP Playground',
+    description: 'Picture-in-picture mode playground',
+    url: 'https://v0-pip-playground.vercel.app/',
+  },
+  {
+    id: 'storybook-creator',
+    name: 'AI Storybook Creator',
+    description: "Generate illustrated children's ABC books with AI",
+    url: 'https://v0-ai-story-book-creator.vercel.app/',
+  },
+  {
+    id: 'gitkv',
+    name: 'GitKV',
+    description: 'A key-value store backed by a git repository',
+    url: 'https://github.com/MaxLeiter/gitkv',
+  },
+  {
+    id: 'gboy-ts',
+    name: 'gboy.ts',
+    description: 'A GameBoy emulator written in TypeScript',
+    url: 'https://gboy-ts.vercel.app/',
+  },
+]
 
 export interface Talk {
   id: string
@@ -8,7 +71,7 @@ export interface Talk {
   videoId: string
 }
 
-const TALKS: Talk[] = [
+export const TALKS: Talk[] = [
   {
     id: 'GMyg5ohTsVY',
     title: 'The Graphing Calculator Story',
@@ -138,27 +201,3 @@ const TALKS: Talk[] = [
     videoId: 'wo84LFzx5nI',
   },
 ]
-
-export function TalksContent() {
-  return (
-    <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-2 text-[var(--fg)]">
-        talks/
-      </h1>
-      <p className="mb-8 text-[var(--gray)]">Talks I like.</p>
-
-      <ul className="space-y-2">
-        {TALKS.map((talk) => (
-          <ListCard
-            key={talk.id}
-            href={`https://www.youtube.com/watch?v=${talk.videoId}`}
-            title={talk.title}
-            description={`${talk.channel} · ${talk.duration}`}
-            external
-            icon={false}
-          />
-        ))}
-      </ul>
-    </div>
-  )
-}

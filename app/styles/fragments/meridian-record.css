@@ -1,0 +1,236 @@
+/*
+ * MERIDIAN's service record (`/about`): the career grid, the per-year chart
+ * and the medals. Gated on `class="mx-sr-` in build.ts.
+ */
+
+.mx-xp-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font: 600 11px/1.3 var(--mx-f-ui);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mx-ink-dim);
+}
+
+.mx-chart-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.mx-chart-svg text {
+  font: 600 11px var(--mx-f-ui);
+  letter-spacing: 0.1em;
+  fill: var(--mx-ink-dim);
+}
+
+.mx-chart-svg .mx-v {
+  fill: var(--mx-hi);
+  font-size: 12px;
+}
+
+.mx-medal-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.mx-medal-t {
+  font: 400 13px/1.4 var(--mx-f-body);
+  color: var(--mx-ink-dim);
+}
+
+.mx-medal-t b {
+  font: 700 12px/1 var(--mx-f-ui);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mx-amber);
+}
+
+.mx-medal-lock {
+  font: 600 11px/1 var(--mx-f-ui);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mx-ink-faint);
+}
+
+.mx-medal-d {
+  display: block;
+  margin-top: 4px;
+}
+
+.mx-sr-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  gap: 26px;
+  align-items: start;
+}
+
+.mx-sr-id {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--mx-line);
+  background: linear-gradient(
+    120deg,
+    rgba(48, 98, 150, 0.55),
+    rgba(10, 24, 42, 0.2)
+  );
+}
+
+[data-theme='light'] .mx-sr-id {
+  background: linear-gradient(
+    120deg,
+    rgba(48, 98, 150, 0.16),
+    rgba(10, 24, 42, 0.02)
+  );
+}
+
+.mx-xp {
+  padding: 16px 20px 6px;
+}
+
+.mx-sr-blurb {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  font: 400 15px/1.6 var(--mx-f-body);
+  color: var(--mx-ink-2);
+}
+
+.mx-sr-blurb .mx-lab {
+  margin: 6px 0 -4px;
+}
+
+.mx-links {
+  padding: 6px 0 10px;
+}
+
+.mx-sr-right,
+.mx-sr-lower {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+
+.mx-sr-lower {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  align-items: start;
+}
+
+.mx-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mx-stat {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 16px;
+  border-right: 1px solid var(--mx-line-soft);
+  border-bottom: 1px solid var(--mx-line-soft);
+}
+
+.mx-stat:nth-child(4n) {
+  border-right: 0;
+}
+
+.mx-stat:nth-last-child(-n + 4) {
+  border-bottom: 0;
+}
+
+.mx-stat dd {
+  font: 300 30px/1 var(--mx-f-ui);
+  font-stretch: 110%;
+  letter-spacing: 0.04em;
+  color: var(--mx-hi);
+}
+
+.mx-stat dt {
+  font: 700 10px/1.3 var(--mx-f-ui);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--mx-ink-dim);
+}
+
+.mx-chart {
+  padding: 16px 18px 12px;
+}
+
+.mx-grid {
+  stroke: var(--mx-line-soft);
+}
+
+.mx-axis {
+  stroke: var(--mx-line-hi);
+}
+
+.mx-bar-col {
+  fill: var(--mx-bar-fill);
+  stroke: var(--mx-cyan-hi);
+}
+
+.mx-bar-hot {
+  fill: url(#mx-amber);
+  stroke: #ffe2a8;
+}
+
+.mx-medal {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 6px 8px;
+}
+
+.mx-locked .mx-medal-icon {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.mx-locked .mx-medal-t b {
+  color: var(--mx-ink-faint);
+}
+
+@media (max-width: 1100px) {
+  .mx-sr-lower {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .mx-sr-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mx-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mx-stat:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .mx-stat:nth-child(4n) {
+    border-right: 0;
+  }
+
+  .mx-stat:nth-last-child(-n + 4) {
+    border-bottom: 1px solid var(--mx-line-soft);
+  }
+
+  .mx-stat:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .mx-sr-id {
+    grid-template-columns: 72px 1fr;
+  }
+}
