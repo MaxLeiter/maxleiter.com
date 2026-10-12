@@ -30,12 +30,15 @@ export const IMAGE_QUALITY = 75
 const DEFAULT_WIDTH = 1536
 
 /**
- * The real column width. `max-w-3xl` is 48rem = 768px (article-pages.tsx)
- * inside `p-6`, so the breakpoint is 768 + 48 and the wide case is 768px flat.
- * The old `700px` understated the desktop column by 68px, which is how a page
- * ends up upscaling an image it had a bigger candidate for.
+ * The real column width: the glass reader's text column
+ * (app/styles/fragments/reader.css). On a phone the glass is full width with
+ * 20px of padding a side. Above that the glass sits 26px in from each edge and
+ * pads its text 40px a side, so the column is the viewport less 132px until it
+ * reaches its 768px maximum at 900px. Understating it is how a page ends up
+ * upscaling an image it had a bigger candidate for.
  */
-const DEFAULT_SIZES = '(max-width: 816px) calc(100vw - 48px), 768px'
+const DEFAULT_SIZES =
+  '(max-width: 760px) calc(100vw - 40px), (max-width: 900px) calc(100vw - 132px), 768px'
 
 /** Formats /_vercel/image cannot optimize, or would reject outright. */
 const PASS_THROUGH = /\.(webm|mp4|m4v|mov|ogv|svg)(\?|$)/i

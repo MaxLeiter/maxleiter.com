@@ -1,4 +1,4 @@
-import { ListCard } from '@components/desktop/list-card'
+import { Row, Rows } from '@components/blades/blade-page'
 
 export interface Talk {
   id: string
@@ -141,24 +141,18 @@ const TALKS: Talk[] = [
 
 export function TalksContent() {
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-2 text-[var(--fg)]">
-        talks/
-      </h1>
-      <p className="mb-8 text-[var(--gray)]">Talks I like.</p>
-
-      <ul className="space-y-2">
-        {TALKS.map((talk) => (
-          <ListCard
-            key={talk.id}
-            href={`https://www.youtube.com/watch?v=${talk.videoId}`}
-            title={talk.title}
-            description={`${talk.channel} · ${talk.duration}`}
-            external
-            icon={false}
-          />
-        ))}
-      </ul>
-    </div>
+    <Rows>
+      {TALKS.map((talk) => (
+        <Row
+          key={talk.id}
+          href={`https://www.youtube.com/watch?v=${talk.videoId}`}
+          title={talk.title}
+          desc={talk.channel}
+          meta={talk.duration}
+          icon="work"
+          external
+        />
+      ))}
+    </Rows>
   )
 }

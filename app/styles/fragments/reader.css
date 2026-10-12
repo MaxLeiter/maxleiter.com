@@ -1,0 +1,374 @@
+/*
+ * The glass reader every post and note is read in
+ * (app/components/blades/reader.tsx).
+ *
+ * The glass follows the reading theme: smoked graphite by default, brushed
+ * white under `[data-theme='light']`. Inside it the site's own variables are
+ * set again, so markdown.css and every MDX component sheet, which read
+ * `--fg`, `--gray`, `--lighter-gray` and the rest, render on the glass they
+ * are actually on. The header is the section's blade colour in both themes.
+ */
+
+/* The morph from a dashboard preview or a section row into this glass: the
+   blades' spring, sampled into linear(). Only named elements take this; the
+   root keeps its short cross-fade. */
+::view-transition-group(*) {
+  animation-duration: 0.55s;
+  animation-timing-function: linear(
+    0,
+    0.089,
+    0.271,
+    0.478,
+    0.668,
+    0.822,
+    0.933,
+    1.004,
+    1.043,
+    1.058,
+    1.058,
+    1.05,
+    1.038,
+    1.026,
+    1.015,
+    1.007,
+    1.002,
+    0.998,
+    0.997,
+    0.996,
+    0.997,
+    0.997,
+    0.998,
+    0.999,
+    0.999,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  );
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.reader {
+  display: block;
+  padding: 18px 26px 40px;
+}
+
+.reader-glass {
+  --bg: #1b1f23;
+  --fg: #d5dbe0;
+  --article-color: #e9edf0;
+  --gray: #a7b0b8;
+  --light-gray: #3d444b;
+  --lighter-gray: #2b3137;
+  --lightest-gray: #22272c;
+  --border-color: rgba(255, 255, 255, 0.12);
+  --selection: rgba(255, 255, 255, 0.88);
+  --link: var(--rl-d);
+  --glass-foot: linear-gradient(#262b30, #1c2024);
+  position: relative;
+  width: min(848px, 100%);
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: clip;
+  color: var(--fg);
+  text-shadow: none;
+  line-height: 1.7;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.022) 0 1px,
+      transparent 1px 3px
+    ),
+    linear-gradient(180deg, #23282d, #181b1f);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 0 0 2px rgba(0, 0, 0, 0.5),
+    0 30px 90px rgba(0, 0, 0, 0.7),
+    inset 0 2px 0 rgba(255, 255, 255, 0.12);
+}
+
+[data-theme='light'] .reader-glass {
+  --bg: #f4f6f8;
+  --fg: #2b3237;
+  --article-color: #1d2124;
+  --gray: #59626a;
+  --light-gray: #d3d9de;
+  --lighter-gray: #e3e8ec;
+  --lightest-gray: #eef1f4;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --selection: rgba(0, 0, 0, 0.99);
+  --link: var(--rl-l);
+  --glass-foot: linear-gradient(#e9edf0, #dfe4e8);
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.55) 0 1px,
+      transparent 1px 3px
+    ),
+    linear-gradient(180deg, #fbfcfd, #eef1f4);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 0 0 2px rgba(0, 0, 0, 0.3),
+    0 30px 90px rgba(0, 0, 0, 0.7),
+    inset 0 2px 0 #fff;
+}
+
+/* markdown.css lays out every child of an `article`; the glass's own frame
+   opts out of that rhythm. */
+.reader-glass > * + * {
+  margin-top: 0;
+}
+
+/* ------------------------------------------------------------ header -- */
+
+.reader-head {
+  position: relative;
+  padding: 20px 40px 24px;
+  color: #fff;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.45) 0,
+      rgba(255, 255, 255, 0.08) 4%,
+      rgba(255, 255, 255, 0) 30%
+    ),
+    radial-gradient(
+      40% 90% at 92% -30%,
+      color-mix(in srgb, var(--c1) 75%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      130% 160% at 30% 0%,
+      var(--c2),
+      color-mix(in srgb, var(--c2) 65%, var(--c3))
+    );
+  box-shadow:
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.reader-cover {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  mix-blend-mode: soft-light;
+}
+
+.reader-cover svg {
+  width: 100%;
+  height: 100%;
+}
+
+.reader-head > :not(.reader-cover) {
+  position: relative;
+}
+
+.reader-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.reader-back {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 14px 0 4px;
+  border-radius: 15px;
+  font-size: 13px;
+  font-weight: 700;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(0, 0, 0, 0.1) 51%,
+    rgba(255, 255, 255, 0.15)
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.reader-back::after {
+  content: '';
+  position: absolute;
+  inset: -9px -6px;
+}
+
+.reader-back .key {
+  min-width: 34px;
+  height: 22px;
+}
+
+.reader-glass .reader-kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+.reader-head a {
+  color: inherit;
+}
+
+/* A 44px target around the section link in the small kicker. */
+.reader-kicker a {
+  position: relative;
+}
+
+.reader-kicker a::after {
+  content: '';
+  position: absolute;
+  inset: -15px -4px;
+}
+
+.reader-glass .reader-title {
+  margin: 0;
+  padding: 0;
+  font-size: 36px;
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  max-width: 720px;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.45),
+    0 0 22px rgba(255, 255, 255, 0.25);
+}
+
+.reader-glass .reader-desc {
+  margin: 8px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+/* -------------------------------------------------------------- body -- */
+
+.reader-body {
+  padding: 28px 40px 36px;
+  user-select: text;
+}
+
+.reader-prose {
+  max-width: 768px;
+  margin: 0 auto;
+  font-size: 17px;
+  line-height: 1.72;
+}
+
+.reader-prose > :first-child {
+  margin-top: 0;
+}
+
+.reader-prose h1,
+.reader-prose h2,
+.reader-prose h3,
+.reader-prose h4 {
+  color: var(--article-color);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+
+.reader-prose a {
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+/* Heading anchors from rehype-autolink-headings read as headings. */
+.reader-prose :is(h1, h2, h3, h4) a {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+.reader-prose blockquote {
+  border-left-color: var(--link);
+}
+
+.reader-thanks {
+  max-width: 768px;
+  margin: 32px auto 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.reader-thanks a {
+  font-weight: 600;
+}
+
+.reader-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 40px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--gray);
+  background: var(--glass-foot);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 -1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.reader-foot .key {
+  margin-right: 4px;
+}
+
+.reader-foot-url {
+  margin-left: auto;
+}
+
+@media (max-width: 760px) {
+  .reader {
+    padding: 0 0 24px;
+  }
+
+  .reader-glass {
+    border-radius: 0;
+  }
+
+  .reader-head {
+    padding: 16px 20px 18px;
+  }
+
+  .reader-glass .reader-title {
+    font-size: 27px;
+  }
+
+  .reader-body {
+    padding: 20px 20px 28px;
+  }
+
+  .reader-prose {
+    font-size: 16.5px;
+  }
+
+  .reader-foot {
+    display: none;
+  }
+}

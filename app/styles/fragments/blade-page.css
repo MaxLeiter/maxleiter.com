@@ -1,0 +1,457 @@
+/*
+ * A section page: one blade open, the other four filed beside it as edges
+ * (app/components/blades/blade-page.tsx). The surface, title, chips and
+ * buttons are the base sheet's (app/styles/blades.css); this is the layout
+ * and the rows. The document scrolls, so the edges are sticky.
+ */
+
+.bl-page {
+  --E: 40px;
+  padding-bottom: 30px;
+}
+
+.pb-frame {
+  position: relative;
+  display: flex;
+  padding: 0 calc(var(--nr) * var(--E)) 0
+    calc(30px + var(--nl) * var(--E));
+}
+
+.edges {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.edge-l,
+.edge-r {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+}
+
+.edge-l {
+  left: 30px;
+}
+
+.edge-r {
+  right: 0;
+}
+
+.edge {
+  position: sticky;
+  top: 8px;
+  height: calc(100vh - var(--top) - 38px);
+  width: var(--E);
+  display: flex;
+  justify-content: center;
+  padding-top: 26px;
+  border-radius: 24px 0 0 24px;
+  pointer-events: auto;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.55) 0,
+      rgba(255, 255, 255, 0.12) 2px,
+      rgba(0, 0, 0, 0.18) 100%
+    ),
+    radial-gradient(140% 60% at 40% 0%, var(--c2), var(--c3));
+  box-shadow:
+    -10px 0 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.edge-l .edge {
+  filter: brightness(0.62);
+}
+
+.edge:hover {
+  filter: brightness(1.12);
+}
+
+.edge span,
+.pb-tab span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 19px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.45),
+    0 0 10px rgba(255, 255, 255, 0.3);
+  align-self: flex-start;
+}
+
+.edge.is-cur {
+  display: none;
+}
+
+.page-blade {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: calc(100vh - var(--top) - 30px);
+  border-radius: 24px 0 0 24px;
+}
+
+.pb-tab {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--E);
+  height: calc(100vh - var(--top) - 30px);
+  display: flex;
+  justify-content: center;
+  padding-top: 26px;
+  z-index: 1;
+}
+
+.pb-body {
+  position: relative;
+  padding: 16px 34px 34px calc(var(--E) + 30px);
+}
+
+.pb-back {
+  position: relative;
+  margin: 0 0 12px auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  font-size: 13px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.pb-back .key {
+  min-width: 34px;
+}
+
+.pb-back::after {
+  content: '';
+  position: absolute;
+  inset: -7px -4px;
+}
+
+.pb-back + .bcount {
+  margin-left: 16px;
+}
+
+.pb-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 32%);
+  gap: 26px;
+  padding-top: 14px;
+  align-items: start;
+}
+
+.pb-solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.pb-side {
+  position: sticky;
+  top: 20px;
+}
+
+/* --------------------------------------------------------------- rows -- */
+
+.rows-group + .rows-group {
+  margin-top: 26px;
+}
+
+.rows-h {
+  margin: 0 0 8px 2px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.rows {
+  display: grid;
+  gap: 6px;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 14px 10px 8px;
+  border-radius: 10px;
+  color: #fff;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.07) 49%,
+    rgba(0, 0, 0, 0.06) 51%,
+    rgba(255, 255, 255, 0.06)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.22);
+}
+
+.row .ico {
+  margin-top: 1px;
+}
+
+.row-x {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row-t {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.row-d {
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #f1f4f6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.row-m {
+  flex: none;
+  padding-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #f1f4f6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.row-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.row-tag {
+  padding: 1px 8px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+/* Hover and focus light a row up the way the dashboard selects one. */
+.row:hover,
+.row:focus-visible {
+  color: var(--ink);
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f1f4f6 48%,
+    #dde3e8 52%,
+    #eef1f4 100%
+  );
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.95),
+    0 0 16px 3px var(--glow),
+    0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.row:hover .row-t,
+.row:hover .row-d,
+.row:hover .row-m,
+.row:focus-visible .row-t,
+.row:focus-visible .row-d,
+.row:focus-visible .row-m {
+  color: var(--ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.row:hover .row-tag,
+.row:focus-visible .row-tag {
+  color: #fff;
+  background: color-mix(in srgb, var(--c2) 80%, #000);
+}
+
+/* ---------------------------------------------------- side and prose -- */
+
+.pb-panel {
+  border-radius: 16px;
+  padding: 16px 18px 18px;
+  color: var(--ink);
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f0f3f5 44%,
+    #e2e7eb 45%,
+    #eef1f3 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 14px 34px rgba(0, 0, 0, 0.42),
+    inset 0 2px 0 #fff;
+}
+
+.pb-panel-t {
+  margin: 12px 0 6px;
+  font-size: 21px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #15191c;
+}
+
+.pb-panel-x {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #3b4349;
+}
+
+.pb-panel-x a {
+  color: var(--rl-l);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.pb-prose {
+  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.65;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+.pb-prose section + section {
+  margin-top: 26px;
+}
+
+.pb-prose h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pb-prose p {
+  margin: 0;
+}
+
+.pb-prose a:not(.btn) {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.pb-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pb-links .btn {
+  padding: 0 18px;
+}
+
+/* ----------------------------------------------------------- phones -- */
+
+@media (max-width: 760px) {
+  .bl-page {
+    --E: 11px;
+  }
+
+  .pb-frame {
+    flex-direction: column;
+    padding: 0 0 0 8px;
+  }
+
+  .edges,
+  .edge-l,
+  .edge-r {
+    position: static;
+    display: contents;
+  }
+
+  .edges {
+    display: flex;
+    gap: 5px;
+    padding: 0 10px 10px 2px;
+    pointer-events: auto;
+  }
+
+  .edge,
+  .edge.is-cur {
+    position: static;
+    display: grid;
+    place-items: center;
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    width: auto;
+    padding: 0;
+    border-radius: 10px;
+    filter: none;
+    background:
+      linear-gradient(
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(0, 0, 0, 0.12) 51%,
+        rgba(255, 255, 255, 0.06)
+      ),
+      linear-gradient(var(--c2), color-mix(in srgb, var(--c2) 70%, var(--c3)));
+  }
+
+  .edge span {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 13px;
+    align-self: center;
+  }
+
+  .edge.is-cur {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      0 0 0 2px rgba(255, 255, 255, 0.9),
+      0 0 14px var(--glow);
+  }
+
+  .page-blade {
+    border-radius: 18px 0 0 18px;
+  }
+
+  .pb-tab {
+    display: none;
+  }
+
+  .pb-body {
+    padding: 10px 14px 24px calc(var(--E) + 14px);
+  }
+
+  .pb-back {
+    margin-bottom: 8px;
+  }
+
+  .pb-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pb-side {
+    position: static;
+  }
+
+  .row-m {
+    display: none;
+  }
+}

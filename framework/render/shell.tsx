@@ -37,9 +37,16 @@ export const THEME_SCRIPT =
   `if(m)m.setAttribute('content',e=='light'?'#fff':'#000000')}catch(_){}`
 
 /**
- * Same-document view transitions: the router's page swap and the desktop's
- * window open/close. Reduced motion is honoured by the router, which skips
- * `startViewTransition` entirely rather than animating at zero duration.
+ * Marks the document as scripted before first paint, for the controls only
+ * JavaScript can drive (`.js-only` in app/styles/blades.css). Its own tag, not
+ * a line in THEME_SCRIPT, whose bytes the gate pins.
+ */
+export const JS_SCRIPT = `document.documentElement.classList.add('js')`
+
+/**
+ * Same-document view transitions: the router's page swap. Reduced motion is
+ * honoured by the router, which skips `startViewTransition` entirely rather
+ * than animating at zero duration.
  */
 export const VIEW_TRANSITION_CSS = `
 ::view-transition-old(root),::view-transition-new(root){animation-duration:180ms}
@@ -101,9 +108,9 @@ export interface ShellOptions {
    */
   runtimePreload?: string[]
   /**
-   * The document is the `/embed` variant, loaded in a desktop window's iframe.
+   * The document is the `/embed` variant, made to be loaded in an iframe.
    * Every link in it must navigate the top page, not the frame: a post that
-   * links another post would otherwise open it nested inside the window.
+   * links another post would otherwise open it nested inside the frame.
    */
   embed?: boolean
   /**
@@ -292,6 +299,7 @@ export function renderShell(options: ShellOptions): string {
     `<style id="css-base">${fonts.css}\n${css.base}\n${VIEW_TRANSITION_CSS}</style>`,
     `<style id="css-page">${css.page}</style>`,
     `<script>${THEME_SCRIPT}</script>`,
+    `<script>${JS_SCRIPT}</script>`,
   ].join('')
 
   const scripts: string[] = [islandsScript(islands)]

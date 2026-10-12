@@ -1,0 +1,424 @@
+/*
+ * The blade primitives the dashboard and the section pages share: the glass
+ * surface, the big lowercase title and its count chip, the row icons, the
+ * glossy buttons and chips, and the profile card.
+ *
+ * A fragment rather than part of the base sheet so the article reader, which
+ * uses none of it, does not carry it. Gated on the surface every blade
+ * renders; the homepage's own rules (app/styles/blades.css, subtracted into
+ * the `blades` fragment) sort after this one and refine it.
+ */
+
+.ico {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      120% 90% at 50% 0%,
+      rgba(255, 255, 255, 0.6),
+      transparent 55%
+    ),
+    linear-gradient(var(--c1), var(--c2));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.ico svg {
+  width: 16px;
+  height: 16px;
+  fill: #fff;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  background:
+    linear-gradient(
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.04) 50%,
+      rgba(0, 0, 0, 0.14) 51%,
+      rgba(255, 255, 255, 0.06)
+    ),
+    color-mix(in srgb, var(--c2) 85%, var(--c3));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 42px;
+  padding: 0 18px 0 8px;
+  border-radius: 21px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.42),
+      rgba(255, 255, 255, 0.06) 50%,
+      rgba(0, 0, 0, 0.1) 51%,
+      rgba(255, 255, 255, 0.1)
+    ),
+    linear-gradient(var(--c2), color-mix(in srgb, var(--c2) 70%, var(--c3)));
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.btn:hover {
+  filter: brightness(1.08);
+}
+
+.btn.ghost {
+  color: var(--ink);
+  text-shadow: 0 1px 0 #fff;
+  background: linear-gradient(#fff, #e9edf0 50%, #dce2e7 51%, #f3f5f7);
+  padding: 0 16px;
+}
+
+.btn .g {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(
+    circle at 40% 30%,
+    #fff,
+    #d5dbe0 50%,
+    #8c96a0
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.25),
+    0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.btn .g svg {
+  width: 12px;
+  height: 12px;
+  fill: #3a4249;
+}
+
+/* ------------------------------------------------- blade surface ------ */
+
+/* The glass of a blade: a rim of gloss, the tab's bevel, a key light top
+   right, and a body gradient from --c2 to --c3. Used by the homepage blades,
+   the section pages' blade and their edge tabs. */
+.blade-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.5) 0,
+      rgba(255, 255, 255, 0.14) 1.1%,
+      rgba(255, 255, 255, 0.035) 4%,
+      rgba(255, 255, 255, 0) 22%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.55) 0,
+      rgba(255, 255, 255, 0.18) 2px,
+      rgba(255, 255, 255, 0.04) 8px,
+      rgba(0, 0, 0, 0.22) calc(var(--E, 40px) - 1px),
+      rgba(255, 255, 255, 0.35) var(--E, 40px),
+      rgba(255, 255, 255, 0.08) calc(var(--E, 40px) + 2px),
+      transparent calc(var(--E, 40px) + 40px),
+      rgba(255, 255, 255, 0.04) 42%,
+      rgba(255, 255, 255, 0) 64%,
+      rgba(0, 0, 0, 0.28) 100%
+    ),
+    radial-gradient(
+      48% 34% at 86% -4%,
+      color-mix(in srgb, var(--c1) 80%, transparent),
+      transparent 100%
+    ),
+    radial-gradient(
+      140% 110% at 40% 0%,
+      var(--c2) 0,
+      color-mix(in srgb, var(--c2) 72%, var(--c3)) 62%,
+      var(--c3) 100%
+    );
+  box-shadow:
+    -14px 0 34px rgba(0, 0, 0, 0.5),
+    inset 1px 0 0 rgba(255, 255, 255, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* A curved specular band. */
+.blade-surface::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 48%;
+  background: radial-gradient(
+    70% 60% at 82% -38%,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.05) 55%,
+    transparent 70%
+  );
+}
+
+/* Faint concentric rings in the corner, the era's watermark, over a brushed
+   noise the homepage island paints at boot (`--noise`). */
+.blade-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-size:
+    auto,
+    256px 256px;
+  background-image: radial-gradient(
+    circle at 96% 104%,
+    transparent 0 17%,
+    rgba(255, 255, 255, 0.07) 17.2% 17.8%,
+    transparent 18% 27%,
+    rgba(255, 255, 255, 0.05) 27.2% 30%,
+    transparent 30.2% 41%,
+    rgba(255, 255, 255, 0.045) 41.2% 41.6%,
+    transparent 41.8%
+  ),
+  var(--noise, none);
+}
+
+/* The big lowercase title and its strapline. */
+.bh {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  min-height: 66px;
+  flex: none;
+}
+
+.bt {
+  margin: 0;
+  font-size: 50px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  text-transform: lowercase;
+  text-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.3),
+    0 0 22px rgba(255, 255, 255, 0.45);
+  padding-bottom: 6px;
+}
+
+.bs {
+  margin: 0 0 13px;
+  font-size: 14px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.bcount {
+  position: relative;
+  margin-left: auto;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+  background: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.32));
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+a.bcount::after {
+  content: '';
+  position: absolute;
+  inset: -8px -4px;
+}
+
+a.bcount:hover {
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.45));
+}
+
+/* ----------------------------------------------------- profile card -- */
+
+.gcard {
+  flex: none;
+  position: relative;
+  display: flex;
+  color: #fff;
+  gap: 13px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    #5b636b 0%,
+    #31363c 46%,
+    #1b1e22 50%,
+    #24282d 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.gcard::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 48%;
+  border-radius: 12px 12px 40% 40% / 12px 12px 14px 14px;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0.04)
+  );
+  pointer-events: none;
+}
+
+.avatar {
+  flex: none;
+  width: 68px;
+  height: 68px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px #e9eef2,
+    0 0 0 3px rgba(0, 0, 0, 0.6),
+    0 3px 8px rgba(0, 0, 0, 0.6);
+}
+
+.avatar svg {
+  width: 100%;
+  height: 100%;
+}
+
+.gmeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  position: relative;
+  z-index: 1;
+}
+
+.gtag {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 12px rgba(255, 255, 255, 0.25);
+}
+
+.grow {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e3e8ec;
+  text-shadow: 0 1px 1px #000;
+}
+
+.grow .k {
+  color: #bcc6ce;
+  min-width: 34px;
+}
+
+.stars svg {
+  width: 64px;
+  height: 12px;
+}
+
+.score {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.score::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 40% 35%,
+    #fff,
+    #c9d0d6 45%,
+    #6f7a84
+  );
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 1060px) {
+  .bt {
+    font-size: 42px;
+  }
+}
+
+@media (max-width: 760px) {
+  .bs {
+    display: none;
+  }
+
+  .bh {
+    min-height: 54px;
+  }
+
+  .bt {
+    font-size: 38px;
+  }
+}
+
+@media (max-height: 540px) {
+  .bs {
+    display: none;
+  }
+
+  .bh {
+    min-height: 44px;
+  }
+
+  .bt {
+    font-size: 30px;
+    padding-bottom: 4px;
+  }
+
+  .bcount {
+    margin-bottom: 6px;
+  }
+}

@@ -59,6 +59,22 @@ export interface ClientResult {
  */
 const ISLAND_NAMESPACE = 'island-entry'
 
+/**
+ * `app/islands/<name>.ts`, with no `.tsx` beside it, is a plain island: its
+ * default export is already `mount(el, props) => teardown`, and no preact is
+ * bundled for it. That is for an island that renders nothing and only takes
+ * over server-rendered markup, like the homepage dashboard, where a component
+ * framework would be pure weight.
+ */
+async function isPlainIsland(dir: string, name: string): Promise<boolean> {
+  const exists = (file: string) =>
+    fs.access(path.join(dir, file)).then(
+      () => true,
+      () => false,
+    )
+  return !(await exists(`${name}.tsx`)) && (await exists(`${name}.ts`))
+}
+
 function islandEntryPlugin(islandsDir: string): esbuild.Plugin {
   return {
     name: ISLAND_NAMESPACE,
@@ -67,22 +83,28 @@ function islandEntryPlugin(islandsDir: string): esbuild.Plugin {
         path: args.path.slice('island:'.length),
         namespace: ISLAND_NAMESPACE,
       }))
-      build.onLoad({ filter: /.*/, namespace: ISLAND_NAMESPACE }, (args) => ({
-        contents: [
-          "import { hydrateRoot } from 'preact/compat/client'",
-          `import Component from './${args.path}'`,
-          '',
-          '// Returns its own teardown: the router unmounts every island',
-          '// before it replaces the body, so listeners an island registered',
-          '// on window or document do not accumulate one set per navigation.',
-          'export default function mount(el, props) {',
-          '  const root = hydrateRoot(el, <Component {...(props ?? {})} />)',
-          '  return () => root.unmount()',
-          '}',
-        ].join('\n'),
-        resolveDir: islandsDir,
-        loader: 'tsx',
-      }))
+      build.onLoad(
+        { filter: /.*/, namespace: ISLAND_NAMESPACE },
+        async (args) => ({
+          contents: (await isPlainIsland(islandsDir, args.path))
+            ? `export { default } from './${args.path}'`
+            : [
+                "import { hydrateRoot } from 'preact/compat/client'",
+                `import Component from './${args.path}'`,
+                '',
+                '// Returns its own teardown: the router unmounts every island',
+                '// before it replaces the body, so listeners an island',
+                '// registered on window or document do not accumulate one set',
+                '// per navigation.',
+                'export default function mount(el, props) {',
+                '  const root = hydrateRoot(el, <Component {...(props ?? {})} />)',
+                '  return () => root.unmount()',
+                '}',
+              ].join('\n'),
+          resolveDir: islandsDir,
+          loader: 'tsx',
+        }),
+      )
     },
   }
 }
@@ -143,7 +165,7 @@ export async function buildClient(options: {
     // `island.palette.3f9a.js` -> `island.palette`. Only the entries declared
     // above count: esbuild also marks every chunk a lazy import() targets as
     // an entry point, and treating those as roots makes a chunk only the
-    // desktop loads look loadable by anything.
+    // homepage dashboard loads look loadable by anything.
     const logical = base.replace(/\.[A-Z0-9]+\.js$/i, '')
     const entry = Object.hasOwn(entryPoints, logical) ? logical : undefined
     outputs.push({

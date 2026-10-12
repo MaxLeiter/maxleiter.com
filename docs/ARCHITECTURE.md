@@ -11,10 +11,17 @@ route is rendered to HTML at build time and served as a file. The output is a
 [Vercel Build Output API](https://vercel.com/docs/build-output-api/v3)
 directory: static files plus a routing table.
 
-78 routes, 4 islands, 12 platform routes, and it builds in about 350 ms. A
-content page ships roughly 1 KB of JavaScript. The homepage, which has a
-draggable window manager on it, ships about 17 KB brotli, and none of it before
-first paint.
+82 routes, 5 islands, 13 platform routes, and it builds in about 350 ms. A
+content page ships roughly 1 KB of JavaScript. The homepage, a 2005-style
+"blades" dashboard, loads an 11 KB brotli island after first paint and a
+1.7 KB background renderer after that; sound is another 1.3 KB, fetched only
+when the visitor turns it on.
+
+Every page wears the same theme. Each section is one of five glossy blades --
+projects, blog, notes, work and system -- and its colour carries through to its
+section page and its articles. The homepage is the dashboard itself, a section
+page is one blade open with the other four filed beside it, and an article is
+the dashboard's glass reader.
 
 `bun run build.ts` is the local path. `node scripts/build.mjs` is what Vercel
 runs, and the two produce byte-identical output. Nothing in the build uses a
@@ -64,11 +71,13 @@ framework/
     router.ts               the same-document router, lazily imported
 app/
   pages/                    page components, plain React
-  islands/                  the interactive ones
+  islands/                  the interactive ones; blades.ts is the dashboard
   components/               shared components, server-rendered
+    blades/                 the theme: chrome, dashboard, blade page, reader
   mdx/                      the MDX component maps: static and island halves
   lib/                      the client-safe app layer (see Types)
-  styles/                   global.css, markdown.css, the CSS fragments
+    blades/                 blade colours, item model, procedural art
+  styles/                   global.css, markdown.css, blades.css, fragments/
 posts/ notes/               MDX content
 public/                     copied verbatim
 tools/snapshot.ts           the regression gate
@@ -114,7 +123,7 @@ per-step times in the report do not sum to the total.
 
 6. **css fragments** — each conditional slice of the stylesheet is read and
    minified, every sheet is pruned against the classes the build emits, the
-   rules only the desktop can use are subtracted from the base sheet into a
+   rules only the homepage can use are subtracted from the base sheet into a
    fragment of their own, and each fragment is given the markup marker that
    proves a page needs it.
 
@@ -164,33 +173,40 @@ seventeen variables in `global.css` nothing reads. The build log lists what
 each sheet lost, minus Tailwind's own `--tw-*` variables.
 
 The sheets are pruned together, not one at a time, because a variable crosses
-sheets: the desktop fragment's utilities read `@property` rules that live in
-the base sheet, and dropping a registration changes the variable's initial
-value and whether it inherits. Classes inside `:not()`, `:is()` and `:where()`
-never count against a selector, which errs toward keeping.
+sheets: the homepage fragment's rules read `@property` registrations
+(`--bg-a`, `--orb-rot`) that live in the base sheet, and dropping a
+registration changes the variable's initial value and whether it inherits.
+Classes inside `:not()`, `:is()` and `:where()` never count against a
+selector, which errs toward keeping.
 
-The base sheet is the pruned Tailwind build minus what only the desktop can
+The base sheet is the pruned Tailwind build minus what only the homepage can
 use, and that difference is decided from the output too (`assembleSheets` in
 `build.ts`). The sheet is pruned a second time against everything but the
-desktop: the bodies without its `data-island="desktop"` marker, and only the
+homepage: the bodies without its `data-island="blades"` marker, and only the
 client files some other entry can load, following static and lazy imports.
 That second view is the base sheet. What it lost, subtracted from the first by
-atom (`subtractCss`), is the `desktop` fragment, so only the homepage pays for
-it. Two details carry the weight. Reachability, not the entry file: most of
-the window chrome lives in a chunk esbuild split out for the desktop's own
-lazy imports, and esbuild's metafile lists every lazily imported chunk as an
-entry point, so only the entries the build declared count as roots. And atoms,
-not blocks: a grouped selector can lose one member and a `:root` block one
-variable, so the subtraction compares one declaration plus the headers above
-it, which is why `.a,.b{d}` is split into `.a{d}.b{d}`. The desktop half keeps
-the full sheet's order within itself, but it lands after the whole base sheet,
-so a homepage element carrying a desktop-only utility and a shared responsive
-variant of the same property resolves in the fragment's favour; the visual
-comparison over the homepage is what catches that.
+atom (`subtractCss`), is the `blades` fragment, so only the homepage pays for
+the dashboard. `app/styles/blades.css` is imported by `global.css` for exactly
+this reason: the dashboard's rules need no gate of their own. Two details
+carry the weight. Reachability, not the entry file: esbuild's metafile lists
+every lazily imported chunk (the dashboard's ambient background and
+synthesizer) as an entry point, so only the entries the build declared count
+as roots. And atoms, not blocks: a grouped selector can lose one member and a
+`:root` block one variable, so the subtraction compares one declaration plus
+the headers above it, which is why `.a,.b{d}` is split into `.a{d}.b{d}`. The
+homepage half keeps the full sheet's order within itself, but it lands after
+the whole base sheet, so a homepage element carrying a homepage-only rule and
+a shared responsive variant of the same property resolves in the fragment's
+favour; the visual comparison over the homepage is what catches that.
 
 Every fragment is a plain stylesheet whose scoping is written into the class
-names — `.tree-`, `.shot-`, `.mc-`, `.mdx-note`, `.rt-` — and `PLAIN_SHEETS` in
-`build.ts` pairs each with the marker that gates it. The markers are
+names — `.tree-`, `.shot-`, `.mc-`, `.mdx-note`, `.rt-`, `.reader-`,
+`.page-blade`, `.blade-surface` — and `PLAIN_SHEETS` in `build.ts` pairs each
+with the marker that gates it. The theme is three of them plus the base sheet:
+`blades.css` (the chrome every page has, and the dashboard, subtracted as
+above), `fragments/blade-common.css` (the blade glass, titles, buttons and
+profile card the dashboard and the section pages share), `blade-page.css`
+(a section page) and `reader.css` (the article reader). The markers are
 attribute-shaped (`class="shiki`, not `shiki`) because a bare word matches
 prose, and because `.react-tweet-theme` appears in the base sheet as a
 first-party override.
@@ -222,31 +238,79 @@ and mounts it on Cmd/Ctrl+K or a `[data-open-palette]` click.
   must render markup identical to their fallback on first render.
 - The hydrate wrapper that owns the `hydrateRoot` call is a virtual esbuild
   entry (`island:<name>`), which is what keeps preact out of the runtime.
+- A *plain* island is `app/islands/<name>.ts` with no `.tsx` beside it: its
+  default export is already `mount(el, props) => teardown`, the virtual entry
+  re-exports it, and no preact is bundled. The homepage dashboard
+  (`blades.ts`) is the one, because it renders nothing: it takes over markup
+  the build already rendered, and a component framework would be pure weight.
 - A real fallback is preferred, because it is what makes the page work with
   JavaScript off. An empty fallback is correct only where the island adds a
   control surface rather than reproducing markup: the shot grid renders just a
   `<dialog>`, and it is a *sibling* of the server-rendered grid on purpose. An
   island wrapping that grid would have to reproduce the image optimizer's
-  `<img>` markup exactly or preact would destroy it on hydration.
+  `<img>` markup exactly or preact would destroy it on hydration. The
+  dashboard is the same shape at page scale: `Dashboard` renders the complete
+  at-rest page, every row a real link, and the empty `blades` island beside it
+  finds that markup by id, adds the listbox and tablist roles, and animates it.
 - Islands take class names as literals from their own pre-scoped stylesheet, not
   as props. They used to be passed through `data-props` because the client
   bundle had no CSS-module plugin and would have minted different hashes.
-- The runtime also owns, with no island: the theme toggle, Cmd/Ctrl+K, delegated
-  `[data-track]` analytics, and the lazy import of the router. For
+- The runtime also owns, with no island: the theme toggle, Cmd/Ctrl+K, Esc
+  following a page's `[data-esc]` link (the reader's Back, a section's way to
+  the dashboard), delegated `[data-track]` analytics, and the lazy import of
+  the router. For
   `[data-track]`, `data-track` is the event *name* and every other data
   attribute becomes a payload key, camelCased by the dataset API: write
   `data-section`, not `data-track-section`. `data-vt-name` is excluded from that
   payload because it is the transition opt-in.
-- The menubar clock is not the runtime's. `#menubar-clock` exists only on the
-  homepage, where the desktop island hydrates over it and owns it; a second
-  interval writing `textContent` behind preact's back is one owner too many.
+- The dashboard clock is not the runtime's. `#clock` exists only on the
+  homepage, where an inline script writes it before first paint and the
+  `blades` island owns it once mounted; a second interval is one owner too
+  many.
 - View-transition names have a single owner: the router's click handler.
   Elements opt in with `data-vt-name`, it names the one that was clicked, and
   it stands down when something already holds that name as a live inline
-  style, which is how an open post window wins over the card behind it. Two
-  elements holding one name cancels the transition outright. The name comes
-  from `transitionName(kind, slug)` in `framework/shared/transitions.ts`, never
-  from a string spelled out at a call site.
+  style. Two elements holding one name cancels the transition outright. The
+  dashboard's preview pane carries its selected article's name, and the
+  island opens an article through the pane's Read button rather than the row,
+  so the brushed glass is what morphs into the reader. The name comes from
+  `transitionName(kind, slug)` in `framework/shared/transitions.ts`, never from
+  a string spelled out at a call site.
+
+## The theme
+
+Three page shapes, all in `app/components/blades/`, all server-rendered from
+the real `BuildContext`.
+
+- **The dashboard** (`/`, `dashboard.tsx`). Five blades, filed like binder
+  pages, each a section: projects, blog (the open one), notes, work (posts on
+  the Vercel blog) and system (about, labs, talks, links, settings). Every
+  row is a real link, and CSS alone places the blades where the spring
+  settles (`.blade[data-pos]`), so the page is complete at rest and with
+  JavaScript off: the blade edges and the phone tabs link to the section
+  pages, and only the open blade's body is visible or tabbable. The `blades`
+  island then adds the swing (one spring position mapped onto every blade's
+  translate, hinge and shade), hover selection, touch drag with momentum, the
+  wheel, the keyboard, a gamepad, the guide (a modal `<dialog>`), the toasts,
+  the live-region announcements and the in-page settings. It keeps the open
+  blade in the address bar as `/?blade=notes`; `?item=<slug>` selects a row,
+  which is where an article's Back returns to. The ambient background runs in
+  a worker on an OffscreenCanvas, built from the module's own function
+  source; WebAudio is synthesized, muted until asked for, and loaded then.
+- **A section page** (`blade-page.tsx`). One blade open in its colour, the
+  other four filed beside it as sticky edges that link to their sections.
+  No JavaScript of its own.
+- **An article** (`reader.tsx`). The dashboard's glass reader: a header in the
+  section's colour over the item's ribbons, then the post on brushed glass,
+  rendered through the normal MDX pipeline. The glass follows the reading
+  theme (white in light, graphite in dark) because every MDX component sheet
+  is themed against `data-theme`; inside it the site's colour variables are
+  set again, so those sheets read the glass they are on.
+
+A blade's colours come from one table, `app/lib/blades/theme.ts`, and reach a
+page as inline custom properties on its `.bl-root`, so no per-blade class
+exists in any sheet. Controls only script can drive carry `js-only`, hidden
+until a one-line head script marks `<html class="js">` before first paint.
 
 ## Navigation
 
@@ -298,6 +362,10 @@ re-running either would double every listener. `<script type="application/json">
 and `application/ld+json` survive, because `#__islands` and `#jsonld` are data.
 `<html data-theme>` and `<meta name="theme-color">` are never touched by a
 swap, because they are viewer state rather than page content.
+
+Reduced motion skips `startViewTransition` entirely rather than animating
+at zero duration: the system setting, or the dashboard's own Motion setting,
+which marks `<html class="rm">` for the rest of the visit.
 
 The router owns scroll and focus. `history.scrollRestoration` is `manual`:
 left on `auto`, the browser restores on popstate immediately, against the old
@@ -362,7 +430,10 @@ a fast first click has to ride the `hold` fallback.
   `[data-theme='light']` is the light selector everywhere. The script also
   corrects `<meta name="theme-color">` (shipped dark, like the document), and
   the runtime's toggle keeps it in step; the pair of values must match `--bg`
-  in `global.css`.
+  in `global.css`. The theme decides only the reading glass: the blades chrome
+  is dark in both, and `html, body` are a fixed near-black so an overscroll
+  never flashes white. The dashboard borrows `theme-color` for the open
+  blade's shadow tone while it is up and hands it back in its teardown.
 
 ## Types
 
@@ -373,9 +444,12 @@ Two files, one source of truth each.
   describe records loaded with `node:fs` and gray-matter, but the file itself
   imports nothing, which is the `shared/` rule.
 - `app/lib/types.ts` owns the client-safe view types plus `entryHref` and
-  `POPULAR_SLUGS`. It lives under `app/lib/` because the desktop island imports
-  it, and nothing the client bundle reaches may pull in `node:fs` or
-  gray-matter. `window-styles.ts` is there for the same reason.
+  `POPULAR_SLUGS`. It lives under `app/lib/` because nothing the client bundle
+  reaches may pull in `node:fs` or gray-matter. `app/lib/blades/` is there for
+  the same reason: the blade colours, the dashboard's item model and its
+  procedural art are rendered by the build and again by the homepage island,
+  so they are string functions in leaf modules. Only `excerpt.ts` is
+  build-side in practice, and it is a leaf too.
 
 Anything shared between the build and an island has to be a leaf module. That is
 what both `app/lib/` and `framework/shared/` are for; the difference is only
@@ -469,8 +543,23 @@ checked with real hashes instead of stated in prose.
 Still-true decisions, newest first. A decision that stops being true should be
 deleted from this list rather than annotated.
 
-**The desktop fragment is derived from the output, not from its sources.** A
-hand-kept list of the desktop's source files, fed to a second Tailwind run,
+**The site wears the 2005 "blades" theme, and the window manager is gone.**
+October 2026, ported from a standalone prototype. The homepage became the
+dashboard, the section pages its open blades, and every article its glass
+reader; the routes, titles, descriptions, canonicals, OG images and the feed
+are unchanged. Three things were decided on the way. The dashboard is a plain
+island over complete server markup, not a preact tree, so the at-rest frame
+is the no-JavaScript page and the island ships no component framework. The
+heavy parts are separate chunks loaded after the dashboard is interactive (the
+background) or on request (sound), never in the inline runtime and never on a
+content page. And the reading glass follows `data-theme` rather than always
+being the prototype's white, because the MDX components inside it are themed
+against that attribute. Content pages cost about 1.7 KB brotli more than the
+window-manager site (the reader's chrome and its sheet); the homepage's HTML
+roughly doubled, since every blade's rows and their preview text are in it.
+
+**The homepage fragment is derived from the output, not from its sources.** A
+hand-kept list of the homepage's source files, fed to a second Tailwind run,
 once left out the module holding the shared toolbar's classes and shipped
 every content page a toolbar with no height or padding. Reading the split off
 the output cannot misfile a file, and it took 3.4 KB raw off every document,
@@ -531,9 +620,9 @@ island — the command palette — which renders `hidden`, where a `pointerdown`
 
 **`load` islands mount after first paint,** through
 `requestAnimationFrame` then `setTimeout(0)`. The runtime is an inline module,
-so it runs before the browser has painted; starting the desktop's 48 KB import
-there put all of it on the homepage's critical path, for an island whose markup
-is already server-rendered and already reads as links.
+so it runs before the browser has painted; starting the homepage island's
+import there put all of it on the critical path, for an island whose markup is
+already server-rendered and already reads as links.
 
 **Fonts are subset to what the site renders and instanced to 400-700.** The
 subset used to name eight whole Unicode blocks, 1,208 codepoints, of which Geist
@@ -568,11 +657,11 @@ date/time input pseudo-element, `optgroup`, `progress`, `textarea`, the Firefox
 `:invalid` fixes — is gone, for about 500 B brotli off every page. That block is
 the one file that has to be rechecked on a Tailwind major upgrade.
 
-**The image ladder is `[640, 828, 1536, 1920]` and `sizes` is
-`(max-width: 816px) calc(100vw - 48px), 768px`.** The article column is
-`max-w-3xl` = 768px inside `p-6`, so the old `700px` understated desktop by 68px
-and a DPR-2 desktop screen — the modal visitor — was served the 1920 candidate
-for a 1536-pixel need.
+**The image ladder is `[640, 828, 1536, 1920]` and `sizes` follows the glass
+reader's text column:** the viewport less 40px on a phone, less 132px up to
+900px, and 768px flat above that. An earlier `700px` understated the desktop
+column by 68px, and a DPR-2 desktop screen — the modal visitor — was served the
+1920 candidate for a 1536-pixel need.
 
 **Canonical URLs are derived, not declared.** See Types.
 
@@ -605,8 +694,6 @@ targets.
 quality 5. It used to run after `total` was computed, so a quarter of the
 build's cost appeared in no table at all.
 
-**`--breakpoint-3xl: 120rem` is defined in an `@theme` block** in `global.css`.
-The ~21 surviving `3xl:` classes in the desktop chrome were no-ops without it.
 
 ### Open
 

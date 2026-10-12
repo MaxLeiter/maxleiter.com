@@ -8,9 +8,9 @@
  * Islands are mounted through a generated wrapper that owns the `hydrate` call,
  * so preact lives in the island's shared chunk and never in this file.
  *
- * The menubar clock is NOT here. `#menubar-clock` only exists on the homepage,
- * where the desktop island hydrates over it and owns it; a second interval
- * writing `textContent` behind preact's back is one owner too many.
+ * The homepage clock is NOT here. `#clock` only exists on the dashboard, whose
+ * island owns it; a second interval writing the same `textContent` is one
+ * owner too many.
  */
 
 /** The generated island entry returns its own teardown. */
@@ -103,10 +103,10 @@ function schedule(el: HTMLElement): void {
   const on = el.dataset.on
   if (on === 'load') {
     // After first paint, not during it. This runtime is an inline module, so
-    // it runs before the browser has painted anything; starting the desktop's
-    // 48 KB import here put all of it on the homepage's critical path, for an
-    // island whose markup is already server-rendered and already reads as
-    // links. rAF fires before the paint, the `setTimeout` after it.
+    // it runs before the browser has painted anything; starting the
+    // homepage island's import here would put all of it on the critical path,
+    // for an island whose markup is already server-rendered and already reads
+    // as links. rAF fires before the paint, the `setTimeout` after it.
     requestAnimationFrame(() => setTimeout(() => void mount(el), 0))
   } else if (on === 'visible') {
     observeForVisibility(el)
@@ -128,9 +128,10 @@ function scheduleIslands(): void {
 /**
  * Unmounts every island before the router replaces the body.
  *
- * Islands register listeners on `window` and `document` -- the desktop's Ctrl+W
- * handler, its breakpoint and clock subscriptions -- which outlive their own
- * DOM. Without this they would accumulate one set per navigation.
+ * Islands register listeners on `window` and `document` -- the dashboard's
+ * keyboard and gamepad handlers, its clock and its resize subscription --
+ * which outlive their own DOM. Without this they would accumulate one set per
+ * navigation.
  */
 function unmountIslands(): void {
   generation++
@@ -175,6 +176,21 @@ addEventListener('keydown', (event) => {
     event.preventDefault()
     openPalette()
   }
+})
+
+/**
+ * Esc follows a page's `[data-esc]` link: the reader's Back, a section's way
+ * to the dashboard. Not while anything else claims the key -- the palette, a
+ * dialog, a field being typed in -- which is what `defaultPrevented` and the
+ * `closest` check rule out. The homepage has no such link; its island owns Esc.
+ */
+addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || event.defaultPrevented) return
+  const target = event.target as Element | null
+  if (target?.closest?.('input, textarea, dialog, [data-island="palette"]')) {
+    return
+  }
+  document.querySelector<HTMLElement>('[data-esc]')?.click()
 })
 
 /* ---------------------------------------------------- theme, analytics -- */
@@ -253,7 +269,7 @@ document.addEventListener('click', (event) => {
  * Keep the import lazy: a static one would put the router in this inline
  * runtime on every page.
  */
-// A framed document is an `/embed` inside a desktop window. Its links carry
+// A framed document is an `/embed` inside an iframe. Its links carry
 // `<base target="_top">` and must reach the browser untouched; the router
 // reads the anchor's own `target`, which `<base>` does not set, and would
 // swap the new page into the frame.

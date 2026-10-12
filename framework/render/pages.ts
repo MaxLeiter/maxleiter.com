@@ -8,6 +8,7 @@ import { collectLanguages, getHighlighter } from './highlight'
 import { createMdxCompiler } from './mdx'
 import { createMdxComponents } from '../../app/mdx/static-components'
 import { HomePage } from '../../app/pages/home'
+import { profileCard } from '../../app/components/blades/home-model'
 import {
   AboutPage,
   BlogIndexPage,
@@ -87,6 +88,12 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
 
   const entries = buildEntries(ctx)
   const projectCards = ctx.projects.map(toProjectCard)
+  const home = {
+    posts: ctx.posts,
+    notes: ctx.notes,
+    externalPosts: ctx.externalPosts,
+    projects: ctx.projects,
+  }
 
   const pages: PageDef[] = [
     {
@@ -94,8 +101,7 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
       head: {
         description: 'A website by Max Leiter.',
       },
-      render: () =>
-        createElement(HomePage, { posts: entries, projects: projectCards }),
+      render: () => createElement(HomePage, home),
     },
     {
       path: '/about',
@@ -104,7 +110,8 @@ export async function getPages(ctx: BuildContext): Promise<PageDef[]> {
         description: 'About this website.',
       },
       variants: { embed: true },
-      render: ({ toolbar }) => createElement(AboutPage, { toolbar }),
+      render: ({ toolbar }) =>
+        createElement(AboutPage, { toolbar, card: profileCard(home) }),
     },
     {
       path: '/blog',

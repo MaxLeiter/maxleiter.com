@@ -266,6 +266,29 @@ const PLAIN_SHEETS = [
     order: 1,
   },
   {
+    // The glass surface, titles, buttons and profile card the dashboard and
+    // the section pages share; the article reader has none of them.
+    name: 'blade-common',
+    file: 'app/styles/fragments/blade-common.css',
+    markers: ['class="blade-surface'],
+    order: 1,
+  },
+  {
+    // A section page's open blade, its edges and its rows.
+    name: 'blade-page',
+    file: 'app/styles/fragments/blade-page.css',
+    markers: ['class="page-blade'],
+    order: 1,
+  },
+  {
+    // The article reader's glass. `.reader-glass` re-themes the variables the
+    // MDX components read, so it sorts after every sheet those live in.
+    name: 'reader',
+    file: 'app/styles/fragments/reader.css',
+    markers: ['class="reader-'],
+    order: 2,
+  },
+  {
     // The fallback renders the root, input and empty cards, so the classes
     // the island only adds once results arrive (`.es-grid`, `.es-tile`) ride
     // on the same marker.
@@ -455,17 +478,21 @@ async function publish(buildOut: string, finalOut: string): Promise<void> {
   }
 }
 
-/** The island whose rules get a fragment of their own. */
-const DESKTOP = 'desktop'
-const DESKTOP_MARKER = `data-island="${DESKTOP}"`
+/**
+ * The island whose rules get a fragment of their own: the homepage dashboard.
+ * Its sources (app/styles/blades.css) sit in the base sheet and everything
+ * only that page uses is subtracted out below.
+ */
+const HOME = 'blades'
+const HOME_MARKER = `data-island="${HOME}"`
 
 /**
  * Every stylesheet a page can carry, pruned against what the build emits.
  *
  * Two views of the output. Everything decides which rules exist at all.
- * Everything but the desktop -- the pages without its marker, and the scripts
- * some other entry can load -- decides what the base sheet needs, and the
- * difference is the desktop's fragment. Both views are pruned against the
+ * Everything but the homepage -- the pages without its island's marker, and
+ * the scripts some other entry can load -- decides what the base sheet needs,
+ * and the difference is the homepage's fragment. Both views are pruned against the
  * whole build, never one page: the base sheet has to be byte-identical on
  * every page. Minified on both sides of the prune: the pruner reads minified
  * CSS, and the second pass is the syntax check.
@@ -481,7 +508,7 @@ async function assembleSheets(input: {
   fragments: Fragment[]
   pruned: Record<string, string[]>
 }> {
-  const shared = loadedWithout(input.client, `island.${DESKTOP}`)
+  const shared = loadedWithout(input.client, `island.${HOME}`)
   const scripts = await Promise.all(
     input.client
       .filter((output) => output.file.endsWith('.js'))
@@ -490,18 +517,18 @@ async function assembleSheets(input: {
         shared: shared.has(output.file),
       })),
   )
-  // Each source is tokenized once, into the desktop's view or the rest.
-  const desktop = usedNames({
-    bodies: input.bodies.filter((body) => body.includes(DESKTOP_MARKER)),
+  // Each source is tokenized once, into the homepage's view or the rest.
+  const home = usedNames({
+    bodies: input.bodies.filter((body) => body.includes(HOME_MARKER)),
     scripts: scripts.filter((s) => !s.shared).map((s) => s.text),
   })
   const elsewhere = usedNames({
-    bodies: input.bodies.filter((body) => !body.includes(DESKTOP_MARKER)),
+    bodies: input.bodies.filter((body) => !body.includes(HOME_MARKER)),
     scripts: scripts.filter((s) => s.shared).map((s) => s.text),
   })
   const everywhere = {
-    classes: new Set([...elsewhere.classes, ...desktop.classes]),
-    variables: new Set([...elsewhere.variables, ...desktop.variables]),
+    classes: new Set([...elsewhere.classes, ...home.classes]),
+    variables: new Set([...elsewhere.variables, ...home.variables]),
   }
 
   const gated = [
@@ -527,13 +554,10 @@ async function assembleSheets(input: {
   const output = await minifyAll({
     ...all.sheets,
     base,
-    [DESKTOP]: subtractCss(all.sheets.base, base),
+    [HOME]: subtractCss(all.sheets.base, base),
   })
 
-  const fragments = [
-    ...gated,
-    { name: DESKTOP, markers: [DESKTOP_MARKER], order: 1 },
-  ]
+  const fragments = [...gated, { name: HOME, markers: [HOME_MARKER], order: 1 }]
     // An empty sheet is one the prune emptied: no page needs a tag for it.
     .filter((sheet) => output[sheet.name])
     .map((sheet) =>
@@ -546,8 +570,8 @@ async function assembleSheets(input: {
 /**
  * The client files some entry other than `entry` can load, following static
  * and lazy imports. What is left only `entry` ever loads: its own file, and
- * the chunks esbuild split out of it for its own lazy imports, which is where
- * most of the desktop's window chrome lives.
+ * the chunks esbuild split out of it for its own lazy imports -- the
+ * dashboard's ambient background and synthesizer.
  */
 function loadedWithout(
   outputs: ClientResult['outputs'],
@@ -711,7 +735,7 @@ async function main(): Promise<void> {
         runtime: client.runtime,
         runtimePreload: client.preloads,
         // Only this page's islands, so a content page does not carry a map
-        // entry for the desktop it will never mount.
+        // entry for the dashboard it will never mount.
         islands: Object.fromEntries(
           page.islands
             .filter((name) => client.islands[name])

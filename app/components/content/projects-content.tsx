@@ -1,33 +1,31 @@
-import { ListCard } from '@components/desktop/list-card'
+import { Row, Rows } from '@components/blades/blade-page'
 import type { ProjectCard } from '@lib/types'
 
 interface ProjectsContentProps {
   projects: ProjectCard[]
 }
 
+/** `blog/MSHW0184` is relative in the project list; a row's href is rooted. */
+const rooted = (href: string) =>
+  /^https?:/.test(href) || href.startsWith('/') ? href : `/${href}`
+
 export function ProjectsContent({ projects }: ProjectsContentProps) {
   return (
-    <div className="max-w-3xl">
-      <h1
-        className="text-3xl font-mono font-bold mb-8"
-        style={{ color: 'var(--fg)' }}
-      >
-        projects/
-      </h1>
-
-      <ul className="space-y-2">
-        {projects.map((project) => (
-          <ListCard
+    <Rows>
+      {projects.map((project) => {
+        const href = rooted(project.link)
+        return (
+          <Row
             key={project.id}
-            href={project.link}
+            href={href}
             title={project.name}
-            description={project.description}
+            desc={project.description}
             tags={project.tech}
-            external
-            icon={false}
+            icon="project"
+            external={/^https?:/.test(href)}
           />
-        ))}
-      </ul>
-    </div>
+        )
+      })}
+    </Rows>
   )
 }

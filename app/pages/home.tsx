@@ -1,77 +1,37 @@
-import type { ListEntry, ProjectCard } from '@lib/types'
 import { Island } from '@framework/render/islands'
-import { DesktopChrome } from '../islands/desktop/chrome'
-import type { DesktopPost, DesktopProject } from '../islands/desktop/data'
-import { CommandPalette } from './shell'
+import { CommandPalette } from '@components/blades/chrome'
+import { Dashboard } from '@components/blades/dashboard'
+import { buildHome, type HomeContent } from '@components/blades/home-model'
+import type { BladesProps } from '@islands/blades'
 
 /**
- * The desktop homepage, server-rendered.
+ * The blades dashboard, server-rendered from the real content.
  *
- * The markup is `DesktopChrome`, which the `desktop` island renders again as
- * its first hydration pass; sharing the component is what keeps the two trees
- * identical. Every folder is a real anchor to its page, so the homepage works
- * with JavaScript disabled -- today those are dead `onClick` handlers.
+ * The dashboard is complete markup on its own (see `Dashboard`). The `blades`
+ * island is its sibling with an empty fallback: it adds behaviour to markup it
+ * finds by id and renders none of its own, which is the shot grid's pattern
+ * and why nothing here has to be reproduced exactly by a client render. Its
+ * props are what the previews need that the rows do not show.
  *
- * The clock script and the command palette sit outside the island wrapper.
- * Preact would otherwise own that DOM, and the palette is a separate island
- * that the runtime unhides and mounts on its own.
+ * The clock script and the command palette sit outside the island too. The
+ * script writes the clock before first paint, so the bar does not flash
+ * `--:--`; the island takes the clock over once it mounts.
  */
 
-/**
- * Writes the clock before first paint so the menubar does not flash empty.
- * Replaces the `window.__INITIAL_TIME__` handshake, which existed only to seed
- * a `useState` without a hydration mismatch; the island now seeds from the
- * element's own text instead.
- */
 const CLOCK_SCRIPT =
-  `var c=document.getElementById('menubar-clock');` +
-  `if(c)c.textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})`
+  `var c=document.getElementById('clock');` +
+  `if(c)c.textContent=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})`
 
-/**
- * Only the fields the homepage renders. `excerpt` and `content` are dead weight
- * here, and island props are serialized into the HTML alongside the markup that
- * already carries them.
- */
-function toDesktopPost(post: ListEntry): DesktopPost {
-  return {
-    slug: post.slug,
-    title: post.title,
-    date: post.date,
-    type: post.type,
-    ...(post.href ? { href: post.href } : null),
-    ...(post.isThirdParty ? { isThirdParty: true } : null),
-  }
-}
-
-function toDesktopProject(project: ProjectCard): DesktopProject {
-  return {
-    id: project.id,
-    name: project.name,
-    description: project.description,
-    link: project.link,
-    tech: project.tech,
-  }
-}
-
-export interface HomePageProps {
-  posts: ListEntry[]
-  projects: ProjectCard[]
-}
-
-export function HomePage({ posts, projects }: HomePageProps) {
-  const desktopPosts = posts.map(toDesktopPost)
-  const desktopProjects = projects.map(toDesktopProject)
-
+export function HomePage(content: HomeContent) {
+  const { blades, card } = buildHome(content)
+  const props: BladesProps = { blades: blades.map((b) => b.items), card }
   return (
     <>
-      <Island
-        name="desktop"
-        on="load"
-        props={{ posts: desktopPosts, projects: desktopProjects }}
-      >
-        <DesktopChrome posts={desktopPosts} projects={desktopProjects} />
-      </Island>
+      <Dashboard blades={blades} card={card} />
       <script dangerouslySetInnerHTML={{ __html: CLOCK_SCRIPT }} />
+      <Island name="blades" on="load" props={props}>
+        {null}
+      </Island>
       <CommandPalette />
     </>
   )

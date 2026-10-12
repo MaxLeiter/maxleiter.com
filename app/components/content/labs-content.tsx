@@ -1,4 +1,4 @@
-import { ListCard } from '@components/desktop/list-card'
+import { Row, Rows } from '@components/blades/blade-page'
 
 export interface Lab {
   id: string
@@ -62,23 +62,17 @@ const LABS: Lab[] = [
 
 export function LabsContent() {
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
-        labs/
-      </h1>
-
-      <ul className="space-y-2">
-        {LABS.map((lab) => (
-          <ListCard
-            key={lab.id}
-            href={lab.url}
-            title={lab.name}
-            description={lab.description}
-            external
-            icon={false}
-          />
-        ))}
-      </ul>
-    </div>
+    <Rows>
+      {LABS.map((lab) => (
+        <Row
+          key={lab.id}
+          href={lab.url}
+          title={lab.name}
+          desc={lab.description}
+          icon="project"
+          external={/^https?:/.test(lab.url)}
+        />
+      ))}
+    </Rows>
   )
 }

@@ -227,3 +227,24 @@
     transform: none;
   }
 }
+
+/* Inside the glass reader (fragments/reader.css), the article's glass widens
+   to hold the breakout, and the breakout is measured against that glass
+   rather than the viewport, so nothing is clipped at its edge. Here rather
+   than in the reader's sheet because only a page with this component pays
+   for it. Without :has, it stays in the text column. */
+.reader-glass:has(.shot-grid) {
+  width: min(1104px, 100%);
+}
+
+@media (min-width: 60rem) {
+  .reader-prose .shot-grid {
+    --breakout: calc((min(64rem, 100vw - 132px) - 100%) / 2);
+  }
+}
+
+@supports not selector(:has(*)) {
+  .reader-prose .shot-grid {
+    margin-inline: 0;
+  }
+}

@@ -218,10 +218,9 @@ function resetLinkObserver(): void {
  * Hands the outgoing name to the element the reader actually clicked, so a
  * card morphs into the article it opens.
  *
- * It stands down when something already holds that name, which is how the
- * desktop's open post window wins over the card behind it: the window frame
- * renders `view-transition-name` itself, and two elements holding one name
- * cancels the transition outright.
+ * It stands down when something already holds that name as a live inline
+ * style, because two elements holding one name cancels the transition
+ * outright.
  */
 function claimTransitionName(source: Element | null, url: string): () => void {
   const noop = () => undefined
@@ -239,7 +238,9 @@ function withTransition(update: () => void, enabled: boolean): Promise<void> {
   if (
     !enabled ||
     typeof document.startViewTransition !== 'function' ||
-    matchMedia('(prefers-reduced-motion: reduce)').matches
+    matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    // The dashboard's own motion setting, which outlives its page.
+    document.documentElement.classList.contains('rm')
   ) {
     update()
     return Promise.resolve()

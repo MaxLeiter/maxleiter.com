@@ -10,6 +10,7 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities) source(none);
 @import './markdown.css';
+@import './blades.css';
 
 /*
  * Tailwind's preflight, minus the two thirds of it this site has no elements
@@ -123,7 +124,7 @@
     height: auto;
   }
 
-  /* The command palette's input, and every button in the desktop chrome. */
+  /* The command palette's input, and every button in the blades chrome. */
   button,
   input {
     font: inherit;
@@ -149,15 +150,6 @@
   [hidden]:where(:not([hidden='until-found'])) {
     display: none !important;
   }
-}
-
-/*
- * `3xl:` is used throughout the desktop chrome to scale type and padding up on
- * very large displays. Tailwind 4 ships no 3xl breakpoint, so every one of
- * those classes was a no-op until this block existed.
- */
-@theme {
-  --breakpoint-3xl: 120rem;
 }
 
 :root {
@@ -220,11 +212,14 @@
   color: var(--bg);
 }
 
+/* Not `--bg`: every page is a blade on a dark backdrop in either theme, and
+   only the reading glass follows the theme. This is what an overscroll or a
+   slow first paint shows. */
 html,
 body {
   padding: 0;
   margin: 0;
-  background: var(--bg);
+  background: #050805;
   color: var(--fg);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

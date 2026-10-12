@@ -1,79 +1,48 @@
-'use client'
-
-import { ListCard } from '@components/desktop/list-card'
+import { Row, Rows } from '@components/blades/blade-page'
+import { transitionName } from '@framework/shared/transitions'
 import { entryHref, type ListEntry, POPULAR_SLUGS } from '@lib/types'
 
 interface BlogListContentProps {
   posts: ListEntry[]
-  onPostClick?: (slug: string) => void
-  onPostHover?: (slug: string) => void
-  onPostHoverEnd?: () => void
 }
 
-export function BlogListContent({
-  posts,
-  onPostClick,
-  onPostHover,
-  onPostHoverEnd,
-}: BlogListContentProps) {
+function EntryRow({ post }: { post: ListEntry }) {
+  const isNote = post.type === 'note'
+  const external = Boolean(post.isThirdParty)
+  return (
+    <Row
+      href={entryHref(post)}
+      title={post.title}
+      desc={post.excerpt}
+      meta={external ? `${post.date} · vercel.com` : post.date}
+      icon={external ? 'work' : isNote ? 'note' : 'post'}
+      external={external}
+      {...(external
+        ? {}
+        : { vt: transitionName(isNote ? 'note' : 'blog', post.slug) })}
+    />
+  )
+}
+
+export function BlogListContent({ posts }: BlogListContentProps) {
   const popularPosts = POPULAR_SLUGS.map((slug) =>
     posts.find((p) => p.slug === slug),
   ).filter((p): p is ListEntry => p !== undefined)
 
-  const renderPost = (post: ListEntry) => {
-    const isExternal = post.isThirdParty
-    const isNote = post.type === 'note'
-    const href = entryHref(post)
-
-    return (
-      <ListCard
-        key={post.slug}
-        href={href}
-        title={post.title}
-        description={post.excerpt}
-        meta={
-          isExternal
-            ? `${post.date} · external`
-            : isNote
-              ? `${post.date} · note`
-              : post.date
-        }
-        icon
-        external={isExternal}
-        onClick={
-          !isExternal && onPostClick
-            ? (e) => {
-                e.preventDefault()
-                onPostClick(post.slug)
-              }
-            : undefined
-        }
-        onMouseEnter={!isExternal ? () => onPostHover?.(post.slug) : undefined}
-        onMouseLeave={!isExternal ? onPostHoverEnd : undefined}
-      />
-    )
-  }
-
   return (
-    <div className="max-w-3xl">
-      <h1
-        className="text-3xl font-mono font-bold mb-8"
-        style={{ color: 'var(--article-color)' }}
-      >
-        writing/
-      </h1>
-
+    <>
       {popularPosts.length > 0 && (
-        <section className="mb-10">
-          <h2 className="text-sm font-mono text-(--gray) mb-3">popular</h2>
-          <ul className="space-y-2">{popularPosts.map(renderPost)}</ul>
-        </section>
+        <Rows heading="popular">
+          {popularPosts.map((post) => (
+            <EntryRow key={`popular-${post.slug}`} post={post} />
+          ))}
+        </Rows>
       )}
-
-      <section>
-        <h2 className="text-sm font-mono text-(--gray) mb-3">all posts</h2>
-        <ul className="space-y-2">{posts.map(renderPost)}</ul>
-      </section>
-    </div>
+      <Rows heading="all posts">
+        {posts.map((post) => (
+          <EntryRow key={post.slug} post={post} />
+        ))}
+      </Rows>
+    </>
   )
 }

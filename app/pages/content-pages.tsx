@@ -4,67 +4,101 @@ import { TalksContent } from '@components/content/talks-content'
 import { ProjectsContent } from '@components/content/projects-content'
 import { BlogListContent } from '@components/content/blog-list-content'
 import { NotesContent } from '@components/content/notes-content'
+import { BladePage, SidePanel } from '@components/blades/blade-page'
+import { profileCardHTML, type ProfileCard } from '@lib/blades/items'
+import { bladeById, type BladeId } from '@lib/blades/theme'
 import type { ListEntry, ProjectCard } from '@lib/types'
-import type { ComponentType } from 'react'
 import type { Note } from '@framework/shared/types'
-import { PageShell } from './shell'
 import { transitionName } from '@framework/shared/transitions'
 
 /**
- * The six list-and-prose routes.
- *
- * Each reuses the existing component under `app/components/content/`, so the
- * markup matches what the Next build produced. The one difference is where the
- * view-transition name lands: React's `<ViewTransition>` put it on the content
- * component's own root element, and these put it on `<main>`, because the
- * content components do not take a style prop.
+ * The six list-and-prose routes, each one blade open in its section's colour
+ * (see `BladePage`). About, labs and talks are the system blade's pages.
  *
  * All six take `toolbar` so the build can emit an `/embed` variant with no
- * chrome. The desktop's folder windows iframe those, which keeps the window
- * content byte-identical to the real page at zero client-JS cost.
+ * chrome; it maps onto the blade page's `chrome`.
  */
 
 export interface ContentPageProps {
   toolbar?: boolean
 }
 
-/**
- * `/about`, `/labs` and `/talks` are the same page three times: the section
- * name is the title, the only breadcrumb, the route and the transition name.
- * One function applied three times rather than three copies of eleven lines.
- */
-function sectionPage(name: string, Content: ComponentType) {
-  return function SectionPage({ toolbar }: ContentPageProps) {
-    return (
-      <PageShell
-        toolbar={toolbar}
-        title={name}
-        segments={[{ name, href: `/${name}` }]}
-        vtName={transitionName('page', name)}
-      >
-        <Content />
-      </PageShell>
-    )
+function page(blade: BladeId, name: string) {
+  return {
+    blade: bladeById(blade),
+    title: name,
+    vtName: transitionName('page', name),
   }
 }
 
-export const AboutPage = sectionPage('about', AboutContent)
-export const LabsPage = sectionPage('labs', LabsContent)
-export const TalksPage = sectionPage('talks', TalksContent)
+export function AboutPage({
+  toolbar,
+  card,
+}: ContentPageProps & { card: ProfileCard }) {
+  return (
+    <BladePage
+      {...page('system', 'about')}
+      chrome={toolbar}
+      side={
+        <div
+          dangerouslySetInnerHTML={{ __html: profileCardHTML(card, 'ab') }}
+        />
+      }
+    >
+      <AboutContent />
+    </BladePage>
+  )
+}
+
+export function LabsPage({ toolbar }: ContentPageProps) {
+  return (
+    <BladePage
+      {...page('system', 'labs')}
+      chrome={toolbar}
+      side={
+        <SidePanel kicker="Labs" title="Experiments and playthings">
+          <p>
+            Small tools and demos: some finished, some abandoned, all of them
+            fun to build. Most open somewhere else.
+          </p>
+        </SidePanel>
+      }
+    >
+      <LabsContent />
+    </BladePage>
+  )
+}
+
+export function TalksPage({ toolbar }: ContentPageProps) {
+  return (
+    <BladePage
+      {...page('system', 'talks')}
+      chrome={toolbar}
+      side={
+        <SidePanel kicker="Talks" title="Talks I like.">
+          <p>
+            Tech talks I enjoy from around the web. Every one opens on YouTube.
+          </p>
+        </SidePanel>
+      }
+    >
+      <TalksContent />
+    </BladePage>
+  )
+}
 
 export function ProjectsPage({
   projects,
   toolbar,
 }: ContentPageProps & { projects: ProjectCard[] }) {
   return (
-    <PageShell
-      toolbar={toolbar}
-      title="projects"
-      segments={[{ name: 'projects', href: '/projects' }]}
-      vtName={transitionName('page', 'projects')}
+    <BladePage
+      {...page('projects', 'projects')}
+      count={`${projects.length} projects`}
+      chrome={toolbar}
     >
       <ProjectsContent projects={projects} />
-    </PageShell>
+    </BladePage>
   )
 }
 
@@ -73,14 +107,21 @@ export function BlogIndexPage({
   toolbar,
 }: ContentPageProps & { posts: ListEntry[] }) {
   return (
-    <PageShell
-      toolbar={toolbar}
-      title="blog"
-      segments={[{ name: 'blog', href: '/blog' }]}
-      vtName={transitionName('page', 'blog')}
+    <BladePage
+      {...page('blog', 'blog')}
+      count={`${posts.length} entries`}
+      chrome={toolbar}
+      side={
+        <SidePanel kicker="Subscribe" title="Every post, in your reader">
+          <p>
+            Posts, notes and articles on the Vercel blog, newest first. The{' '}
+            <a href="/feed.xml">RSS feed</a> has all of them.
+          </p>
+        </SidePanel>
+      }
     >
       <BlogListContent posts={posts} />
-    </PageShell>
+    </BladePage>
   )
 }
 
@@ -89,35 +130,32 @@ export function NotesIndexPage({
   toolbar,
 }: ContentPageProps & { notes: Note[] }) {
   return (
-    <PageShell
-      toolbar={toolbar}
-      title="notes"
-      segments={[{ name: 'notes', href: '/notes' }]}
-      vtName={transitionName('page', 'notes')}
+    <BladePage
+      {...page('notes', 'notes')}
+      count={`${notes.length} notes`}
+      chrome={toolbar}
+      side={
+        <SidePanel kicker="Tip" title="The short, practical stuff">
+          <p>
+            Scripts and fixes worth finding again. Short-form thoughts, code
+            snippets, and tips.
+          </p>
+        </SidePanel>
+      }
     >
       <NotesContent notes={notes} />
-    </PageShell>
+    </BladePage>
   )
 }
 
 export function NotFoundPage() {
   return (
-    <PageShell title="404" vtName={transitionName('page', '404')}>
-      <div className="max-w-3xl">
-        <h1 className="text-3xl font-mono font-bold mb-8 text-[var(--fg)]">
-          404
-        </h1>
-        <p className="text-[var(--gray)]">
-          That page does not exist.{' '}
-          <a
-            href="/"
-            className="text-[var(--link)] hover:opacity-80 underline transition-opacity"
-          >
-            Go home
-          </a>
-          .
+    <BladePage {...page('system', '404')}>
+      <div className="pb-prose">
+        <p>
+          That page does not exist. <a href="/">Go home</a>.
         </p>
       </div>
-    </PageShell>
+    </BladePage>
   )
 }
